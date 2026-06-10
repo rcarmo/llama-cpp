@@ -1278,6 +1278,22 @@ static void ggml_compute_forward_mul_mat_one_chunk(
                 //    vec_dot(ne00, &dst_col[ir0], src0_row + ir0*nb01, src1_col);
                 //}
 
+#if defined(__riscv) || defined(__riscv__)
+                if (num_rows_per_vec_dot == 1 && type == GGML_TYPE_F16 && vec_dot_type == GGML_TYPE_F16 &&
+                    getenv("SPACEMIT_EXPERIMENTAL_F16_MATVEC4")) {
+                    int64_t ir0 = iir0;
+                    const int64_t ir0_block_end = MIN(iir0 + blck_0, ir0_end);
+                    for (; ir0 + 3 < ir0_block_end; ir0 += 4) {
+                        ggml_vec_dot_f16_4(ne00, &dst_col[ir0], (const ggml_fp16_t *) (src0_row + ir0 * nb01), nb01,
+                                           (const ggml_fp16_t *) src1_col);
+                    }
+                    for (; ir0 < ir0_block_end; ++ir0) {
+                        vec_dot(ne00, &dst_col[ir0], 0, src0_row + ir0 * nb01, 0, src1_col, 0, 1);
+                    }
+                    continue;
+                }
+#endif
+
                 for (int64_t ir0 = iir0; ir0 < iir0 + blck_0 && ir0 < ir0_end; ir0 += num_rows_per_vec_dot) {
                     vec_dot(ne00, &tmp[ir0 - iir0], (num_rows_per_vec_dot > 1 ? 16 : 0), src0_row + ir0 * nb01, (num_rows_per_vec_dot > 1 ? nb01 : 0), src1_col, (num_rows_per_vec_dot > 1 ? src1_col_stride : 0), num_rows_per_vec_dot);
                 }

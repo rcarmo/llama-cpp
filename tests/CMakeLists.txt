@@ -307,4 +307,6 @@ endif()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "riscv64")
     llama_build(test-spacemit-q4k-correctness.cpp)
+    llama_build(test-spacemit-f16-matvec4.cpp)
+    target_include_directories(test-spacemit-f16-matvec4 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../ggml/src ${CMAKE_CURRENT_SOURCE_DIR}/../ggml/src/ggml-cpu)
 endif()

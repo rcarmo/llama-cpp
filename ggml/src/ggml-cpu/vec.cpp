@@ -261,6 +261,54 @@ void ggml_vec_dot_bf16(int n, float * GGML_RESTRICT s, size_t bs, ggml_bf16_t * 
     *s = sumf;
 }
 
+void ggml_vec_dot_f16_4(int n, float * GGML_RESTRICT s, const ggml_fp16_t * GGML_RESTRICT x, size_t bx, const ggml_fp16_t * GGML_RESTRICT y) {
+#if defined(__riscv_v_intrinsic) && defined(__riscv_zvfh)
+    const char * x0p = (const char *) x;
+    const char * x1p = x0p + bx;
+    const char * x2p = x1p + bx;
+    const char * x3p = x2p + bx;
+
+    int vl = __riscv_vsetvlmax_e32m2();
+    vfloat32m2_t sum0 = __riscv_vreinterpret_v_u32m2_f32m2(__riscv_vmv_v_x_u32m2(0, vl));
+    vfloat32m2_t sum1 = __riscv_vreinterpret_v_u32m2_f32m2(__riscv_vmv_v_x_u32m2(0, vl));
+    vfloat32m2_t sum2 = __riscv_vreinterpret_v_u32m2_f32m2(__riscv_vmv_v_x_u32m2(0, vl));
+    vfloat32m2_t sum3 = __riscv_vreinterpret_v_u32m2_f32m2(__riscv_vmv_v_x_u32m2(0, vl));
+
+    for (int i = 0; i < n; i += vl) {
+        vl = __riscv_vsetvl_e16m1(n - i);
+        vfloat16m1_t vy = __riscv_vle16_v_f16m1((const _Float16 *) (y + i), vl);
+        vfloat16m1_t x0 = __riscv_vle16_v_f16m1((const _Float16 *) ((const ggml_fp16_t *) x0p + i), vl);
+        vfloat16m1_t x1 = __riscv_vle16_v_f16m1((const _Float16 *) ((const ggml_fp16_t *) x1p + i), vl);
+        vfloat16m1_t x2 = __riscv_vle16_v_f16m1((const _Float16 *) ((const ggml_fp16_t *) x2p + i), vl);
+        vfloat16m1_t x3 = __riscv_vle16_v_f16m1((const _Float16 *) ((const ggml_fp16_t *) x3p + i), vl);
+        sum0 = __riscv_vfwmacc_vv_f32m2(sum0, x0, vy, vl);
+        sum1 = __riscv_vfwmacc_vv_f32m2(sum1, x1, vy, vl);
+        sum2 = __riscv_vfwmacc_vv_f32m2(sum2, x2, vy, vl);
+        sum3 = __riscv_vfwmacc_vv_f32m2(sum3, x3, vy, vl);
+    }
+
+    vl = __riscv_vsetvlmax_e32m1();
+    vfloat32m1_t zero = __riscv_vfmv_v_f_f32m1(0.0f, 1);
+    vfloat32m1_t ac0 = __riscv_vfadd_vv_f32m1(__riscv_vget_v_f32m2_f32m1(sum0, 0), __riscv_vget_v_f32m2_f32m1(sum0, 1), vl);
+    vfloat32m1_t ac1 = __riscv_vfadd_vv_f32m1(__riscv_vget_v_f32m2_f32m1(sum1, 0), __riscv_vget_v_f32m2_f32m1(sum1, 1), vl);
+    vfloat32m1_t ac2 = __riscv_vfadd_vv_f32m1(__riscv_vget_v_f32m2_f32m1(sum2, 0), __riscv_vget_v_f32m2_f32m1(sum2, 1), vl);
+    vfloat32m1_t ac3 = __riscv_vfadd_vv_f32m1(__riscv_vget_v_f32m2_f32m1(sum3, 0), __riscv_vget_v_f32m2_f32m1(sum3, 1), vl);
+    ac0 = __riscv_vfredusum_vs_f32m1_f32m1(ac0, zero, vl);
+    ac1 = __riscv_vfredusum_vs_f32m1_f32m1(ac1, zero, vl);
+    ac2 = __riscv_vfredusum_vs_f32m1_f32m1(ac2, zero, vl);
+    ac3 = __riscv_vfredusum_vs_f32m1_f32m1(ac3, zero, vl);
+    s[0] = __riscv_vfmv_f_s_f32m1_f32(ac0);
+    s[1] = __riscv_vfmv_f_s_f32m1_f32(ac1);
+    s[2] = __riscv_vfmv_f_s_f32m1_f32(ac2);
+    s[3] = __riscv_vfmv_f_s_f32m1_f32(ac3);
+#else
+    ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+    ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+    ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+    ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+#endif
+}
+
 void ggml_vec_dot_f16(int n, float * GGML_RESTRICT s, size_t bs, ggml_fp16_t * GGML_RESTRICT x, size_t bx, ggml_fp16_t * GGML_RESTRICT y, size_t by, int nrc) {
     assert(nrc == 1);
     GGML_UNUSED(nrc);
