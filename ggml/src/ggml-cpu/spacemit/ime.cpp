@@ -1288,8 +1288,7 @@ static bool ggml_riscv64_spacemit_name_ends_with(const char * name, const char *
 
 static bool ggml_riscv64_spacemit_is_bf16_proj_q8_candidate(const ggml_tensor * cur) {
 #if defined(RISCV64_SPACEMIT_IME2)
-    return std::getenv("SPACEMIT_EXPERIMENTAL_BF16_PROJ_Q8") &&
-           ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_BF16 &&
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_BF16 &&
            ggml_n_dims(cur) == 2 && cur->ne[0] % QK8_0 == 0 && cur->ne[1] % 32 == 0 &&
            std::strcmp(cur->name, "per_layer_model_proj.weight") == 0;
 #else
@@ -1300,8 +1299,7 @@ static bool ggml_riscv64_spacemit_is_bf16_proj_q8_candidate(const ggml_tensor * 
 
 static bool ggml_riscv64_spacemit_is_f32_proj_q8_candidate(const ggml_tensor * cur) {
 #if defined(RISCV64_SPACEMIT_IME2)
-    return std::getenv("SPACEMIT_EXPERIMENTAL_F32_PROJ_Q8") &&
-           ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_F32 &&
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_F32 &&
            ggml_n_dims(cur) == 2 && cur->ne[0] % QK8_0 == 0 && cur->ne[1] % 32 == 0 &&
            std::strncmp(cur->name, "blk.", 4) == 0 &&
            (ggml_riscv64_spacemit_name_ends_with(cur->name, ".inp_gate.weight") ||
@@ -1383,8 +1381,8 @@ static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack
         case GGML_TYPE_Q4_K:
             {
 #if defined(RISCV64_SPACEMIT_IME2)
-                if (std::getenv("SPACEMIT_EXPERIMENTAL_Q4K_32X256") && cur->ne[1] % 32 == 0 &&
-                    cur->ne[0] % 256 == 0 && (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
+                if (cur->ne[1] % 32 == 0 && cur->ne[0] % 256 == 0 &&
+                    (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
                     return &ggml::cpu::riscv64_spacemit::q4_k_32x256_q8_0;
                 }
 

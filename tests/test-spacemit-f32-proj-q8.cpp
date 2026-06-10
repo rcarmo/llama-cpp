@@ -165,8 +165,6 @@ static bool run_case(const char * name, int64_t rows, int64_t tokens, int64_t k,
 
 int main(int argc, char ** argv) {
     ggml_time_init();
-    setenv("SPACEMIT_EXPERIMENTAL_F32_PROJ_Q8", "1", 1);
-
     int n_threads = 8;
     if (argc > 1) {
         n_threads = std::atoi(argv[1]);

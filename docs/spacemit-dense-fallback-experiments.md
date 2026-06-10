@@ -2,7 +2,7 @@
 
 Branch: `exp/dense-fallback-profile`
 
-Goal: stop broad assembly tweaks and convert measured Gemma dense fallback projection/attention `mul_mat` paths into narrow SpaceMIT-friendly guarded paths.
+Goal: stop broad assembly tweaks and convert measured Gemma dense fallback projection/attention `mul_mat` paths into narrow SpaceMIT-friendly default paths.
 
 ## Profiling setup
 
@@ -14,10 +14,6 @@ Fallback profiler commit:
 Representative profiling command:
 
 ```sh
-SPACEMIT_EXPERIMENTAL_Q4K_32X256=1 \
-SPACEMIT_EXPERIMENTAL_F16_MATVEC8=1 \
-SPACEMIT_EXPERIMENTAL_BF16_PROJ_Q8=1 \
-SPACEMIT_EXPERIMENTAL_F32_PROJ_Q8=1 \
 SPACEMIT_PROFILE_FALLBACK=1 \
 build/bin/llama-bench \
   -m /home/me/models/gguf-misc/gemma-4-E4B-it-Q4_K_M.gguf \
@@ -37,15 +33,30 @@ Post-routing Gemma fallback profile (`/tmp/fallback-gemma-allflags-tg64.*`):
     - `455 cache_v_l* dst=kqv-* f16xf32 nrows=1 ne0=256,512,2,1 ne1=256,1,8,1 nb0=2,512,262144,524288 nb1=4,1024,1024,8192`
     - `455 cache_k_l* dst=kq-* f16xf32 nrows=1 ne0=512,256,2,1 ne1=512,1,8,1 nb0=2,2048,1024,524288 nb1=4,16384,2048,16384`
 
-## Accepted guarded routes
+## Accepted default routes
+
+### Q4_K 32x256 route
+
+Commit lineage: `ce64713 spacemit: gate q4k hp 32x256 path`, later defaulted after correctness/perf validation.
+
+Status: default on SpaceMIT IME2 for Q4_K tensors with `ne[1] % 32 == 0` and `ne[0] % 256 == 0`.
+
+The diagnostic reference switch `SPACEMIT_EXPERIMENTAL_Q4K_32X256_REF=1` remains guarded in `ime2_kernels.cpp` for targeted comparisons only.
+
+Correctness:
+
+```sh
+build/bin/test-spacemit-q4k-correctness 8
+# q4k_RC=0
+```
 
 ### F16 attention fallback matvec4
 
 Commit: `46f972d spacemit: gate f16 fallback matvec4 path`
 
-Flag: `SPACEMIT_EXPERIMENTAL_F16_MATVEC4=1`
+Status: helper retained for correctness coverage and matvec8 tails; the broad runtime env-gated route was removed when the Gemma-specific matvec8 route became the default.
 
-Scope: generic fallback `GGML_TYPE_F16 × vec_dot_type F16`, `num_rows_per_vec_dot == 1`; computes 4 adjacent rows per vectorized helper call.
+Original scope: generic fallback `GGML_TYPE_F16 × vec_dot_type F16`, `num_rows_per_vec_dot == 1`; computes 4 adjacent rows per vectorized helper call.
 
 Correctness:
 
@@ -60,7 +71,7 @@ Result: small decode win; later superseded by separately gated 8-row variant for
 
 Commit: `8f56d69 spacemit: gate bf16 projection q8 route`
 
-Flag: `SPACEMIT_EXPERIMENTAL_BF16_PROJ_Q8=1`
+Status: default on SpaceMIT IME2 when the tensor name and shape predicates match.
 
 Scope: exact tensor name `per_layer_model_proj.weight`, BF16 2D weights, dimensions aligned to Q8_0 32x32 packing.
 
@@ -82,7 +93,7 @@ Effect:
 
 Commit: `45ae189 spacemit: gate f32 projection q8 route`
 
-Flag: `SPACEMIT_EXPERIMENTAL_F32_PROJ_Q8=1`
+Status: default on SpaceMIT IME2 when the tensor name and shape predicates match.
 
 Scope: Gemma block projection tensor names only:
 
@@ -108,7 +119,7 @@ Effect:
 
 Commit: `78b0372 spacemit: gate f16 fallback matvec8 path`
 
-Flag: `SPACEMIT_EXPERIMENTAL_F16_MATVEC8=1`
+Status: default on RISC-V when the Gemma-style cache attention name and shape predicates match.
 
 Scope: Gemma-style F16 cache attention fallback only: `src0` name starts with `cache_k_l` or `cache_v_l`, `dst` name starts with `kq-` or `kqv-`, and `src1->ne[2] == 8`. It computes 8 adjacent F16 rows per helper call and falls back to matvec4/tail rows inside the 16-row block. The `src1->ne[2] == 8` predicate intentionally excludes the measured Qwen REAP cache-attention shape (`src1->ne[2] == 16`).
 
@@ -130,7 +141,7 @@ Qwen REAP shape check:
 - Qwen cache attention has the same `ne0=256,256,2,1` family, but `src1->ne[2] == 16`, so the narrowed matvec8 predicate does not select it.
 - Qwen short benchmark remains noisy (`pp16` varied from `24.53 ± 3.44` baseline to `27.41 ± 0.28` with the flag; `tg16 7.57 → 7.46`), but the code path is Gemma-shape-gated.
 
-Decision: keep separately gated and shape/name-restricted. It is a small Gemma decode win, not a prompt route.
+Decision: make default, but keep it shape/name-restricted. It is a small Gemma decode win, not a prompt route.
 
 ## Rejected / not kept
 
