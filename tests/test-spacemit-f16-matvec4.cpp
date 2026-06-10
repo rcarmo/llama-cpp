@@ -20,7 +20,7 @@ static bool run_case(int n, size_t bx, uint32_t seed) {
     }
 
     const size_t stride_elems = bx / sizeof(ggml_fp16_t);
-    std::vector<ggml_fp16_t> x(stride_elems * 4 + 32);
+    std::vector<ggml_fp16_t> x(stride_elems * 8 + 32);
     std::vector<ggml_fp16_t> y((size_t) n + 32);
 
     std::mt19937 rng(seed);
@@ -32,24 +32,32 @@ static bool run_case(int n, size_t bx, uint32_t seed) {
         v = to_f16(dist(rng));
     }
 
-    float got[4] = {0, 0, 0, 0};
-    float ref[4] = {0, 0, 0, 0};
-    ggml_vec_dot_f16_4(n, got, x.data(), bx, y.data());
-    for (int r = 0; r < 4; ++r) {
+    float got4[4] = {0, 0, 0, 0};
+    float got8[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    float ref[8]  = {0, 0, 0, 0, 0, 0, 0, 0};
+    ggml_vec_dot_f16_4(n, got4, x.data(), bx, y.data());
+    ggml_vec_dot_f16_8(n, got8, x.data(), bx, y.data());
+    for (int r = 0; r < 8; ++r) {
         ggml_vec_dot_f16(n, &ref[r], 0, x.data() + (size_t) r * stride_elems, 0, y.data(), 0, 1);
     }
 
     bool ok = true;
-    for (int r = 0; r < 4; ++r) {
-        const double diff = std::fabs((double) got[r] - (double) ref[r]);
+    for (int r = 0; r < 8; ++r) {
+        const double got = r < 4 ? got4[r] : got8[r];
+        const double diff = std::fabs(got - (double) ref[r]);
         const double tol = 2.0e-2 + 2.0e-3 * std::fabs((double) ref[r]);
-        if (!std::isfinite(got[r]) || diff > tol) {
-            std::fprintf(stderr, "bad n=%d bx=%zu row=%d got=% .9g ref=% .9g diff=%g tol=%g\n", n, bx, r, got[r], ref[r], diff, tol);
+        if (r < 4 && (!std::isfinite(got4[r]) || std::fabs((double) got4[r] - (double) ref[r]) > tol)) {
+            std::fprintf(stderr, "bad4 n=%d bx=%zu row=%d got=% .9g ref=% .9g diff=%g tol=%g\n", n, bx, r, got4[r], ref[r], std::fabs((double) got4[r] - (double) ref[r]), tol);
             ok = false;
         }
+        if (!std::isfinite(got8[r]) || std::fabs((double) got8[r] - (double) ref[r]) > tol) {
+            std::fprintf(stderr, "bad8 n=%d bx=%zu row=%d got=% .9g ref=% .9g diff=%g tol=%g\n", n, bx, r, got8[r], ref[r], std::fabs((double) got8[r] - (double) ref[r]), tol);
+            ok = false;
+        }
+        GGML_UNUSED(diff);
     }
-    std::printf("case n=%d bx=%zu got=[%.8g %.8g %.8g %.8g] ref=[%.8g %.8g %.8g %.8g] %s\n",
-                n, bx, got[0], got[1], got[2], got[3], ref[0], ref[1], ref[2], ref[3], ok ? "ok" : "FAIL");
+    std::printf("case n=%d bx=%zu got4=[%.8g %.8g %.8g %.8g] got8=[%.8g %.8g %.8g %.8g %.8g %.8g %.8g %.8g] %s\n",
+                n, bx, got4[0], got4[1], got4[2], got4[3], got8[0], got8[1], got8[2], got8[3], got8[4], got8[5], got8[6], got8[7], ok ? "ok" : "FAIL");
     return ok;
 }
 
