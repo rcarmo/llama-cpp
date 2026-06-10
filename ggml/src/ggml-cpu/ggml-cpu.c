@@ -1280,7 +1280,10 @@ static void ggml_compute_forward_mul_mat_one_chunk(
 
 #if defined(__riscv) || defined(__riscv__)
                 if (num_rows_per_vec_dot == 1 && type == GGML_TYPE_F16 && vec_dot_type == GGML_TYPE_F16 &&
-                    getenv("SPACEMIT_EXPERIMENTAL_F16_MATVEC8")) {
+                    getenv("SPACEMIT_EXPERIMENTAL_F16_MATVEC8") &&
+                    src1->ne[2] == 8 &&
+                    (strncmp(src0->name, "cache_k_l", 9) == 0 || strncmp(src0->name, "cache_v_l", 9) == 0) &&
+                    (strncmp(dst->name, "kq-", 3) == 0 || strncmp(dst->name, "kqv-", 4) == 0)) {
                     int64_t ir0 = iir0;
                     const int64_t ir0_block_end = MIN(iir0 + blck_0, ir0_end);
                     for (; ir0 + 7 < ir0_block_end; ir0 += 8) {

@@ -110,7 +110,7 @@ Commit: `78b0372 spacemit: gate f16 fallback matvec8 path`
 
 Flag: `SPACEMIT_EXPERIMENTAL_F16_MATVEC8=1`
 
-Scope: same narrow generic fallback condition as matvec4, but computes 8 adjacent F16 rows per helper call and falls back to matvec4/tail rows inside the 16-row block.
+Scope: Gemma-style F16 cache attention fallback only: `src0` name starts with `cache_k_l` or `cache_v_l`, `dst` name starts with `kq-` or `kqv-`, and `src1->ne[2] == 8`. It computes 8 adjacent F16 rows per helper call and falls back to matvec4/tail rows inside the 16-row block. The `src1->ne[2] == 8` predicate intentionally excludes the measured Qwen REAP cache-attention shape (`src1->ne[2] == 16`).
 
 Correctness:
 
@@ -122,17 +122,15 @@ build/bin/test-spacemit-f16-matvec4
 
 Gemma A/B with BF16+F32 projection routes held constant:
 
-- no F16 route: `tg128 6.72`, `tg16 6.73`, `pp16 51.03`
-- matvec4: `tg128 6.80`, `tg16 6.79`, `pp16 50.87`
-- matvec8: `tg128 6.83`, `tg16 6.84`, `pp16 50.88`
+- before narrowing: no F16 route `tg128 6.72`, `tg16 6.73`, `pp16 51.03`; matvec4 `tg128 6.80`, `tg16 6.79`, `pp16 50.87`; matvec8 `tg128 6.83`, `tg16 6.84`, `pp16 50.88`.
+- after narrowing to Gemma-style cache attention: no F16 route `tg128 6.69`, `tg16 6.69`, `pp16 50.91`; matvec8 `tg128 6.81`, `tg16 6.79`, `pp16 50.76`.
 
-Qwen REAP short check:
+Qwen REAP shape check:
 
-- no F16 route: `pp16 27.70`, `tg16 7.66`
-- matvec4: `pp16 26.33`, `tg16 7.50`
-- matvec8: `pp16 26.24`, `tg16 7.65`
+- Qwen cache attention has the same `ne0=256,256,2,1` family, but `src1->ne[2] == 16`, so the narrowed matvec8 predicate does not select it.
+- Qwen short benchmark remains noisy (`pp16` varied from `24.53 ± 3.44` baseline to `27.41 ± 0.28` with the flag; `tg16 7.57 → 7.46`), but the code path is Gemma-shape-gated.
 
-Decision: keep separately gated. It is a small Gemma decode win, but prompt speed is not improved and Qwen prompt is lower than no-F16.
+Decision: keep separately gated and shape/name-restricted. It is a small Gemma decode win, not a prompt route.
 
 ## Rejected / not kept
 
