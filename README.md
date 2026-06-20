@@ -1,5 +1,104 @@
 # llama.cpp SpaceMIT/TurboQuant K3 fork
 
+
+## Gemma 4 26B A4B QAT — Optimal Server Configuration
+
+Based on llama-bench sweep (96 runs) and context-size testing:
+
+```sh
+/home/me/run-gemma-26b-a4b-qat-server.sh
+# or:
+llama-server \
+  --model gemma-4-26B-A4B-it-qat-UD-Q4_K_XL.gguf \
+  --model-draft mtp-gemma-4-26B-A4B-it-qat-Q4_0.gguf \
+  --spec-type draft-mtp --spec-draft-n-max 4 \
+  --threads 8 --ubatch-size 256 \
+  --ctx-size 16384 --cache-type-k f16 --cache-type-v f16 \
+  --reasoning off --reasoning-format deepseek
+```
+
+**Why these settings:**
+- `t=8`: only the 8 A100/IME2 preferred cores — t≥12 causes TCM contention (SIGABRT)
+- `ctx=16384`: tg tok/s is flat 4K→16K (~8.5 tok/s); drops at 32K and OOMs at 64K
+- `ctk=f16`: better pp AND tg than q8_0 for this MoE model; q8_0 is consistently ~1.8 tok/s slower
+- `ub=256`: no meaningful difference vs 128/512/1024 for this model
+- `reasoning-format deepseek`: prevents 26B from leaking `<|channel>thought` into response body
+
+**Context size vs tg tok/s (26B A4B, t=8 ub=256):**
+
+| ctx | ctk | tg tok/s | mem |
+|---|---|---:|---|
+| 4K | f16 | 8.46 | 820 MiB |
+| 4K | q8_0 | 6.66 | 745 MiB |
+| 8K | f16 | 8.47 | 902 MiB |
+| 8K | q8_0 | 6.70 | 809 MiB |
+| 16K | **f16** | **8.36** | **1066 MiB** | ← sweet spot |
+| 16K | q8_0 | 6.78 | 935 MiB |
+| 32K | f16 | ~6.1 | ~2 GiB | OOM risk |
+| 64K | — | OOM | — | kills the machine |
+
+**Practical capacity at 16K**: ~12,000 words / 10–15 source files / full function-level code context.
+
+## Gemma 4 QAT + MTP Benchmarks (SpaceMIT IME2/TCM, A100 cores)
+
+**Build:** `-DGGML_CPU_RISCV64_SPACEMIT=ON -DGGML_RV_ZBA=ON -DGGML_RV_ZFH=ON -DGGML_RV_ZVFH=ON`
+
+**Runtime evidence:**
+```
+CPU_RISCV64_SPACEMIT: tcm is available, blk_size: 393216
+CPU_RISCV64_SPACEMIT: perfer_core_arch_id: a064, use_ime2: 1, mem_backend: HPAGE
+```
+
+**Server benchmark — complex agent prompt, no token limit, `finish_reason=stop`:**
+
+| Model | Prefill tok/s | Gen tok/s | MTP acc | Coherence |
+|---|---:|---:|---:|---|
+| Gemma 4 E2B QAT UD-Q4_K_XL | 93.14 | 12.93 | 0.306 | pass |
+| Gemma 4 E4B QAT UD-Q4_K_XL | 55.37 | 8.52 | 0.336 | pass |
+| Gemma 4 12B QAT UD-Q4_K_XL | 20.72 | 4.32 | 0.429 | pass |
+
+**Server benchmark — agent prompt (synthetic, for reproducibility):**
+
+> The benchmark uses a **fixed synthetic agent prompt** designed to elicit structured,
+> multi-section output from a coding assistant. It is not a real user query.
+> It was chosen to produce sufficiently long, coherent output (finish_reason=stop)
+> to measure generation throughput at realistic token counts (~800–900 tokens).
+
+```
+system: "You are a senior local coding agent. Return only the final answer.
+         Do not include hidden reasoning, scratchpad, tool calls, function-call
+         JSON, or channel tags. Be concrete and internally consistent."
+
+user:   "We need to clean up a provider abstraction layer in a mixed
+         TypeScript/C++ AI runtime. Produce a concise but complete
+         implementation plan that: identifies likely dead provider code,
+         separates provider registry from transport clients, preserves
+         backwards compatibility for existing model IDs, adds tests and
+         telemetry, handles rollback, and lists the top risks.
+         Use numbered sections and concrete validation steps."
+
+parameters: temperature=0.2, no max_tokens limit
+```
+
+> **Coherence grading**: pass = finish_reason=stop + no leaked thought/channel tags
+> + ≥7/10 on-topic terms + structured numbered sections.
+
+**llama-bench sweep — best settings per model (TCM enabled, `tcm-cleanup` before each run):**
+
+| Model | Best pp tok/s | Settings | Best tg tok/s | Settings |
+|---|---:|---|---:|---|
+| Gemma 4 E2B QAT | 120.90 | t=8 ub=256 ctk=f16 | 13.36 | t=8 ub=512 ctk=f16 |
+| Gemma 4 E4B QAT | 70.54 | t=8 ub=256 ctk=f16 | 8.02 | t=8 ub=256 ctk=f16 |
+| Gemma 4 12B QAT | 29.06 | t=8 ub=256 ctk=f16 | 3.65 | t=8 ub=256 ctk=f16 |
+
+**Notes:**
+- t=8 (8 A100/IME2 preferred cores) consistently best; t=12/16 causes TCM contention
+- f16 KV cache consistently best; q8_0 marginal or slower
+- Smaller ubatch (256) wins on pp; 512 wins on tg for E2B
+- Full sweep: `benchmarks/spacemit-speedup-bench-*.tsv`
+- Bench script: `scripts/run-speedup-bench.sh` (calls `tcm-cleanup` before each run)
+
+
 This repository is the source tree used for the Milk-V Jupiter 2 / SpacemiT K3 local LLM server experiments documented on [taoofmac.com](https://taoofmac.com/). It is a squashed `llama.cpp` fork with the SpaceMIT CPU backend, TurboQuant/KV-cache work, and a small runtime robustness patch for current Bianbu/K3 systems.
 
 It is **not** a clean upstream branch and should be read as a working vendor fork snapshot: useful if you want to reproduce the K3 results, inspect the SpaceMIT integration points, or run the same OpenAI-compatible server on the board.
