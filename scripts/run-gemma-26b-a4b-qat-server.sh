@@ -16,5 +16,8 @@ exec /home/me/src/llama-cpp-ff-gemma4-mtp-ime2-work/build/bin/llama-server \
   --ubatch-size 256 --ctx-size 16384 \
   --cache-type-k f16 --cache-type-v f16 \
   --parallel 1 --jinja \
+  --cache-prompt \
+  --cache-reuse 256 \
+  --slot-save-path /home/me/gemma-26b-a4b-slot-cache \
   --reasoning off --reasoning-format deepseek \
   --no-warmup
