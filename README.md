@@ -1,5 +1,34 @@
 # llama.cpp SpaceMIT/TurboQuant K3 fork
 
+## Gemma 4 E2B QAT — 128K Cached Server Profile
+
+For long-context coding sessions where context capacity matters more than maximum model quality, use the E2B QAT + MTP profile:
+
+```sh
+scripts/run-gemma-e2b-qat-128k-server.sh
+```
+
+Live configuration validated on Milk-V SpaceMIT K3:
+
+| Setting | Value |
+|---|---|
+| Model | `gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf` |
+| Draft model | `mtp-gemma-4-E2B-it-qat-Q4_0.gguf` |
+| Context | `131072` tokens |
+| Threads | `8` / `threads-batch=8` |
+| uBatch | `1024` |
+| KV cache | `f16` K/V |
+| Prompt cache | enabled, 8 GiB budget |
+| Slot save path | `/home/me/gemma-e2b-128k-slot-cache` |
+| MTP | enabled, `draft-mtp`, `n_max=4` |
+
+Notes:
+
+- The server reports `default_generation_settings.n_ctx = 131072` via `/props`.
+- `--cache-prompt` is active. This is the useful prefix cache for repeated code-context requests.
+- `--cache-reuse` is currently disabled by llama-server when `draft-mtp` is active (`cache_reuse is not supported by this context`).
+- Smoke test on a short prompt showed MTP acceptance at 14/24 draft tokens (0.58) and ~20.9 tok/s generation.
+
 
 ## Gemma 4 26B A4B QAT — Optimal Server Configuration
 
