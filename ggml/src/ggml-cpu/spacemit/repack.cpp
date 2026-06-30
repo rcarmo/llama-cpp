@@ -6,6 +6,7 @@
 #include "ggml-common.h"
 #include "ggml-cpu.h"
 #include "ggml-impl.h"
+#include "ggml-quants.h"
 #include "ime_kernels.h"
 
 #include <algorithm>
@@ -1481,6 +1482,52 @@ static int repack_f32_to_q8_0_32_bl_ref(ggml_tensor *              t,
     }
     return 0;
 }
+
+template <typename SRC_BLOCK, ggml_type SRC_TYPE, void (*DEQUANTIZE)(const SRC_BLOCK * GGML_RESTRICT, float * GGML_RESTRICT, int64_t)>
+static int repack_iq_k_to_q8_0_32_bl_ref(ggml_tensor *              t,
+                                         int                        interleave_block,
+                                         const void * GGML_RESTRICT data,
+                                         size_t                     data_size) {
+    GGML_ASSERT(t->type == SRC_TYPE);
+    GGML_ASSERT(interleave_block == 32);
+
+    constexpr int nrows_interleaved = 32;
+    constexpr int src_block_size    = QK_K;
+    constexpr int q8_per_src_block  = src_block_size / QK8_0;
+
+    block_q8_0x32 *       dst          = (block_q8_0x32 *) t->data;
+    const SRC_BLOCK *     src          = (const SRC_BLOCK *) data;
+    block_q8_0            dst_tmp[32];
+    float                 f32_tmp[src_block_size];
+    const int64_t         nrow         = ggml_nrows(t);
+    const int64_t         nsrc_blocks  = t->ne[0] / src_block_size;
+    const int64_t         nq8_blocks   = t->ne[0] / QK8_0;
+
+    GGML_ASSERT(data_size == (size_t) nrow * nsrc_blocks * sizeof(SRC_BLOCK));
+
+    if (t->ne[0] % src_block_size != 0 || t->ne[1] % nrows_interleaved != 0) {
+        return -1;
+    }
+
+    for (int64_t b = 0; b < nrow; b += nrows_interleaved) {
+        const int64_t nrows_real = std::min(nrow - b, (int64_t) nrows_interleaved);
+        for (int64_t x = 0; x < nq8_blocks; x++) {
+            const int64_t src_x = x / q8_per_src_block;
+            const int64_t q8_x  = x % q8_per_src_block;
+            int i = 0;
+            for (; i < nrows_real; i++) {
+                DEQUANTIZE(src + ((b + i) * nsrc_blocks) + src_x, f32_tmp, src_block_size);
+                quantize_f32_row_to_q8_0(f32_tmp + q8_x * QK8_0, &dst_tmp[i]);
+            }
+            for (; i < nrows_interleaved; i++) {
+                memset(&dst_tmp[i], 0, sizeof(block_q8_0));
+            }
+            *dst++ = make_block_q8_0x32(dst_tmp, interleave_block);
+        }
+    }
+    return 0;
+}
+
 static void dequantize_iq4_nl_block_to_f32(const block_iq4_nl * GGML_RESTRICT src, float * GGML_RESTRICT dst) {
     const uint8_t * qs = src->qs;
     const float d = GGML_FP16_TO_FP32(src->d);
@@ -1936,6 +1983,18 @@ int repack_f32_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_siz
 
 int repack_iq4_nl_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
     return repack_iq4_nl_to_q8_0_32_bl_ref(t, 32, data, data_size);
+}
+
+int repack_iq2_xs_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
+    return repack_iq_k_to_q8_0_32_bl_ref<block_iq2_xs, GGML_TYPE_IQ2_XS, dequantize_row_iq2_xs>(t, 32, data, data_size);
+}
+
+int repack_iq3_xxs_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
+    return repack_iq_k_to_q8_0_32_bl_ref<block_iq3_xxs, GGML_TYPE_IQ3_XXS, dequantize_row_iq3_xxs>(t, 32, data, data_size);
+}
+
+int repack_iq4_xs_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
+    return repack_iq_k_to_q8_0_32_bl_ref<block_iq4_xs, GGML_TYPE_IQ4_XS, dequantize_row_iq4_xs>(t, 32, data, data_size);
 }
 
 template <> int repack<block_q4_0, 32, 16>(ggml_tensor * t, const void * data, size_t data_size) {
