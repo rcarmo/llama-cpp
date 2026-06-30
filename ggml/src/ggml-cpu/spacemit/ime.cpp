@@ -1037,6 +1037,100 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 #endif
     }
 
+    static float dot_iq2_xs_f32(const block_iq2_xs * x, const float * y, int64_t k) {
+        GGML_ASSERT(k % QK_K == 0);
+        const int64_t nb = k / QK_K;
+        float sum = 0.0f;
+        for (int64_t i = 0; i < nb; ++i) {
+            const float d = GGML_FP16_TO_FP32(x[i].d);
+            for (int ib32 = 0; ib32 < QK_K/32; ++ib32) {
+                const float db0 = d * (0.5f + (x[i].scales[ib32] & 0x0f)) * 0.25f;
+                const float db1 = d * (0.5f + (x[i].scales[ib32] >>  4)) * 0.25f;
+                const float * yy = y + i*QK_K + ib32*32;
+                for (int l = 0; l < 4; ++l) {
+                    const uint16_t q = x[i].qs[4*ib32 + l];
+                    const uint8_t * grid = (const uint8_t *) (iq2xs_grid + (q & 511));
+                    const uint8_t signs = ksigns_iq2xs[q >> 9];
+                    const float db = (l < 2) ? db0 : db1;
+                    for (int j = 0; j < 8; ++j) {
+                        const float sign = (signs & kmask_iq2xs[j]) ? -1.0f : 1.0f;
+                        sum += db * (float) grid[j] * sign * yy[l*8 + j];
+                    }
+                }
+            }
+        }
+        return sum;
+    }
+
+    static float dot_iq3_xxs_f32(const block_iq3_xxs * x, const float * y, int64_t k) {
+        GGML_ASSERT(k % QK_K == 0);
+        const int64_t nb = k / QK_K;
+        float sum = 0.0f;
+        for (int64_t i = 0; i < nb; ++i) {
+            const float d = GGML_FP16_TO_FP32(x[i].d);
+            const uint8_t * qs = x[i].qs;
+            const uint8_t * scales_and_signs = qs + QK_K/4;
+            const float * yy = y + i*QK_K;
+            for (int ib32 = 0; ib32 < QK_K/32; ++ib32) {
+                uint32_t aux32;
+                memcpy(&aux32, scales_and_signs + 4*ib32, sizeof(uint32_t));
+                const float db = d * (0.5f + (aux32 >> 28)) * 0.5f;
+                const float * yy32 = yy + ib32*32;
+                for (int l = 0; l < 4; ++l) {
+                    const uint8_t signs = ksigns_iq2xs[(aux32 >> (7*l)) & 127];
+                    const uint8_t * grid1 = (const uint8_t *) (iq3xxs_grid + qs[2*l+0]);
+                    const uint8_t * grid2 = (const uint8_t *) (iq3xxs_grid + qs[2*l+1]);
+                    for (int j = 0; j < 4; ++j) {
+                        const float sign0 = (signs & kmask_iq2xs[j+0]) ? -1.0f : 1.0f;
+                        const float sign1 = (signs & kmask_iq2xs[j+4]) ? -1.0f : 1.0f;
+                        sum += db * (float) grid1[j] * sign0 * yy32[l*8 + j + 0];
+                        sum += db * (float) grid2[j] * sign1 * yy32[l*8 + j + 4];
+                    }
+                }
+                qs += 8;
+            }
+        }
+        return sum;
+    }
+
+    static float dot_iq4_xs_f32(const block_iq4_xs * x, const float * y, int64_t k) {
+        GGML_ASSERT(k % QK_K == 0);
+        const int64_t nb = k / QK_K;
+        float sum = 0.0f;
+        for (int64_t i = 0; i < nb; ++i) {
+            const float d = GGML_FP16_TO_FP32(x[i].d);
+            const uint8_t * qs = x[i].qs;
+            const float * yy = y + i*QK_K;
+            for (int ib = 0; ib < QK_K/32; ++ib) {
+                const int ls = ((x[i].scales_l[ib/2] >> (4*(ib%2))) & 0x0f) | (((x[i].scales_h >> (2*ib)) & 3) << 4);
+                const float dl = d * (ls - 32);
+                const float * yy32 = yy + ib*32;
+                for (int j = 0; j < 16; ++j) {
+                    sum += dl * kvalues_iq4nl[qs[j] & 0x0f] * yy32[j + 0];
+                    sum += dl * kvalues_iq4nl[qs[j] >> 4]    * yy32[j + 16];
+                }
+                qs += 16;
+            }
+        }
+        return sum;
+    }
+
+    static bool dot_iq_direct_f32(ggml_type type, const void * x, const float * y, int64_t k, float * out) {
+        switch (type) {
+            case GGML_TYPE_IQ2_XS:
+                *out = dot_iq2_xs_f32((const block_iq2_xs *) x, y, k);
+                return true;
+            case GGML_TYPE_IQ3_XXS:
+                *out = dot_iq3_xxs_f32((const block_iq3_xxs *) x, y, k);
+                return true;
+            case GGML_TYPE_IQ4_XS:
+                *out = dot_iq4_xs_f32((const block_iq4_xs *) x, y, k);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     void forward_mul_mat_id(ggml_compute_params * params, ggml_tensor * op) const {
         const ggml_tensor * src0 = op->src[0];
         const ggml_tensor * src1 = op->src[1];
@@ -1101,9 +1195,13 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 const float * src1_col = (const float *) src1_col_bytes;
                 const char * src0_row = src0_cur + ir0 * nb01;
 
-                to_float(src0_row, deq_row, ne00);
+                float v;
+                if (!dot_iq_direct_f32(src0->type, src0_row, src1_col, ne00, &v)) {
+                    to_float(src0_row, deq_row, ne00);
+                    v = dot_f32(deq_row, src1_col, ne00);
+                }
                 float * dst_col = (float *) ((char *) dst->data + i1 * nb1 + i2 * nb2);
-                dst_col[ir0] = dot_f32(deq_row, src1_col, ne00);
+                dst_col[ir0] = v;
             }
         }
     }
