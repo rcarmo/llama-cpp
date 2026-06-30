@@ -1346,9 +1346,35 @@ static bool ggml_riscv64_spacemit_is_f32_proj_q8_candidate(const ggml_tensor * c
 #endif
 }
 
+static bool ggml_riscv64_spacemit_iq_repack_enabled(ggml_type type) {
+    const char * mode = std::getenv("GGML_RISCV64_SPACEMIT_IQ_REPACK");
+    if (mode == nullptr || mode[0] == '\0') {
+        // Default to the small 4-bit IQ formats. Repacking IQ2/IQ3 expert tensors
+        // expands Qwen3.6 UD Q2_K_XL by ~22 GiB and does not fit on 32 GiB boards.
+        return type == GGML_TYPE_IQ4_NL || type == GGML_TYPE_IQ4_XS;
+    }
+    if (std::strcmp(mode, "0") == 0 || std::strcmp(mode, "off") == 0 || std::strcmp(mode, "false") == 0) {
+        return false;
+    }
+    if (std::strcmp(mode, "1") == 0 || std::strcmp(mode, "all") == 0 || std::strcmp(mode, "true") == 0) {
+        return true;
+    }
+    if (std::strcmp(mode, "iq4") == 0 || std::strcmp(mode, "small") == 0) {
+        return type == GGML_TYPE_IQ4_NL || type == GGML_TYPE_IQ4_XS;
+    }
+    if (std::strcmp(mode, "iq2") == 0) {
+        return type == GGML_TYPE_IQ2_XS;
+    }
+    if (std::strcmp(mode, "iq3") == 0) {
+        return type == GGML_TYPE_IQ3_XXS;
+    }
+    return false;
+}
+
 static bool ggml_riscv64_spacemit_is_iq4_nl_proj_q8_candidate(const ggml_tensor * cur) {
 #if defined(RISCV64_SPACEMIT_IME2)
-    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_IQ4_NL &&
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 &&
+           ggml_riscv64_spacemit_iq_repack_enabled(GGML_TYPE_IQ4_NL) && cur->type == GGML_TYPE_IQ4_NL &&
            cur->ne[0] % QK8_0 == 0 && cur->ne[1] % 32 == 0;
 #else
     GGML_UNUSED(cur);
@@ -1357,8 +1383,8 @@ static bool ggml_riscv64_spacemit_is_iq4_nl_proj_q8_candidate(const ggml_tensor 
 }
 static bool ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(const ggml_tensor * cur, ggml_type type) {
 #if defined(RISCV64_SPACEMIT_IME2)
-    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == type &&
-           cur->ne[0] % QK_K == 0 && cur->ne[1] % 32 == 0;
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && ggml_riscv64_spacemit_iq_repack_enabled(type) &&
+           cur->type == type && cur->ne[0] % QK_K == 0 && cur->ne[1] % 32 == 0;
 #else
     GGML_UNUSED(cur);
     GGML_UNUSED(type);
