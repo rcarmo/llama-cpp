@@ -1481,6 +1481,54 @@ static int repack_f32_to_q8_0_32_bl_ref(ggml_tensor *              t,
     }
     return 0;
 }
+static void dequantize_iq4_nl_block_to_f32(const block_iq4_nl * GGML_RESTRICT src, float * GGML_RESTRICT dst) {
+    const uint8_t * qs = src->qs;
+    const float d = GGML_FP16_TO_FP32(src->d);
+    for (int j = 0; j < QK4_NL / 2; ++j) {
+        dst[j]             = d * kvalues_iq4nl[qs[j] & 0x0f];
+        dst[j + QK4_NL/2]  = d * kvalues_iq4nl[qs[j] >> 4];
+    }
+}
+
+static int repack_iq4_nl_to_q8_0_32_bl_ref(ggml_tensor *              t,
+                                           int                        interleave_block,
+                                           const void * GGML_RESTRICT data,
+                                           size_t                     data_size) {
+    GGML_ASSERT(t->type == GGML_TYPE_IQ4_NL);
+    GGML_ASSERT(interleave_block == 32);
+
+    constexpr int nrows_interleaved = 32;
+
+    block_q8_0x32 *       dst     = (block_q8_0x32 *) t->data;
+    const block_iq4_nl *  src     = (const block_iq4_nl *) data;
+    block_q8_0            dst_tmp[32];
+    float                 f32_tmp[QK8_0];
+    const int64_t         nrow    = ggml_nrows(t);
+    const int64_t         nblocks = t->ne[0] / QK8_0;
+
+    GGML_ASSERT(data_size == (size_t) nrow * nblocks * sizeof(block_iq4_nl));
+
+    if (t->ne[0] % QK8_0 != 0 || t->ne[1] % nrows_interleaved != 0) {
+        return -1;
+    }
+
+    for (int64_t b = 0; b < nrow; b += nrows_interleaved) {
+        const int64_t nrows_real = std::min(nrow - b, (int64_t) nrows_interleaved);
+        for (int64_t x = 0; x < nblocks; x++) {
+            int i = 0;
+            for (; i < nrows_real; i++) {
+                dequantize_iq4_nl_block_to_f32(src + ((b + i) * nblocks) + x, f32_tmp);
+                quantize_f32_row_to_q8_0(f32_tmp, &dst_tmp[i]);
+            }
+            for (; i < nrows_interleaved; i++) {
+                memset(&dst_tmp[i], 0, sizeof(block_q8_0));
+            }
+            *dst++ = make_block_q8_0x32(dst_tmp, interleave_block);
+        }
+    }
+    return 0;
+}
+
 
 // RVV optimized version of repack_q8_0_to_q8_0_32_bl
 // Eliminates the intermediate dst_tmp buffer and vectorizes scale gather + qs copy.
@@ -1884,6 +1932,10 @@ int repack_bf16_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_si
 
 int repack_f32_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
     return repack_f32_to_q8_0_32_bl_ref(t, 32, data, data_size);
+}
+
+int repack_iq4_nl_to_q8_0_32x32(ggml_tensor * t, const void * data, size_t data_size) {
+    return repack_iq4_nl_to_q8_0_32_bl_ref(t, 32, data, data_size);
 }
 
 template <> int repack<block_q4_0, 32, 16>(ggml_tensor * t, const void * data, size_t data_size) {
