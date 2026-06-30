@@ -5,16 +5,20 @@
 	import { chatStore, isLoading, isChatStreaming } from '$lib/stores/chat.svelte';
 	import { activeMessages, activeConversation } from '$lib/stores/conversations.svelte';
 	import { config } from '$lib/stores/settings.svelte';
-	import { getProcessingInfoContext } from '$lib/contexts';
 
 	const processingState = useProcessingState();
-	const processingInfoCtx = getProcessingInfoContext();
-
-	let showProcessingInfo = $derived(processingInfoCtx.showProcessingInfo);
 
 	let isCurrentConversationLoading = $derived(isLoading());
 	let isStreaming = $derived(isChatStreaming());
 	let processingDetails = $derived(processingState.getTechnicalDetails());
+
+	let processingVisible = $derived(processingDetails.length > 0);
+
+	let { onVisibilityChange }: { onVisibilityChange?: (visible: boolean) => void } = $props();
+
+	$effect(() => {
+		onVisibilityChange?.(processingVisible);
+	});
 
 	$effect(() => {
 		const conversation = activeConversation();
@@ -60,9 +64,12 @@
 </script>
 
 <div
-	class={['chat-processing-info-container pointer-events-none', showProcessingInfo && 'visible']}
+	class={[
+		'chat-processing-info-container pointer-events-none relative w-full hidden md:block',
+		processingVisible && 'visible'
+	]}
 >
-	<div class="chat-processing-info-content">
+	<div class="chat-processing-info-content absolute bottom-4 left-1/2 -translate-x-1/2">
 		{#each processingDetails as detail (detail)}
 			<span class="chat-processing-info-detail pointer-events-auto backdrop-blur-sm">{detail}</span>
 		{/each}

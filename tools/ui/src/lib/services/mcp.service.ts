@@ -16,7 +16,9 @@ import {
 	DEFAULT_MCP_CONFIG,
 	DEFAULT_CLIENT_VERSION,
 	DEFAULT_IMAGE_MIME_TYPE,
-	MCP_PARTIAL_REDACT_HEADERS
+	CORS_PROXY_HEADER_PREFIX,
+	MCP_PARTIAL_REDACT_HEADERS,
+	CORS_PROXY_ENDPOINT
 } from '$lib/constants';
 import {
 	MCPConnectionPhase,
@@ -132,6 +134,20 @@ export class MCPService {
 		return details;
 	}
 
+	private static addRequestHeaders(
+		requestHeaders: Headers,
+		headers: HeadersInit,
+		useProxy: boolean
+	) {
+		for (const [key, value] of new Headers(headers).entries()) {
+			const proxiedKey =
+				useProxy && !key.toLowerCase().startsWith(CORS_PROXY_HEADER_PREFIX)
+					? `${CORS_PROXY_HEADER_PREFIX}${key}`
+					: key;
+			requestHeaders.set(proxiedKey, value);
+		}
+	}
+
 	private static summarizeError(error: unknown): Record<string, unknown> {
 		if (error instanceof Error) {
 			return {
@@ -236,19 +252,45 @@ export class MCPService {
 
 		return {
 			fetch: async (input, init) => {
+				if (useProxy && typeof window !== 'undefined') {
+					let requestUrlStr = '';
+					if (typeof input === 'string') {
+						requestUrlStr = input;
+					} else if (input instanceof URL) {
+						requestUrlStr = input.href;
+					}
+
+					if (requestUrlStr) {
+						const parsedRequestUrl = new URL(requestUrlStr, window.location.origin);
+						if (
+							parsedRequestUrl.origin === window.location.origin &&
+							!parsedRequestUrl.pathname.includes(CORS_PROXY_ENDPOINT)
+						) {
+							const originalConfigUrl = new URL(config.url);
+							const realTargetUrl = new URL(
+								parsedRequestUrl.pathname + parsedRequestUrl.search,
+								originalConfigUrl.origin
+							);
+							const proxiedUrl = buildProxiedUrl(realTargetUrl.href);
+
+							if (typeof input === 'string') {
+								input = proxiedUrl.href;
+							} else if (input instanceof URL) {
+								input = proxiedUrl;
+							}
+						}
+					}
+				}
+
 				const startedAt = performance.now();
 				const requestHeaders = new Headers(baseInit.headers);
 
 				if (typeof Request !== 'undefined' && input instanceof Request) {
-					for (const [key, value] of input.headers.entries()) {
-						requestHeaders.set(key, value);
-					}
+					this.addRequestHeaders(requestHeaders, input.headers, useProxy);
 				}
 
 				if (init?.headers) {
-					for (const [key, value] of new Headers(init.headers).entries()) {
-						requestHeaders.set(key, value);
-					}
+					this.addRequestHeaders(requestHeaders, init.headers, useProxy);
 				}
 
 				const request = this.createDiagnosticRequestDetails(
@@ -392,7 +434,7 @@ export class MCPService {
 
 			const url = new URL(config.url);
 
-			if (import.meta.env.DEV) {
+			if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
 				console.log(`[MCPService] Creating WebSocket transport for ${url.href}`);
 			}
 
@@ -400,6 +442,32 @@ export class MCPService {
 				transport: new WebSocketClientTransport(url),
 				type: MCPTransportType.WEBSOCKET,
 				stopPhaseLogging: () => {}
+			};
+		}
+
+		if (config.transport === MCPTransportType.SSE) {
+			const url = useProxy ? buildProxiedUrl(config.url) : new URL(config.url);
+			const { fetch: diagnosticFetch, disable: stopPhaseLogging } = this.createDiagnosticFetch(
+				serverName,
+				config,
+				requestInit,
+				url,
+				useProxy,
+				onLog
+			);
+
+			if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
+				console.log(`[MCPService] Creating SSE transport for ${url.href}`);
+			}
+
+			return {
+				transport: new SSEClientTransport(url, {
+					requestInit,
+					fetch: diagnosticFetch,
+					eventSourceInit: { fetch: diagnosticFetch }
+				}),
+				type: MCPTransportType.SSE,
+				stopPhaseLogging
 			};
 		}
 
@@ -413,12 +481,12 @@ export class MCPService {
 			onLog
 		);
 
-		if (useProxy && import.meta.env.DEV) {
+		if (useProxy && import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
 			console.log(`[MCPService] Using CORS proxy for ${config.url} -> ${url.href}`);
 		}
 
 		try {
-			if (import.meta.env.DEV) {
+			if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
 				console.log(`[MCPService] Creating StreamableHTTP transport for ${url.href}`);
 			}
 
@@ -520,7 +588,7 @@ export class MCPService {
 			)
 		);
 
-		if (import.meta.env.DEV) {
+		if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
 			console.log(`[MCPService][${serverName}] Creating transport...`);
 		}
 
@@ -560,6 +628,23 @@ export class MCPService {
 		);
 
 		const runtimeErrorHandler = (error: Error) => {
+			// the SDK reports any post initialize error here, including the abort we trigger
+			// ourselves on the next health check cycle, on tab unload, or on server teardown.
+			// these are lifecycle aborts, not actionable errors, so we keep them out of the red console.
+			// the SDK wraps the original AbortError in a generic Error like
+			//   "SSE stream disconnected: AbortError: The operation was aborted."
+			// which isAbortError cannot recognize by name alone, so we also pattern match on the message
+			if (isAbortError(error)) {
+				return;
+			}
+			const msg = error?.message ?? '';
+			if (
+				/SSE stream disconnected:.*AbortError/i.test(msg) ||
+				/AbortError: .*aborted/i.test(msg) ||
+				/stream locked by a reader/i.test(msg)
+			) {
+				return;
+			}
 			console.error(`[MCPService][${serverName}] Protocol error after initialize:`, error);
 		};
 
@@ -658,7 +743,10 @@ export class MCPService {
 			this.createLog(MCPConnectionPhase.LISTING_TOOLS, 'Listing available tools...')
 		);
 
-		console.log(`[MCPService][${serverName}] Connected, listing tools...`);
+		if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
+			console.log(`[MCPService][${serverName}] Connected, listing tools...`);
+		}
+
 		const tools = await this.listTools({
 			client,
 			transport,
@@ -680,10 +768,11 @@ export class MCPService {
 				`Connection established with ${tools.length} tools (${connectionTimeMs}ms)`
 			)
 		);
-
-		console.log(
-			`[MCPService][${serverName}] Initialization complete with ${tools.length} tools in ${connectionTimeMs}ms`
-		);
+		if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
+			console.log(
+				`[MCPService][${serverName}] Initialization complete with ${tools.length} tools in ${connectionTimeMs}ms`
+			);
+		}
 
 		return {
 			client,
@@ -709,9 +798,22 @@ export class MCPService {
 	 * @param connection - The active MCP connection to close
 	 */
 	static async disconnect(connection: MCPConnection): Promise<void> {
-		console.log(`[MCPService][${connection.serverName}] Disconnecting...`);
+		if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
+			console.log(`[MCPService][${connection.serverName}] Disconnecting...`);
+		}
+
 		try {
-			// Prevent reconnection on voluntary disconnect
+			// Terminate the session first for streamable-http transports to cleanly
+			// close streams, matching the inspector's disconnect flow.
+			if (connection.transport instanceof StreamableHTTPClientTransport) {
+				await connection.transport.terminateSession();
+			}
+
+			// Clear error handlers before closing to prevent noise from expected
+			// abort errors during shutdown. The inspector avoids this entirely
+			// by not setting onerror, but since we use it for protocol logging,
+			// we must clear it before disconnect.
+			connection.client.onerror = undefined;
 			if (connection.transport.onclose) {
 				connection.transport.onclose = undefined;
 			}
@@ -1078,7 +1180,9 @@ export class MCPService {
 		try {
 			await connection.client.unsubscribeResource({ uri });
 
-			console.log(`[MCPService][${connection.serverName}] Unsubscribed from resource: ${uri}`);
+			if (import.meta.env.DEV && import.meta.env.VITE_DEBUG) {
+				console.log(`[MCPService][${connection.serverName}] Unsubscribed from resource: ${uri}`);
+			}
 		} catch (error) {
 			console.error(
 				`[MCPService][${connection.serverName}] Failed to unsubscribe from resource:`,

@@ -181,7 +181,7 @@
 #            define GGML_API __declspec(dllimport) extern
 #        endif
 #    else
-#        define GGML_API __attribute__ ((visibility ("default")))
+#        define GGML_API __attribute__ ((visibility ("default"))) extern
 #    endif
 #else
 #    define GGML_API extern
@@ -429,12 +429,7 @@ extern "C" {
         GGML_TYPE_MXFP4   = 39, // MXFP4 (1 block)
         GGML_TYPE_NVFP4   = 40, // NVFP4 (4 blocks, E4M3 scale)
         GGML_TYPE_Q1_0    = 41,
-        GGML_TYPE_TURBO2_0 = 42, // TurboQuant 2-bit KV cache: WHT + 2-bit PolarQuant
-        GGML_TYPE_TURBO3_0 = 43, // TurboQuant 3-bit KV cache: WHT + 3-bit PolarQuant
-        GGML_TYPE_TURBO4_0 = 44, // TurboQuant 4-bit KV cache: WHT + 4-bit PolarQuant
-        GGML_TYPE_TQ3_1S  = 45, // TurboQuant 3-bit weight: WHT-rotated 8-level Lloyd-Max, block_size=32
-        GGML_TYPE_TQ4_1S  = 46, // TurboQuant 4-bit weight: WHT-rotated 16-level Lloyd-Max, block_size=32
-        GGML_TYPE_COUNT   = 47,
+        GGML_TYPE_COUNT   = 42,
     };
 
     // precision
@@ -540,6 +535,7 @@ extern "C" {
         GGML_OP_IM2COL,
         GGML_OP_IM2COL_BACK,
         GGML_OP_IM2COL_3D,
+        GGML_OP_COL2IM_1D,
         GGML_OP_CONV_2D,
         GGML_OP_CONV_3D,
         GGML_OP_CONV_2D_DW,
@@ -572,7 +568,6 @@ extern "C" {
         GGML_OP_RWKV_WKV7,
         GGML_OP_SOLVE_TRI,
         GGML_OP_GATED_DELTA_NET,
-        GGML_OP_TURBO_WHT,
 
         GGML_OP_UNARY,
 
@@ -1195,8 +1190,8 @@ extern "C" {
             struct ggml_context * ctx,
             struct ggml_tensor  * a);
 
-    // a - x
-    // b - dy
+    // a - dy
+    // b - x
     GGML_API struct ggml_tensor * ggml_silu_back(
             struct ggml_context * ctx,
             struct ggml_tensor  * a,
@@ -2013,6 +2008,16 @@ extern "C" {
         int                   d1, // dilation dimension 1
         bool                  is_2D);
 
+    // col2im_1d: scatter-add GEMM columns back to 1D signal
+    // a: [K*OC, T_in]  (columns from matmul, K = a->ne[0]/OC)
+    // result: [T_out, OC]  where T_out = (T_in - 1)*s0 + K - 2*p0
+    GGML_API struct ggml_tensor * ggml_col2im_1d(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * a,   // columns [K*OC, T_in]
+        int                   s0,  // stride
+        int                   oc,  // output channels
+        int                   p0); // padding to crop from both sides
+
     GGML_API struct ggml_tensor * ggml_conv_1d(
             struct ggml_context * ctx,
             struct ggml_tensor  * a,   // convolution kernel
@@ -2548,10 +2553,16 @@ extern "C" {
     // TODO: add ggml_gated_delta_net_set_bcast() to be able to configure Q, K broadcast type: tiled vs interleaved [TAG_GGML_GDN_BCAST]
     // ref: https://github.com/ggml-org/llama.cpp/pull/19468#discussion_r2786394306
     //
-    // state is a 3D tensor of shape (S_v*S_v*H, K, n_seqs):
-    //   K == 1: output carries the final state only.
-    //   K  > 1: output carries K snapshot slots; the kernel writes the last min(n_tokens, K)
-    //   per-token snapshots into the trailing slots
+    // tensor shapes (S_k == S_v, H_v % H_k == 0):
+    //   q, k  : [S_k, H_k, n_tokens, n_seqs]
+    //   v     : [S_v, H_v, n_tokens, n_seqs]
+    //   g     : [1, H_v, n_tokens, n_seqs] (scalar gate) or [S_v, H_v, n_tokens, n_seqs] (KDA)
+    //   beta  : [1, H_v, n_tokens, n_seqs]
+    //   state : [S_v, S_v, H_v, n_seqs] -- initial recurrent state s0
+    //
+    // the output packs the attention scores [S_v, H_v, n_tokens, n_seqs] followed by K state
+    // snapshots, most-recent first (slot 0 = final state, slot s = state s tokens back). K == 1
+    // keeps only the final state; when n_tokens < K only slots 0..n_tokens-1 are written.
     GGML_API struct ggml_tensor * ggml_gated_delta_net(
             struct ggml_context * ctx,
             struct ggml_tensor  * q,
@@ -2559,17 +2570,8 @@ extern "C" {
             struct ggml_tensor  * v,
             struct ggml_tensor  * g,
             struct ggml_tensor  * beta,
-            struct ggml_tensor  * state);
-
-    // TurboQuant Walsh-Hadamard Transform (O(d log d) rotation for KV cache compression)
-    // Applies WHT rotation to 128-element groups along ne[0]: sign1 → butterfly → sign2 → normalize
-    // direction: 0 = forward (signs1 → WHT → signs2), 1 = inverse (signs2 → WHT → signs1)
-    GGML_API struct ggml_tensor * ggml_turbo_wht(
-            struct ggml_context * ctx,
-            struct ggml_tensor  * a,
-            int                   direction,
-            int                   group_size,    // 0 = auto (64 or 128 from ne[0])
-            struct ggml_tensor  * scale);        // NULL = no InnerQ scaling
+            struct ggml_tensor  * state,
+            int64_t               K);
 
     // custom operators
 

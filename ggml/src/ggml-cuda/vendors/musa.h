@@ -32,6 +32,7 @@
 #define cublasSetMathMode mublasSetMathMode
 #define cublasSetStream mublasSetStream
 #define cublasSgemm mublasSgemm
+#define cublasSgemmBatched mublasSgemmBatched
 #define cublasSgemmStridedBatched mublasSgemmStridedBatched
 #define cublasStatus_t mublasStatus_t
 #define cublasOperation_t mublasOperation_t
@@ -76,9 +77,7 @@
 #define cudaMemcpyDeviceToDevice musaMemcpyDeviceToDevice
 #define cudaMemcpyDeviceToHost musaMemcpyDeviceToHost
 #define cudaMemcpyHostToDevice musaMemcpyHostToDevice
-#define cudaMemcpyFromSymbol musaMemcpyFromSymbol
 #define cudaMemcpyKind musaMemcpyKind
-#define cudaMemcpyToSymbol musaMemcpyToSymbol
 #define cudaMemset musaMemset
 #define cudaMemsetAsync musaMemsetAsync
 #define cudaMemGetInfo musaMemGetInfo

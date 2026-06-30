@@ -18,7 +18,7 @@ import {
 	MimeTypeApplication,
 	MimeTypeText
 } from '$lib/enums';
-import { FileExtensionVideo, FileTypeVideo } from '$lib/enums/files';
+import { FileExtensionVideo, FileTypeVideo } from '$lib/enums/files.enums';
 
 // File type configuration using enums
 export const AUDIO_FILE_TYPES = {
@@ -63,6 +63,10 @@ export const IMAGE_FILE_TYPES = {
 	[FileTypeImage.SVG]: {
 		extensions: [FileExtensionImage.SVG],
 		mimeTypes: [MimeTypeImage.SVG]
+	},
+	[FileTypeImage.HEIC]: {
+		extensions: [FileExtensionImage.HEIC, FileExtensionImage.HEIF],
+		mimeTypes: [MimeTypeImage.HEIC, MimeTypeImage.HEIF]
 	}
 } as const;
 

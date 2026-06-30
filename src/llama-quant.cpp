@@ -817,8 +817,6 @@ ggml_type llama_ftype_get_default_type(llama_ftype ftype) {
         case LLAMA_FTYPE_MOSTLY_Q6_K:    return GGML_TYPE_Q6_K;
         case LLAMA_FTYPE_MOSTLY_TQ1_0:   return GGML_TYPE_TQ1_0;
         case LLAMA_FTYPE_MOSTLY_TQ2_0:   return GGML_TYPE_TQ2_0;
-        case LLAMA_FTYPE_MOSTLY_TQ3_1S:  return GGML_TYPE_TQ3_1S;
-        case LLAMA_FTYPE_MOSTLY_TQ4_1S:  return GGML_TYPE_TQ4_1S;
         case LLAMA_FTYPE_MOSTLY_IQ2_XXS: return GGML_TYPE_IQ2_XXS;
         case LLAMA_FTYPE_MOSTLY_IQ2_XS:  return GGML_TYPE_IQ2_XS;
         case LLAMA_FTYPE_MOSTLY_IQ2_S:   return GGML_TYPE_IQ2_XS;
@@ -849,7 +847,7 @@ static void init_quantize_state_counters(quantize_state_impl & qs, std::vector<t
             qs.has_tied_embeddings = false;
         }
     }
-    qs.n_ffn_down = qs.n_ffn_gate = qs.n_ffn_up = (int)qs.model.hparams.n_layer;
+    qs.n_ffn_down = qs.n_ffn_gate = qs.n_ffn_up = (int)qs.model.hparams.n_layer_all;
 }
 
 //
@@ -934,8 +932,8 @@ static void llama_model_quantize_impl(const std::string & fname_inp, const std::
 
     // copy the KV pairs from the input file
     gguf_set_kv     (ctx_out.get(), ml.metadata);
-    gguf_set_val_u32(ctx_out.get(), "general.quantization_version", GGML_QNT_VERSION); // TODO: use LLM_KV
-    gguf_set_val_u32(ctx_out.get(), "general.file_type", ftype); // TODO: use LLM_KV
+    gguf_set_val_u32(ctx_out.get(), ml.llm_kv(LLM_KV_GENERAL_QUANTIZATION_VERSION).c_str(), GGML_QNT_VERSION);
+    gguf_set_val_u32(ctx_out.get(), ml.llm_kv(LLM_KV_GENERAL_FILE_TYPE).c_str(), ftype);
 
     // Remove split metadata
     gguf_remove_key(ctx_out.get(), ml.llm_kv(LLM_KV_SPLIT_NO).c_str());
@@ -1350,7 +1348,7 @@ llama_model * llama_quant_model_from_metadata(const llama_quant_model_desc * des
     model->hparams.n_embd             = desc->n_embd;
     model->hparams.n_embd_head_k_full = desc->n_embd_head_k;
     model->hparams.n_embd_head_v_full = desc->n_embd_head_v;
-    model->hparams.n_layer            = desc->n_layer;
+    model->hparams.n_layer_all        = desc->n_layer;
     model->hparams.n_expert           = desc->n_expert;
 
     for (uint32_t i = 0; i < desc->n_layer; i++) {

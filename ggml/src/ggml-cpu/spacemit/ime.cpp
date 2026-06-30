@@ -27,6 +27,8 @@
 #include <cerrno>
 #include <cmath>
 #include <cstdio>  // for GGML_ASSERT
+#include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <thread>
 // clang-format off
@@ -200,6 +202,13 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         //case GGML_TYPE_MXFP4:
                         forward_mul_mat(params, op);
                         return true;
+                    case GGML_TYPE_BF16:
+                    case GGML_TYPE_F32:
+                        if constexpr (std::is_same_v<BLOC_TYPE, block_q8_0>) {
+                            forward_mul_mat(params, op);
+                            return true;
+                        }
+                        return false;
                     default:
                         // GGML_ABORT("fatal error: unsupported type for src0 in MUL_MAT");
                         return false;
@@ -935,6 +944,20 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
     }
 };
 
+class tensor_traits_bf16_proj_q8_0 : public tensor_traits<block_q8_0, 32, 32> {
+    int repack(ggml_tensor * t, const void * data, size_t data_size) override {
+        GGML_LOG_DEBUG("%s: repack tensor %s with bf16_q8_0_32x32\n", __func__, t->name);
+        return ggml::cpu::riscv64_spacemit::repack_bf16_to_q8_0_32x32(t, data, data_size);
+    }
+};
+
+class tensor_traits_f32_proj_q8_0 : public tensor_traits<block_q8_0, 32, 32> {
+    int repack(ggml_tensor * t, const void * data, size_t data_size) override {
+        GGML_LOG_DEBUG("%s: repack tensor %s with f32_q8_0_32x32\n", __func__, t->name);
+        return ggml::cpu::riscv64_spacemit::repack_f32_to_q8_0_32x32(t, data, data_size);
+    }
+};
+
 class tensor_traits_common : public tensor_traits_base {
     bool work_size(int n_threads, const ggml_tensor * op, size_t & size) override {
         switch (op->op) {
@@ -1243,8 +1266,11 @@ static const tensor_traits<block_q4_1, 32, 32>  q4_1_32x32_q8_0;
 static const tensor_traits<block_q4_0, 256, 32> q4_0_32x256_q8_0;
 static const tensor_traits<block_q4_1, 256, 32> q4_1_32x256_q8_0;
 static const tensor_traits<block_q4_K, 32, 32>  q4_k_32x32_q8_0;
+static const tensor_traits<block_q4_K, 256, 32> q4_k_32x256_q8_0;
 static const tensor_traits<block_q6_K, 32, 32>  q6_k_32x32_q8_0;
 static const tensor_traits<block_q8_0, 32, 32>  q8_0_32x32_q8_0;
+static const tensor_traits_bf16_proj_q8_0       bf16_proj_q8_0_32x32;
+static const tensor_traits_f32_proj_q8_0        f32_proj_q8_0_32x32;
 static const tensor_traits<block_mxfp4, 32, 32> mxfp4_32x32_q8_0;
 static const tensor_traits<block_q5_K, 32, 32>  q5_k_32x32_q8_0;
 static const tensor_traits<block_q5_1, 32, 32>  q5_1_32x32_q8_0;
@@ -1254,7 +1280,44 @@ static const tensor_traits_common               rvv_impl;
 
 }  // namespace ggml::cpu::riscv64_spacemit
 
+static bool ggml_riscv64_spacemit_name_ends_with(const char * name, const char * suffix) {
+    const size_t name_len   = std::strlen(name);
+    const size_t suffix_len = std::strlen(suffix);
+    return name_len >= suffix_len && std::strcmp(name + name_len - suffix_len, suffix) == 0;
+}
+
+static bool ggml_riscv64_spacemit_is_bf16_proj_q8_candidate(const ggml_tensor * cur) {
+#if defined(RISCV64_SPACEMIT_IME2)
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_BF16 &&
+           ggml_n_dims(cur) == 2 && cur->ne[0] % QK8_0 == 0 && cur->ne[1] % 32 == 0 &&
+           std::strcmp(cur->name, "per_layer_model_proj.weight") == 0;
+#else
+    GGML_UNUSED(cur);
+    return false;
+#endif
+}
+
+static bool ggml_riscv64_spacemit_is_f32_proj_q8_candidate(const ggml_tensor * cur) {
+#if defined(RISCV64_SPACEMIT_IME2)
+    return ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 && cur->type == GGML_TYPE_F32 &&
+           ggml_n_dims(cur) == 2 && cur->ne[0] % QK8_0 == 0 && cur->ne[1] % 32 == 0 &&
+           std::strncmp(cur->name, "blk.", 4) == 0 &&
+           (ggml_riscv64_spacemit_name_ends_with(cur->name, ".inp_gate.weight") ||
+            ggml_riscv64_spacemit_name_ends_with(cur->name, ".proj.weight"));
+#else
+    GGML_UNUSED(cur);
+    return false;
+#endif
+}
+
 static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack_type(const ggml_tensor * cur) {
+    if (ggml_riscv64_spacemit_is_bf16_proj_q8_candidate(cur)) {
+        return &ggml::cpu::riscv64_spacemit::bf16_proj_q8_0_32x32;
+    }
+    if (ggml_riscv64_spacemit_is_f32_proj_q8_candidate(cur)) {
+        return &ggml::cpu::riscv64_spacemit::f32_proj_q8_0_32x32;
+    }
+
     switch (cur->type) {
         case GGML_TYPE_Q2_K:
             {
@@ -1318,6 +1381,11 @@ static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack
         case GGML_TYPE_Q4_K:
             {
 #if defined(RISCV64_SPACEMIT_IME2)
+                if (cur->ne[1] % 32 == 0 && cur->ne[0] % 256 == 0 &&
+                    (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
+                    return &ggml::cpu::riscv64_spacemit::q4_k_32x256_q8_0;
+                }
+
                 if (cur->ne[1] % 32 == 0 && (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
                     return &ggml::cpu::riscv64_spacemit::q4_k_32x32_q8_0;
                 }
@@ -1509,6 +1577,14 @@ static size_t ggml_backend_cpu_riscv64_spacemit_nbytes(ggml_backend_buffer_type_
         }
         return total;
     };
+
+    if (ggml_riscv64_spacemit_is_bf16_proj_q8_candidate(tensor) ||
+        ggml_riscv64_spacemit_is_f32_proj_q8_candidate(tensor)) {
+        const int64_t nrow        = ggml_nrows(tensor);
+        const int64_t padded_nrow = GGML_PAD(nrow, 32);
+        const int64_t nblocks     = tensor->ne[0] / QK8_0;
+        return (size_t) padded_nrow * nblocks * sizeof(block_q8_0);
+    }
 
     const size_t blck_size = ggml_blck_size(tensor->type);
     if (blck_size == 1) {

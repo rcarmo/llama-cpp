@@ -225,43 +225,6 @@ ggml_metal_library_t ggml_metal_library_init(ggml_metal_device_t dev) {
                 [prep setObject:@"1" forKey:@"GGML_METAL_EMBED_LIBRARY"];
 #endif
 
-                // TurboQuant: auto-select dequant path based on hardware
-                // M1/M2/M3/M4 (no tensor API): 4-mag LUT (+38-45% decode at long ctx)
-                // M5+ (has tensor API): 8-entry full LUT (best decode speed)
-                {
-                    const char * force_4mag = getenv("TURBO_FORCE_4MAG");
-                    // Always compile with 4-mag support. The dispatch code selects
-                    // 4-mag vs 8-LUT based on context depth at runtime.
-                    // Pre-M5: always 4-mag (constant cache too slow)
-                    // M5+: 4-mag for mid-context (8K-20K), 8-LUT otherwise
-                    if (!ggml_metal_device_get_props(dev)->has_tensor || (force_4mag && force_4mag[0] == '1')) {
-                        [prep setObject:@"1" forKey:@"TURBO_USE_4MAG"];
-                        GGML_LOG_INFO("%s: turbo3 using 4-mag LUT%s\n", __func__,
-                            force_4mag ? " (forced)" : " (pre-M5 hardware)");
-                    }
-                    // Sparse V dequant: skip V for negligible attention weights
-                    // Enabled by default on all Metal (validated: PPL identical, NIAH 9/9, 30+ testers)
-                    // Opt-out via TURBO_SPARSE_V=0
-                    const char * sparse_v_env = getenv("TURBO_SPARSE_V");
-                    const bool sparse_v_disabled = sparse_v_env && sparse_v_env[0] == '0';
-                    if (!sparse_v_disabled) {
-                        [prep setObject:@"1" forKey:@"TURBO_SPARSE_V"];
-                        GGML_LOG_INFO("%s: turbo3 sparse V dequant enabled (opt-out: TURBO_SPARSE_V=0)\n", __func__);
-                    }
-                    // TODO: context-adaptive dispatch — compile both 4-mag and 8-LUT
-                    // FA kernel instantiations, select based on ne11 (KV cache size)
-                    // at dispatch time in ggml_metal_op_flash_attn_ext()
-                }
-
-                // TurboQuant profiling: set TURBO_PROFILE_MODE env var (0-4)
-                {
-                    const char * pm = getenv("TURBO_PROFILE_MODE");
-                    if (pm && pm[0] >= '0' && pm[0] <= '4') {
-                        [prep setObject:[NSString stringWithUTF8String:pm] forKey:@"TURBO_PROFILE_MODE"];
-                        GGML_LOG_INFO("%s: TURBO_PROFILE_MODE=%s\n", __func__, pm);
-                    }
-                }
-
                 MTLCompileOptions * options = [MTLCompileOptions new];
                 options.preprocessorMacros = prep;
 
@@ -584,6 +547,8 @@ struct ggml_metal_rsets {
     // number of seconds since the last graph computation
     // keep the residency sets wired for that amount of time to avoid being collected by the OS
     int keep_alive_s;
+    int loops_per_s;
+    int time_per_loop_ms;
 
     // background heartbeat thread to keep the residency sets alive
     atomic_bool d_stop;
@@ -610,10 +575,13 @@ ggml_metal_rsets_t ggml_metal_rsets_init(void) {
         res->keep_alive_s = 3*60;
     }
 
+    res->time_per_loop_ms = 5;
+    res->loops_per_s = 1000/res->time_per_loop_ms;
+
     GGML_LOG_INFO("%s: creating a residency set collection (keep_alive = %d s)\n", __func__, res->keep_alive_s);
 
     atomic_store_explicit(&res->d_stop, false, memory_order_relaxed);
-    atomic_store_explicit(&res->d_loop, 2*res->keep_alive_s, memory_order_relaxed);
+    atomic_store_explicit(&res->d_loop, res->loops_per_s*res->keep_alive_s, memory_order_relaxed);
 
     res->d_group = dispatch_group_create();
 
@@ -636,8 +604,7 @@ ggml_metal_rsets_t ggml_metal_rsets_init(void) {
                       [res->lock unlock];
                   }
 
-                  // half a second
-                  usleep(500 * 1000);
+                  usleep(res->time_per_loop_ms * 1000);
               }
         }
 #endif
@@ -663,6 +630,50 @@ void ggml_metal_rsets_free(ggml_metal_rsets_t rsets) {
     [rsets->lock release];
 
     free(rsets);
+}
+
+static enum ggml_metal_device_id ggml_metal_device_id_parse(const char * name) {
+    if (!name) {
+        return GGML_METAL_DEVICE_GENERIC;
+    }
+
+    static const char prefix[] = "Apple ";
+    if (strncmp(name, prefix, sizeof(prefix) - 1) != 0) {
+        return GGML_METAL_DEVICE_GENERIC;
+    }
+    const char * suffix = name + sizeof(prefix) - 1;
+
+    static const struct {
+        const char * name;
+        enum ggml_metal_device_id id;
+    } table[] = {
+        {"M1",       GGML_METAL_DEVICE_M1},
+        {"M1 Pro",   GGML_METAL_DEVICE_M1_PRO},
+        {"M1 Max",   GGML_METAL_DEVICE_M1_MAX},
+        {"M1 Ultra", GGML_METAL_DEVICE_M1_ULTRA},
+        {"M2",       GGML_METAL_DEVICE_M2},
+        {"M2 Pro",   GGML_METAL_DEVICE_M2_PRO},
+        {"M2 Max",   GGML_METAL_DEVICE_M2_MAX},
+        {"M2 Ultra", GGML_METAL_DEVICE_M2_ULTRA},
+        {"M3",       GGML_METAL_DEVICE_M3},
+        {"M3 Pro",   GGML_METAL_DEVICE_M3_PRO},
+        {"M3 Max",   GGML_METAL_DEVICE_M3_MAX},
+        {"M3 Ultra", GGML_METAL_DEVICE_M3_ULTRA},
+        {"M4",       GGML_METAL_DEVICE_M4},
+        {"M4 Pro",   GGML_METAL_DEVICE_M4_PRO},
+        {"M4 Max",   GGML_METAL_DEVICE_M4_MAX},
+        {"M5",       GGML_METAL_DEVICE_M5},
+        {"M5 Pro",   GGML_METAL_DEVICE_M5_PRO},
+        {"M5 Max",   GGML_METAL_DEVICE_M5_MAX},
+        {"M5 Ultra", GGML_METAL_DEVICE_M5_ULTRA},
+    };
+
+    for (size_t i = 0; i < sizeof(table)/sizeof(table[0]); ++i) {
+        if (strcmp(suffix, table[i].name) == 0) {
+            return table[i].id;
+        }
+    }
+    return GGML_METAL_DEVICE_GENERIC;
 }
 
 ggml_metal_device_t ggml_metal_device_init(int device) {
@@ -832,6 +843,8 @@ ggml_metal_device_t ggml_metal_device_init(int device) {
 
             dev->props.supports_gpu_family_apple7 = [dev->mtl_device supportsFamily:MTLGPUFamilyApple7];
 
+            dev->props.device_id = ggml_metal_device_id_parse([[dev->mtl_device name] UTF8String]);
+
             dev->props.op_offload_min_batch_size  = getenv("GGML_OP_OFFLOAD_MIN_BATCH") ? atoi(getenv("GGML_OP_OFFLOAD_MIN_BATCH")) : 32;
 
             dev->props.max_buffer_size            = dev->mtl_device.maxBufferLength;
@@ -970,7 +983,7 @@ void ggml_metal_device_rsets_keep_alive(ggml_metal_device_t dev) {
         return;
     }
 
-    atomic_store_explicit(&dev->rsets->d_loop, 2*dev->rsets->keep_alive_s, memory_order_relaxed);
+    atomic_store_explicit(&dev->rsets->d_loop, dev->rsets->loops_per_s*dev->rsets->keep_alive_s, memory_order_relaxed);
 }
 
 struct ggml_metal_event {
@@ -1098,7 +1111,7 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                 case GGML_GLU_OP_SWIGLU_OAI:
                 case GGML_GLU_OP_GEGLU_ERF:
                 case GGML_GLU_OP_GEGLU_QUICK:
-                    return ggml_is_contiguous_1(op->src[0]) && op->src[0]->type == GGML_TYPE_F32;
+                    return ggml_is_contiguous_1(op->src[0]) && (op->src[0]->type == GGML_TYPE_F32 || op->src[0]->type == GGML_TYPE_F16);
                default:
                     return false;
             }
@@ -1107,8 +1120,28 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
         case GGML_OP_VIEW:
         case GGML_OP_TRANSPOSE:
         case GGML_OP_PERMUTE:
-        case GGML_OP_CONCAT:
             return true;
+        case GGML_OP_CONCAT:
+            {
+                const enum ggml_type src0_type = op->src[0]->type;
+                const enum ggml_type src1_type = op->src[1]->type;
+                if (src0_type != src1_type || src0_type != op->type) {
+                    return false;
+                }
+                switch (src0_type) {
+                    case GGML_TYPE_F32:
+                    case GGML_TYPE_F16:
+                    case GGML_TYPE_I8:
+                    case GGML_TYPE_I16:
+                    case GGML_TYPE_I32:
+                    case GGML_TYPE_I64:
+                        return true;
+                    case GGML_TYPE_BF16:
+                        return has_bfloat;
+                    default:
+                        return false;
+                }
+            }
         case GGML_OP_ADD:
         case GGML_OP_SUB:
         case GGML_OP_MUL:
@@ -1151,6 +1184,7 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
         case GGML_OP_RMS_NORM:
             return has_simdgroup_reduction && (ggml_is_contiguous_rows(op->src[0]));
         case GGML_OP_ROPE:
+        case GGML_OP_ROPE_BACK:
             return true;
         case GGML_OP_IM2COL:
             return ggml_is_contiguous(op->src[1]) && op->src[1]->type == GGML_TYPE_F32 && (op->type == GGML_TYPE_F16 || op->type == GGML_TYPE_F32);
@@ -1201,23 +1235,7 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                 return false;
             }
             if (op->src[1]->type != op->src[2]->type) {
-                // Allow asymmetric K/V for supported mixed pairs:
-                // - turbo x turbo (any combination)
-                // - q8_0 x turbo (either direction)
-                const bool k_is_turbo = (op->src[1]->type == GGML_TYPE_TURBO2_0 ||
-                                         op->src[1]->type == GGML_TYPE_TURBO3_0 ||
-                                         op->src[1]->type == GGML_TYPE_TURBO4_0);
-                const bool v_is_turbo = (op->src[2]->type == GGML_TYPE_TURBO2_0 ||
-                                         op->src[2]->type == GGML_TYPE_TURBO3_0 ||
-                                         op->src[2]->type == GGML_TYPE_TURBO4_0);
-                const bool k_is_q8 = (op->src[1]->type == GGML_TYPE_Q8_0);
-                const bool v_is_q8 = (op->src[2]->type == GGML_TYPE_Q8_0);
-                const bool supported = (k_is_turbo && v_is_turbo) ||
-                                       (k_is_q8 && v_is_turbo) ||
-                                       (k_is_turbo && v_is_q8);
-                if (!supported) {
-                    return false;
-                }
+                return false;
             }
             switch (op->src[1]->type) {
                 case GGML_TYPE_F32:
@@ -1227,9 +1245,6 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                 case GGML_TYPE_Q4_1:
                 case GGML_TYPE_Q5_0:
                 case GGML_TYPE_Q5_1:
-                case GGML_TYPE_TURBO2_0:
-                case GGML_TYPE_TURBO3_0:
-                case GGML_TYPE_TURBO4_0:
                     break;
                 case GGML_TYPE_BF16:
                     if (!has_bfloat) {
@@ -1248,8 +1263,6 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
             return true;
         case GGML_OP_GATED_DELTA_NET:
             return has_simdgroup_reduction && op->src[2]->ne[0] % 32 == 0;
-        case GGML_OP_TURBO_WHT:
-            return op->src[0]->ne[0] % 128 == 0;
         case GGML_OP_SOLVE_TRI:
         case GGML_OP_MUL_MAT:
         case GGML_OP_MUL_MAT_ID:
@@ -1273,9 +1286,6 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                            case GGML_TYPE_Q5_1:
                            case GGML_TYPE_IQ4_NL:
                            case GGML_TYPE_I32:
-                           case GGML_TYPE_TURBO2_0:
-                           case GGML_TYPE_TURBO3_0:
-                           case GGML_TYPE_TURBO4_0:
                                 return true;
                            default:
                                 return false;
@@ -1302,8 +1312,6 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                     case GGML_TYPE_Q5_0:
                     case GGML_TYPE_Q5_1:
                     case GGML_TYPE_Q8_0:
-                    case GGML_TYPE_TQ3_1S:
-                    case GGML_TYPE_TQ4_1S:
                         switch (op->type) {
                             case GGML_TYPE_F32:
                             case GGML_TYPE_F16:
@@ -1335,9 +1343,6 @@ bool ggml_metal_device_supports_op(ggml_metal_device_t dev, const struct ggml_te
                     case GGML_TYPE_Q5_0:
                     case GGML_TYPE_Q5_1:
                     case GGML_TYPE_IQ4_NL:
-                    case GGML_TYPE_TURBO2_0:
-                    case GGML_TYPE_TURBO3_0:
-                    case GGML_TYPE_TURBO4_0:
                         return true;
                     default:
                         return false;
