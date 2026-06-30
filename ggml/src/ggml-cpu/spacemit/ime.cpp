@@ -1015,11 +1015,26 @@ class tensor_traits_iq_compact : public tensor_traits_base {
     }
 
     static float dot_f32(const float * a, const float * b, int64_t n) {
+#if defined(__riscv_v_intrinsic)
+        float sum = 0.0f;
+        for (int64_t i = 0; i < n;) {
+            const size_t vl = __riscv_vsetvl_e32m8((size_t) (n - i));
+            vfloat32m8_t va = __riscv_vle32_v_f32m8(a + i, vl);
+            vfloat32m8_t vb = __riscv_vle32_v_f32m8(b + i, vl);
+            vfloat32m8_t vp = __riscv_vfmul_vv_f32m8(va, vb, vl);
+            vfloat32m1_t zero = __riscv_vfmv_s_f_f32m1(0.0f, vl);
+            vfloat32m1_t red  = __riscv_vfredusum_vs_f32m8_f32m1(vp, zero, vl);
+            sum += __riscv_vfmv_f_s_f32m1_f32(red);
+            i += (int64_t) vl;
+        }
+        return sum;
+#else
         float sum = 0.0f;
         for (int64_t i = 0; i < n; ++i) {
             sum += a[i] * b[i];
         }
         return sum;
+#endif
     }
 
     void forward_mul_mat_id(ggml_compute_params * params, ggml_tensor * op) const {
