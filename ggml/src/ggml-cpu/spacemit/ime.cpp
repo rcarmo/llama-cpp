@@ -1037,6 +1037,32 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 #endif
     }
 
+    static float dot_i8_f32_scaled(const int8_t * q, const float * y, int n, float scale) {
+#if defined(__riscv_v_intrinsic)
+        float sum = 0.0f;
+        for (int i = 0; i < n;) {
+            const size_t vl = __riscv_vsetvl_e8m1((size_t) (n - i));
+            vint8m1_t  vq8  = __riscv_vle8_v_i8m1(q + i, vl);
+            vint16m2_t vq16 = __riscv_vwadd_vx_i16m2(vq8, 0, vl);
+            vint32m4_t vq32 = __riscv_vwadd_vx_i32m4(vq16, 0, vl);
+            vfloat32m4_t vf = __riscv_vfcvt_f_x_v_f32m4(vq32, vl);
+            vfloat32m4_t vy = __riscv_vle32_v_f32m4(y + i, vl);
+            vfloat32m4_t vp = __riscv_vfmul_vf_f32m4(__riscv_vfmul_vv_f32m4(vf, vy, vl), scale, vl);
+            vfloat32m1_t zero = __riscv_vfmv_s_f_f32m1(0.0f, vl);
+            vfloat32m1_t red  = __riscv_vfredusum_vs_f32m4_f32m1(vp, zero, vl);
+            sum += __riscv_vfmv_f_s_f32m1_f32(red);
+            i += (int) vl;
+        }
+        return sum;
+#else
+        float sum = 0.0f;
+        for (int i = 0; i < n; ++i) {
+            sum += scale * (float) q[i] * y[i];
+        }
+        return sum;
+#endif
+    }
+
     static float dot_iq2_xs_f32(const block_iq2_xs * x, const float * y, int64_t k) {
         GGML_ASSERT(k % QK_K == 0);
         const int64_t nb = k / QK_K;
@@ -1047,16 +1073,17 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 const float db0 = d * (0.5f + (x[i].scales[ib32] & 0x0f)) * 0.25f;
                 const float db1 = d * (0.5f + (x[i].scales[ib32] >>  4)) * 0.25f;
                 const float * yy = y + i*QK_K + ib32*32;
+                int8_t qv[32];
                 for (int l = 0; l < 4; ++l) {
                     const uint16_t q = x[i].qs[4*ib32 + l];
                     const uint8_t * grid = (const uint8_t *) (iq2xs_grid + (q & 511));
                     const uint8_t signs = ksigns_iq2xs[q >> 9];
-                    const float db = (l < 2) ? db0 : db1;
                     for (int j = 0; j < 8; ++j) {
-                        const float sign = (signs & kmask_iq2xs[j]) ? -1.0f : 1.0f;
-                        sum += db * (float) grid[j] * sign * yy[l*8 + j];
+                        qv[l*8 + j] = (int8_t) ((signs & kmask_iq2xs[j]) ? -(int) grid[j] : (int) grid[j]);
                     }
                 }
+                sum += dot_i8_f32_scaled(qv +  0, yy +  0, 16, db0);
+                sum += dot_i8_f32_scaled(qv + 16, yy + 16, 16, db1);
             }
         }
         return sum;
@@ -1076,17 +1103,17 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 memcpy(&aux32, scales_and_signs + 4*ib32, sizeof(uint32_t));
                 const float db = d * (0.5f + (aux32 >> 28)) * 0.5f;
                 const float * yy32 = yy + ib32*32;
+                int8_t qv[32];
                 for (int l = 0; l < 4; ++l) {
                     const uint8_t signs = ksigns_iq2xs[(aux32 >> (7*l)) & 127];
                     const uint8_t * grid1 = (const uint8_t *) (iq3xxs_grid + qs[2*l+0]);
                     const uint8_t * grid2 = (const uint8_t *) (iq3xxs_grid + qs[2*l+1]);
                     for (int j = 0; j < 4; ++j) {
-                        const float sign0 = (signs & kmask_iq2xs[j+0]) ? -1.0f : 1.0f;
-                        const float sign1 = (signs & kmask_iq2xs[j+4]) ? -1.0f : 1.0f;
-                        sum += db * (float) grid1[j] * sign0 * yy32[l*8 + j + 0];
-                        sum += db * (float) grid2[j] * sign1 * yy32[l*8 + j + 4];
+                        qv[l*8 + j + 0] = (int8_t) ((signs & kmask_iq2xs[j+0]) ? -(int) grid1[j] : (int) grid1[j]);
+                        qv[l*8 + j + 4] = (int8_t) ((signs & kmask_iq2xs[j+4]) ? -(int) grid2[j] : (int) grid2[j]);
                     }
                 }
+                sum += dot_i8_f32_scaled(qv, yy32, 32, db);
                 qs += 8;
             }
         }
@@ -1105,10 +1132,12 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 const int ls = ((x[i].scales_l[ib/2] >> (4*(ib%2))) & 0x0f) | (((x[i].scales_h >> (2*ib)) & 3) << 4);
                 const float dl = d * (ls - 32);
                 const float * yy32 = yy + ib*32;
+                int8_t qv[32];
                 for (int j = 0; j < 16; ++j) {
-                    sum += dl * kvalues_iq4nl[qs[j] & 0x0f] * yy32[j + 0];
-                    sum += dl * kvalues_iq4nl[qs[j] >> 4]    * yy32[j + 16];
+                    qv[j + 0]  = kvalues_iq4nl[qs[j] & 0x0f];
+                    qv[j + 16] = kvalues_iq4nl[qs[j] >> 4];
                 }
+                sum += dot_i8_f32_scaled(qv, yy32, 32, dl);
                 qs += 16;
             }
         }
