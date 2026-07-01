@@ -239,6 +239,15 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         //case GGML_TYPE_MXFP4:
                         forward_mul_mat_id(params, op);
                         return true;
+                    case GGML_TYPE_IQ2_XS:
+                    case GGML_TYPE_IQ3_XXS:
+                    case GGML_TYPE_IQ4_XS:
+                    case GGML_TYPE_IQ4_NL:
+                        if constexpr (std::is_same_v<BLOC_TYPE, block_q8_0>) {
+                            forward_mul_mat_id(params, op);
+                            return true;
+                        }
+                        return false;
                     default:
                         // GGML_ABORT("fatal error: unsupported type for src0 in MUL_MAT_ID");
                         return false;
@@ -583,9 +592,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
             int32_t i2;
         };
 
-        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8;
-        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel;
-        spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m2;
+        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8 = nullptr;
+        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel = nullptr;
+        spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m2 = nullptr;
         bool                                           set_kernel_impl = false;
         size_t                                         block_stride_a  = spacemit_kernels::q8_blk_size(QK4_0);
 
@@ -971,6 +980,13 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         return ptr;
     }
 
+    static bool ime2_tile_enabled() {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE");
+        return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
+    }
+
+    static constexpr int64_t IQ_IME2_TILE_N = 32;
+
   public:
     explicit constexpr tensor_traits_iq_compact(ggml_type type) : type_(type) {}
 
@@ -987,10 +1003,21 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         const ggml_tensor * src1 = op->src[1];
         const ggml_tensor * ids  = op->src[2];
         size = 0;
-        // Quantized src1 rows for direct compact-IQ x Q8_K dots, plus one
-        // fallback dequantized src0 row per compute thread.
-        size += ggml_row_size(GGML_TYPE_Q8_K, src0->ne[0]) * (size_t) ggml_nelements(src1) / (size_t) src0->ne[0];
+        const int64_t src1_rows = ggml_nelements(src1) / src0->ne[0];
+        const bool use_ime2_tile = ime2_tile_enabled() && src0->ne[0] % 32 == 0;
+        // Quantized src1 rows for the default direct compact-IQ x Q8_K dots.
+        size += ggml_row_size(GGML_TYPE_Q8_K, src0->ne[0]) * (size_t) src1_rows;
         size = GGML_PAD(size, sizeof(int64_t));
+        if (use_ime2_tile) {
+            const size_t k_blks          = spacemit_kernels::div_round_up((size_t) src0->ne[0], (size_t) 32);
+            const size_t ime2_a_row_size = k_blks * spacemit_kernels::q8_blk_size(32, true);
+            const size_t ime2_b_tile_size = k_blks * (IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32);
+            size += ime2_a_row_size * (size_t) src1_rows;
+            size = GGML_PAD(size, sizeof(int64_t));
+            size += (size_t) n_threads * ime2_b_tile_size;
+            size = GGML_PAD(size, sizeof(int64_t));
+        }
+        // One fallback/decode row per compute thread, also used by the experimental IME2 tile packer.
         size += (size_t) n_threads * (size_t) src0->ne[0] * sizeof(float);
         size = GGML_PAD(size, sizeof(int64_t));
         const int64_t n_as     = src0->ne[2];
@@ -1279,6 +1306,49 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     }
 
+    static void quantize_f32_to_q8_0_32(const float * x, int64_t n, ggml_fp16_t * d, int8_t * qs) {
+        float amax = 0.0f;
+        for (int64_t i = 0; i < n; ++i) {
+            amax = std::max(amax, std::fabs(x[i]));
+        }
+        if (amax == 0.0f) {
+            *d = GGML_FP32_TO_FP16(0.0f);
+            memset(qs, 0, 32);
+            return;
+        }
+        const float id = 127.0f / amax;
+        const float dd = 1.0f / id;
+        *d = GGML_FP32_TO_FP16(dd);
+        int64_t i = 0;
+        for (; i < n; ++i) {
+            int q = (int) std::nearbyintf(x[i] * id);
+            q = std::max(-127, std::min(127, q));
+            qs[i] = (int8_t) q;
+        }
+        for (; i < 32; ++i) {
+            qs[i] = 0;
+        }
+    }
+
+    static void pack_iq_tile_to_q8_0_32(ggml_to_float_t to_float, const char * src0_cur, int64_t nb01, int64_t ne00,
+                                        int64_t ni, int64_t nb_real, uint8_t * tile, float * deq_row) {
+        const int64_t k_blks = spacemit_kernels::div_round_up(ne00, (int64_t) 32);
+        const size_t b_blk_stride = IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32;
+        memset(tile, 0, (size_t) k_blks * b_blk_stride);
+        for (int64_t ci = 0; ci < nb_real; ++ci) {
+            const char * src0_row = src0_cur + (ni + ci) * nb01;
+            to_float(src0_row, deq_row, ne00);
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                const int64_t k0 = kb * 32;
+                const int64_t kn = std::min<int64_t>(32, ne00 - k0);
+                quantize_f32_to_q8_0_32(deq_row + k0, kn, scales + ci, qs + ci * 32);
+            }
+        }
+    }
+
     void forward_mul_mat_id(ggml_compute_params * params, ggml_tensor * op) const {
         const ggml_tensor * src0 = op->src[0];
         const ggml_tensor * src1 = op->src[1];
@@ -1300,7 +1370,20 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 
         void * wdata_cur = params->wdata;
         const size_t q8_row_size = ggml_row_size(GGML_TYPE_Q8_K, ne10);
-        char * qsrc1 = (char *) incr_ptr_aligned(&wdata_cur, q8_row_size * (size_t) ggml_nelements(src1) / (size_t) ne10, sizeof(int64_t));
+        const int64_t src1_rows = ggml_nelements(src1) / ne10;
+        char * qsrc1 = (char *) incr_ptr_aligned(&wdata_cur, q8_row_size * (size_t) src1_rows, sizeof(int64_t));
+
+        const bool use_ime2_tile = ime2_tile_enabled() && global_spine_env_info.use_ime2 && ne00 % 32 == 0;
+        const size_t ime2_k_blks = spacemit_kernels::div_round_up((size_t) ne00, (size_t) 32);
+        const size_t ime2_a_row_size = ime2_k_blks * spacemit_kernels::q8_blk_size(32, true);
+        const size_t ime2_b_tile_size = ime2_k_blks * (IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32);
+        char * qsrc1_ime2 = nullptr;
+        uint8_t * ime2_b_tiles = nullptr;
+        if (use_ime2_tile) {
+            qsrc1_ime2 = (char *) incr_ptr_aligned(&wdata_cur, ime2_a_row_size * (size_t) src1_rows, sizeof(int64_t));
+            ime2_b_tiles = (uint8_t *) incr_ptr_aligned(&wdata_cur, (size_t) nth * ime2_b_tile_size, sizeof(int64_t));
+        }
+
         float * deq_rows = (float *) incr_ptr_aligned(&wdata_cur, (size_t) nth * (size_t) ne00 * sizeof(float), sizeof(int64_t));
         float * deq_row  = deq_rows + (size_t) ith * (size_t) ne00;
 
@@ -1311,13 +1394,15 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         mmid_row_mapping * matrix_rows = (mmid_row_mapping *) incr_ptr_aligned(&wdata_cur, n_as * max_rows * sizeof(mmid_row_mapping), sizeof(int64_t));
         GGML_ASSERT(params->wsize >= (size_t) ((char *) wdata_cur - (char *) params->wdata));
 
-        const int64_t src1_rows = ne11 * ne12 * ne13;
         for (int64_t row = ith; row < src1_rows; row += nth) {
             const int64_t i11q = row % ne11;
             const int64_t i12q = (row / ne11) % ne12;
             const int64_t i13q = row / (ne11 * ne12);
             const float * src1_row = (const float *) ((const char *) src1->data + i13q * nb13 + i12q * nb12 + i11q * nb11);
             quantize_row_q8_K(src1_row, qsrc1 + (size_t) row * q8_row_size, ne10);
+            if (use_ime2_tile) {
+                spacemit_kernels::rvv::quantize_a_row_i8(32, src1_row, ne10, (uint8_t *) qsrc1_ime2 + (size_t) row * ime2_a_row_size);
+            }
         }
         ggml_barrier(params->threadpool);
 
@@ -1333,6 +1418,35 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             }
         }
         ggml_barrier(params->threadpool);
+
+        if (use_ime2_tile) {
+            for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
+                const int64_t cne1 = matrix_row_counts[cur_a];
+                if (cne1 == 0) {
+                    continue;
+                }
+                const char * src0_cur = (const char *) src0->data + cur_a * nb02;
+                for (int64_t ni = (int64_t) ith * IQ_IME2_TILE_N; ni < ne01; ni += (int64_t) nth * IQ_IME2_TILE_N) {
+                    const int64_t nb_real = std::min<int64_t>(IQ_IME2_TILE_N, ne01 - ni);
+                    uint8_t * b_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
+                    pack_iq_tile_to_q8_0_32(to_float, src0_cur, nb01, ne00, ni, nb_real, b_tile, deq_row);
+
+                    for (int64_t ir1 = 0; ir1 < cne1; ++ir1) {
+                        const mmid_row_mapping row_mapping = matrix_rows[cur_a * max_rows + ir1];
+                        const int64_t i11 = row_mapping.i1 % ne11;
+                        const int64_t i12 = row_mapping.i2;
+                        const int64_t i1  = row_mapping.i1;
+                        const int64_t i2  = i12;
+                        const int64_t src1_row_idx = i11 + i12 * ne11;
+                        const uint8_t * a_row = (const uint8_t *) qsrc1_ime2 + (size_t) src1_row_idx * ime2_a_row_size;
+                        float * dst_col = (float *) ((char *) dst->data + i1 * nb1 + i2 * nb2);
+                        spacemit_kernels::ime2::gemm_kernel_i8i8(32, a_row, b_tile, nullptr, dst_col + ni, 1,
+                                                                 (size_t) nb_real, ime2_k_blks, ne01);
+                    }
+                }
+            }
+            return;
+        }
 
         const bool src1_cont = ggml_is_contiguous(src1);
         for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
@@ -1836,8 +1950,43 @@ static bool ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(const ggml_tensor * 
 #endif
 }
 
+static bool ggml_riscv64_spacemit_iq_moe_repack_enabled(ggml_type type) {
+    const char * mode = std::getenv("GGML_RISCV64_SPACEMIT_IQ_MOE_REPACK");
+    if (mode == nullptr || mode[0] == '\0' || std::strcmp(mode, "0") == 0 || std::strcmp(mode, "off") == 0 ||
+        std::strcmp(mode, "false") == 0) {
+        return false;
+    }
+    if (std::strcmp(mode, "1") == 0 || std::strcmp(mode, "all") == 0 || std::strcmp(mode, "true") == 0) {
+        return true;
+    }
+    if (std::strcmp(mode, "iq4") == 0 || std::strcmp(mode, "small") == 0) {
+        return type == GGML_TYPE_IQ4_NL || type == GGML_TYPE_IQ4_XS;
+    }
+    if (std::strcmp(mode, "iq2") == 0) {
+        return type == GGML_TYPE_IQ2_XS;
+    }
+    if (std::strcmp(mode, "iq3") == 0) {
+        return type == GGML_TYPE_IQ3_XXS;
+    }
+    return false;
+}
 
-
+static bool ggml_riscv64_spacemit_is_iq_moe_q8_candidate(const ggml_tensor * cur, ggml_type type) {
+#if defined(RISCV64_SPACEMIT_IME2)
+    if (!ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2 || !ggml_riscv64_spacemit_iq_moe_repack_enabled(type) ||
+        cur->type != type || ggml_n_dims(cur) != 3 || cur->ne[1] % 32 != 0) {
+        return false;
+    }
+    if (type == GGML_TYPE_IQ4_NL) {
+        return cur->ne[0] % QK8_0 == 0;
+    }
+    return cur->ne[0] % QK_K == 0;
+#else
+    GGML_UNUSED(cur);
+    GGML_UNUSED(type);
+    return false;
+#endif
+}
 
 static bool ggml_riscv64_spacemit_claim_iq_compact() {
     const char * claim = std::getenv("GGML_RISCV64_SPACEMIT_CLAIM_IQ_COMPACT");
@@ -1909,6 +2058,18 @@ static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack
         return &ggml::cpu::riscv64_spacemit::iq3_xxs_proj_q8_0_32x32;
     }
     if (ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(cur, GGML_TYPE_IQ4_XS)) {
+        return &ggml::cpu::riscv64_spacemit::iq4_xs_proj_q8_0_32x32;
+    }
+    if (ggml_riscv64_spacemit_is_iq_moe_q8_candidate(cur, GGML_TYPE_IQ4_NL)) {
+        return &ggml::cpu::riscv64_spacemit::iq4_nl_proj_q8_0_32x32;
+    }
+    if (ggml_riscv64_spacemit_is_iq_moe_q8_candidate(cur, GGML_TYPE_IQ2_XS)) {
+        return &ggml::cpu::riscv64_spacemit::iq2_xs_proj_q8_0_32x32;
+    }
+    if (ggml_riscv64_spacemit_is_iq_moe_q8_candidate(cur, GGML_TYPE_IQ3_XXS)) {
+        return &ggml::cpu::riscv64_spacemit::iq3_xxs_proj_q8_0_32x32;
+    }
+    if (ggml_riscv64_spacemit_is_iq_moe_q8_candidate(cur, GGML_TYPE_IQ4_XS)) {
         return &ggml::cpu::riscv64_spacemit::iq4_xs_proj_q8_0_32x32;
     }
 
@@ -2182,7 +2343,11 @@ static size_t ggml_backend_cpu_riscv64_spacemit_nbytes(ggml_backend_buffer_type_
         ggml_riscv64_spacemit_is_iq4_nl_proj_q8_candidate(tensor) ||
         ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(tensor, GGML_TYPE_IQ2_XS) ||
         ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(tensor, GGML_TYPE_IQ3_XXS) ||
-        ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(tensor, GGML_TYPE_IQ4_XS)) {
+        ggml_riscv64_spacemit_is_iq_k_proj_q8_candidate(tensor, GGML_TYPE_IQ4_XS) ||
+        ggml_riscv64_spacemit_is_iq_moe_q8_candidate(tensor, GGML_TYPE_IQ4_NL) ||
+        ggml_riscv64_spacemit_is_iq_moe_q8_candidate(tensor, GGML_TYPE_IQ2_XS) ||
+        ggml_riscv64_spacemit_is_iq_moe_q8_candidate(tensor, GGML_TYPE_IQ3_XXS) ||
+        ggml_riscv64_spacemit_is_iq_moe_q8_candidate(tensor, GGML_TYPE_IQ4_XS)) {
         const int64_t nrow        = ggml_nrows(tensor);
         const int64_t padded_nrow = GGML_PAD(nrow, 32);
         const int64_t nblocks     = tensor->ne[0] / QK8_0;
