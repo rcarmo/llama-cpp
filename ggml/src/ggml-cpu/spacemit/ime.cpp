@@ -1317,7 +1317,7 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             const int64_t i12q = (row / ne11) % ne12;
             const int64_t i13q = row / (ne11 * ne12);
             const float * src1_row = (const float *) ((const char *) src1->data + i13q * nb13 + i12q * nb12 + i11q * nb11);
-            quantize_row_q8_K_generic(src1_row, qsrc1 + (size_t) row * q8_row_size, ne10);
+            quantize_row_q8_K(src1_row, qsrc1 + (size_t) row * q8_row_size, ne10);
         }
         ggml_barrier(params->threadpool);
 
