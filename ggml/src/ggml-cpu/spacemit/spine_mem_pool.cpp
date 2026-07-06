@@ -579,24 +579,41 @@ class spine_mem_pool_shared_mem final : public spine_mem_pool_manager {
             return false;
         }
 
+        // Preferred path: legacy SpaceMiT TCM sync-memory device (vendor/BSP kernels).
+        // It exposes a small on-chip shared-SRAM region that can be mmap'd directly.
         const int fd = open(SPINE_MEM_POOL_TCM_SYNC_MEM_DEV, O_RDWR | O_SYNC);
-        if (fd < 0) {
-            GGML_LOG_ERROR("CPU_RISCV64_SPACEMIT: %s: open(%s) failed, errno=%d\n", __func__,
-                           SPINE_MEM_POOL_TCM_SYNC_MEM_DEV, errno);
-            return false;
-        }
-
-        void * map_addr = mmap(nullptr, default_chunk_size(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        if (map_addr == MAP_FAILED) {
-            GGML_LOG_ERROR("CPU_RISCV64_SPACEMIT: %s: mmap failed for %s size %zu, errno=%d\n", __func__,
-                           SPINE_MEM_POOL_TCM_SYNC_MEM_DEV, default_chunk_size(), errno);
+        if (fd >= 0) {
+            void * map_addr = mmap(nullptr, default_chunk_size(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+            if (map_addr != MAP_FAILED) {
+                chunk->base = static_cast<uint8_t *>(map_addr);
+                chunk->size = default_chunk_size();
+                chunk->fd   = fd;
+                return true;
+            }
+            GGML_LOG_DEBUG(
+                "CPU_RISCV64_SPACEMIT: %s: mmap(%s) failed size %zu errno=%d, using anonymous shared memory\n",
+                __func__, SPINE_MEM_POOL_TCM_SYNC_MEM_DEV, default_chunk_size(), errno);
             close(fd);
+        } else {
+            // Mainline/generic kernels do not ship the legacy tcm_sync_mem driver. The
+            // barriers are cache-line aligned and work correctly from ordinary shared
+            // DRAM, so fall back to an anonymous MAP_SHARED region instead of erroring
+            // out and demoting the barrier to a private heap allocation.
+            GGML_LOG_DEBUG("CPU_RISCV64_SPACEMIT: %s: %s unavailable (errno=%d), using anonymous shared memory\n",
+                           __func__, SPINE_MEM_POOL_TCM_SYNC_MEM_DEV, errno);
+        }
+
+        void * anon_addr =
+            mmap(nullptr, default_chunk_size(), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+        if (anon_addr == MAP_FAILED) {
+            GGML_LOG_ERROR("CPU_RISCV64_SPACEMIT: %s: anonymous shared mmap failed size %zu, errno=%d\n", __func__,
+                           default_chunk_size(), errno);
             return false;
         }
 
-        chunk->base = static_cast<uint8_t *>(map_addr);
+        chunk->base = static_cast<uint8_t *>(anon_addr);
         chunk->size = default_chunk_size();
-        chunk->fd   = fd;
+        chunk->fd   = -1;  // anonymous mapping: nothing to close
         return true;
     }
 

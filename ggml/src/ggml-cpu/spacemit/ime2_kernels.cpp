@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <stdexcept>
 
 #if !defined(__riscv_v) || !defined(__riscv_v_intrinsic)
@@ -2999,8 +3000,123 @@ void gemm_kernel_i8i4_hp_m1(size_t          blk_len,
                   "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31", "fa0", "fa1", "ft0", "ft1");
         }
     } else {
-        // TODO: support quant_b_zp for i8i4 hp kernel
-        GGML_ABORT("gemm_kernel_i8i4_hp_m1 with quant_b_zp is not supported yet");
+        for (size_t ni = 0; ni < count_n; ni += 32) {
+            uint8_t * b_data = (uint8_t *) quant_b_data + (ni / NB_COLS) * b_tile_stride;
+            uint8_t * b_zp   = b_data + sizeof(block_q4_0x32_layout) * k_subblks_per_superblk;
+            int8_t *  a_data = (int8_t *) quant_a_ptr;
+            float *   dst_c  = c_ptr + ni;
+
+            asm volatile(
+                "vsetvli        t0, x0, e16, m1         \n\t"
+                "vxor.vv        v31, v31, v31           \n\t"  // init acc to zero
+                "mv             t4, %[BK]               \n\t"
+                "li             t0, 0x4c00              \n\t"  // 16 in fp16
+                "fmv.h.x        fa0, t0                 \n\t"
+                "li             t0, 0x3000              \n\t"  // 0.125 in fp16
+                "fmv.h.x        fa2, t0                 \n\t"
+                "li             t0, 0x3c00              \n\t"  // 1.0 in fp16
+                "fmv.h.x        fa3, t0                 \n\t"
+
+                ".align 4                               \n\t"
+                "BLK_LOOP%=:                            \n\t"
+                "li             t5, 8                   \n\t"
+                "addi           t6, %[A], 288           \n\t"  // point to blk scale
+                "flh            ft1, (t6)               \n\t"
+                "addi           t6, %[A], 272           \n\t"  // point to asum
+
+                // init the acc fp16
+                "vsetvli        t0, x0, e16, m1         \n\t"
+                "vxor.vv        v16, v18, v18           \n\t"
+                "vxor.vv        v17, v18, v18           \n\t"
+                "vxor.vv        v18, v18, v18           \n\t"
+                "vxor.vv        v19, v18, v18           \n\t"
+
+                "INNER_BLK_LOOP%=:                      \n\t"
+                // load a sum and scale
+                "flh            fa1, (t6)               \n\t"
+                "addi           t6, t6, 2               \n\t"
+                "flh            ft0, (%[A])             \n\t"
+                "addi           %[A], %[A], 2           \n\t"
+                // load A
+                "vsetvli        t0, x0, e8, mf4         \n\t"
+                "vle8.v         v3, (%[A])              \n\t"  // 1x32@i8
+                "addi           %[A], %[A], 32          \n\t"
+
+                // load scale B and B
+                "vsetvli        t0, x0, e16, mf2        \n\t"
+                "vle16.v        v8, (%[B])              \n\t"  // b_scale fp16
+                "addi           %[B], %[B], 64          \n\t"
+                "vl4r.v         v4, (%[B])              \n\t"  // 32*32@i4
+                "addi           %[B], %[B], 512         \n\t"
+                "vfmul.vf       v8, v8, ft0             \n\t"  // scale b * scale a
+                "vfmul.vf       v9, v8, fa0             \n\t"
+
+                // zp correction: a_sum * 0.125 * zp * scale_a * scale_b * block_scale
+                "vsetvli        t0, x0, e8, mf4         \n\t"
+                "vle8.v         v24, (%[ZP])            \n\t"
+                "addi           %[ZP], %[ZP], 32        \n\t"
+                "vfwcvt.f.x.v   v10, v24                \n\t"  // zp as fp16
+                "vsetvli        t0, x0, e16, mf2        \n\t"
+                "vfwcvt.f.f.v   v12, v10                \n\t"  // zp as fp32
+                "vfwcvt.f.f.v   v14, v8                 \n\t"  // scale_a * scale_b as fp32
+                "fcvt.s.h       ft2, fa1                \n\t"
+                "fcvt.s.h       ft3, fa2                \n\t"
+                "fcvt.s.h       ft4, ft1                \n\t"
+                "vsetvli        t0, x0, e32, m1         \n\t"
+                "vfmul.vf       v12, v12, ft2           \n\t"
+                "vfmul.vf       v12, v12, ft3           \n\t"
+                "vfmul.vf       v12, v12, ft4           \n\t"
+                "vfmul.vv       v12, v12, v14           \n\t"
+                "vfadd.vv       v31, v31, v12           \n\t"
+
+                "vsetvli        t0, x0, e8, m1          \n\t"
+                "vpack.vv       v0, v8, v9, 3           \n\t"
+                "vsrl.vi        v28, v3, 4              \n\t"
+
+                "vsetvli        t0, x0, e16, m1         \n\t"
+                "vnpack4.vv     v2, v3, v3, 3           \n\t"  // lo4 of A
+                "vnpack4.vv     v3, v28, v28, 3         \n\t"  // hi4 of A
+
+                // i4 * i4 vmadot
+                "vsetvli        t0, x0, e16, m1         \n\t"
+                "vmadotsu.hp    v16, v3, v4, v0, 4, i4  \n\t"  // high 4
+                "vmadotsu.hp    v17, v3, v5, v0, 5, i4  \n\t"
+                "vmadotsu.hp    v18, v3, v6, v0, 6, i4  \n\t"
+                "vmadotsu.hp    v19, v3, v7, v0, 7, i4  \n\t"
+                "vmadotu.hp     v16, v2, v4, v0, 0, i4  \n\t"  // low 4
+                "vmadotu.hp     v17, v2, v5, v0, 1, i4  \n\t"
+                "vmadotu.hp     v18, v2, v6, v0, 2, i4  \n\t"
+                "vmadotu.hp     v19, v2, v7, v0, 3, i4  \n\t"
+
+                "addi           t5, t5, -1              \n\t"
+                "bgtz           t5, INNER_BLK_LOOP%=    \n\t"
+
+                "vpack.vv       v8, v16, v17, 1         \n\t"
+                "vpack.vv       v12, v18, v19, 1        \n\t"
+                "vpack.vv       v20, v8, v12, 2         \n\t"
+
+                "vsetvli        t0, x0, e16, mf2        \n\t"
+                "addi           t4, t4, -1              \n\t"
+                "vfwmacc.vf     v31, ft1, v20           \n\t"
+
+                // update A ptr and skip 256-byte ZP tail in B; ZP pointer skips next 4608-byte data body
+                "addi           %[A], t6, 2             \n\t"
+                "addi           %[B], %[B], 256         \n\t"
+                "li             t2, 4608                \n\t"
+                "add            %[ZP], %[ZP], t2        \n\t"
+
+                "bgtz           t4, BLK_LOOP%=          \n\t"
+
+                // save
+                "vsetvli        t0, x0, e32, m1         \n\t"
+                "vse32.v        v31, (%[DST])           \n\t"
+                : [A] "+r"(a_data), [B] "+r"(b_data), [ZP] "+r"(b_zp)
+                : [DST] "r"(dst_c), [BK] "r"(k_blks)
+                : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7",
+                  "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19", "v20", "v21",
+                  "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31", "fa0", "fa1", "fa2", "fa3",
+                  "ft0", "ft1", "ft2", "ft3", "ft4");
+        }
     }
 }
 
@@ -5626,12 +5742,13 @@ size_t gemm_kernel_i8i4_hp(size_t          blk_len,
 #endif
         return 4;
     } else {
-#if 0
-        gemm_kernel_i8i4_hp_mrow_ref<1, 32>(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n,
-                                            k_blks, ldc);
-#else
-        gemm_kernel_i8i4_hp_m1(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
-#endif
+        if (quant_b_zp && std::getenv("SPACEMIT_EXPERIMENTAL_Q4K_32X256_REF")) {
+            gemm_kernel_i8i4_hp_mrow_ref<1, 32>(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m,
+                                                count_n, k_blks, ldc);
+        } else {
+            gemm_kernel_i8i4_hp_m1(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks,
+                                   ldc);
+        }
         return 1;
     }
 }
