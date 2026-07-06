@@ -277,6 +277,24 @@ typedef struct {
 } block_tq2_0;
 static_assert(sizeof(block_tq2_0) == sizeof(ggml_half) + QK_K / 4, "wrong tq2_0 block size/padding");
 
+// TurboQuant WHT-rotated weight blocks used by Spacemit/CUDA experimental paths.
+#define QK_TQ3_0 32
+#define QK_TQ4_1S 32
+
+typedef struct {
+    ggml_half d0;
+    ggml_half d1;
+    uint8_t qs[QK_TQ3_0 * 3 / 8]; // 3-bit indices, packed in 4 groups of 8 -> 12 bytes
+} block_tq3_1s;
+static_assert(sizeof(block_tq3_1s) == 2*sizeof(ggml_half) + QK_TQ3_0 * 3 / 8, "wrong tq3_1s block size/padding");
+
+typedef struct {
+    ggml_half d0;
+    ggml_half d1;
+    uint8_t qs[QK_TQ4_1S / 2]; // 4-bit indices
+} block_tq4_1s;
+static_assert(sizeof(block_tq4_1s) == 2*sizeof(ggml_half) + QK_TQ4_1S / 2, "wrong tq4_1s block size/padding");
+
 //
 // Super-block quantization structures
 //
