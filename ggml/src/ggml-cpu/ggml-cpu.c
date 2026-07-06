@@ -1233,6 +1233,28 @@ static void ggml_compute_forward_mul_mat_one_chunk(
                 //    vec_dot(ne00, &dst_col[ir0], src0_row + ir0*nb01, src1_col);
                 //}
 
+#if defined(__riscv) || defined(__riscv__)
+                if (num_rows_per_vec_dot == 1 && type == GGML_TYPE_F16 && vec_dot_type == GGML_TYPE_F16 &&
+                    src1->ne[2] == 8 &&
+                    (strncmp(src0->name, "cache_k_l", 9) == 0 || strncmp(src0->name, "cache_v_l", 9) == 0) &&
+                    (strncmp(dst->name, "kq-", 3) == 0 || strncmp(dst->name, "kqv-", 4) == 0)) {
+                    int64_t ir0 = iir0;
+                    const int64_t ir0_block_end = MIN(iir0 + blck_0, ir0_end);
+                    for (; ir0 + 7 < ir0_block_end; ir0 += 8) {
+                        ggml_vec_dot_f16_8(ne00, &dst_col[ir0], (const ggml_fp16_t *) (src0_row + ir0 * nb01), nb01,
+                                           (const ggml_fp16_t *) src1_col);
+                    }
+                    for (; ir0 + 3 < ir0_block_end; ir0 += 4) {
+                        ggml_vec_dot_f16_4(ne00, &dst_col[ir0], (const ggml_fp16_t *) (src0_row + ir0 * nb01), nb01,
+                                           (const ggml_fp16_t *) src1_col);
+                    }
+                    for (; ir0 < ir0_block_end; ++ir0) {
+                        vec_dot(ne00, &dst_col[ir0], 0, src0_row + ir0 * nb01, 0, src1_col, 0, 1);
+                    }
+                    continue;
+                }
+#endif
+
                 for (int64_t ir0 = iir0; ir0 < iir0 + blck_0 && ir0 < ir0_end; ir0 += num_rows_per_vec_dot) {
                     vec_dot(ne00, &tmp[ir0 - iir0], (num_rows_per_vec_dot > 1 ? 16 : 0), src0_row + ir0 * nb01, (num_rows_per_vec_dot > 1 ? nb01 : 0), src1_col, (num_rows_per_vec_dot > 1 ? src1_col_stride : 0), num_rows_per_vec_dot);
                 }
@@ -1266,6 +1288,22 @@ void ggml_compute_forward_mul_mat(
     enum ggml_type           const vec_dot_type         = type_traits_cpu[src0->type].vec_dot_type;
     ggml_from_float_t        const from_float           = type_traits_cpu[vec_dot_type].from_float;
     int64_t                  const vec_dot_num_rows     = type_traits_cpu[src0->type].nrows;
+
+#if defined(__riscv) || defined(__riscv__)
+    if (ith == 0 && getenv("SPACEMIT_PROFILE_FALLBACK")) {
+        fprintf(stderr,
+                "SPACEMIT_FALLBACK_MUL_MAT dst=%s src0=%s src1=%s type0=%s type1=%s vecdot=%s nrows=%" PRId64
+                " ne0=%" PRId64 ",%" PRId64 ",%" PRId64 ",%" PRId64
+                " ne1=%" PRId64 ",%" PRId64 ",%" PRId64 ",%" PRId64
+                " nb0=%zu,%zu,%zu,%zu nb1=%zu,%zu,%zu,%zu\n",
+                dst->name, src0->name, src1->name, ggml_type_name(src0->type), ggml_type_name(src1->type),
+                ggml_type_name(vec_dot_type), vec_dot_num_rows,
+                src0->ne[0], src0->ne[1], src0->ne[2], src0->ne[3],
+                src1->ne[0], src1->ne[1], src1->ne[2], src1->ne[3],
+                src0->nb[0], src0->nb[1], src0->nb[2], src0->nb[3],
+                src1->nb[0], src1->nb[1], src1->nb[2], src1->nb[3]);
+    }
+#endif
 
     GGML_ASSERT(ne0 == ne01);
     GGML_ASSERT(ne1 == ne11);
