@@ -12,8 +12,9 @@ set -euo pipefail
 # - 128K and 262K contexts work as long-context/coherence modes but are slower.
 # - `--n-gpu-layers auto` is preferred here because fixed high offload can fit
 #   bench runs but fail server KV/compute allocation at larger contexts.
-# - `--spec-draft-n-max 3` is deliberate: local Qwen sweep found it faster
-#   than draft depths 4, 2, 1, and no speculative decoding for a forced 180-token run.
+# - After the July 2026 merge, the fastest reliable RTX 3060 profile uses
+#   q4_0 KV cache, `--no-mmap`, and native MTP draft depth 1 (~58 tok/s on a
+#   controlled 160-token local prompt). Higher draft depths were slower.
 
 MODEL_DIR=${MODEL_DIR:-/workspace/models/gguf-misc}
 LLAMA_SERVER=${LLAMA_SERVER:-/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin/llama-server}
@@ -28,14 +29,15 @@ mkdir -p "$SLOT_SAVE_PATH"
 
 exec "$LLAMA_SERVER" \
   --model "$MODEL_DIR/Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf" \
-  --spec-type draft-mtp --spec-draft-n-max 3 \
+  --spec-type draft-mtp --spec-draft-n-max 1 \
   --alias qwen36-35b-a3b-mtp-q2 \
   --host 0.0.0.0 --port 8090 \
   --threads 8 --threads-batch 8 \
   --batch-size 1024 --ubatch-size 1024 \
   --ctx-size 32768 \
   --parallel 1 \
-  --cache-type-k f16 --cache-type-v f16 \
+  --cache-type-k q4_0 --cache-type-v q4_0 \
+  --no-mmap \
   -fa on \
   --jinja \
   --cache-prompt \
