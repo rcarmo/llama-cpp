@@ -10,11 +10,11 @@ set -euo pipefail
 # - 32K context is deliberate for speed: a 26K-token smoke test measured about
 #   900 prompt tok/s and 52.7 generation tok/s before later llama.cpp updates.
 # - 128K and 262K contexts work as long-context/coherence modes but are slower.
-# - `--n-gpu-layers auto` is preferred here because fixed high offload can fit
-#   bench runs but fail server KV/compute allocation at larger contexts.
 # - After the July 2026 merge, the fastest reliable RTX 3060 profile uses
-#   q4_0 KV cache, `--no-mmap`, and native MTP draft depth 1 (~58 tok/s on a
-#   controlled 160-token local prompt). Higher draft depths were slower.
+#   q4_0 KV cache, `--no-mmap`, native MTP draft depth 1, and MoE-aware
+#   placement (`--n-gpu-layers all --n-cpu-moe 5`). This measured ~70 tok/s on
+#   a controlled 160-token local prompt, with higher draft depths and larger
+#   n_cpu_moe values slower.
 
 MODEL_DIR=${MODEL_DIR:-/workspace/models/gguf-misc}
 LLAMA_SERVER=${LLAMA_SERVER:-/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin/llama-server}
@@ -50,6 +50,7 @@ exec "$LLAMA_SERVER" \
   --metrics \
   --ui-mcp-proxy \
   --ui-config-file /workspace/.pi/llama-ui-config.json \
-  --n-gpu-layers auto \
+  --n-gpu-layers all \
+  --n-cpu-moe 5 \
   --reasoning on --reasoning-format deepseek \
   --no-warmup
