@@ -93,53 +93,72 @@ Despite the script name, this profile currently points at:
 Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf
 ```
 
-Fastest tested practical settings for the 26k-token smoke prompt plus current
-drafter tuning:
+Current fastest tested RTX 3060 settings:
 
 ```text
 --ctx-size 32768
 -fa on
 --batch-size 1024
 --ubatch-size 1024
---n-gpu-layers auto
---cache-type-k f16
---cache-type-v f16
+--n-gpu-layers all
+--n-cpu-moe 5
+--cache-type-k q4_0
+--cache-type-v q4_0
+--no-mmap
 --spec-type draft-mtp
---spec-draft-n-max 3
+--spec-draft-n-max 1
 ```
 
-Why `--spec-draft-n-max 3`?
+Why `--n-cpu-moe 5`?
 
-A forced 180-token sweep on the RTX 3060 showed that the previous draft depth of
-4 over-drafted for this model/prompt mix. Unlike Gemma E2B, Qwen benefited from
-a moderate draft depth rather than the minimum depth.
+A Qwen3.6 35B-A3B tuning pass showed that generic layer auto-fit was leaving
+speed on the table, but pushing too many MoE experts to CPU caused PCIe/expert
+fetch overhead. The sweet spot on the RTX 3060 is to keep almost all experts on
+GPU while leaving five MoE layers on CPU to stay just below the 12 GiB VRAM
+limit.
 
-| Mode | Avg generation tok/s | Drafted | Accepted |
-|---|---:|---:|---:|
-| no speculative | 28.85 | — | — |
-| draft max 4 | 25.96 | 230 | 121 |
-| draft max 3 | 40.76 | 159 | 125 |
-| draft max 2 | 38.52 | 142 | 107 |
-| draft max 1 | 34.91 | 95 | 84 |
+| `--n-cpu-moe` | Approx. GPU used | Avg generation tok/s | Notes |
+|---:|---:|---:|---|
+| none, `--n-gpu-layers auto`, q4_0 KV | ~10.9 GiB | ~55–58 | Previous tuned baseline. |
+| 26 | ~6.5 GiB | ~36 | Better than 35/36, still too much CPU expert traffic. |
+| 12 | ~10.0 GiB | ~52 | Close to old baseline. |
+| 8 | ~10.9 GiB | ~59.6 | Good, but below the knee. |
+| 7 | ~11.2 GiB | ~61.8 | Stable. |
+| 6 | ~11.4 GiB | ~67.3 | Stable. |
+| 5 | ~11.7 GiB | ~70.2 | Current fastest stable profile. |
+| 4 | ~11.9 GiB | unstable | Too close to VRAM limit. |
+| 2 / 0 | — | failed to load | OOM/allocation failure. |
 
-Conclusion: keep `draft_n_max=3` as the current Qwen default on this hardware;
-`2` is close enough to re-test for other prompt distributions.
+Why `--spec-draft-n-max 1`?
 
-Context-size tradeoff observed on the RTX 3060:
+After the July 2026 merge and MoE placement retune, deeper native MTP draft
+windows over-draft on this hardware. A reliable 160-token local prompt sweep
+with `q4_0` KV and `--no-mmap` found draft depth 1 faster than depths 2–4.
+
+| Mode | Avg generation tok/s | Notes |
+|---|---:|---|
+| no speculative | ~52.5 | q4_0 KV, 32k context. |
+| draft max 1 | ~58.2 before MoE retune; ~70 with `--n-cpu-moe 5` | Current default. |
+| draft max 3 | ~48.9 | Slower on current build/profile. |
+| draft max 4 | ~45.4 | Over-drafts. |
+
+KV cache notes:
+
+- `q4_0/q4_0` is the fastest tested cache for the live 32k profile.
+- TurboQuant KV cache types (`turbo2`, `turbo3`, `turbo4`) are now registered
+  and can load/generate with Flash Attention enabled.
+- The video-inspired `--cache-type-k turbo4 --cache-type-v turbo3` combination
+  worked at 32k, but measured ~49 tok/s on this RTX 3060/Qwen profile, so it is
+  retained for long-context experiments rather than used as the default.
+- Quantized V cache requires `-fa on`.
+
+Context-size tradeoff observed on the RTX 3060 before the final MoE retune:
 
 | Context | Prompt tok/s | Generation tok/s | Notes |
 |---:|---:|---:|---|
 | 262144 | ~587 | ~31.5 | Maximum coherence/context test; slowest. |
 | 131072 | ~705 | ~41.9 | Better long-context compromise. |
-| 32768 | ~900 | ~52.7 | Fastest; fits the 26k prompt smoke test. |
-
-Manual `llama-bench` offload findings:
-
-```text
-ngl=40 was fastest in tiny/medium bench,
-but fixed ngl=40 could not allocate large 128k server KV/cache buffers.
-For the 32k live profile, auto fitting was the safer operational default.
-```
+| 32768 | ~900 | ~52.7 | Fastest older baseline; current tuned profile is ~70 tok/s. |
 
 ## Agents-A1 APEX-I-Mini trial
 
