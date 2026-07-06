@@ -1,0 +1,13 @@
+[Unit]
+Description=llama.cpp Qwen3.6-35B-A3B MoE + MTP (CUDA, expert offload, 64K ctx, <30s long-context)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/run-qwen35b-a3b-cuda.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

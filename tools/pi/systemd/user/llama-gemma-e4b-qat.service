@@ -1,0 +1,13 @@
+[Unit]
+Description=llama.cpp Gemma 4 E4B QAT + MTP (CUDA, single 65k slot, prompt cache, Pi profile)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/run-gemma-e4b-qat-cuda.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=llama-ui web search MCP server (SearXNG via umcp)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/workspace/tools/llama-ui-search-mcp/search_mcp.py --host 127.0.0.1 --port 8092
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,26 @@
+{
+  "default": "qwen36-35b-a3b-mtp-q2",
+  "servers": {
+    "qwen36-35b-a3b-mtp-q2": {
+      "url": "http://localhost:8090",
+      "service": "llama-qwen36-27b-mtp.service",
+      "slots": 1,
+      "ctx_per_slot": 32768,
+      "note": "Active Qwen3.6 35B-A3B native-MTP Q2_K_XL profile. Tuned for tok/s: ctx=32768, fa=on, batch=1024, ubatch=1024, n_gpu_layers=auto."
+    },
+    "gemma4-e2b-qat-mtp": {
+      "url": "http://localhost:8090",
+      "service": "llama-gemma-e2b-qat.service",
+      "slots": 2,
+      "ctx_per_slot": 65536,
+      "note": "Configured but currently stopped when Qwen/E4B is active; uses same port."
+    },
+    "gemma4-e4b-qat-mtp": {
+      "url": "http://localhost:8090",
+      "service": "llama-gemma-e4b-qat.service",
+      "slots": 1,
+      "ctx_per_slot": 81920,
+      "note": "Configured but currently stopped when Qwen is active; E4B uses -fa off due CUDA flash-attn startup crash."
+    }
+  }
+}

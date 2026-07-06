@@ -1,0 +1,13 @@
+[Unit]
+Description=llama.cpp Qwen3.6 35B-A3B native MTP Q2_K_XL (CUDA, single 32k slot, Pi profile)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/run-qwen36-27b-mtp-cuda.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
