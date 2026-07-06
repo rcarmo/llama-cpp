@@ -93,7 +93,8 @@ Despite the script name, this profile currently points at:
 Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf
 ```
 
-Fastest tested practical settings for the 26k-token smoke prompt:
+Fastest tested practical settings for the 26k-token smoke prompt plus current
+drafter tuning:
 
 ```text
 --ctx-size 32768
@@ -104,8 +105,25 @@ Fastest tested practical settings for the 26k-token smoke prompt:
 --cache-type-k f16
 --cache-type-v f16
 --spec-type draft-mtp
---spec-draft-n-max 4
+--spec-draft-n-max 3
 ```
+
+Why `--spec-draft-n-max 3`?
+
+A forced 180-token sweep on the RTX 3060 showed that the previous draft depth of
+4 over-drafted for this model/prompt mix. Unlike Gemma E2B, Qwen benefited from
+a moderate draft depth rather than the minimum depth.
+
+| Mode | Avg generation tok/s | Drafted | Accepted |
+|---|---:|---:|---:|
+| no speculative | 28.85 | — | — |
+| draft max 4 | 25.96 | 230 | 121 |
+| draft max 3 | 40.76 | 159 | 125 |
+| draft max 2 | 38.52 | 142 | 107 |
+| draft max 1 | 34.91 | 95 | 84 |
+
+Conclusion: keep `draft_n_max=3` as the current Qwen default on this hardware;
+`2` is close enough to re-test for other prompt distributions.
 
 Context-size tradeoff observed on the RTX 3060:
 
