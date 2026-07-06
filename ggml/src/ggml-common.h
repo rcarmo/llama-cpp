@@ -295,6 +295,51 @@ typedef struct {
 } block_tq4_1s;
 static_assert(sizeof(block_tq4_1s) == 2*sizeof(ggml_half) + QK_TQ4_1S / 2, "wrong tq4_1s block size/padding");
 
+// TurboQuant KV-cache blocks (PolarQuant/RHT cache compression).
+#define QK_TURBO3 128
+#define QK_TURBO3_GROUP 128
+#define NL_TURBO3     (QK_TURBO3 / 16)
+#define NL_TURBO3_VEC (QK_TURBO3 / 4)
+typedef struct {
+    ggml_half norm;
+    uint8_t   qs[QK_TURBO3 / 4];
+    uint8_t   signs[QK_TURBO3 / 8];
+} block_turbo3_0;
+static_assert(sizeof(block_turbo3_0) == sizeof(ggml_half) + QK_TURBO3/4 + QK_TURBO3/8, "wrong turbo3_0 block size/padding");
+
+#ifndef TURBO4_USE_4BIT
+#  define TURBO4_USE_4BIT 1
+#endif
+
+#define QK_TURBO4 128
+#if TURBO4_USE_4BIT
+typedef struct {
+    ggml_half norm;
+    ggml_half rnorm;
+    uint8_t   qs[QK_TURBO4 / 2];
+} block_turbo4_0;
+static_assert(sizeof(block_turbo4_0) == 68, "wrong turbo4_0 block size");
+#else
+typedef struct {
+    ggml_half norm;
+    ggml_half rnorm;
+    uint8_t   qs[QK_TURBO4 * 3 / 8];
+    uint8_t   signs[QK_TURBO4 / 8];
+} block_turbo4_0;
+static_assert(sizeof(block_turbo4_0) == 2*sizeof(ggml_half) + QK_TURBO4*3/8 + QK_TURBO4/8, "wrong turbo4_0 block size");
+#endif
+static_assert(QK_TURBO4 == 128, "turbo4 kernels assume QK_TURBO4 == 128");
+
+#define QK_TURBO2 128
+#define QK_TURBO2_GROUP 128
+#define NL_TURBO2     (QK_TURBO2 / 16)
+#define NL_TURBO2_VEC (QK_TURBO2 / 4)
+typedef struct {
+    ggml_half norm;
+    uint8_t   qs[QK_TURBO2 / 4];
+} block_turbo2_0;
+static_assert(sizeof(block_turbo2_0) == sizeof(ggml_half) + QK_TURBO2/4, "wrong turbo2_0 block size/padding");
+
 //
 // Super-block quantization structures
 //
