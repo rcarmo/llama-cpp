@@ -2,6 +2,12 @@ name: Actions cleanup
 
 on:
   workflow_run:
+    workflows:
+      - "EditorConfig Checker"
+      - ".github/workflows/build-cann.yml"
+      - "Code Style Checker"
+      - "Dependency Graph"
+      - ".github/workflows/build-cpu.yml"
     types: [completed]
   workflow_dispatch:
 
@@ -13,8 +19,7 @@ jobs:
   cleanup:
     name: Prune old Actions artifacts and runs
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.name != 'Actions cleanup')
+      github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Delete artifacts and completed runs older than 7 days
