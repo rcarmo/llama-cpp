@@ -10,7 +10,6 @@ permissions:
 jobs:
   cleanup:
     name: Prune old Actions artifacts, caches, and runs
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Delete stale artifacts, branch-scoped caches, and old completed runs
@@ -24,10 +23,14 @@ jobs:
             async function retry(label, fn) {
               let lastError;
               for (let attempt = 1; attempt <= 3; attempt++) {
-                try { return await fn(); } catch (error) {
+                try {
+                  return await fn();
+                } catch (error) {
                   lastError = error;
                   core.warning(`${label} failed on attempt ${attempt}: ${error.message}`);
-                  if (attempt < 3) await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+                  if (attempt < 3) {
+                    await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+                  }
                 }
               }
               throw lastError;
@@ -77,7 +80,7 @@ jobs:
                   await retry(`delete workflow run ${run.id}`, () => github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id }));
                   runCount++;
                 } catch (error) {
-                  core.warning(`Could not delete workflow run ${run.id} after retries: ${error.message}`);
+                  core.warning(`Could not delete workflow run ${run.id}: ${error.message}`);
                 }
               }
             }
