@@ -2424,45 +2424,36 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
     bool supports_op(ggml_backend_dev_t, const ggml_tensor * op) override {
         switch (op->op) {
             case GGML_OP_MUL_MAT:
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 2) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                    return true;
-                }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 2) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0])) {
-                    if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
+            case GGML_OP_MUL_MAT_ID:
+                {
+                    if (op->op == GGML_OP_MUL_MAT_ID && ggml_riscv64_spacemit_claim_iq_compact() &&
+                        ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
+                        if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
+                            return false;
+                        }
+                        return op->src[1]->type == GGML_TYPE_F32;
+                    }
+
+                    if (!op->src[0]->buffer ||
+                        op->src[0]->buffer->buft != ggml_backend_cpu_riscv64_spacemit_buffer_type()) {
                         return false;
                     }
-                    if (op->src[1]->type == GGML_TYPE_F32) {
-                        return true;
+
+                    const int required_dims = op->op == GGML_OP_MUL_MAT ? 2 : 3;
+                    if (ggml_n_dims(op->src[0]) != required_dims) {
+                        return false;
                     }
-                }
-                break;
-            case GGML_OP_MUL_MAT_ID:
-                if (ggml_riscv64_spacemit_claim_iq_compact() && ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
+
+                    if (!ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type) &&
+                        op->src[0]->extra == nullptr && ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0]) == nullptr) {
+                        return false;
+                    }
+
                     if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
                         return false;
                     }
                     return op->src[1]->type == GGML_TYPE_F32;
                 }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 3) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                    return true;
-                }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 3) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0])) {
-                    if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
-                        return false;
-                    }
-                    if (op->src[1]->type == GGML_TYPE_F32) {
-                        return true;
-                    }
-                }
-                break;
             default:
                 // GGML_ABORT("fatal error");
                 break;

@@ -290,14 +290,28 @@ spine_env_info::spine_env_info() {
         num_cores, num_perfer_cores, (uint16_t) perfer_core_arch_id, exclude_main_thread, use_ime1, use_ime2,
         spine_mem_pool_backend_to_string(mem_backend), cpu_mask, aicpu_id_offset);
 
-    const size_t init_barrier_size = sizeof(spine_barrier_t) * spine_init_barrier_count;
-    init_barrier =
-        static_cast<spine_barrier_t *>(spine_mem_pool_shared_mem_alloc(init_barrier_size, alignof(spine_barrier_t)));
-    if (init_barrier != nullptr) {
-        init_barrier_is_shared_mem = true;
-    } else {
-        GGML_LOG_WARN("CPU_RISCV64_SPACEMIT: failed to allocate init_barrier from shared mem, falling back to heap\n",
-                      __func__);
+    // Keep the IME thread-pair barriers in normal process memory by default.
+    // They contain std::atomic members and do not need to be visible outside this
+    // process; placing them in the mmap-backed shared pool has proven unsafe on
+    // some upstream-merged builds during CPU backend registration. Leave an opt-in
+    // escape hatch for experiments that specifically require shared barriers.
+    const char * shared_barrier_str = getenv("SPACEMIT_SHARED_BARRIER");
+    const bool   use_shared_barrier = shared_barrier_str != nullptr && strcmp(shared_barrier_str, "0") != 0 &&
+                                    strcmp(shared_barrier_str, "off") != 0 && strcmp(shared_barrier_str, "false") != 0;
+
+    if (use_shared_barrier) {
+        const size_t init_barrier_size = sizeof(spine_barrier_t) * spine_init_barrier_count;
+        init_barrier = static_cast<spine_barrier_t *>(
+            spine_mem_pool_shared_mem_alloc(init_barrier_size, alignof(spine_barrier_t)));
+        if (init_barrier != nullptr) {
+            init_barrier_is_shared_mem = true;
+        } else {
+            GGML_LOG_WARN("CPU_RISCV64_SPACEMIT: failed to allocate init_barrier from shared mem, falling back to heap\n",
+                          __func__);
+        }
+    }
+
+    if (init_barrier == nullptr) {
         init_barrier = new spine_barrier_t[spine_init_barrier_count];
     }
 
