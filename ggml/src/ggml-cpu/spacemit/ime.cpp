@@ -2138,11 +2138,9 @@ static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack
         case GGML_TYPE_Q4_K:
             {
 #if defined(RISCV64_SPACEMIT_IME2)
-                if (cur->ne[1] % 32 == 0 && cur->ne[0] % 256 == 0 &&
-                    (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
-                    return &ggml::cpu::riscv64_spacemit::q4_k_32x256_q8_0;
-                }
-
+                // Keep Q4_K on the regular 32-wide IME2 path. The 256-wide
+                // high-performance layout currently produces incorrect logits
+                // for Qwen3.6 Q4_K_M tensors.
                 if (cur->ne[1] % 32 == 0 && (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
                     return &ggml::cpu::riscv64_spacemit::q4_k_32x32_q8_0;
                 }
@@ -2602,7 +2600,13 @@ void ggml_backend_cpu_riscv64_spacemit_set_numa_thread_affinity(int thread_n) {
         void * rt =
             ggml::cpu::riscv64_spacemit::spine_mem_pool_tcm_mem_wait(ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
         if (rt == nullptr) {
-            GGML_ABORT("wait tcm buffer failed for cpu_id: %d", ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
+            // A second thread pool (for example an MTP draft model) can contend
+            // with the main model for the same per-core TCM block. Falling back
+            // to the normal workspace is safe; aborting takes down the server.
+            GGML_LOG_WARN("CPU_RISCV64_SPACEMIT: TCM unavailable for cpu_id %d, using normal workspace\n",
+                          ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
+            ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer      = nullptr;
+            ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer_size = 0;
         }
     }
 }
