@@ -10,7 +10,9 @@ The model data path remains the tagged baseline; the harness commit changes only
 ## Environment
 
 - Milk-V K3, 16 visible cores
-- Benchmark process inherited CPUs `0-7`; SpaceMIT reported preferred IME worker mask `ff00`
+- Benchmark process inherited CPUs `0-7`; SpaceMIT registered and selected worker mask `ff00` through the K3-specific `/proc/set_ai_thread` mechanism
+- The process must not be externally pinned: restricting its inherited affinity prevents backend worker migration and can corrupt IME/TCM execution
+- Historical notes disagree on X100/A100 naming versus IME ownership; this campaign records numeric CPU masks, ISA behavior and runtime dispatch instead of inferring capabilities from labels
 - 8 benchmark threads
 - SpaceMIT IME2 enabled, HPAGE backend, 8 × 393,216-byte TCM blocks
 - Q8 KV/service settings do not apply to `llama-bench`
