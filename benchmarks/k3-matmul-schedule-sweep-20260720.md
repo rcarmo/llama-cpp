@@ -34,10 +34,22 @@ Auto and TCM-B are equivalent within noise. TCM-A/direct are decisively worse.
 
 TCM-B wins both A3B workloads and materially improves generation. Auto sometimes selects TCM-A when its activation row block fits, but capacity alone is not a sufficient performance criterion.
 
+## Follow-up automatic-dispatch experiments
+
+A global TCM-B preference was rejected after the full Gemma sweep:
+
+- pp32 remained effectively unchanged;
+- pp128 regressed about 10.6%;
+- pp512 regressed about 7.7%;
+- generation remained within noise.
+
+A `gemm_m <= 64` preference restored Gemma and produced one strong A3B pp64 run, but repeated A3B generation stayed within baseline noise rather than reproducing the forced-mode result. A further TCM-B-then-direct small-row rule also remained within noise. These defaults were reverted before commit.
+
 ## Decision
 
-1. Preserve TCM staging; direct execution is not competitive on K3.
-2. Prefer TCM-B over TCM-A in automatic ordinary `MUL_MAT` dispatch.
-3. Keep the environment selector for regression diagnosis and future crossover work.
-4. Benchmark the preference change against the full immutable Gemma/A3B matrix in a separate commit.
+1. Preserve the existing automatic heuristic; it is safer across prompt sizes.
+2. Preserve TCM staging; direct execution is not competitive as a global policy on K3.
+3. Keep the environment selector for regression diagnosis and later per-shape crossover work.
+4. Do not promote a threshold from one favorable A3B run.
 5. Treat MoE selected-row scheduling separately; this selector does not cover it.
+6. The imported IME2 kernels already implement vector-wide 32-column register blocks with distinct m1/m4 kernels, so new register tiling must improve those hot loops rather than duplicate their structure.
