@@ -121,6 +121,51 @@ static bool spacemit_moe_m4_enabled() {
     return enabled;
 }
 
+struct spacemit_moe_tile_profile {
+    std::atomic<uint64_t> m4 { 0 };
+    std::atomic<uint64_t> m2 { 0 };
+    std::atomic<uint64_t> m1 { 0 };
+};
+
+static bool spacemit_moe_tile_profile_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+static spacemit_moe_tile_profile & spacemit_get_moe_tile_profile() {
+    static spacemit_moe_tile_profile profile;
+    return profile;
+}
+
+static void spacemit_moe_tile_profile_dump() {
+    auto & profile = spacemit_get_moe_tile_profile();
+    std::fprintf(stderr, "SPACEMIT_MOE_TILE_PROFILE m4=%" PRIu64 " m2=%" PRIu64 " m1=%" PRIu64 "\n",
+                 profile.m4.load(std::memory_order_relaxed), profile.m2.load(std::memory_order_relaxed),
+                 profile.m1.load(std::memory_order_relaxed));
+}
+
+static void spacemit_profile_moe_tile(size_t rows) {
+    if (!spacemit_moe_tile_profile_enabled()) {
+        return;
+    }
+    static const bool registered = [] {
+        std::atexit(spacemit_moe_tile_profile_dump);
+        return true;
+    }();
+    (void) registered;
+    auto & profile = spacemit_get_moe_tile_profile();
+    if (rows == 4) {
+        profile.m4.fetch_add(1, std::memory_order_relaxed);
+    } else if (rows == 2) {
+        profile.m2.fetch_add(1, std::memory_order_relaxed);
+    } else {
+        profile.m1.fetch_add(1, std::memory_order_relaxed);
+    }
+}
+
 static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> &
 spacemit_copy_counters() {
     static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> counters;
@@ -1031,6 +1076,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                                    (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
                                         src0_cur_start;
                                 }
+                                spacemit_profile_moe_tile(4);
                                 moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                    dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
                                                    ne01);
@@ -1051,6 +1097,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                 dst_workspaces[1] = (float *) ((char *) dst->data +
                                                                ((row_mapping_1.i1) * nb1 + (row_mapping_1.i2) * nb2)) +
                                                     src0_cur_start;
+                                spacemit_profile_moe_tile(2);
                                 moe_gemm_kernel_m2(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                    dst_workspaces.data(), 1, src0_cur_end - src0_cur_start, b_k_blks,
                                                    ne01);
@@ -1060,6 +1107,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         for (; iir1 < (ir1 + quant_a_tile_size); iir1++, quant_a_tile_buffer += nbw1) {
                             mmid_row_mapping row_mapping_0 = MMID_MATRIX_ROW(cur_a, iir1);
 
+                            spacemit_profile_moe_tile(1);
                             gemm_kernel(
                                 b_blk_len, quant_a_tile_buffer, src0_cur, b_col_zp,
                                 (float *) ((char *) dst->data + (row_mapping_0.i1 * nb1 + row_mapping_0.i2 * nb2)) +
@@ -1083,6 +1131,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                                (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
                                     src0_cur_start;
                             }
+                            spacemit_profile_moe_tile(4);
                             moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
                                                ne01);
@@ -1108,6 +1157,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                     (float *) ((char *) dst->data + (i1 * nb1 + i2 * nb2)) + src0_cur_start;
                             }
 
+                            spacemit_profile_moe_tile(2);
                             moe_gemm_kernel_m2(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                dst_workspaces.data(), 1, src0_cur_end - src0_cur_start, b_k_blks, ne01);
                         }
@@ -1126,6 +1176,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 
                         auto * src1_col = quant_a_buffer + (i11 * nbw1 + i12 * nbw2);
 
+                        spacemit_profile_moe_tile(1);
                         gemm_kernel(b_blk_len, src1_col, src0_cur, b_col_zp,
                                     (float *) ((char *) dst->data + (i1 * nb1 + i2 * nb2)) + src0_cur_start, 1,
                                     src0_cur_end - src0_cur_start, b_k_blks, ne01);
