@@ -126,7 +126,9 @@ static bool run_case(ggml_type type, int64_t tokens, int n_threads) {
     id->data = id_storage.data();
     out->data = out_storage.data();
 
+    const int64_t set_start_us = ggml_time_us();
     ggml_backend_tensor_set(as, qweights.data(), 0, qweights.size());
+    const int64_t set_us = ggml_time_us() - set_start_us;
     std::memcpy(b->data, activations.data(), activations.size() * sizeof(float));
     std::memcpy(id->data, ids.data(), ids.size() * sizeof(int32_t));
     std::memset(out->data, 0, ggml_nbytes(out));
@@ -148,6 +150,22 @@ static bool run_case(ggml_type type, int64_t tokens, int n_threads) {
     const ggml_status status = ggml_backend_graph_compute(backend, gf);
     bool ok = status == GGML_STATUS_SUCCESS;
 
+    int bench_iters = 0;
+    if (const char * v = std::getenv("SPACEMIT_IQ_MOE_BENCH_ITERS")) {
+        bench_iters = std::max(0, std::atoi(v));
+    }
+    int64_t compute_us = 0;
+    if (ok && bench_iters > 0) {
+        const int64_t compute_start_us = ggml_time_us();
+        for (int i = 0; i < bench_iters; ++i) {
+            if (ggml_backend_graph_compute(backend, gf) != GGML_STATUS_SUCCESS) {
+                ok = false;
+                break;
+            }
+        }
+        compute_us = ggml_time_us() - compute_start_us;
+    }
+
     const float * got = (const float *) out->data;
     const size_t nout = (size_t) rows * n_used * tokens;
     double mse = 0.0;
@@ -165,10 +183,12 @@ static bool run_case(ggml_type type, int64_t tokens, int n_threads) {
         }
     }
     const double nmse = mse / std::max(1e-12, ref_energy);
-    std::printf("case type=%s tokens=%lld threads=%d mode=%s max_abs=%.9g nmse=%.9g bad=%zu/%zu\n",
+    std::printf("case type=%s tokens=%lld threads=%d mode=%s plain_bytes=%zu alloc_bytes=%zu "
+                "set_us=%lld compute_us=%.3f bench_iters=%d max_abs=%.9g nmse=%.9g bad=%zu/%zu\n",
             ggml_type_name(type), (long long) tokens, n_threads,
             std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") ? std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") : "rvv",
-            max_abs, nmse, bad, nout);
+            ggml_nbytes(as), as_alloc_size, (long long) set_us,
+            bench_iters > 0 ? (double) compute_us / bench_iters : 0.0, bench_iters, max_abs, nmse, bad, nout);
     ok = ok && bad == 0 && nmse < 3.0e-2;
 
     ggml_backend_buffer_free(buf);
