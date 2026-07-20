@@ -814,7 +814,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
         int ith_es = ith % nth_es;
         int ith_n  = (ith / nth_es) % nth_n;
 
-        if (valid_ep_count_t % nth == 0 && tcm_buffer != nullptr && valid_ep_count_t == n_as &&
+        // This fast path uses even/odd producer-consumer barriers and needs a
+        // partner thread. With nth == 1 it waits forever on the paired barrier.
+        if (nth >= 2 && valid_ep_count_t % nth == 0 && tcm_buffer != nullptr && valid_ep_count_t == n_as &&
             valid_act_count_t == n_as && per_nb_cols_wsize <= tcm_buffer_size) {
             for (int64_t valid_id = ith; valid_id < valid_ep_count_t; valid_id += nth) {
                 const int64_t cur_a = valid_matrix_row_counts[valid_id];
@@ -2526,6 +2528,14 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
         switch (op->op) {
             case GGML_OP_MUL_MAT:
             case GGML_OP_MUL_MAT_ID:
+                if (op->src[0]->buffer && op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
+                    op->src[0]->extra != nullptr) {
+                    // Once buffer initialization installs a persistent repack
+                    // trait, src0 bytes use that trait's layout even though the
+                    // logical GGML type is unchanged. It must take precedence
+                    // over late-bound compact-IQ dispatch.
+                    return (ggml::cpu::tensor_traits *) op->src[0]->extra;
+                }
                 if (op->op == GGML_OP_MUL_MAT_ID && ggml_riscv64_spacemit_claim_iq_compact() &&
                     ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
                     switch (op->src[0]->type) {
@@ -2542,10 +2552,7 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
                     }
                 }
                 if (op->src[0]->buffer && op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type()) {
-                    if (ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                        return (ggml::cpu::tensor_traits *) (&ggml::cpu::riscv64_spacemit::passthrough);
-                    }
-                    return (ggml::cpu::tensor_traits *) op->src[0]->extra;
+                    return (ggml::cpu::tensor_traits *) (&ggml::cpu::riscv64_spacemit::passthrough);
                 }
                 break;
             case GGML_OP_NORM:
