@@ -54,4 +54,15 @@ scripts/summarize-k3-matmul-trace.awk trace.log
 
 Each `SPACEMIT_MATMUL` line records the selected path, operation, types, M/N/K, batch dimensions and thread count. The summarizer reports both call frequency and relative MAC weight; MAC weight is a prioritization estimate, not elapsed time. Tracing is disabled by default and cached once per process.
 
+The standard IME matmul scheduler can also be forced for crossover diagnosis:
+
+```bash
+GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto    # existing heuristic
+GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=tcm-a   # stage quantized activations
+GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=tcm-b   # stage weight columns
+GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=direct  # bypass both TCM paths
+```
+
+Forced TCM modes fall through to the direct scheduler when their capacity constraint is not met. This selector does not change arithmetic kernels or the separate MoE scheduler.
+
 Benchmark result directories are not intended to be committed wholesale. Promote the selected immutable baseline and final tables into a report with links or checksums for retained raw artifacts.

@@ -89,6 +89,34 @@ static bool spacemit_matmul_trace_enabled() {
     return enabled;
 }
 
+enum class spacemit_matmul_schedule {
+    automatic,
+    tcm_a,
+    tcm_b,
+    direct,
+};
+
+static spacemit_matmul_schedule spacemit_get_matmul_schedule() {
+    static const spacemit_matmul_schedule schedule = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE");
+        if (v == nullptr || std::strcmp(v, "auto") == 0) {
+            return spacemit_matmul_schedule::automatic;
+        }
+        if (std::strcmp(v, "tcm-a") == 0) {
+            return spacemit_matmul_schedule::tcm_a;
+        }
+        if (std::strcmp(v, "tcm-b") == 0) {
+            return spacemit_matmul_schedule::tcm_b;
+        }
+        if (std::strcmp(v, "direct") == 0) {
+            return spacemit_matmul_schedule::direct;
+        }
+        std::fprintf(stderr, "warning: unknown GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=%s; using auto\n", v);
+        return spacemit_matmul_schedule::automatic;
+    }();
+    return schedule;
+}
+
 static void spacemit_trace_matmul(const ggml_compute_params * params, const ggml_tensor * dst, const char * path) {
     if (params->ith != 0 || !spacemit_matmul_trace_enabled()) {
         return;
@@ -459,7 +487,11 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 std::min(gemm_n_stride, spacemit_kernels::div_round_up(max_gemm_n_stride, NB_COLS) * NB_COLS);
         }
 
-        if (gemm_n_stride == gemm_n && tcm_buffer != nullptr && per_mb_rows_wsize <= tcm_buffer_size) {
+        const spacemit_matmul_schedule schedule = spacemit_get_matmul_schedule();
+        const bool allow_tcm_a = schedule == spacemit_matmul_schedule::automatic || schedule == spacemit_matmul_schedule::tcm_a;
+        const bool allow_tcm_b = schedule == spacemit_matmul_schedule::automatic || schedule == spacemit_matmul_schedule::tcm_b;
+
+        if (allow_tcm_a && gemm_n_stride == gemm_n && tcm_buffer != nullptr && per_mb_rows_wsize <= tcm_buffer_size) {
             for (int64_t m_start = ith * row_align; m_start < gemm_m; m_start += row_align * nth) {
                 uint8_t * b_col    = reinterpret_cast<uint8_t *>(w_data);
                 uint8_t * b_col_zp = block_type_has_zp<BLOC_TYPE>() ? b_col : nullptr;
@@ -489,7 +521,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                     }
                 }
             }
-        } else if (tcm_buffer != nullptr && per_nb_cols_wsize <= tcm_buffer_size) {
+        } else if (allow_tcm_b && tcm_buffer != nullptr && per_nb_cols_wsize <= tcm_buffer_size) {
             uint8_t * a_row = quant_a_buffer;
             uint8_t * b_col = reinterpret_cast<uint8_t *>(tcm_buffer);
             if ((gemm_workspace_size + per_nb_cols_wsize) <= tcm_buffer_size) {
