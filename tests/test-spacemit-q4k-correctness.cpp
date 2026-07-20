@@ -193,9 +193,12 @@ int main(int argc, char ** argv) {
     }
 
     bool ok = true;
+    // Cover m1, m4, mixed m4+m1 tails, and a prompt-sized activation row set.
+    for (int64_t tokens = 1; tokens <= 9; ++tokens) {
+        ok = run_case(64, tokens, 512, n_threads) && ok;
+    }
+    ok = run_case(64, 32, 512, n_threads) && ok;
     ok = run_case(32, 1, 256, n_threads) && ok;
-    ok = run_case(64, 1, 512, n_threads) && ok;
-    ok = run_case(64, 4, 512, n_threads) && ok;
     ok = run_case(128, 1, 1024, n_threads) && ok;
 
     ggml_quantize_free();
