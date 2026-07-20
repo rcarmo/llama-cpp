@@ -5007,6 +5007,116 @@ void gemm_kernel_i8i8_m1(size_t          blk_len,
     }
 }
 
+void gemm_kernel_i8i8_m2(size_t          blk_len,
+                         const uint8_t * quant_a_ptr,
+                         const uint8_t * quant_b_data,
+                         const uint8_t * quant_b_zp,
+                         float *         c_ptr,
+                         size_t          count_m,
+                         size_t          count_n,
+                         size_t          k_blks,
+                         size_t          ldc) {
+    GGML_ASSERT(count_m >= 2);
+    const size_t row_stride = k_blks * q8_blk_size(blk_len, true);
+
+    for (size_t n = 0; n < count_n; n += 32) {
+        const size_t nblks = std::min<size_t>(32, count_n - n);
+        const uint8_t * b_data = quant_b_data + n * k_blks * (blk_len + sizeof(_Float16));
+        const uint8_t * a0 = quant_a_ptr;
+        const uint8_t * a1 = quant_a_ptr + row_stride;
+        float * c0 = c_ptr + n;
+        float * c1 = c_ptr + ldc + n;
+
+        asm volatile(
+            "vsetvli t0, x0, e32, m1\n\t"
+            "vxor.vv v2, v2, v2\n\t"
+            "vxor.vv v3, v3, v3\n\t"
+            "mv t3, %[BK]\n\t"
+            ".align 4\n\t"
+            "1:\n\t"
+            // Keep the B scale and unpacked 32x32 B tile live for both A rows.
+            "vsetvli t0, x0, e16, mf2\n\t"
+            "vle16.v v0, (%[B])\n\t"
+            "addi %[B], %[B], 64\n\t"
+            "vfwcvt.f.f.v v14, v0\n\t"
+            "vsetvli t0, x0, e8, m1\n\t"
+            "vl4r.v v4, (%[B])\n\t"
+            "addi %[B], %[B], 512\n\t"
+            "vl4r.v v8, (%[B])\n\t"
+            "addi %[B], %[B], 512\n\t"
+            "vsetvli t0, x0, e32, m1\n\t"
+            "vupack.vv v24, v4, v5, 1\n\t"
+            "vupack.vv v26, v6, v7, 1\n\t"
+            "vupack.vv v28, v8, v9, 1\n\t"
+            "vupack.vv v30, v10, v11, 1\n\t"
+
+            // Row 0 dot product.
+            "flw fa0, (%[A0])\n\t"
+            "addi %[A0], %[A0], 6\n\t"
+            "vsetvli t0, x0, e8, mf4\n\t"
+            "vle8.v v12, (%[A0])\n\t"
+            "addi %[A0], %[A0], 32\n\t"
+            "vsetvli t0, x0, e32, m1\n\t"
+            "vslidedown.vi v13, v12, 4\n\t"
+            "vxor.vv v16, v16, v16\n\t"
+            "vxor.vv v18, v18, v18\n\t"
+            "vxor.vv v20, v20, v20\n\t"
+            "vxor.vv v22, v22, v22\n\t"
+            "vmadot v16, v12, v24, i8\n\t"
+            "vmadot v18, v12, v26, i8\n\t"
+            "vmadot v20, v12, v28, i8\n\t"
+            "vmadot v22, v12, v30, i8\n\t"
+            "vmadot v16, v13, v25, i8\n\t"
+            "vmadot v18, v13, v27, i8\n\t"
+            "vmadot v20, v13, v29, i8\n\t"
+            "vmadot v22, v13, v31, i8\n\t"
+            "vpack.vv v4, v16, v18, 2\n\t"
+            "vpack.vv v6, v20, v22, 2\n\t"
+            "vpack.vv v12, v4, v6, 3\n\t"
+
+            // Row 1 reuses the unpacked B tile.
+            "flw fa1, (%[A1])\n\t"
+            "addi %[A1], %[A1], 6\n\t"
+            "vsetvli t0, x0, e8, mf4\n\t"
+            "vle8.v v0, (%[A1])\n\t"
+            "addi %[A1], %[A1], 32\n\t"
+            "vsetvli t0, x0, e32, m1\n\t"
+            "vslidedown.vi v1, v0, 4\n\t"
+            "vxor.vv v16, v16, v16\n\t"
+            "vxor.vv v18, v18, v18\n\t"
+            "vxor.vv v20, v20, v20\n\t"
+            "vxor.vv v22, v22, v22\n\t"
+            "vmadot v16, v0, v24, i8\n\t"
+            "vmadot v18, v0, v26, i8\n\t"
+            "vmadot v20, v0, v28, i8\n\t"
+            "vmadot v22, v0, v30, i8\n\t"
+            "vmadot v16, v1, v25, i8\n\t"
+            "vmadot v18, v1, v27, i8\n\t"
+            "vmadot v20, v1, v29, i8\n\t"
+            "vmadot v22, v1, v31, i8\n\t"
+            "vpack.vv v4, v16, v18, 2\n\t"
+            "vpack.vv v6, v20, v22, 2\n\t"
+            "vpack.vv v8, v4, v6, 3\n\t"
+
+            "vfcvt.f.x.v v12, v12\n\t"
+            "vfcvt.f.x.v v8, v8\n\t"
+            "vfmul.vv v12, v12, v14\n\t"
+            "vfmul.vv v8, v8, v14\n\t"
+            "vfmacc.vf v2, fa0, v12\n\t"
+            "vfmacc.vf v3, fa1, v8\n\t"
+            "addi t3, t3, -1\n\t"
+            "bgtz t3, 1b\n\t"
+            "vsetvli t0, %[N], e32, m1\n\t"
+            "vse32.v v2, (%[C0])\n\t"
+            "vse32.v v3, (%[C1])\n\t"
+            : [A0] "+r"(a0), [A1] "+r"(a1), [B] "+r"(b_data)
+            : [BK] "r"(k_blks), [N] "r"(nblks), [C0] "r"(c0), [C1] "r"(c1)
+            : "cc", "memory", "t0", "t3", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9",
+              "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19", "v20", "v21",
+              "v22", "v23", "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31", "fa0", "fa1");
+    }
+}
+
 void gemm_kernel_i8i8_m4(size_t          blk_len,
                          const uint8_t * quant_a_ptr,
                          const uint8_t * quant_b_data,
@@ -5806,15 +5916,20 @@ size_t gemm_kernel_i8i8(size_t          blk_len,
         gemm_kernel_i8i8_m4(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
 #endif
         return 4;
-    } else {
-#if 0
-        gemm_kernel_i8i8_mrow_ref<1, 32>(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n,
-                                         k_blks, ldc);
-#else
-        gemm_kernel_i8i8_m1(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
-#endif
-        return 1;
     }
+    const char * m2 = std::getenv("GGML_RISCV64_SPACEMIT_I8I8_M2");
+    if (count_m >= 2 && m2 != nullptr && strcmp(m2, "0") != 0 && strcmp(m2, "off") != 0 &&
+        strcmp(m2, "false") != 0) {
+        gemm_kernel_i8i8_m2(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
+        return 2;
+    }
+#if 0
+    gemm_kernel_i8i8_mrow_ref<1, 32>(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks,
+                                     ldc);
+#else
+    gemm_kernel_i8i8_m1(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
+#endif
+    return 1;
 }
 
 size_t gemm_kernel_i8mxfp4(size_t          blk_len,
