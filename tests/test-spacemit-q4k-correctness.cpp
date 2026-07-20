@@ -136,6 +136,22 @@ static bool run_case(int64_t rows, int64_t tokens, int64_t k, int n_threads) {
         std::fprintf(stderr, "ggml_backend_graph_compute failed: %s\n", ggml_status_to_string(status));
     }
 
+    int bench_iters = 0;
+    if (const char * v = std::getenv("SPACEMIT_Q4K_BENCH_ITERS")) {
+        bench_iters = std::max(0, std::atoi(v));
+    }
+    int64_t compute_us = 0;
+    if (ok && bench_iters > 0) {
+        const int64_t start_us = ggml_time_us();
+        for (int i = 0; i < bench_iters; ++i) {
+            if (ggml_backend_graph_compute(backend, gf) != GGML_STATUS_SUCCESS) {
+                ok = false;
+                break;
+            }
+        }
+        compute_us = ggml_time_us() - start_us;
+    }
+
     const float * got = (const float *) out->data;
     double max_abs    = 0.0;
     double max_rel    = 0.0;
@@ -169,9 +185,11 @@ static bool run_case(int64_t rows, int64_t tokens, int64_t k, int n_threads) {
     const double rmse    = std::sqrt(mse);
     const double nmse    = mse / std::max(1e-12, ref_energy);
 
-    std::printf("case rows=%lld tokens=%lld k=%lld threads=%d max_abs=%.9g max_rel=%.9g rmse=%.9g ref_rms=%.9g got_rms=%.9g nmse=%.9g bad=%zu/%zu\n",
-                (long long) rows, (long long) tokens, (long long) k, n_threads, max_abs, max_rel, rmse, ref_rms,
-                got_rms, nmse, bad, nout);
+    std::printf("case rows=%lld tokens=%lld k=%lld threads=%d compute_us=%.3f bench_iters=%d max_abs=%.9g "
+                "max_rel=%.9g rmse=%.9g ref_rms=%.9g got_rms=%.9g nmse=%.9g bad=%zu/%zu\n",
+                (long long) rows, (long long) tokens, (long long) k, n_threads,
+                bench_iters > 0 ? (double) compute_us / bench_iters : 0.0, bench_iters, max_abs, max_rel, rmse,
+                ref_rms, got_rms, nmse, bad, nout);
 
     ok = ok && bad == 0 && nmse < 2.0e-2 && got_rms > 0.01 * ref_rms;
 
@@ -193,9 +211,12 @@ int main(int argc, char ** argv) {
     }
 
     bool ok = true;
+    // Cover m1, m4, mixed m4+m1 tails, and a prompt-sized activation row set.
+    for (int64_t tokens = 1; tokens <= 9; ++tokens) {
+        ok = run_case(64, tokens, 512, n_threads) && ok;
+    }
+    ok = run_case(64, 32, 512, n_threads) && ok;
     ok = run_case(32, 1, 256, n_threads) && ok;
-    ok = run_case(64, 1, 512, n_threads) && ok;
-    ok = run_case(64, 4, 512, n_threads) && ok;
     ok = run_case(128, 1, 1024, n_threads) && ok;
 
     ggml_quantize_free();

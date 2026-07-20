@@ -8,7 +8,7 @@
 [![Docker](https://github.com/ggml-org/llama.cpp/actions/workflows/docker.yml/badge.svg)](https://github.com/ggml-org/llama.cpp/actions/workflows/docker.yml)
 [![Winget](https://github.com/ggml-org/llama.cpp/actions/workflows/winget.yml/badge.svg)](https://github.com/ggml-org/llama.cpp/actions/workflows/winget.yml)
 
-[Manifesto](https://github.com/ggml-org/llama.cpp/discussions/205) / [ggml](https://github.com/ggml-org/ggml) / [ops](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md)
+[Manifesto](https://github.com/ggml-org/llama.cpp/discussions/205) / [ggml](https://github.com/ggml-org/ggml) / [ops](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md) / [maintainer PRs](https://github.com/ggml-org/llama.cpp/issues?q=is%3Apr%20is%3Aopen%20draft%3AFalse%20(author%3Argerganov%20OR%20author%3AKitaitiMakoto%20OR%20author%3Adanbev%20OR%20author%3Aaldehir%20OR%20author%3Amax-krasnyansky%20OR%20author%3ACISC%20OR%20author%3Aggerganov%20OR%20author%3Aam17an%20OR%20author%3Abartowski1182%20OR%20author%3Ahipudding%20OR%20author%3AServeurpersoCom%20OR%20author%3Apwilkin%20OR%20author%3Areeselevine%20OR%20author%3Angxson%20OR%20author%3Ajeffbolznv%20OR%20author%3A0cc4m%20OR%20author%3Aangt%20OR%20author%3AIMbackK%20OR%20author%3Aarthw%20OR%20author%3AJohannesGaessler%20OR%20author%3AORippler%20OR%20author%3Aruixiang63%20OR%20author%3Axctan%20OR%20author%3Aallozaur%20OR%20author%3Ayomaytk%20OR%20author%3Aaendk%20OR%20author%3Agaugarg-nv%20OR%20author%3Ataronaeo%20OR%20author%3Aforforever73%20OR%20author%3Alhez%20OR%20author%3Anetrunnereve%20OR%20author%3Afairydreaming)%20sort%3Aupdated-desc)
 
 LLM inference in C/C++
 
@@ -72,6 +72,55 @@ range of hardware - locally and in the cloud.
 - CPU+GPU hybrid inference to partially accelerate models larger than the total VRAM capacity
 
 The `llama.cpp` project is the main playground for developing new features for the [ggml](https://github.com/ggml-org/ggml) library.
+
+## rcarmo fork: SpaceMIT K3
+
+This fork adds a RISC-V CPU backend for the Milk-V K3 and compatible SpaceMIT SoCs. The backend uses RVV for activation processing, IME1/IME2 matrix kernels, TCM staging, quantized-weight repacking and GGML's worker pool. The fork's mainline branch is `master`.
+
+Configure a native release build with:
+
+```bash
+cmake -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGGML_CPU_RISCV64_SPACEMIT=ON \
+    -DGGML_NATIVE=ON
+cmake --build build -j"$(nproc)"
+```
+
+### K3 optimisation progress
+
+The table records the state verified on a Milk-V K3 as of 20 July 2026. `Default` means the path is active without an experimental environment variable.
+
+| Area | Implementation and evidence | Measured result | State |
+|---|---|---:|---|
+| SpaceMIT backend | RVV activation kernels, IME1/IME2 dispatch, TCM allocation and K3 AI-core affinity | Qwen and Gemma services live-verified | Default |
+| Quantized weights | Load-time repacking for Q4_K, Q5_K, Q6_K and Q8_0 IME layouts | Avoids per-call weight conversion | Default |
+| Q4_K edges | Register-tiled m4/m1 family tested at activation rows 1–9 and 32 | All one- and eight-thread cases passed | Default |
+| Matmul scheduling | Profiled `auto`, `tcm-a`, `tcm-b` and `direct` across prompt and generation shapes | `direct` reduced Qwen generation by 8.2%; `auto` retained | Default: `auto` |
+| Compact-IQ MoE | Direct RVV, per-call IME2 packing and persistent IQ→Q8 repacking tested for IQ2_XS, IQ3_XXS, IQ4_XS and IQ4_NL | Persistent repacking was 3.13–40.42× faster after amortisation, but expanded weights 1.89–3.68× | Opt-in |
+| Q4_K/Q5_K MoE edges | m4→m2→m1 contract and routed-row fixture for rows 1, 2, 4, 5 and 8 | 120 gate/type/row/thread combinations passed; m4 was 4.48% of Qwen MoE tiles | Opt-in |
+| Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
+| Qwen3.6-35B-A3B MTP | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance | Live-verified |
+| Qwen context/cache | Realistic 2,094-token coding prompt and cached follow-up | 10.54 prompt tok/s; 1,962 cached tokens reused | Live-verified |
+
+No experimental matrix kernel met the 2% end-to-end promotion threshold in the final Qwen campaign. The service therefore uses the automatic scheduler and existing TCM staging, with the experimental kernels disabled.
+
+### K3 controls
+
+| Variable | Effect | Default |
+|---|---|---|
+| `GGML_RISCV64_SPACEMIT_MATMUL_TRACE=1` | Emit exact matmul operations, types and shapes | Off |
+| `GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto\|tcm-a\|tcm-b\|direct` | Select the diagnostic matmul schedule | `auto` |
+| `GGML_RISCV64_SPACEMIT_COPY_PROFILE=1` | Count dense and MoE TCM copy calls and bytes | Off |
+| `GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE=1` | Count m4, m2 and m1 MoE dispatches | Off |
+| `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable the Q4_K/Q5_K m4 edge contract | Off |
+| `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense register-tiled i8×i8 m2 kernel | Off |
+
+Detailed measurements and reproduction instructions:
+
+- [Qwen3.6-35B-A3B matrix campaign](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
+- [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
+- [K3 benchmark harness](scripts/README-k3-matmul.md)
 
 <details>
 <summary>Models</summary>

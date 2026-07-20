@@ -4772,12 +4772,16 @@ static size_t ggml_backend_cpu_repack_buffer_type_get_alignment(ggml_backend_buf
 namespace ggml::cpu::repack {
 class extra_buffer_type : ggml::cpu::extra_buffer_type {
     bool supports_op(ggml_backend_dev_t, const struct ggml_tensor * op) override {
-        if (    op->op == GGML_OP_MUL_MAT &&
+        if ((op->op == GGML_OP_MUL_MAT || op->op == GGML_OP_MUL_MAT_ID) &&
                 op->src[0]->buffer &&
-                (ggml_n_dims(op->src[0]) == 2) &&
-                op->src[0]->buffer->buft == ggml_backend_cpu_repack_buffer_type() &&
-                ggml_repack_get_optimal_repack_type(op->src[0])
-                ) {
+                op->src[0]->buffer->buft == ggml_backend_cpu_repack_buffer_type()) {
+            const int required_dims = op->op == GGML_OP_MUL_MAT ? 2 : 3;
+            if (ggml_n_dims(op->src[0]) != required_dims) {
+                return false;
+            }
+            if (op->src[0]->extra == nullptr && ggml_repack_get_optimal_repack_type(op->src[0]) == nullptr) {
+                return false;
+            }
             if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
                 return false;
             }
@@ -4788,21 +4792,6 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
             //    return true;
             //}
             // may be possible if Q8_0 packed...
-        } else if (op->op == GGML_OP_MUL_MAT_ID
-                && op->src[0]->buffer
-                && (ggml_n_dims(op->src[0]) == 3)
-                && op->src[0]->buffer->buft == ggml_backend_cpu_repack_buffer_type()
-                && ggml_repack_get_optimal_repack_type(op->src[0])
-                ) {
-            if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
-                return false;
-            }
-            if (op->src[1]->type == GGML_TYPE_F32) {
-                return true;
-            }
-            //if (op->src[1]->type == GGML_TYPE_Q8_0) {
-            //    return true;
-            //}
         }
         return false;
     }

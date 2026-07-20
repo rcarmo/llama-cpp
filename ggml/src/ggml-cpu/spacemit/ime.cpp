@@ -23,8 +23,11 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <cassert>
 #include <cerrno>
+#include <cinttypes>
 #include <cmath>
 #include <cstdio>  // for GGML_ASSERT
 #include <cstdlib>
@@ -79,6 +82,171 @@ extern int  ggml_threadpool_chunk_add(struct ggml_threadpool * tp, int value);
 }
 
 namespace ggml::cpu::riscv64_spacemit {
+
+static bool spacemit_matmul_trace_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MATMUL_TRACE");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+enum class spacemit_copy_category : size_t {
+    dense_tcm_a,
+    dense_tcm_b_weights,
+    dense_tcm_b_activations,
+    moe_tcm_weights,
+    moe_tcm_activations,
+    count,
+};
+
+struct spacemit_copy_counter {
+    std::atomic<uint64_t> calls { 0 };
+    std::atomic<uint64_t> bytes { 0 };
+};
+
+static bool spacemit_copy_profile_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_COPY_PROFILE");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+static bool spacemit_moe_m4_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MOE_M4");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+struct spacemit_moe_tile_profile {
+    std::atomic<uint64_t> m4 { 0 };
+    std::atomic<uint64_t> m2 { 0 };
+    std::atomic<uint64_t> m1 { 0 };
+};
+
+static bool spacemit_moe_tile_profile_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+static spacemit_moe_tile_profile & spacemit_get_moe_tile_profile() {
+    static spacemit_moe_tile_profile profile;
+    return profile;
+}
+
+static void spacemit_moe_tile_profile_dump() {
+    auto & profile = spacemit_get_moe_tile_profile();
+    std::fprintf(stderr, "SPACEMIT_MOE_TILE_PROFILE m4=%" PRIu64 " m2=%" PRIu64 " m1=%" PRIu64 "\n",
+                 profile.m4.load(std::memory_order_relaxed), profile.m2.load(std::memory_order_relaxed),
+                 profile.m1.load(std::memory_order_relaxed));
+}
+
+static void spacemit_profile_moe_tile(size_t rows) {
+    if (!spacemit_moe_tile_profile_enabled()) {
+        return;
+    }
+    static const bool registered = [] {
+        std::atexit(spacemit_moe_tile_profile_dump);
+        return true;
+    }();
+    (void) registered;
+    auto & profile = spacemit_get_moe_tile_profile();
+    if (rows == 4) {
+        profile.m4.fetch_add(1, std::memory_order_relaxed);
+    } else if (rows == 2) {
+        profile.m2.fetch_add(1, std::memory_order_relaxed);
+    } else {
+        profile.m1.fetch_add(1, std::memory_order_relaxed);
+    }
+}
+
+static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> &
+spacemit_copy_counters() {
+    static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> counters;
+    return counters;
+}
+
+static void spacemit_copy_profile_dump() {
+    static constexpr const char * names[] = {
+        "dense-tcm-a",
+        "dense-tcm-b-weights",
+        "dense-tcm-b-activations",
+        "moe-tcm-weights",
+        "moe-tcm-activations",
+    };
+    auto & counters = spacemit_copy_counters();
+    for (size_t i = 0; i < counters.size(); ++i) {
+        std::fprintf(stderr, "SPACEMIT_COPY_PROFILE category=%s calls=%" PRIu64 " bytes=%" PRIu64 "\n", names[i],
+                     counters[i].calls.load(std::memory_order_relaxed),
+                     counters[i].bytes.load(std::memory_order_relaxed));
+    }
+}
+
+static void spacemit_profiled_copy(spacemit_copy_category category, void * dst, const void * src, int64_t size) {
+    if (spacemit_copy_profile_enabled()) {
+        static const bool registered = [] {
+            std::atexit(spacemit_copy_profile_dump);
+            return true;
+        }();
+        (void) registered;
+        auto & counter = spacemit_copy_counters()[static_cast<size_t>(category)];
+        counter.calls.fetch_add(1, std::memory_order_relaxed);
+        counter.bytes.fetch_add(static_cast<uint64_t>(size), std::memory_order_relaxed);
+    }
+    spacemit_kernels::rvv::memcpy1d(dst, src, size);
+}
+
+enum class spacemit_matmul_schedule {
+    automatic,
+    tcm_a,
+    tcm_b,
+    direct,
+};
+
+static spacemit_matmul_schedule spacemit_get_matmul_schedule() {
+    static const spacemit_matmul_schedule schedule = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE");
+        if (v == nullptr || std::strcmp(v, "auto") == 0) {
+            return spacemit_matmul_schedule::automatic;
+        }
+        if (std::strcmp(v, "tcm-a") == 0) {
+            return spacemit_matmul_schedule::tcm_a;
+        }
+        if (std::strcmp(v, "tcm-b") == 0) {
+            return spacemit_matmul_schedule::tcm_b;
+        }
+        if (std::strcmp(v, "direct") == 0) {
+            return spacemit_matmul_schedule::direct;
+        }
+        std::fprintf(stderr, "warning: unknown GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=%s; using auto\n", v);
+        return spacemit_matmul_schedule::automatic;
+    }();
+    return schedule;
+}
+
+static void spacemit_trace_matmul(const ggml_compute_params * params, const ggml_tensor * dst, const char * path) {
+    if (params->ith != 0 || !spacemit_matmul_trace_enabled()) {
+        return;
+    }
+
+    const ggml_tensor * src0 = dst->src[0];
+    const ggml_tensor * src1 = dst->src[1];
+    GGML_ASSERT(src0 != nullptr && src1 != nullptr);
+
+    std::fprintf(stderr,
+            "SPACEMIT_MATMUL path=%s op=%s type0=%s type1=%s type_dst=%s "
+            "m=%" PRId64 " n=%" PRId64 " k=%" PRId64 " "
+            "src0_ne2=%" PRId64 " src1_ne2=%" PRId64 " src1_ne3=%" PRId64 " nth=%d\n",
+            path, ggml_op_name(dst->op), ggml_type_name(src0->type), ggml_type_name(src1->type),
+            ggml_type_name(dst->type), dst->ne[0], dst->ne[1], src0->ne[0], src0->ne[2], src1->ne[2], src1->ne[3],
+            params->nth);
+}
 
 struct TLSContext {
     int       cpu_id{ -1 };
@@ -194,6 +362,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
     }
 
     bool compute_forward(ggml_compute_params * params, ggml_tensor * op) override {
+        if (op->op == GGML_OP_MUL_MAT || op->op == GGML_OP_MUL_MAT_ID) {
+            spacemit_trace_matmul(params, op, "ime");
+        }
         switch (op->op) {
             case GGML_OP_MUL_MAT:
                 switch (op->src[0]->type) {
@@ -429,15 +600,19 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 std::min(gemm_n_stride, spacemit_kernels::div_round_up(max_gemm_n_stride, NB_COLS) * NB_COLS);
         }
 
-        if (gemm_n_stride == gemm_n && tcm_buffer != nullptr && per_mb_rows_wsize <= tcm_buffer_size) {
+        const spacemit_matmul_schedule schedule = spacemit_get_matmul_schedule();
+        const bool allow_tcm_a = schedule == spacemit_matmul_schedule::automatic || schedule == spacemit_matmul_schedule::tcm_a;
+        const bool allow_tcm_b = schedule == spacemit_matmul_schedule::automatic || schedule == spacemit_matmul_schedule::tcm_b;
+
+        if (allow_tcm_a && gemm_n_stride == gemm_n && tcm_buffer != nullptr && per_mb_rows_wsize <= tcm_buffer_size) {
             for (int64_t m_start = ith * row_align; m_start < gemm_m; m_start += row_align * nth) {
                 uint8_t * b_col    = reinterpret_cast<uint8_t *>(w_data);
                 uint8_t * b_col_zp = block_type_has_zp<BLOC_TYPE>() ? b_col : nullptr;
 
                 int64_t m_row_real = std::min(gemm_m - m_start, row_align);
 
-                spacemit_kernels::rvv::memcpy1d(tcm_buffer, quant_a_buffer + m_start * row_stride_a,
-                                                m_row_real * row_stride_a);
+                spacemit_profiled_copy(spacemit_copy_category::dense_tcm_a, tcm_buffer,
+                                        quant_a_buffer + m_start * row_stride_a, m_row_real * row_stride_a);
 
                 int64_t n_blk_real = 0;
                 for (int64_t ni = 0; ni < gemm_n; ni += n_blk_real, b_col += n_blk_real * row_stride_b) {
@@ -459,7 +634,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                     }
                 }
             }
-        } else if (tcm_buffer != nullptr && per_nb_cols_wsize <= tcm_buffer_size) {
+        } else if (allow_tcm_b && tcm_buffer != nullptr && per_nb_cols_wsize <= tcm_buffer_size) {
             uint8_t * a_row = quant_a_buffer;
             uint8_t * b_col = reinterpret_cast<uint8_t *>(tcm_buffer);
             if ((gemm_workspace_size + per_nb_cols_wsize) <= tcm_buffer_size) {
@@ -472,10 +647,12 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
             int64_t nb_real = std::min(gemm_n - ni, NB_COLS);
 
             if (ith % 2 == 0 && nb_real > 0) {
-                spacemit_kernels::rvv::memcpy1d(b_col, reinterpret_cast<uint8_t *>(w_data) + ni * row_stride_b,
-                                                nb_real * row_stride_b);
+                spacemit_profiled_copy(spacemit_copy_category::dense_tcm_b_weights, b_col,
+                                        reinterpret_cast<uint8_t *>(w_data) + ni * row_stride_b,
+                                        nb_real * row_stride_b);
                 if (a_row != quant_a_buffer) {
-                    spacemit_kernels::rvv::memcpy1d(a_row, quant_a_buffer, gemm_workspace_size);
+                    spacemit_profiled_copy(spacemit_copy_category::dense_tcm_b_activations, a_row, quant_a_buffer,
+                                            gemm_workspace_size);
                 }
             }
 
@@ -483,10 +660,12 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 
             if (ith % 2 != 0 && nb_real > 0) {
                 if (a_row != quant_a_buffer) {
-                    spacemit_kernels::rvv::memcpy1d(a_row, quant_a_buffer, gemm_workspace_size);
+                    spacemit_profiled_copy(spacemit_copy_category::dense_tcm_b_activations, a_row, quant_a_buffer,
+                                            gemm_workspace_size);
                 }
-                spacemit_kernels::rvv::memcpy1d(b_col, reinterpret_cast<uint8_t *>(w_data) + ni * row_stride_b,
-                                                nb_real * row_stride_b);
+                spacemit_profiled_copy(spacemit_copy_category::dense_tcm_b_weights, b_col,
+                                        reinterpret_cast<uint8_t *>(w_data) + ni * row_stride_b,
+                                        nb_real * row_stride_b);
             }
 
             for (; ni < gemm_n; ni += NB_COLS * nth) {
@@ -515,8 +694,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 const int64_t next_ni = ni + NB_COLS * nth;
                 if (next_ni < gemm_n) {
                     nb_real = std::min(gemm_n - next_ni, NB_COLS);
-                    spacemit_kernels::rvv::memcpy1d(b_col, reinterpret_cast<uint8_t *>(w_data) + next_ni * row_stride_b,
-                                                    nb_real * row_stride_b);
+                    spacemit_profiled_copy(spacemit_copy_category::dense_tcm_b_weights, b_col,
+                                            reinterpret_cast<uint8_t *>(w_data) + next_ni * row_stride_b,
+                                            nb_real * row_stride_b);
                 }
             }
         } else {
@@ -592,10 +772,11 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
             int32_t i2;
         };
 
-        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8 = nullptr;
-        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel = nullptr;
+        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8  = nullptr;
+        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel        = nullptr;
         spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m2 = nullptr;
-        bool                                           set_kernel_impl = false;
+        spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m4 = nullptr;
+        bool                                           set_kernel_impl    = false;
         size_t                                         block_stride_a  = spacemit_kernels::q8_blk_size(QK4_0);
 
 #if defined(RISCV64_SPACEMIT_IME2)
@@ -616,6 +797,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 } else {
                     gemm_kernel        = spacemit_kernels::ime2::gemm_kernel_i8i4;
                     moe_gemm_kernel_m2 = spacemit_kernels::ime2::moe_m2_gemm_kernel_i8i4;
+                    moe_gemm_kernel_m4 = spacemit_kernels::ime2::moe_m4_gemm_kernel_i8i4;
                     quantize_a_row_i8  = spacemit_kernels::rvv::quantize_a_row_i8;
                     block_stride_a     = spacemit_kernels::q8_blk_size(a_blk_len, true);
                     set_kernel_impl    = true;
@@ -638,6 +820,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                  std::is_same_v<BLOC_TYPE, block_q5_0>) {
                 gemm_kernel        = spacemit_kernels::ime2::gemm_kernel_i8i5;
                 moe_gemm_kernel_m2 = spacemit_kernels::ime2::moe_m2_gemm_kernel_i8i5;
+                moe_gemm_kernel_m4 = spacemit_kernels::ime2::moe_m4_gemm_kernel_i8i5;
                 set_kernel_impl    = true;
             }
         }
@@ -737,8 +920,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
         const size_t expert_b_stride   = ne01 * row_stride_b;
         const size_t per_nb_cols_wsize = NB_COLS * row_stride_b;
 
-        std::array<const uint8_t *, 2> src_workspaces;
-        std::array<float *, 2>         dst_workspaces;
+        std::array<const uint8_t *, 4> src_workspaces;
+        std::array<float *, 4>         dst_workspaces;
 
         auto *     tcm_buffer      = ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer;
         const auto tcm_buffer_size = ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer_size;
@@ -752,7 +935,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
         int ith_es = ith % nth_es;
         int ith_n  = (ith / nth_es) % nth_n;
 
-        if (valid_ep_count_t % nth == 0 && tcm_buffer != nullptr && valid_ep_count_t == n_as &&
+        // This fast path uses even/odd producer-consumer barriers and needs a
+        // partner thread. With nth == 1 it waits forever on the paired barrier.
+        if (nth >= 2 && valid_ep_count_t % nth == 0 && tcm_buffer != nullptr && valid_ep_count_t == n_as &&
             valid_act_count_t == n_as && per_nb_cols_wsize <= tcm_buffer_size) {
             for (int64_t valid_id = ith; valid_id < valid_ep_count_t; valid_id += nth) {
                 const int64_t cur_a = valid_matrix_row_counts[valid_id];
@@ -778,10 +963,11 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 uint8_t * b_col_zp = block_type_has_zp<BLOC_TYPE>() ? b_col : nullptr;
 
                 if (ith % 2 == 0) {
-                    spacemit_kernels::rvv::memcpy1d(b_col, reinterpret_cast<uint8_t *>(src0_cur), per_nb_cols_wsize);
+                    spacemit_profiled_copy(spacemit_copy_category::moe_tcm_weights, b_col,
+                                            reinterpret_cast<uint8_t *>(src0_cur), per_nb_cols_wsize);
 
                     if (a_row != src1_col) {
-                        spacemit_kernels::rvv::memcpy1d(a_row, src1_col, nbw1);
+                        spacemit_profiled_copy(spacemit_copy_category::moe_tcm_activations, a_row, src1_col, nbw1);
                     }
                 }
 
@@ -789,10 +975,11 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 
                 if (ith % 2 != 0) {
                     if (a_row != src1_col) {
-                        spacemit_kernels::rvv::memcpy1d(a_row, src1_col, nbw1);
+                        spacemit_profiled_copy(spacemit_copy_category::moe_tcm_activations, a_row, src1_col, nbw1);
                     }
 
-                    spacemit_kernels::rvv::memcpy1d(b_col, reinterpret_cast<uint8_t *>(src0_cur), per_nb_cols_wsize);
+                    spacemit_profiled_copy(spacemit_copy_category::moe_tcm_weights, b_col,
+                                            reinterpret_cast<uint8_t *>(src0_cur), per_nb_cols_wsize);
                 }
 
                 int64_t nb_real = std::min(ne01, NB_COLS);
@@ -810,8 +997,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                     const int64_t next_ni = ni + NB_COLS;
                     if (next_ni < ne01) {
                         nb_real = std::min(ne01 - next_ni, NB_COLS);
-                        spacemit_kernels::rvv::memcpy1d(
-                            b_col, reinterpret_cast<uint8_t *>(src0_cur) + next_ni * row_stride_b, per_nb_cols_wsize);
+                        spacemit_profiled_copy(spacemit_copy_category::moe_tcm_weights, b_col,
+                                                reinterpret_cast<uint8_t *>(src0_cur) + next_ni * row_stride_b,
+                                                per_nb_cols_wsize);
                     }
                 }
             }
@@ -842,8 +1030,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 void * extra_tcm_buffer      = tcm_buffer;
                 if (tcm_buffer != nullptr && (src1_cur_end - src1_cur_start) >= 4 &&
                     (src0_cur_end - src0_cur_start) * row_stride_b <= tcm_buffer_size) {
-                    spacemit_kernels::rvv::memcpy1d(tcm_buffer, src0_cur,
-                                                    (src0_cur_end - src0_cur_start) * row_stride_b);
+                    spacemit_profiled_copy(spacemit_copy_category::moe_tcm_weights, tcm_buffer, src0_cur,
+                                            (src0_cur_end - src0_cur_start) * row_stride_b);
                     src0_cur = reinterpret_cast<uint8_t *>(tcm_buffer);
                     b_col_zp = block_type_has_zp<BLOC_TYPE>() ? src0_cur : nullptr;
                     extra_tcm_buffer_size -= (src0_cur_end - src0_cur_start) * row_stride_b;
@@ -870,12 +1058,30 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                             const int64_t i12 = row_mapping.i2;  // row index in src1
 
                             auto * src1_col = quant_a_buffer + (i11 * nbw1 + i12 * nbw2);
-                            spacemit_kernels::rvv::memcpy1d(quant_a_tile_buffer, src1_col, nbw1);
+                            spacemit_profiled_copy(spacemit_copy_category::moe_tcm_activations, quant_a_tile_buffer,
+                                                    src1_col, nbw1);
                             quant_a_tile_buffer = quant_a_tile_buffer + nbw1;
                         }
 
                         quant_a_tile_buffer = reinterpret_cast<uint8_t *>(extra_tcm_buffer);
                         iir1                = ir1;
+
+                        if (spacemit_moe_m4_enabled() && moe_gemm_kernel_m4 != nullptr) {
+                            for (; iir1 < (ir1 + quant_a_tile_size - 3); iir1 += 4, quant_a_tile_buffer += 4 * nbw1) {
+                                for (int row = 0; row < 4; ++row) {
+                                    mmid_row_mapping row_mapping = MMID_MATRIX_ROW(cur_a, iir1 + row);
+                                    src_workspaces[row] = quant_a_tile_buffer + row * nbw1;
+                                    dst_workspaces[row] =
+                                        (float *) ((char *) dst->data +
+                                                   (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
+                                        src0_cur_start;
+                                }
+                                spacemit_profile_moe_tile(4);
+                                moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
+                                                   dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
+                                                   ne01);
+                            }
+                        }
 
                         if (moe_gemm_kernel_m2 != nullptr) {
                             for (; iir1 < (ir1 + quant_a_tile_size - 1); iir1 += 2, quant_a_tile_buffer += 2 * nbw1) {
@@ -891,6 +1097,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                 dst_workspaces[1] = (float *) ((char *) dst->data +
                                                                ((row_mapping_1.i1) * nb1 + (row_mapping_1.i2) * nb2)) +
                                                     src0_cur_start;
+                                spacemit_profile_moe_tile(2);
                                 moe_gemm_kernel_m2(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                    dst_workspaces.data(), 1, src0_cur_end - src0_cur_start, b_k_blks,
                                                    ne01);
@@ -900,6 +1107,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         for (; iir1 < (ir1 + quant_a_tile_size); iir1++, quant_a_tile_buffer += nbw1) {
                             mmid_row_mapping row_mapping_0 = MMID_MATRIX_ROW(cur_a, iir1);
 
+                            spacemit_profile_moe_tile(1);
                             gemm_kernel(
                                 b_blk_len, quant_a_tile_buffer, src0_cur, b_col_zp,
                                 (float *) ((char *) dst->data + (row_mapping_0.i1 * nb1 + row_mapping_0.i2 * nb2)) +
@@ -910,6 +1118,26 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         ir1 += quant_a_tile_size;
                     } while (ir1 < src1_cur_end);
                 } else {
+                    if (spacemit_moe_m4_enabled() && moe_gemm_kernel_m4 != nullptr) {
+                        for (; ir1 < src1_cur_end - 3; ir1 += 4) {
+                            for (int row = 0; row < 4; ++row) {
+                                mmid_row_mapping row_mapping = MMID_MATRIX_ROW(cur_a, ir1 + row);
+
+                                const int64_t i11 = row_mapping.i1 % ne11;
+                                const int64_t i12 = row_mapping.i2;
+                                src_workspaces[row] = quant_a_buffer + (i11 * nbw1 + i12 * nbw2);
+                                dst_workspaces[row] =
+                                    (float *) ((char *) dst->data +
+                                               (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
+                                    src0_cur_start;
+                            }
+                            spacemit_profile_moe_tile(4);
+                            moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
+                                               dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
+                                               ne01);
+                        }
+                    }
+
                     if (moe_gemm_kernel_m2 != nullptr) {
                         for (; ir1 < src1_cur_end - 1; ir1 += 2) {
                             for (int iir1 = 0; iir1 < 2; ++iir1) {
@@ -929,6 +1157,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                     (float *) ((char *) dst->data + (i1 * nb1 + i2 * nb2)) + src0_cur_start;
                             }
 
+                            spacemit_profile_moe_tile(2);
                             moe_gemm_kernel_m2(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
                                                dst_workspaces.data(), 1, src0_cur_end - src0_cur_start, b_k_blks, ne01);
                         }
@@ -947,6 +1176,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 
                         auto * src1_col = quant_a_buffer + (i11 * nbw1 + i12 * nbw2);
 
+                        spacemit_profile_moe_tile(1);
                         gemm_kernel(b_blk_len, src1_col, src0_cur, b_col_zp,
                                     (float *) ((char *) dst->data + (i1 * nb1 + i2 * nb2)) + src0_cur_start, 1,
                                     src0_cur_end - src0_cur_start, b_k_blks, ne01);
@@ -1036,6 +1266,7 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         if (op->op != GGML_OP_MUL_MAT_ID || op->src[0]->type != type_) {
             return false;
         }
+        spacemit_trace_matmul(params, op, "iq-compact");
         const char * compact_compute = std::getenv("GGML_RISCV64_SPACEMIT_IQ_COMPACT_COMPUTE");
         if (compact_compute && (std::strcmp(compact_compute, "0") == 0 || std::strcmp(compact_compute, "off") == 0 ||
                                 std::strcmp(compact_compute, "false") == 0)) {
@@ -2138,11 +2369,9 @@ static const ggml::cpu::tensor_traits * ggml_riscv64_spacemit_get_optimal_repack
         case GGML_TYPE_Q4_K:
             {
 #if defined(RISCV64_SPACEMIT_IME2)
-                if (cur->ne[1] % 32 == 0 && cur->ne[0] % 256 == 0 &&
-                    (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
-                    return &ggml::cpu::riscv64_spacemit::q4_k_32x256_q8_0;
-                }
-
+                // Keep Q4_K on the regular 32-wide IME2 path. The 256-wide
+                // high-performance layout currently produces incorrect logits
+                // for Qwen3.6 Q4_K_M tensors.
                 if (cur->ne[1] % 32 == 0 && (ggml::cpu::riscv64_spacemit::global_spine_env_info.use_ime2)) {
                     return &ggml::cpu::riscv64_spacemit::q4_k_32x32_q8_0;
                 }
@@ -2424,45 +2653,36 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
     bool supports_op(ggml_backend_dev_t, const ggml_tensor * op) override {
         switch (op->op) {
             case GGML_OP_MUL_MAT:
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 2) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                    return true;
-                }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 2) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0])) {
-                    if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
+            case GGML_OP_MUL_MAT_ID:
+                {
+                    if (op->op == GGML_OP_MUL_MAT_ID && ggml_riscv64_spacemit_claim_iq_compact() &&
+                        ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
+                        if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
+                            return false;
+                        }
+                        return op->src[1]->type == GGML_TYPE_F32;
+                    }
+
+                    if (!op->src[0]->buffer ||
+                        op->src[0]->buffer->buft != ggml_backend_cpu_riscv64_spacemit_buffer_type()) {
                         return false;
                     }
-                    if (op->src[1]->type == GGML_TYPE_F32) {
-                        return true;
+
+                    const int required_dims = op->op == GGML_OP_MUL_MAT ? 2 : 3;
+                    if (ggml_n_dims(op->src[0]) != required_dims) {
+                        return false;
                     }
-                }
-                break;
-            case GGML_OP_MUL_MAT_ID:
-                if (ggml_riscv64_spacemit_claim_iq_compact() && ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
+
+                    if (!ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type) &&
+                        op->src[0]->extra == nullptr && ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0]) == nullptr) {
+                        return false;
+                    }
+
                     if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
                         return false;
                     }
                     return op->src[1]->type == GGML_TYPE_F32;
                 }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 3) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                    return true;
-                }
-                if (op->src[0]->buffer && (ggml_n_dims(op->src[0]) == 3) &&
-                    op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
-                    ggml_riscv64_spacemit_get_optimal_repack_type(op->src[0])) {
-                    if (op->src[1]->buffer && !ggml_backend_buft_is_host(op->src[1]->buffer->buft)) {
-                        return false;
-                    }
-                    if (op->src[1]->type == GGML_TYPE_F32) {
-                        return true;
-                    }
-                }
-                break;
             default:
                 // GGML_ABORT("fatal error");
                 break;
@@ -2474,6 +2694,14 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
         switch (op->op) {
             case GGML_OP_MUL_MAT:
             case GGML_OP_MUL_MAT_ID:
+                if (op->src[0]->buffer && op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type() &&
+                    op->src[0]->extra != nullptr) {
+                    // Once buffer initialization installs a persistent repack
+                    // trait, src0 bytes use that trait's layout even though the
+                    // logical GGML type is unchanged. It must take precedence
+                    // over late-bound compact-IQ dispatch.
+                    return (ggml::cpu::tensor_traits *) op->src[0]->extra;
+                }
                 if (op->op == GGML_OP_MUL_MAT_ID && ggml_riscv64_spacemit_claim_iq_compact() &&
                     ggml_riscv64_spacemit_is_iq_compact_moe_tensor(op->src[0])) {
                     switch (op->src[0]->type) {
@@ -2490,10 +2718,7 @@ class extra_buffer_type : ggml::cpu::extra_buffer_type {
                     }
                 }
                 if (op->src[0]->buffer && op->src[0]->buffer->buft == ggml_backend_cpu_riscv64_spacemit_buffer_type()) {
-                    if (ggml_riscv64_spacemit_type_disabled_for_repack(op->src[0]->type)) {
-                        return (ggml::cpu::tensor_traits *) (&ggml::cpu::riscv64_spacemit::passthrough);
-                    }
-                    return (ggml::cpu::tensor_traits *) op->src[0]->extra;
+                    return (ggml::cpu::tensor_traits *) (&ggml::cpu::riscv64_spacemit::passthrough);
                 }
                 break;
             case GGML_OP_NORM:
@@ -2611,7 +2836,13 @@ void ggml_backend_cpu_riscv64_spacemit_set_numa_thread_affinity(int thread_n) {
         void * rt =
             ggml::cpu::riscv64_spacemit::spine_mem_pool_tcm_mem_wait(ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
         if (rt == nullptr) {
-            GGML_ABORT("wait tcm buffer failed for cpu_id: %d", ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
+            // A second thread pool (for example an MTP draft model) can contend
+            // with the main model for the same per-core TCM block. Falling back
+            // to the normal workspace is safe; aborting takes down the server.
+            GGML_LOG_WARN("CPU_RISCV64_SPACEMIT: TCM unavailable for cpu_id %d, using normal workspace\n",
+                          ggml::cpu::riscv64_spacemit::tls_context.cpu_id);
+            ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer      = nullptr;
+            ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer_size = 0;
         }
     }
 }
