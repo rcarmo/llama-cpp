@@ -40,4 +40,18 @@ jq -rs -f scripts/summarize-k3-matmul.jq \
   benchmarks/k3-matmul/*/llama-bench.json
 ```
 
+## Matmul shape tracing
+
+Build with the campaign telemetry commit, then enable structured thread-zero tracing for a short isolated workload:
+
+```bash
+GGML_RISCV64_SPACEMIT_MATMUL_TRACE=1 \
+  build-upstream/bin/llama-bench -m /path/model.gguf -p 32 -n 0 -r 1 -o jsonl \
+  >trace.jsonl 2>trace.log
+
+scripts/summarize-k3-matmul-trace.awk trace.log
+```
+
+Each `SPACEMIT_MATMUL` line records the selected path, operation, types, M/N/K, batch dimensions and thread count. The summarizer reports both call frequency and relative MAC weight; MAC weight is a prioritization estimate, not elapsed time. Tracing is disabled by default and cached once per process.
+
 Benchmark result directories are not intended to be committed wholesale. Promote the selected immutable baseline and final tables into a report with links or checksums for retained raw artifacts.

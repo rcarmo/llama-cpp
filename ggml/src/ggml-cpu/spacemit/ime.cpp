@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cerrno>
+#include <cinttypes>
 #include <cmath>
 #include <cstdio>  // for GGML_ASSERT
 #include <cstdlib>
@@ -79,6 +80,32 @@ extern int  ggml_threadpool_chunk_add(struct ggml_threadpool * tp, int value);
 }
 
 namespace ggml::cpu::riscv64_spacemit {
+
+static bool spacemit_matmul_trace_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MATMUL_TRACE");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
+static void spacemit_trace_matmul(const ggml_compute_params * params, const ggml_tensor * dst, const char * path) {
+    if (params->ith != 0 || !spacemit_matmul_trace_enabled()) {
+        return;
+    }
+
+    const ggml_tensor * src0 = dst->src[0];
+    const ggml_tensor * src1 = dst->src[1];
+    GGML_ASSERT(src0 != nullptr && src1 != nullptr);
+
+    std::fprintf(stderr,
+            "SPACEMIT_MATMUL path=%s op=%s type0=%s type1=%s type_dst=%s "
+            "m=%" PRId64 " n=%" PRId64 " k=%" PRId64 " "
+            "src0_ne2=%" PRId64 " src1_ne2=%" PRId64 " src1_ne3=%" PRId64 " nth=%d\n",
+            path, ggml_op_name(dst->op), ggml_type_name(src0->type), ggml_type_name(src1->type),
+            ggml_type_name(dst->type), dst->ne[0], dst->ne[1], src0->ne[0], src0->ne[2], src1->ne[2], src1->ne[3],
+            params->nth);
+}
 
 struct TLSContext {
     int       cpu_id{ -1 };
@@ -194,6 +221,9 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
     }
 
     bool compute_forward(ggml_compute_params * params, ggml_tensor * op) override {
+        if (op->op == GGML_OP_MUL_MAT || op->op == GGML_OP_MUL_MAT_ID) {
+            spacemit_trace_matmul(params, op, "ime");
+        }
         switch (op->op) {
             case GGML_OP_MUL_MAT:
                 switch (op->src[0]->type) {
@@ -1036,6 +1066,7 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         if (op->op != GGML_OP_MUL_MAT_ID || op->src[0]->type != type_) {
             return false;
         }
+        spacemit_trace_matmul(params, op, "iq-compact");
         const char * compact_compute = std::getenv("GGML_RISCV64_SPACEMIT_IQ_COMPACT_COMPUTE");
         if (compact_compute && (std::strcmp(compact_compute, "0") == 0 || std::strcmp(compact_compute, "off") == 0 ||
                                 std::strcmp(compact_compute, "false") == 0)) {
