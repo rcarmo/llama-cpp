@@ -134,10 +134,10 @@ static bool run_case(ggml_type type, int64_t tokens, int n_threads) {
     std::memset(out->data, 0, ggml_nbytes(out));
 
     const bool supported = ggml_backend_supports_op(backend, out);
-    // Compact IQ traits are selected from the MUL_MAT_ID operation and type at
-    // compute time; unlike persistent repacks, tensor->extra may remain null.
+    // Compact-IQ traits are selected from the operation at compute time, while
+    // Q4_K/Q5_K tensors install persistent repack traits during tensor_set().
     if (!supported) {
-        std::fprintf(stderr, "SpaceMIT compact path not supported type=%s extra=%p alloc=%zu plain=%zu\n",
+        std::fprintf(stderr, "SpaceMIT MoE path not supported type=%s extra=%p alloc=%zu plain=%zu\n",
                 ggml_type_name(type), as->extra, as_alloc_size, ggml_nbytes(as));
         ggml_backend_buffer_free(buf);
         ggml_free(ctx);
@@ -183,11 +183,15 @@ static bool run_case(ggml_type type, int64_t tokens, int n_threads) {
         }
     }
     const double nmse = mse / std::max(1e-12, ref_energy);
+    const char * m4 = std::getenv("GGML_RISCV64_SPACEMIT_MOE_M4");
+    const bool m4_enabled = m4 != nullptr && std::strcmp(m4, "0") != 0 && std::strcmp(m4, "off") != 0 &&
+                            std::strcmp(m4, "false") != 0;
+    const char * mode = m4_enabled ? "moe-m4" :
+                        (std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") ?
+                             std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") : "default");
     std::printf("case type=%s tokens=%lld threads=%d mode=%s plain_bytes=%zu alloc_bytes=%zu "
                 "set_us=%lld compute_us=%.3f bench_iters=%d max_abs=%.9g nmse=%.9g bad=%zu/%zu\n",
-            ggml_type_name(type), (long long) tokens, n_threads,
-            std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") ? std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_TILE") : "rvv",
-            ggml_nbytes(as), as_alloc_size, (long long) set_us,
+            ggml_type_name(type), (long long) tokens, n_threads, mode, ggml_nbytes(as), as_alloc_size, (long long) set_us,
             bench_iters > 0 ? (double) compute_us / bench_iters : 0.0, bench_iters, max_abs, nmse, bad, nout);
     ok = ok && bad == 0 && nmse < 3.0e-2;
 
@@ -201,8 +205,9 @@ int main(int argc, char ** argv) {
     ggml_time_init();
     int n_threads = argc > 1 ? std::max(1, std::atoi(argv[1])) : 8;
     bool ok = true;
-    for (ggml_type type : { GGML_TYPE_IQ2_XS, GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ4_XS, GGML_TYPE_IQ4_NL }) {
-        for (int64_t tokens : { 1, 4, 5 }) {
+    for (ggml_type type : { GGML_TYPE_Q4_K, GGML_TYPE_Q5_K, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ3_XXS,
+                            GGML_TYPE_IQ4_XS, GGML_TYPE_IQ4_NL }) {
+        for (int64_t tokens : { 1, 2, 4, 5, 8 }) {
             ok = run_case(type, tokens, n_threads) && ok;
         }
     }

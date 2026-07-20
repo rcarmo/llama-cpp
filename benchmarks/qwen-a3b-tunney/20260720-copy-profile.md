@@ -1,6 +1,6 @@
 # Qwen A3B steady-state copy profile
 
-Date: 20 July 2026  
+Date: 20 July 2026
 Branch baseline: `85f170a65`
 
 Five identical 64-token native-MTP requests were run with `GGML_RISCV64_SPACEMIT_COPY_PROFILE=1`. The profiler counts only explicit RVV copies used by SpaceMIT dense and MoE TCM staging; it does not instrument the copy loop itself.

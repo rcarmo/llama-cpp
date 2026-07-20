@@ -5766,6 +5766,29 @@ size_t moe_m2_gemm_kernel_i8i4(size_t           blk_len,
     return 2;
 }
 
+size_t moe_m4_gemm_kernel_i8i4(size_t           blk_len,
+                               const uint8_t ** quant_a_ptr,
+                               const uint8_t *  quant_b_data,
+                               const uint8_t *  quant_b_zp,
+                               float **         c_ptr,
+                               size_t           count_m,
+                               size_t           count_n,
+                               size_t           k_blks,
+                               size_t           ldc) {
+    static const bool traced = [] {
+        if (std::getenv("GGML_RISCV64_SPACEMIT_MOE_M4_TRACE")) {
+            std::fprintf(stderr, "SPACEMIT_MOE_M4 kernel=i8i4 rows=4\n");
+        }
+        return true;
+    }();
+    (void) traced;
+    GGML_ASSERT(count_m >= 4);
+    moe_m2_gemm_kernel_i8i4_impl(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, 2, count_n, k_blks, ldc);
+    moe_m2_gemm_kernel_i8i4_impl(blk_len, quant_a_ptr + 2, quant_b_data, quant_b_zp, c_ptr + 2, 2, count_n, k_blks,
+                                 ldc);
+    return 4;
+}
+
 size_t gemm_kernel_i8i8(size_t          blk_len,
                         const uint8_t * quant_a_ptr,
                         const uint8_t * quant_b_data,
@@ -5879,6 +5902,29 @@ size_t moe_m2_gemm_kernel_i8i5(size_t           blk_len,
     moe_m2_gemm_kernel_i8i5_impl(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, count_m, count_n, k_blks, ldc);
 #endif
     return 2;
+}
+
+size_t moe_m4_gemm_kernel_i8i5(size_t           blk_len,
+                               const uint8_t ** quant_a_ptr,
+                               const uint8_t *  quant_b_data,
+                               const uint8_t *  quant_b_zp,
+                               float **         c_ptr,
+                               size_t           count_m,
+                               size_t           count_n,
+                               size_t           k_blks,
+                               size_t           ldc) {
+    static const bool traced = [] {
+        if (std::getenv("GGML_RISCV64_SPACEMIT_MOE_M4_TRACE")) {
+            std::fprintf(stderr, "SPACEMIT_MOE_M4 kernel=i8i5 rows=4\n");
+        }
+        return true;
+    }();
+    (void) traced;
+    GGML_ASSERT(count_m >= 4);
+    moe_m2_gemm_kernel_i8i5_impl(blk_len, quant_a_ptr, quant_b_data, quant_b_zp, c_ptr, 2, count_n, k_blks, ldc);
+    moe_m2_gemm_kernel_i8i5_impl(blk_len, quant_a_ptr + 2, quant_b_data, quant_b_zp, c_ptr + 2, 2, count_n, k_blks,
+                                 ldc);
+    return 4;
 }
 
 }  // namespace ime2

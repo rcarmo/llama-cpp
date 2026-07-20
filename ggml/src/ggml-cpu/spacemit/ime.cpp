@@ -113,6 +113,14 @@ static bool spacemit_copy_profile_enabled() {
     return enabled;
 }
 
+static bool spacemit_moe_m4_enabled() {
+    static const bool enabled = [] {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_MOE_M4");
+        return v != nullptr && std::strcmp(v, "0") != 0 && std::strcmp(v, "off") != 0 && std::strcmp(v, "false") != 0;
+    }();
+    return enabled;
+}
+
 static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> &
 spacemit_copy_counters() {
     static std::array<spacemit_copy_counter, static_cast<size_t>(spacemit_copy_category::count)> counters;
@@ -719,10 +727,11 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
             int32_t i2;
         };
 
-        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8 = nullptr;
-        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel = nullptr;
+        spacemit_kernels::quantize_a_row_def           quantize_a_row_i8  = nullptr;
+        spacemit_kernels::gemm_kernel_quantize_def     gemm_kernel        = nullptr;
         spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m2 = nullptr;
-        bool                                           set_kernel_impl = false;
+        spacemit_kernels::moe_gemm_kernel_quantize_def moe_gemm_kernel_m4 = nullptr;
+        bool                                           set_kernel_impl    = false;
         size_t                                         block_stride_a  = spacemit_kernels::q8_blk_size(QK4_0);
 
 #if defined(RISCV64_SPACEMIT_IME2)
@@ -743,6 +752,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                 } else {
                     gemm_kernel        = spacemit_kernels::ime2::gemm_kernel_i8i4;
                     moe_gemm_kernel_m2 = spacemit_kernels::ime2::moe_m2_gemm_kernel_i8i4;
+                    moe_gemm_kernel_m4 = spacemit_kernels::ime2::moe_m4_gemm_kernel_i8i4;
                     quantize_a_row_i8  = spacemit_kernels::rvv::quantize_a_row_i8;
                     block_stride_a     = spacemit_kernels::q8_blk_size(a_blk_len, true);
                     set_kernel_impl    = true;
@@ -765,6 +775,7 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                                  std::is_same_v<BLOC_TYPE, block_q5_0>) {
                 gemm_kernel        = spacemit_kernels::ime2::gemm_kernel_i8i5;
                 moe_gemm_kernel_m2 = spacemit_kernels::ime2::moe_m2_gemm_kernel_i8i5;
+                moe_gemm_kernel_m4 = spacemit_kernels::ime2::moe_m4_gemm_kernel_i8i5;
                 set_kernel_impl    = true;
             }
         }
@@ -864,8 +875,8 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
         const size_t expert_b_stride   = ne01 * row_stride_b;
         const size_t per_nb_cols_wsize = NB_COLS * row_stride_b;
 
-        std::array<const uint8_t *, 2> src_workspaces;
-        std::array<float *, 2>         dst_workspaces;
+        std::array<const uint8_t *, 4> src_workspaces;
+        std::array<float *, 4>         dst_workspaces;
 
         auto *     tcm_buffer      = ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer;
         const auto tcm_buffer_size = ggml::cpu::riscv64_spacemit::tls_context.tcm_buffer_size;
@@ -1010,6 +1021,22 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         quant_a_tile_buffer = reinterpret_cast<uint8_t *>(extra_tcm_buffer);
                         iir1                = ir1;
 
+                        if (spacemit_moe_m4_enabled() && moe_gemm_kernel_m4 != nullptr) {
+                            for (; iir1 < (ir1 + quant_a_tile_size - 3); iir1 += 4, quant_a_tile_buffer += 4 * nbw1) {
+                                for (int row = 0; row < 4; ++row) {
+                                    mmid_row_mapping row_mapping = MMID_MATRIX_ROW(cur_a, iir1 + row);
+                                    src_workspaces[row] = quant_a_tile_buffer + row * nbw1;
+                                    dst_workspaces[row] =
+                                        (float *) ((char *) dst->data +
+                                                   (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
+                                        src0_cur_start;
+                                }
+                                moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
+                                                   dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
+                                                   ne01);
+                            }
+                        }
+
                         if (moe_gemm_kernel_m2 != nullptr) {
                             for (; iir1 < (ir1 + quant_a_tile_size - 1); iir1 += 2, quant_a_tile_buffer += 2 * nbw1) {
                                 mmid_row_mapping row_mapping_0 = MMID_MATRIX_ROW(cur_a, iir1);
@@ -1043,6 +1070,25 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
                         ir1 += quant_a_tile_size;
                     } while (ir1 < src1_cur_end);
                 } else {
+                    if (spacemit_moe_m4_enabled() && moe_gemm_kernel_m4 != nullptr) {
+                        for (; ir1 < src1_cur_end - 3; ir1 += 4) {
+                            for (int row = 0; row < 4; ++row) {
+                                mmid_row_mapping row_mapping = MMID_MATRIX_ROW(cur_a, ir1 + row);
+
+                                const int64_t i11 = row_mapping.i1 % ne11;
+                                const int64_t i12 = row_mapping.i2;
+                                src_workspaces[row] = quant_a_buffer + (i11 * nbw1 + i12 * nbw2);
+                                dst_workspaces[row] =
+                                    (float *) ((char *) dst->data +
+                                               (row_mapping.i1 * nb1 + row_mapping.i2 * nb2)) +
+                                    src0_cur_start;
+                            }
+                            moe_gemm_kernel_m4(b_blk_len, src_workspaces.data(), src0_cur, b_col_zp,
+                                               dst_workspaces.data(), 4, src0_cur_end - src0_cur_start, b_k_blks,
+                                               ne01);
+                        }
+                    }
+
                     if (moe_gemm_kernel_m2 != nullptr) {
                         for (; ir1 < src1_cur_end - 1; ir1 += 2) {
                             for (int iir1 = 0; iir1 < 2; ++iir1) {
