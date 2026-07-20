@@ -1,7 +1,7 @@
 # K3 matmul shape profile — 2026-07-19
 
-Branch: `perf/k3-rvv-ime2-matmul-20260719`  
-Profile source: baseline `26e8b4f86` plus opt-in telemetry only  
+Branch: `perf/k3-rvv-ime2-matmul-20260719`
+Profile source: baseline `26e8b4f86` plus opt-in telemetry only
 Models: hashes recorded in `k3-matmul-baseline-20260719.md`
 
 ## Method

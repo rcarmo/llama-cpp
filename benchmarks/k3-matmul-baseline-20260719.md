@@ -1,8 +1,8 @@
 # K3 RVV/IME2 campaign baseline — 2026-07-19
 
-Baseline source commit: `26e8b4f869ece5bda3880fc186c0b501ceb2db14`  
-Harness commit: `3a6b83638d8b521c90a58a03737a633e5d260a56`  
-Annotated tag: `k3-matmul-baseline-20260719`  
+Baseline source commit: `26e8b4f869ece5bda3880fc186c0b501ceb2db14`
+Harness commit: `3a6b83638d8b521c90a58a03737a633e5d260a56`
+Annotated tag: `k3-matmul-baseline-20260719`
 Service state: stopped
 
 The model data path remains the tagged baseline; the harness commit changes only scripts and `.gitignore`.
@@ -21,10 +21,10 @@ The model data path remains the tagged baseline; the harness commit changes only
 
 ## Gemma 4 E2B QAT
 
-Model: `gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf`  
-Size: 2,620,368,960 bytes  
-SHA-256: `cd4526493dccbfd6791bee8822e37e30340074d1d4d9aada52ce09afefd6a33a`  
-Batch/ubatch: 256/128  
+Model: `gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf`
+Size: 2,620,368,960 bytes
+SHA-256: `cd4526493dccbfd6791bee8822e37e30340074d1d4d9aada52ce09afefd6a33a`
+Batch/ubatch: 256/128
 Repetitions: 5
 
 | Test | Median tok/s | Minimum | Maximum | Spread |
@@ -51,10 +51,10 @@ f04170689fd7bd83270aa25728ba6fd1fbaf92c30e145ad4caf3c93878a684b0  metadata.json
 
 ## Qwen3.6-35B-A3B
 
-Model: `Qwen3.6-35B-A3B-UD-Q4_K_M.gguf`  
-Size: 22,134,528,992 bytes  
-SHA-256: `917d55fd552445cd47c06648283a6211702d2e5b932eb76b3606f4ebd780e95c`  
-Batch/ubatch: 512/128  
+Model: `Qwen3.6-35B-A3B-UD-Q4_K_M.gguf`
+Size: 22,134,528,992 bytes
+SHA-256: `917d55fd552445cd47c06648283a6211702d2e5b932eb76b3606f4ebd780e95c`
+Batch/ubatch: 512/128
 Repetitions: 3
 
 | Test | Median tok/s | Minimum | Maximum | Spread |
