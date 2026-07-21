@@ -51,4 +51,10 @@ The profiler recorded 40,800 thread-level 8 MiB-bucket `CPY` calls over the thre
 
 Five 96-token engineering prompts produced identical response hashes, draft counts and accepted drafts with the gate off and on. Mean generation throughput increased from 6.887 to 7.235 tok/s, a 5.05% gain. Individual gains were 4.84–5.16%.
 
-The direct-state path still needs prompt/cache, long-context, memory and service-restart gates before default promotion.
+## Context, cache and memory
+
+A 3,042-token README review and a dependent follow-up passed with matching response hashes and draft acceptance. The follow-up reused 3,038 cached tokens and processed 54 new tokens. Direct-state generation improved from 2.730 to 2.811 tok/s on the initial request and from 2.589 to 2.647 tok/s on the follow-up.
+
+Both slots returned idle. Available memory after each sequence differed by about 1 MB: 8,482,680,832 bytes with the existing copy and 8,483,676,160 bytes with direct state. The production Qwen service restarted and returned HTTP 200 after the test.
+
+The direct-state path still needs final profiler-off correctness, default-service and restart gates before promotion.
