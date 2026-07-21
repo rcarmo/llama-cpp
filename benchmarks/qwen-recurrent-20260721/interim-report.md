@@ -47,4 +47,8 @@ The profiler recorded 40,800 thread-level 8 MiB-bucket `CPY` calls over the thre
 - MTP draft counts and acceptance match in every direct-state pair.
 - The production service still uses the gate-off release binary.
 
-The direct-state path still needs varied-prompt, prompt/cache, long-context, memory and service-restart gates before default promotion.
+## Varied-prompt acceptance
+
+Five 96-token engineering prompts produced identical response hashes, draft counts and accepted drafts with the gate off and on. Mean generation throughput increased from 6.887 to 7.235 tok/s, a 5.05% gain. Individual gains were 4.84–5.16%.
+
+The direct-state path still needs prompt/cache, long-context, memory and service-restart gates before default promotion.
