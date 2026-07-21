@@ -89,7 +89,7 @@ cmake --build build -j"$(nproc)"
 
 ### K3 optimisation progress
 
-The table records the state verified on a Milk-V K3 as of 20 July 2026. `Default` means the path is active without an experimental environment variable.
+The table records the state verified on a Milk-V K3 as of 21 July 2026. `Default` means the path is active without an experimental environment variable.
 
 | Area | Implementation and evidence | Measured result | State |
 |---|---|---:|---|
@@ -102,8 +102,12 @@ The table records the state verified on a Milk-V K3 as of 20 July 2026. `Default
 | Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
 | Qwen3.6-35B-A3B MTP | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance | Live-verified |
 | Qwen context/cache | Realistic 2,094-token coding prompt and cached follow-up | 10.54 prompt tok/s; 1,962 cached tokens reused | Live-verified |
+| Qwen recurrent state | GDN writes rollback snapshots directly into the strided recurrent-cache view, removing the second 8 MiB state copy | +8.33–8.99% in three paired runs; +5.05% across five prompts | Live default |
+| F32 dot reduction | LMUL=8 split and four-accumulator LMUL=4 variants tested at the dominant 128-element shape | 23–43% slower than the current RVV reduction | Rejected |
+| Gated delta net | Fused state-row update and output dot | 15–17% faster fixture; 0.6–1.1% slower across five prompts | Rejected |
+| SSM Conv4 | Channel-vectorised strided RVV kernel for the `8192 × 4` decode shape | 21–29% faster fixture; 0.98% slower without speculation | Rejected |
 
-No experimental matrix kernel met the 2% end-to-end promotion threshold in the final Qwen campaign. The service therefore uses the automatic scheduler and existing TCM staging, with the experimental kernels disabled.
+No experimental matrix or arithmetic kernel met the 2% end-to-end promotion threshold. The service keeps the automatic scheduler, existing TCM staging and existing F32/GDN/SSM kernels. Direct recurrent-state writes met the threshold and are enabled in the live Qwen launcher.
 
 ### K3 controls
 
@@ -115,10 +119,13 @@ No experimental matrix kernel met the 2% end-to-end promotion threshold in the f
 | `GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE=1` | Count m4, m2 and m1 MoE dispatches | Off |
 | `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable the Q4_K/Q5_K m4 edge contract | Off |
 | `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense register-tiled i8×i8 m2 kernel | Off |
+| `GGML_CPU_RECURRENT_PROFILE=1` | Count CPU `DUP`/`CPY` buckets and time GDN/SSM shapes | Off |
+| `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly into the recurrent-cache view | Off in library; on in the Qwen service |
 
 Detailed measurements and reproduction instructions:
 
 - [Qwen3.6-35B-A3B matrix campaign](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
+- [Qwen recurrent-path campaign](benchmarks/qwen-recurrent-20260721/final-report.md)
 - [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
 - [K3 benchmark harness](scripts/README-k3-matmul.md)
 
