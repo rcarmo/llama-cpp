@@ -2,6 +2,7 @@
 
 #include "ggml-cpu.h"
 #include "ggml-impl.h"
+#include "recurrent-profile.h"
 #include "binary-ops.h"
 #include "simd-gemm.h"
 #include "ggml.h"
@@ -528,9 +529,16 @@ void ggml_compute_forward_dup(
         ggml_tensor * dst) {
 
     const ggml_tensor * src0 = dst->src[0];
+    const bool profile = ggml_cpu_recurrent_profile_enabled() &&
+        (dst->op == GGML_OP_DUP || dst->op == GGML_OP_CPY);
+    const int64_t profile_start_us = profile ? ggml_cpu_recurrent_profile_now_us() : 0;
 
     if (src0->type == dst->type) {
         ggml_compute_forward_dup_bytes(params, dst);
+        if (profile) {
+            ggml_cpu_recurrent_profile_copy(dst->op, src0, dst, params->ith, params->nth,
+                    ggml_cpu_recurrent_profile_now_us() - profile_start_us);
+        }
         return;
     }
 
@@ -570,6 +578,11 @@ void ggml_compute_forward_dup(
                 }
                 GGML_ABORT("fatal error");
             }
+    }
+
+    if (profile) {
+        ggml_cpu_recurrent_profile_copy(dst->op, src0, dst, params->ith, params->nth,
+                ggml_cpu_recurrent_profile_now_us() - profile_start_us);
     }
 }
 
@@ -9610,6 +9623,9 @@ static void ggml_compute_forward_ssm_conv_f32(
 void ggml_compute_forward_ssm_conv(
         const ggml_compute_params * params,
         ggml_tensor * dst) {
+    const bool profile = ggml_cpu_recurrent_profile_enabled();
+    const int64_t profile_start_us = profile ? ggml_cpu_recurrent_profile_now_us() : 0;
+
     switch (dst->src[0]->type) {
         case GGML_TYPE_F32:
             {
@@ -9619,6 +9635,11 @@ void ggml_compute_forward_ssm_conv(
             {
                 GGML_ABORT("fatal error");
             }
+    }
+
+    if (profile) {
+        ggml_cpu_recurrent_profile_ssm_conv(dst, params->ith,
+                ggml_cpu_recurrent_profile_now_us() - profile_start_us);
     }
 }
 
@@ -10732,6 +10753,7 @@ void ggml_compute_forward_solve_tri(const struct ggml_compute_params * params, s
 }
 
 // ggml_compute_forward_gated_delta_net
+
 static void ggml_compute_forward_gated_delta_net_one_chunk(
     const ggml_compute_params * params,
     ggml_tensor * dst,
@@ -10742,8 +10764,9 @@ static void ggml_compute_forward_gated_delta_net_one_chunk(
     ggml_tensor * src_k     = dst->src[1];
     ggml_tensor * src_v     = dst->src[2];
     ggml_tensor * src_g     = dst->src[3];
-    ggml_tensor * src_beta  = dst->src[4];
-    ggml_tensor * src_state = dst->src[5];
+    ggml_tensor * src_beta     = dst->src[4];
+    ggml_tensor * src_state    = dst->src[5];
+    ggml_tensor * src_state_dst = dst->src[6];
 
     const int64_t S_v      = src_v->ne[0];
     const int64_t H        = src_v->ne[1];
@@ -10756,6 +10779,13 @@ static void ggml_compute_forward_gated_delta_net_one_chunk(
     GGML_ASSERT(ggml_is_contiguous(src_g));
     GGML_ASSERT(ggml_is_contiguous(src_beta));
     GGML_ASSERT(ggml_is_contiguous(src_state));
+    if (src_state_dst != nullptr) {
+        GGML_ASSERT(src_state_dst->type == GGML_TYPE_F32);
+        GGML_ASSERT(src_state_dst->ne[0] == S_v * S_v * H);
+        GGML_ASSERT(src_state_dst->ne[1] == n_seqs);
+        GGML_ASSERT(src_state_dst->ne[2] >= 1);
+        GGML_ASSERT(src_state_dst->nb[0] == sizeof(float));
+    }
 
     GGML_ASSERT(src_g->ne[0] == 1 || src_g->ne[0] == S_v);
     GGML_ASSERT(src_beta->ne[0] == 1);
@@ -10876,8 +10906,16 @@ static void ggml_compute_forward_gated_delta_net_one_chunk(
             if (K > 1) {
                 const int64_t target_slot = n_tokens - 1 - t;
                 if (target_slot >= 0 && target_slot < K) {
-                    float * curr_state_o = state_out_base + target_slot * state_size_per_snap +
-                                     (iv3 * H + iv1) * S_v * S_v;
+                    float * curr_state_o;
+                    if (src_state_dst != nullptr && target_slot < src_state_dst->ne[2]) {
+                        curr_state_o = (float *)((char *) src_state_dst->data +
+                                target_slot * src_state_dst->nb[2] +
+                                iv3 * src_state_dst->nb[1] +
+                                iv1 * S_v * S_v * sizeof(float));
+                    } else {
+                        curr_state_o = state_out_base + target_slot * state_size_per_snap +
+                                (iv3 * H + iv1) * S_v * S_v;
+                    }
                     memcpy(curr_state_o, s_out, S_v * S_v * sizeof(float));
                 }
             }
@@ -10931,6 +10969,8 @@ void ggml_compute_forward_gated_delta_net(
         const ggml_compute_params * params,
         ggml_tensor * dst) {
     const ggml_tensor * src0 = dst->src[0];
+    const bool profile = ggml_cpu_recurrent_profile_enabled();
+    const int64_t profile_start_us = profile ? ggml_cpu_recurrent_profile_now_us() : 0;
 
     switch (src0->type) {
         case GGML_TYPE_F32:
@@ -10941,6 +10981,11 @@ void ggml_compute_forward_gated_delta_net(
             {
                 GGML_ABORT("fatal error");
             }
+    }
+
+    if (profile) {
+        ggml_cpu_recurrent_profile_gdn(dst, params->ith,
+                ggml_cpu_recurrent_profile_now_us() - profile_start_us);
     }
 }
 

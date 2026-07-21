@@ -6348,6 +6348,20 @@ struct ggml_tensor * ggml_gated_delta_net(
     return result;
 }
 
+void ggml_gated_delta_net_set_state_dst(
+        struct ggml_tensor * result,
+        struct ggml_tensor * state_dst) {
+    GGML_ASSERT(result != NULL);
+    GGML_ASSERT(result->op == GGML_OP_GATED_DELTA_NET);
+    GGML_ASSERT(state_dst != NULL);
+    GGML_ASSERT(state_dst->type == GGML_TYPE_F32);
+    GGML_ASSERT(result->src[5] != NULL);
+    GGML_ASSERT(state_dst->ne[0] == ggml_nelements(result->src[5]) / result->src[5]->ne[3]);
+    GGML_ASSERT(state_dst->ne[1] == result->src[5]->ne[3]);
+    GGML_ASSERT(state_dst->ne[2] >= 1);
+    result->src[6] = state_dst;
+}
+
 // ggml_lightning_indexer
 
 struct ggml_tensor * ggml_lightning_indexer(

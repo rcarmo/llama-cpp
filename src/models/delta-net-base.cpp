@@ -3,6 +3,8 @@
 #include "llama-impl.h"
 #include "llama-memory-recurrent.h"
 
+#include <cstdlib>
+
 // utility to get one slice from the third dimension
 // input dim:  [x, y, c, b]
 // output dim: [x, y, 1, b]
@@ -600,7 +602,12 @@ ggml_tensor * llm_build_delta_net_base::build_recurrent_attn(
         (size_t) mem_size * row_size,
         (size_t) kv_head * row_size);
 
-    ggml_build_forward_expand(gf, ggml_cpy(ctx0, src, dst));
+    const char * direct_state = std::getenv("GGML_CPU_GDN_DIRECT_STATE");
+    if (direct_state != nullptr && direct_state[0] != '\0' && direct_state[0] != '0') {
+        ggml_gated_delta_net_set_state_dst(gdn_out, dst);
+    } else {
+        ggml_build_forward_expand(gf, ggml_cpy(ctx0, src, dst));
+    }
 
     return output;
 }
