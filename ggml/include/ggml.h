@@ -2588,6 +2588,12 @@ extern "C" {
             struct ggml_tensor  * state,
             int64_t               K);
 
+    // Optional direct destination for recurrent-state snapshots. CPU-only
+    // experimental callers may use this to avoid a second full-state CPY.
+    GGML_API void ggml_gated_delta_net_set_state_dst(
+            struct ggml_tensor * result,
+            struct ggml_tensor * state_dst);
+
     // DSA lightning indexer
     //
     // q:       [n_embd_idx, n_head_idx, n_batch, ne3 ]
