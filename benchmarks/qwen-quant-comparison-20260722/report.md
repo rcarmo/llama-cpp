@@ -1,6 +1,6 @@
 # Qwen3.6 35B A3B quant comparison — 2026-07-22
 
-The locally available IQ4_XS model is slower than Q2_K_XL and Q4_K_M on the K3. Q3 remains untested because no Q3 file is local and the filesystem lacks enough free space for one.
+IQ4_XS and Q3_K_M are both slower than Q2_K_XL and Q4_K_M on the K3. Q3_K_M was downloaded and tested after the initial IQ4 comparison.
 
 ## Compared configurations
 
@@ -9,6 +9,7 @@ All compact-IQ tests used the direct block packer and the bounded global LRU fro
 | Quant | Model size | Context | Tile cache | Warm generation |
 |---|---:|---:|---:|---:|
 | Q2_K_XL | 12.57 GB | 16K | 8 GiB | 2.41 tok/s over 64 tokens |
+| Q3_K_M | 17.10 GB | 16K | standard Q3_K repack | 1.05 tok/s over 64 tokens |
 | IQ4_XS | 18.94 GB | 4K | 512 MiB | 0.36 tok/s over 3 tokens |
 | IQ4_XS | 18.94 GB | 4K | 4 GiB | 0.73 tok/s over 64 tokens |
 | IQ4_XS | 18.94 GB | 4K | 8 GiB | 1.28 tok/s over 64 tokens |
@@ -16,7 +17,7 @@ All compact-IQ tests used the direct block packer and the bounded global LRU fro
 
 IQ4_XS reaches 5.82 tok/s for a warm three-token burst with a 4 GiB cache, but sustained routing expands the working set and reduces the 64-token result to 0.73 tok/s. An 8 GiB cache raises sustained generation to 1.28 tok/s, still about half the Q2 result while using a larger source model and leaving less context headroom.
 
-## Q3 candidates
+## Q3 files
 
 Exact files in `unsloth/Qwen3.6-35B-A3B-MTP-GGUF`:
 
@@ -27,8 +28,8 @@ Exact files in `unsloth/Qwen3.6-35B-A3B-MTP-GGUF`:
 | Q3_K_M | 17,104,402,720 bytes |
 | Q3_K_XL | 17,227,569,440 bytes |
 
-The filesystem has 10,214,518,784 bytes free. Testing any MTP Q3 therefore requires freeing at least 3.86 GB for IQ3_XXS or 6.89 GB for Q3_K_M. The 18.94 GB IQ4_XS fixture is the most direct replacement because this campaign has eliminated it as a speed candidate.
+The 18.94 GB IQ4_XS fixture was removed with approval and replaced by Q3_K_M. The downloaded file matched its published size and SHA-256. [The Q3 service report](../qwen-q3km-20260722/report.md) records 1.05 tok/s at 16K without speculation and 0.88 tok/s with MTP draft-1.
 
 ## Deployment state
 
-The IQ4_XS test server was stopped. The Q4_K_M MTP service was restored on port 8090 and `/health` returned `{"status":"ok"}`.
+The IQ4_XS and Q3 test servers were stopped. The Q4_K_M MTP service was restored on port 8090 and `/health` returned `{"status":"ok"}`.

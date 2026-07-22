@@ -133,6 +133,7 @@ Detailed measurements and reproduction instructions:
 - [Compact-IQ IME2 tile and cache campaign](benchmarks/qwen-compact-ime2-20260722/report.md)
 - [Layer-segmented compact-IQ cache experiment](benchmarks/qwen-compact-ime2-segmented-20260722/report.md)
 - [Qwen quant comparison](benchmarks/qwen-quant-comparison-20260722/report.md)
+- [Qwen Q3_K_M service test](benchmarks/qwen-q3km-20260722/report.md)
 - [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
 - [K3 benchmark harness](scripts/README-k3-matmul.md)
 
