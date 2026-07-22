@@ -100,8 +100,9 @@ The table records the state verified on a Milk-V K3 as of 21 July 2026. `Default
 | Compact-IQ MoE | Direct RVV, per-call IME2 packing and persistent IQ→Q8 repacking tested for IQ2_XS, IQ3_XXS, IQ4_XS and IQ4_NL | Persistent repacking was 3.13–40.42× faster after amortisation, but expanded weights 1.89–3.68× | Opt-in |
 | Q4_K/Q5_K MoE edges | m4→m2→m1 contract and routed-row fixture for rows 1, 2, 4, 5 and 8 | 120 gate/type/row/thread combinations passed; m4 was 4.48% of Qwen MoE tiles | Opt-in |
 | Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
-| Qwen3.6-35B-A3B MTP | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance | Live-verified |
-| Qwen context/cache | Realistic 2,094-token coding prompt and cached follow-up | 10.54 prompt tok/s; 1,962 cached tokens reused | Live-verified |
+| Qwen matrix campaign, 20 July | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance on the campaign corpus | Historical benchmark |
+| Qwen live service, 22 July | Q4_K_M, draft maximum 1, eight threads, batch 2,048, microbatch 512, one 4K slot | 7.86 generation tok/s across five varied prompts; 77.4% draft acceptance | Live default |
+| Qwen context/cache | 3,042-token README prompt and cached follow-up | 3,038 cached tokens reused; 54 new tokens processed | Live-verified |
 | Qwen recurrent state | GDN writes rollback snapshots directly into the strided recurrent-cache view, removing the second 8 MiB state copy | +8.33–8.99% in three paired runs; +5.05% across five prompts | Live default |
 | F32 dot reduction | LMUL=8 split and four-accumulator LMUL=4 variants tested at the dominant 128-element shape | 23–43% slower than the current RVV reduction | Rejected |
 | Gated delta net | Fused state-row update and output dot | 15–17% faster fixture; 0.6–1.1% slower across five prompts | Rejected |
@@ -126,6 +127,7 @@ Detailed measurements and reproduction instructions:
 
 - [Qwen3.6-35B-A3B matrix campaign](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
 - [Qwen recurrent-path campaign](benchmarks/qwen-recurrent-20260721/final-report.md)
+- [Qwen service parameter sweep](benchmarks/qwen-parameter-sweep-20260722/final-report.md)
 - [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
 - [K3 benchmark harness](scripts/README-k3-matmul.md)
 
