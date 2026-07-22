@@ -65,4 +65,31 @@ GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=direct  # bypass both TCM paths
 
 Forced TCM modes fall through to the direct scheduler when their capacity constraint is not met. This selector does not change arithmetic kernels or the separate MoE scheduler.
 
+## Compact-IQ IME2 controls
+
+The compact-IQ routed-MoE path is separate from the standard matmul scheduler:
+
+```bash
+# Direct compact-IQ × Q8_K RVV
+GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=0
+
+# Direct IQ2/IQ3/IQ4 packing into IME2 tiles with a bounded cache
+GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1 \
+GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=8192 \
+  build-upstream/bin/llama-server ...
+
+# Exercise IME2 scratch packing without cross-request cache reuse
+GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1 \
+GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=0 \
+  build-upstream/bin/test-spacemit-iq-moe-correctness 8
+```
+
+The cache budget is in MiB. When the tile gate is enabled and the variable is unset, the budget is 64 MiB. Cache allocation failure uses per-thread scratch packing; it does not switch the current operation to RVV.
+
+Use `test-spacemit-iq-moe-correctness` before model tests. The current fixture covers IQ2_XS, IQ3_XXS, IQ4_XS and IQ4_NL at routed row counts 1, 2, 4, 5 and 8 with one and eight workers.
+
+Run prompt-only and generation-only `llama-bench` processes when comparing Q2. Combined pp+tg Q2 invocations produced valid rows and then aborted with `malloc(): invalid size (unsorted)` during graph teardown/rebuild. The persistent server lifecycle completed short, cached, 16K-context and restart tests without that failure.
+
+The 22 July Q2 service sweep found that 512 MiB, 2 GiB and 4 GiB caches did not retain the sustained recurrent working set. An 8 GiB budget reached 2.41 tok/s over 64 warm tokens at 16K context and left about 6.3 GiB available. This is a benchmark profile, not the live default; Q4_K_M remains the production service.
+
 Benchmark result directories are not intended to be committed wholesale. Promote the selected immutable baseline and final tables into a report with links or checksums for retained raw artifacts.

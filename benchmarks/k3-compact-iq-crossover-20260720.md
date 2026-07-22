@@ -1,5 +1,7 @@
 # K3 compact-IQ RVV/IME2 crossover — 2026-07-20
 
+> Historical result: this report measures the original full-row per-call IME2 packer and persistent whole-tensor repacking. Direct block packing and a bounded cross-request cache superseded the per-call path on 22 July. See [the current compact-IQ IME2 report](qwen-compact-ime2-20260722/report.md).
+
 ## Method
 
 The deterministic compact-IQ MoE fixture was run with eight compute threads and repeated graph compute:
@@ -36,9 +38,8 @@ Fixture dimensions: two experts, 64 output rows, K=512, two selected experts per
 5. Persistent and per-call IME2 modes have identical output values because both convert compact weights to Q8_0 tiles.
 6. Numerical cost remains small: roughly 1.3e-5 to 3.0e-5 NMSE after the additional Q8 conversion.
 
-## Policy implication
+## Policy at the time
 
-- Do not promote `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE` as a default in its current form.
-- Prefer persistent load-time repacking when memory capacity allows.
-- Keep direct compact RVV as the low-memory fallback, especially for IQ2/IQ3 models whose Q8 expansion may not fit in 32GB.
-- Default promotion must use both expected reuse and whole-model memory expansion, not compute speed alone.
+The 20 July implementation stayed disabled because every per-call IME2 comparison lost to direct RVV. Persistent load-time repacking was suitable only when the expanded model fit in memory. Direct compact RVV remained the low-memory path.
+
+The 22 July implementation changes this trade-off by caching directly packed active tiles under a byte budget. It remains opt-in because sustained Q2 service performance still trails the live Q4 service.

@@ -1,5 +1,7 @@
 # SpaceMIT K3 RVV/IME2 matmul campaign
 
+> Historical campaign: the compact-IQ conclusions describe the 20 July full-row per-call packer. Direct block packing and a bounded tile cache superseded that path on 22 July. See [the current compact-IQ IME2 report](qwen-compact-ime2-20260722/report.md).
+
 Date: 20 July 2026  
 Branch: `perf/k3-rvv-ime2-matmul-20260719`  
 Baseline: `26e8b4f869ece5bda3880fc186c0b501ceb2db14`  
@@ -59,13 +61,15 @@ The final focused run passed these tests at one and eight threads:
 
 The restored Gemma 4 E2B QAT MTP service uses four 65,536-token slots. It completed 32 concurrent validation requests in eight rounds, all with HTTP 200. Per-request generation ranged from 9.31 to 12.51 tok/s. The service stayed active, `/health` returned `{"status":"ok"}`, and all four slots returned idle after each round.
 
-## Defaults
+## Defaults recorded on 20 July
 
-- Keep `GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto`.
-- Keep `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE` disabled.
-- Keep `GGML_RISCV64_SPACEMIT_IQ_MOE_REPACK` disabled unless memory sizing proves the expanded model fits.
-- Keep compact-IQ direct RVV as the memory-safe fallback.
-- Keep the production Gemma service at four 65,536-token slots with MTP.
+- `GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto`.
+- `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE` disabled.
+- `GGML_RISCV64_SPACEMIT_IQ_MOE_REPACK` disabled unless memory sizing proved the expanded model fit.
+- Compact-IQ direct RVV as the memory-safe path.
+- The production Gemma service at four 65,536-token slots with MTP.
+
+The automatic scheduler remains current. The 22 July compact-IQ tile path is still opt-in, but it now uses direct packing and a bounded cache instead of the full-row per-call conversion measured here. The live service is Qwen Q4_K_M, not the historical Gemma configuration.
 
 Detailed evidence is in:
 
@@ -74,4 +78,5 @@ Detailed evidence is in:
 - `benchmarks/k3-matmul-schedule-sweep-20260720.md`;
 - `benchmarks/k3-matmul-correctness-20260720.md`;
 - `benchmarks/k3-compact-iq-correctness-20260720.md`;
-- `benchmarks/k3-compact-iq-crossover-20260720.md`.
+- `benchmarks/k3-compact-iq-crossover-20260720.md`;
+- `benchmarks/qwen-compact-ime2-20260722/report.md`.

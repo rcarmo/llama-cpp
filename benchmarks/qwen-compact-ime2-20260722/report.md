@@ -11,8 +11,8 @@ The implementation is correct and substantially accelerates cached microkernels,
 Environment controls:
 
 - `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1` enables compact-IQ IME2 tile dispatch.
-- `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` sets the bounded LRU cache budget. The default while the tile gate is enabled is 64 MiB; `0` disables caching.
-- Direct compact-IQ × Q8_K RVV remains the fallback when the IME2 gate is off or the cache cannot allocate an entry.
+- `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` sets the bounded LRU cache budget. The default while the tile gate is enabled is 64 MiB; `0` disables cache reuse and packs into per-thread scratch.
+- Direct compact-IQ × Q8_K RVV runs when the IME2 gate is off. If cache allocation fails while IME2 is enabled, the operation packs into per-thread scratch and still uses IME2.
 
 Packing changes:
 
@@ -86,9 +86,9 @@ The 8 GiB profile successfully loaded at 16K context and reproduced after a comp
 
 Native MTP draft-1 did not help Q2: 2.380 tok/s warm over 64 tokens with 72% acceptance, versus 2.429 tok/s without speculation.
 
-## Decision
+## Deployment decision
 
-Do not replace the live Q4 service yet.
+The live Q4 service stays in production.
 
 The best validated Q2 profile is:
 
@@ -105,7 +105,16 @@ MTP=off
 
 It provides four times the current live context and much more model-file headroom, but sustained warm generation is only about 2.4 tok/s. The restored Q4 service produced 6.10 tok/s in its final health request and remains the better interactive default.
 
-The next optimization, if pursued, should be cache admission/segmentation by layer and expert frequency rather than a larger global LRU. The current cache proves that IME2 compute is fast once tiles remain resident; eviction churn is now the production bottleneck.
+## Further optimisation options
+
+Eviction churn limits sustained Q2 generation. The next experiments, in order, are:
+
+1. Segment the cache by layer and admit tiles by expert frequency so sequential layer traversal cannot evict the whole recurrent working set.
+2. Persistently retain only hot experts and use the bounded cache for the routing tail. Routing telemetry is required to choose that set.
+3. Overlap miss packing with computation using double-buffered tiles. This can reduce cold-path latency but does not improve cache-hit arithmetic.
+4. Implement an IME2 kernel that consumes compact-IQ symbols without Q8 tile expansion. This would recover cache memory for context but requires a new kernel contract.
+
+Increasing the global cache beyond 8 GiB would reduce the memory available for context. Q3 and IQ4 model variants require separate end-to-end service tests; file size alone does not predict performance on this backend.
 
 ## Live service after test
 
