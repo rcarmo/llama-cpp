@@ -32,8 +32,13 @@
 #include <cstdio>  // for GGML_ASSERT
 #include <cstdlib>
 #include <cstring>
+#include <list>
+#include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <thread>
+#include <unordered_map>
+#include <vector>
 // clang-format off
 #if defined(__riscv)
 
@@ -1198,6 +1203,54 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 class tensor_traits_iq_compact : public tensor_traits_base {
     ggml_type type_;
 
+    struct ime2_tile_key {
+        const void * data;
+        uint64_t fingerprint;
+        int64_t ne00;
+        int64_t ne01;
+        int64_t nb01;
+        int64_t nb02;
+        int64_t expert;
+        int64_t row;
+        int64_t rows;
+
+        bool operator==(const ime2_tile_key & other) const {
+            return data == other.data && fingerprint == other.fingerprint && ne00 == other.ne00 &&
+                   ne01 == other.ne01 && nb01 == other.nb01 && nb02 == other.nb02 &&
+                   expert == other.expert && row == other.row && rows == other.rows;
+        }
+    };
+
+    struct ime2_tile_key_hash {
+        size_t operator()(const ime2_tile_key & key) const {
+            size_t h = std::hash<const void *>{}(key.data);
+            auto mix = [&h](uint64_t v) {
+                h ^= std::hash<uint64_t>{}(v) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
+            };
+            mix(key.fingerprint);
+            mix((uint64_t) key.ne00);
+            mix((uint64_t) key.ne01);
+            mix((uint64_t) key.nb01);
+            mix((uint64_t) key.nb02);
+            mix((uint64_t) key.expert);
+            mix((uint64_t) key.row);
+            mix((uint64_t) key.rows);
+            return h;
+        }
+    };
+
+    using ime2_tile_lru = std::list<ime2_tile_key>;
+    struct ime2_tile_entry {
+        std::shared_ptr<std::vector<uint8_t>> data;
+        ime2_tile_lru::iterator lru;
+    };
+
+    mutable std::mutex ime2_cache_mutex_;
+    mutable std::unordered_map<ime2_tile_key, ime2_tile_entry, ime2_tile_key_hash> ime2_cache_;
+    mutable ime2_tile_lru ime2_cache_lru_;
+    mutable size_t ime2_cache_bytes_ = 0;
+    mutable size_t ime2_cache_limit_ = 0;
+
     struct mmid_row_mapping {
         int32_t i1;
         int32_t i2;
@@ -1215,11 +1268,37 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
     }
 
+    static size_t ime2_cache_limit() {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB");
+        if (!v || !*v) {
+            return 64ULL << 20;
+        }
+        char * end = nullptr;
+        const unsigned long long mb = std::strtoull(v, &end, 10);
+        return end != v ? (size_t) mb << 20 : 0;
+    }
+
+    static uint64_t ime2_tensor_fingerprint(const ggml_tensor * src0) {
+        const auto * data = (const uint8_t *) src0->data;
+        const size_t row_size = ggml_row_size(src0->type, src0->ne[0]);
+        const size_t total_size = src0->ne[2] > 0 ? (size_t) src0->nb[2] * (src0->ne[2] - 1) +
+                                                  (size_t) src0->nb[1] * (src0->ne[1] - 1) + row_size : 0;
+        uint64_t hash = 1469598103934665603ULL;
+        const size_t sample = std::min<size_t>(32, total_size);
+        for (size_t i = 0; i < sample; ++i) {
+            hash = (hash ^ data[i]) * 1099511628211ULL;
+        }
+        for (size_t i = total_size - sample; i < total_size; ++i) {
+            hash = (hash ^ data[i]) * 1099511628211ULL;
+        }
+        return hash;
+    }
+
     static constexpr int64_t IQ_IME2_TILE_N      = 32;
     static constexpr int64_t IQ_IME2_DECODE_BLOCK = QK_K;
 
   public:
-    explicit constexpr tensor_traits_iq_compact(ggml_type type) : type_(type) {}
+    explicit tensor_traits_iq_compact(ggml_type type) : type_(type) {}
 
     bool work_size(int n_threads, const ggml_tensor * op, size_t & size) override {
         if (op->op != GGML_OP_MUL_MAT_ID || op->src[0]->type != type_) {
@@ -1564,6 +1643,128 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     }
 
+    static void quantize_iq4_codes_to_q8_0_32(float scale, const uint8_t * packed,
+                                               ggml_fp16_t * d, int8_t * qs) {
+        int max_code = 0;
+        for (int j = 0; j < 16; ++j) {
+            max_code = std::max(max_code, std::abs((int) kvalues_iq4nl[packed[j] & 0xf]));
+            max_code = std::max(max_code, std::abs((int) kvalues_iq4nl[packed[j] >> 4]));
+        }
+        if (scale == 0.0f || max_code == 0) {
+            *d = GGML_FP32_TO_FP16(0.0f);
+            memset(qs, 0, 32);
+            return;
+        }
+        *d = GGML_FP32_TO_FP16(std::fabs(scale) * max_code / 127.0f);
+        const float multiplier = std::copysign(127.0f / max_code, scale);
+        for (int j = 0; j < 16; ++j) {
+            qs[j]      = (int8_t) std::nearbyintf(kvalues_iq4nl[packed[j] & 0xf] * multiplier);
+            qs[j + 16] = (int8_t) std::nearbyintf(kvalues_iq4nl[packed[j] >> 4] * multiplier);
+        }
+    }
+
+    static void quantize_iq_codes_to_q8_0_32(float scale, const int8_t * codes,
+                                              ggml_fp16_t * d, int8_t * qs) {
+        int max_code = 0;
+        for (int j = 0; j < 32; ++j) {
+            max_code = std::max(max_code, std::abs((int) codes[j]));
+        }
+        if (scale == 0.0f || max_code == 0) {
+            *d = GGML_FP32_TO_FP16(0.0f);
+            memset(qs, 0, 32);
+            return;
+        }
+        *d = GGML_FP32_TO_FP16(std::fabs(scale) * max_code / 127.0f);
+        const float multiplier = std::copysign(127.0f / max_code, scale);
+        for (int j = 0; j < 32; ++j) {
+            qs[j] = (int8_t) std::nearbyintf(codes[j] * multiplier);
+        }
+    }
+
+    static bool pack_iq_tile_direct(ggml_type type, const char * row, int64_t k_blks, int64_t ci,
+                                    size_t b_blk_stride, uint8_t * tile) {
+        if (type == GGML_TYPE_IQ4_NL) {
+            const auto * blocks = (const block_iq4_nl *) row;
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_iq4_codes_to_q8_0_32(GGML_FP16_TO_FP32(blocks[kb].d), blocks[kb].qs,
+                                               scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ4_XS) {
+            const auto * blocks = (const block_iq4_xs *) row;
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq4_xs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const int ls = ((block.scales_l[ib / 2] >> 4 * (ib % 2)) & 0xf) |
+                               (((block.scales_h >> 2 * ib) & 3) << 4);
+                const float scale = GGML_FP16_TO_FP32(block.d) * (ls - 32);
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_iq4_codes_to_q8_0_32(scale, block.qs + 16 * ib, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ3_XXS) {
+            const auto * blocks = (const block_iq3_xxs *) row;
+            int8_t codes[32];
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq3_xxs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const uint8_t * q = block.qs + 8 * ib;
+                uint32_t aux32;
+                memcpy(&aux32, block.qs + QK_K / 4 + 4 * ib, sizeof(aux32));
+                for (int l = 0; l < 4; ++l) {
+                    const uint8_t signs = ksigns_iq2xs[(aux32 >> (7 * l)) & 127];
+                    const uint8_t * grid1 = (const uint8_t *) (iq3xxs_grid + q[2 * l]);
+                    const uint8_t * grid2 = (const uint8_t *) (iq3xxs_grid + q[2 * l + 1]);
+                    for (int j = 0; j < 4; ++j) {
+                        codes[8 * l + j] = (int8_t) (grid1[j] * (signs & kmask_iq2xs[j] ? -1 : 1));
+                        codes[8 * l + j + 4] = (int8_t) (grid2[j] * (signs & kmask_iq2xs[j + 4] ? -1 : 1));
+                    }
+                }
+                const float scale = GGML_FP16_TO_FP32(block.d) * (0.5f + (aux32 >> 28)) * 0.5f;
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_iq_codes_to_q8_0_32(scale, codes, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ2_XS) {
+            const auto * blocks = (const block_iq2_xs *) row;
+            float values[32];
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq2_xs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const float d = GGML_FP16_TO_FP32(block.d);
+                const float subscales[2] = {
+                    (0.5f + (block.scales[ib] & 0xf)) * 0.25f,
+                    (0.5f + (block.scales[ib] >> 4)) * 0.25f,
+                };
+                for (int l = 0; l < 4; ++l) {
+                    const uint16_t packed = block.qs[4 * ib + l];
+                    const uint8_t * grid = (const uint8_t *) (iq2xs_grid + (packed & 511));
+                    const uint8_t signs = ksigns_iq2xs[packed >> 9];
+                    for (int j = 0; j < 8; ++j) {
+                        values[8 * l + j] = d * subscales[l / 2] * grid[j] *
+                                            (signs & kmask_iq2xs[j] ? -1.0f : 1.0f);
+                    }
+                }
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_f32_to_q8_0_32(values, 32, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        return false;
+    }
+
     static void pack_iq_tile_to_q8_0_32(ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
                                         int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real,
                                         uint8_t * tile, float * deq_block) {
@@ -1575,6 +1776,9 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         memset(tile, 0, (size_t) k_blks * b_blk_stride);
         for (int64_t ci = 0; ci < nb_real; ++ci) {
             const char * src0_row = src0_cur + (ni + ci) * nb01;
+            if (pack_iq_tile_direct(type, src0_row, k_blks, ci, b_blk_stride, tile)) {
+                continue;
+            }
             for (int64_t k0 = 0; k0 < ne00; k0 += IQ_IME2_DECODE_BLOCK) {
                 const int64_t kn = std::min<int64_t>(IQ_IME2_DECODE_BLOCK, ne00 - k0);
                 GGML_ASSERT(kn % type_blck == 0);
@@ -1590,6 +1794,58 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 }
             }
         }
+    }
+
+    std::shared_ptr<std::vector<uint8_t>> get_cached_iq_tile(
+            const ime2_tile_key & key, ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
+            int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real, size_t tile_size, float * deq_block) const {
+        const size_t limit = ime2_cache_limit();
+        if (limit == 0 || tile_size > limit) {
+            return nullptr;
+        }
+        {
+            std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+            if (ime2_cache_limit_ != limit) {
+                ime2_cache_.clear();
+                ime2_cache_lru_.clear();
+                ime2_cache_bytes_ = 0;
+                ime2_cache_limit_ = limit;
+            }
+            auto it = ime2_cache_.find(key);
+            if (it != ime2_cache_.end()) {
+                ime2_cache_lru_.splice(ime2_cache_lru_.begin(), ime2_cache_lru_, it->second.lru);
+                return it->second.data;
+            }
+        }
+
+        std::shared_ptr<std::vector<uint8_t>> packed;
+        try {
+            packed = std::make_shared<std::vector<uint8_t>>(tile_size);
+        } catch (const std::bad_alloc &) {
+            return nullptr;
+        }
+        pack_iq_tile_to_q8_0_32(type, to_float, src0_cur, nb01, ne00, ni, nb_real,
+                                packed->data(), deq_block);
+
+        std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+        auto existing = ime2_cache_.find(key);
+        if (existing != ime2_cache_.end()) {
+            ime2_cache_lru_.splice(ime2_cache_lru_.begin(), ime2_cache_lru_, existing->second.lru);
+            return existing->second.data;
+        }
+        while (ime2_cache_bytes_ + tile_size > limit && !ime2_cache_lru_.empty()) {
+            auto last = std::prev(ime2_cache_lru_.end());
+            auto victim = ime2_cache_.find(*last);
+            if (victim != ime2_cache_.end()) {
+                ime2_cache_bytes_ -= victim->second.data->size();
+                ime2_cache_.erase(victim);
+            }
+            ime2_cache_lru_.erase(last);
+        }
+        ime2_cache_lru_.push_front(key);
+        ime2_cache_.emplace(key, ime2_tile_entry{packed, ime2_cache_lru_.begin()});
+        ime2_cache_bytes_ += tile_size;
+        return packed;
     }
 
     void forward_mul_mat_id(ggml_compute_params * params, ggml_tensor * op) const {
@@ -1665,6 +1921,7 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         ggml_barrier(params->threadpool);
 
         if (use_ime2_tile) {
+            const uint64_t tensor_fingerprint = ime2_tensor_fingerprint(src0);
             for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
                 const int64_t cne1 = matrix_row_counts[cur_a];
                 if (cne1 == 0) {
@@ -1673,9 +1930,18 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 const char * src0_cur = (const char *) src0->data + cur_a * nb02;
                 for (int64_t ni = (int64_t) ith * IQ_IME2_TILE_N; ni < ne01; ni += (int64_t) nth * IQ_IME2_TILE_N) {
                     const int64_t nb_real = std::min<int64_t>(IQ_IME2_TILE_N, ne01 - ni);
-                    uint8_t * b_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
-                    pack_iq_tile_to_q8_0_32(src0->type, to_float, src0_cur, nb01, ne00,
-                                            ni, nb_real, b_tile, deq_row);
+                    uint8_t * scratch_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
+                    const ime2_tile_key key = {
+                        src0->data, tensor_fingerprint, ne00, ne01, nb01, nb02, cur_a, ni, nb_real,
+                    };
+                    std::shared_ptr<std::vector<uint8_t>> cached_tile = get_cached_iq_tile(
+                            key, src0->type, to_float, src0_cur, nb01, ne00, ni, nb_real,
+                            ime2_b_tile_size, deq_row);
+                    const uint8_t * b_tile = cached_tile ? cached_tile->data() : scratch_tile;
+                    if (!cached_tile) {
+                        pack_iq_tile_to_q8_0_32(src0->type, to_float, src0_cur, nb01, ne00,
+                                                ni, nb_real, scratch_tile, deq_row);
+                    }
 
                     for (int64_t ir1 = 0; ir1 < cne1; ++ir1) {
                         const mmid_row_mapping row_mapping = matrix_rows[cur_a * max_rows + ir1];
