@@ -1215,7 +1215,8 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
     }
 
-    static constexpr int64_t IQ_IME2_TILE_N = 32;
+    static constexpr int64_t IQ_IME2_TILE_N      = 32;
+    static constexpr int64_t IQ_IME2_DECODE_BLOCK = QK_K;
 
   public:
     explicit constexpr tensor_traits_iq_compact(ggml_type type) : type_(type) {}
@@ -1247,8 +1248,10 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             size += (size_t) n_threads * ime2_b_tile_size;
             size = GGML_PAD(size, sizeof(int64_t));
         }
-        // One fallback/decode row per compute thread, also used by the experimental IME2 tile packer.
-        size += (size_t) n_threads * (size_t) src0->ne[0] * sizeof(float);
+        // IME2 decodes one compact block at a time. The direct fallback still needs a full row
+        // for formats without a compact x Q8_K dot implementation (currently IQ4_NL).
+        const size_t decode_elems = use_ime2_tile ? (size_t) IQ_IME2_DECODE_BLOCK : (size_t) src0->ne[0];
+        size += (size_t) n_threads * decode_elems * sizeof(float);
         size = GGML_PAD(size, sizeof(int64_t));
         const int64_t n_as     = src0->ne[2];
         const int64_t max_rows = ids->ne[0] * ids->ne[1];
@@ -1561,21 +1564,30 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     }
 
-    static void pack_iq_tile_to_q8_0_32(ggml_to_float_t to_float, const char * src0_cur, int64_t nb01, int64_t ne00,
-                                        int64_t ni, int64_t nb_real, uint8_t * tile, float * deq_row) {
+    static void pack_iq_tile_to_q8_0_32(ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
+                                        int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real,
+                                        uint8_t * tile, float * deq_block) {
         const int64_t k_blks = spacemit_kernels::div_round_up(ne00, (int64_t) 32);
         const size_t b_blk_stride = IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32;
+        const int64_t type_blck = ggml_blck_size(type);
+        const size_t type_size = ggml_type_size(type);
+        GGML_ASSERT(IQ_IME2_DECODE_BLOCK % type_blck == 0);
         memset(tile, 0, (size_t) k_blks * b_blk_stride);
         for (int64_t ci = 0; ci < nb_real; ++ci) {
             const char * src0_row = src0_cur + (ni + ci) * nb01;
-            to_float(src0_row, deq_row, ne00);
-            for (int64_t kb = 0; kb < k_blks; ++kb) {
-                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
-                auto * scales = (ggml_fp16_t *) blk;
-                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
-                const int64_t k0 = kb * 32;
-                const int64_t kn = std::min<int64_t>(32, ne00 - k0);
-                quantize_f32_to_q8_0_32(deq_row + k0, kn, scales + ci, qs + ci * 32);
+            for (int64_t k0 = 0; k0 < ne00; k0 += IQ_IME2_DECODE_BLOCK) {
+                const int64_t kn = std::min<int64_t>(IQ_IME2_DECODE_BLOCK, ne00 - k0);
+                GGML_ASSERT(kn % type_blck == 0);
+                const char * src_block = src0_row + (k0 / type_blck) * type_size;
+                to_float(src_block, deq_block, kn);
+                for (int64_t block_k0 = 0; block_k0 < kn; block_k0 += 32) {
+                    const int64_t kb = (k0 + block_k0) / 32;
+                    uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                    auto * scales = (ggml_fp16_t *) blk;
+                    auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                    const int64_t block_kn = std::min<int64_t>(32, kn - block_k0);
+                    quantize_f32_to_q8_0_32(deq_block + block_k0, block_kn, scales + ci, qs + ci * 32);
+                }
             }
         }
     }
@@ -1615,8 +1627,10 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             ime2_b_tiles = (uint8_t *) incr_ptr_aligned(&wdata_cur, (size_t) nth * ime2_b_tile_size, sizeof(int64_t));
         }
 
-        float * deq_rows = (float *) incr_ptr_aligned(&wdata_cur, (size_t) nth * (size_t) ne00 * sizeof(float), sizeof(int64_t));
-        float * deq_row  = deq_rows + (size_t) ith * (size_t) ne00;
+        const size_t decode_elems = use_ime2_tile ? (size_t) IQ_IME2_DECODE_BLOCK : (size_t) ne00;
+        float * deq_rows = (float *) incr_ptr_aligned(&wdata_cur,
+                (size_t) nth * decode_elems * sizeof(float), sizeof(int64_t));
+        float * deq_row  = deq_rows + (size_t) ith * decode_elems;
 
         const int64_t n_ids    = ids->ne[0];
         const int64_t n_as     = ne02;
@@ -1660,7 +1674,8 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 for (int64_t ni = (int64_t) ith * IQ_IME2_TILE_N; ni < ne01; ni += (int64_t) nth * IQ_IME2_TILE_N) {
                     const int64_t nb_real = std::min<int64_t>(IQ_IME2_TILE_N, ne01 - ni);
                     uint8_t * b_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
-                    pack_iq_tile_to_q8_0_32(to_float, src0_cur, nb01, ne00, ni, nb_real, b_tile, deq_row);
+                    pack_iq_tile_to_q8_0_32(src0->type, to_float, src0_cur, nb01, ne00,
+                                            ni, nb_real, b_tile, deq_row);
 
                     for (int64_t ir1 = 0; ir1 < cne1; ++ir1) {
                         const mmid_row_mapping row_mapping = matrix_rows[cur_a * max_rows + ir1];
