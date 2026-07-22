@@ -32,11 +32,10 @@
 #include <cstdio>  // for GGML_ASSERT
 #include <cstdlib>
 #include <cstring>
-#include <limits>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
-#include <string>
 #include <thread>
 #include <unordered_map>
 #include <vector>
@@ -1240,55 +1239,17 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     };
 
-    struct ime2_expert_key {
-        int64_t layer;
-        int64_t expert;
-
-        bool operator==(const ime2_expert_key & other) const {
-            return layer == other.layer && expert == other.expert;
-        }
-    };
-
-    struct ime2_expert_key_hash {
-        size_t operator()(const ime2_expert_key & key) const {
-            size_t h = std::hash<int64_t>{}(key.layer);
-            h ^= std::hash<int64_t>{}(key.expert) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
-            return h;
-        }
-    };
-
+    using ime2_tile_lru = std::list<ime2_tile_key>;
     struct ime2_tile_entry {
         std::shared_ptr<std::vector<uint8_t>> data;
-        ime2_expert_key expert;
-    };
-
-    struct ime2_expert_entry {
-        uint64_t accesses = 0;
-        uint64_t last_use = 0;
-        bool admitted = false;
-        size_t bytes = 0;
-        std::vector<ime2_tile_key> tiles;
-    };
-
-    struct ime2_layer_segment {
-        size_t bytes = 0;
+        ime2_tile_lru::iterator lru;
     };
 
     mutable std::mutex ime2_cache_mutex_;
     mutable std::unordered_map<ime2_tile_key, ime2_tile_entry, ime2_tile_key_hash> ime2_cache_;
-    mutable std::unordered_map<ime2_expert_key, ime2_expert_entry, ime2_expert_key_hash> ime2_experts_;
-    mutable std::unordered_map<int64_t, ime2_layer_segment> ime2_segments_;
-    mutable std::unordered_map<std::string, std::pair<const void *, uint64_t>> ime2_tensor_identities_;
+    mutable ime2_tile_lru ime2_cache_lru_;
     mutable size_t ime2_cache_bytes_ = 0;
-    mutable size_t ime2_cache_peak_bytes_ = 0;
     mutable size_t ime2_cache_limit_ = 0;
-    mutable uint64_t ime2_cache_clock_ = 0;
-    mutable std::atomic<uint64_t> ime2_cache_hits_ {0};
-    mutable std::atomic<uint64_t> ime2_cache_misses_ {0};
-    mutable std::atomic<uint64_t> ime2_cache_bypasses_ {0};
-    mutable std::atomic<uint64_t> ime2_cache_admissions_ {0};
-    mutable std::atomic<uint64_t> ime2_cache_evicted_experts_ {0};
-    mutable std::atomic<uint64_t> ime2_cache_evicted_tiles_ {0};
 
     struct mmid_row_mapping {
         int32_t i1;
@@ -1317,45 +1278,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         return end != v ? (size_t) mb << 20 : 0;
     }
 
-    static bool ime2_cache_profile_enabled() {
-        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE");
-        return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
-    }
-
-    static size_t ime2_cache_segments() {
-        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_SEGMENTS");
-        if (!v || !*v) {
-            return 64;
-        }
-        char * end = nullptr;
-        const unsigned long long segments = std::strtoull(v, &end, 10);
-        return end != v ? std::max<size_t>(1, (size_t) segments) : 64;
-    }
-
-    static uint64_t ime2_cache_admit_uses() {
-        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_USES");
-        if (!v || !*v) {
-            return 2;
-        }
-        char * end = nullptr;
-        const unsigned long long uses = std::strtoull(v, &end, 10);
-        return end != v ? std::max<uint64_t>(1, uses) : 2;
-    }
-
-    static bool ime2_is_routing_projection(const ggml_tensor * src0) {
-        return std::strstr(src0->name, "ffn_gate_exps") != nullptr;
-    }
-
-    static int64_t ime2_tensor_layer(const ggml_tensor * src0) {
-        const char * blk = std::strstr(src0->name, "blk.");
-        if (!blk) {
-            return -1;
-        }
-        char * end = nullptr;
-        const long long layer = std::strtoll(blk + 4, &end, 10);
-        return end != blk + 4 ? (int64_t) layer : -1;
-    }
-
     static uint64_t ime2_tensor_fingerprint(const ggml_tensor * src0) {
         const auto * data = (const uint8_t *) src0->data;
         const size_t row_size = ggml_row_size(src0->type, src0->ne[0]);
@@ -1377,24 +1299,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 
   public:
     explicit tensor_traits_iq_compact(ggml_type type) : type_(type) {}
-
-    ~tensor_traits_iq_compact() override {
-        if (!ime2_cache_profile_enabled()) {
-            return;
-        }
-        std::fflush(stdout);
-        flockfile(stderr);
-        std::fprintf(stderr,
-                "SPACEMIT_IQ_IME2_CACHE_PROFILE type=%s hits=%" PRIu64 " misses=%" PRIu64
-                " bypasses=%" PRIu64 " admissions=%" PRIu64 " evicted_experts=%" PRIu64
-                " evicted_tiles=%" PRIu64 " bytes=%zu peak_bytes=%zu segments=%zu experts=%zu tiles=%zu\n",
-                ggml_type_name(type_), ime2_cache_hits_.load(), ime2_cache_misses_.load(),
-                ime2_cache_bypasses_.load(), ime2_cache_admissions_.load(),
-                ime2_cache_evicted_experts_.load(), ime2_cache_evicted_tiles_.load(),
-                ime2_cache_bytes_, ime2_cache_peak_bytes_, ime2_segments_.size(),
-                ime2_experts_.size(), ime2_cache_.size());
-        funlockfile(stderr);
-    }
 
     bool work_size(int n_threads, const ggml_tensor * op, size_t & size) override {
         if (op->op != GGML_OP_MUL_MAT_ID || op->src[0]->type != type_) {
@@ -1431,8 +1335,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         const int64_t n_as     = src0->ne[2];
         const int64_t max_rows = ids->ne[0] * ids->ne[1];
         size += n_as * sizeof(int64_t);
-        size = GGML_PAD(size, sizeof(int64_t));
-        size += n_as * sizeof(uint8_t);
         size = GGML_PAD(size, sizeof(int64_t));
         size += n_as * max_rows * sizeof(mmid_row_mapping);
         size = GGML_PAD(size, CACHE_LINE_SIZE);
@@ -1894,118 +1796,32 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     }
 
-    void reset_ime2_cache_locked(size_t limit) const {
-        ime2_cache_.clear();
-        ime2_experts_.clear();
-        ime2_segments_.clear();
-        ime2_tensor_identities_.clear();
-        ime2_cache_bytes_ = 0;
-        ime2_cache_peak_bytes_ = 0;
-        ime2_cache_limit_ = limit;
-        ime2_cache_clock_ = 0;
-    }
-
-    size_t evict_ime2_expert_locked(const ime2_expert_key & key) const {
-        auto expert_it = ime2_experts_.find(key);
-        if (expert_it == ime2_experts_.end() || expert_it->second.bytes == 0) {
-            return 0;
-        }
-        const size_t bytes = expert_it->second.bytes;
-        const size_t tiles = expert_it->second.tiles.size();
-        for (const ime2_tile_key & tile : expert_it->second.tiles) {
-            ime2_cache_.erase(tile);
-        }
-        auto segment_it = ime2_segments_.find(key.layer);
-        if (segment_it != ime2_segments_.end()) {
-            segment_it->second.bytes -= std::min(segment_it->second.bytes, bytes);
-        }
-        ime2_cache_bytes_ -= std::min(ime2_cache_bytes_, bytes);
-        expert_it->second.bytes = 0;
-        expert_it->second.tiles.clear();
-        ime2_cache_evicted_experts_.fetch_add(1, std::memory_order_relaxed);
-        ime2_cache_evicted_tiles_.fetch_add(tiles, std::memory_order_relaxed);
-        return bytes;
-    }
-
-    bool admit_ime2_expert(const ime2_expert_key & key, const ggml_tensor * src0,
-                           uint64_t fingerprint, size_t limit) const {
-        if (limit == 0) {
-            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
-            return false;
-        }
-        std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
-        if (ime2_cache_limit_ != limit) {
-            reset_ime2_cache_locked(limit);
-        }
-        const std::string tensor_name = src0->name;
-        auto identity = ime2_tensor_identities_.find(tensor_name);
-        if (identity != ime2_tensor_identities_.end() &&
-                (identity->second.first != src0->data || identity->second.second != fingerprint)) {
-            reset_ime2_cache_locked(limit);
-        }
-        ime2_tensor_identities_[tensor_name] = {src0->data, fingerprint};
-        ime2_segments_.try_emplace(key.layer);
-        ime2_expert_entry & expert = ime2_experts_[key];
-        if (ime2_is_routing_projection(src0)) {
-            expert.accesses += 1;
-        }
-        expert.last_use = ++ime2_cache_clock_;
-        if (!expert.admitted && expert.accesses >= ime2_cache_admit_uses()) {
-            expert.admitted = true;
-            ime2_cache_admissions_.fetch_add(1, std::memory_order_relaxed);
-        }
-        if (!expert.admitted) {
-            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
-        }
-        return expert.admitted;
-    }
-
-    bool evict_ime2_victim_locked(int64_t layer, const ime2_expert_key & inserting, bool any_layer) const {
-        auto victim = ime2_experts_.end();
-        for (auto it = ime2_experts_.begin(); it != ime2_experts_.end(); ++it) {
-            if (it->second.bytes == 0 || it->first == inserting || (!any_layer && it->first.layer != layer)) {
-                continue;
-            }
-            if (victim == ime2_experts_.end() || it->second.accesses < victim->second.accesses ||
-                    (it->second.accesses == victim->second.accesses && it->second.last_use < victim->second.last_use)) {
-                victim = it;
-            }
-        }
-        if (victim == ime2_experts_.end()) {
-            return false;
-        }
-        evict_ime2_expert_locked(victim->first);
-        return true;
-    }
-
     std::shared_ptr<std::vector<uint8_t>> get_cached_iq_tile(
-            const ime2_tile_key & key, const ime2_expert_key & expert_key,
-            ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
+            const ime2_tile_key & key, ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
             int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real, size_t tile_size, float * deq_block) const {
         const size_t limit = ime2_cache_limit();
         if (limit == 0 || tile_size > limit) {
-            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
             return nullptr;
         }
         {
             std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+            if (ime2_cache_limit_ != limit) {
+                ime2_cache_.clear();
+                ime2_cache_lru_.clear();
+                ime2_cache_bytes_ = 0;
+                ime2_cache_limit_ = limit;
+            }
             auto it = ime2_cache_.find(key);
             if (it != ime2_cache_.end()) {
-                auto expert_it = ime2_experts_.find(expert_key);
-                if (expert_it != ime2_experts_.end()) {
-                    expert_it->second.last_use = ++ime2_cache_clock_;
-                }
-                ime2_cache_hits_.fetch_add(1, std::memory_order_relaxed);
+                ime2_cache_lru_.splice(ime2_cache_lru_.begin(), ime2_cache_lru_, it->second.lru);
                 return it->second.data;
             }
         }
-        ime2_cache_misses_.fetch_add(1, std::memory_order_relaxed);
 
         std::shared_ptr<std::vector<uint8_t>> packed;
         try {
             packed = std::make_shared<std::vector<uint8_t>>(tile_size);
         } catch (const std::bad_alloc &) {
-            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
             return nullptr;
         }
         pack_iq_tile_to_q8_0_32(type, to_float, src0_cur, nb01, ne00, ni, nb_real,
@@ -2014,28 +1830,21 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
         auto existing = ime2_cache_.find(key);
         if (existing != ime2_cache_.end()) {
-            ime2_cache_hits_.fetch_add(1, std::memory_order_relaxed);
+            ime2_cache_lru_.splice(ime2_cache_lru_.begin(), ime2_cache_lru_, existing->second.lru);
             return existing->second.data;
         }
-        const size_t segment_limit = std::max(tile_size, limit / ime2_cache_segments());
-        ime2_layer_segment & segment = ime2_segments_[expert_key.layer];
-        while (segment.bytes + tile_size > segment_limit &&
-               evict_ime2_victim_locked(expert_key.layer, expert_key, false)) {
+        while (ime2_cache_bytes_ + tile_size > limit && !ime2_cache_lru_.empty()) {
+            auto last = std::prev(ime2_cache_lru_.end());
+            auto victim = ime2_cache_.find(*last);
+            if (victim != ime2_cache_.end()) {
+                ime2_cache_bytes_ -= victim->second.data->size();
+                ime2_cache_.erase(victim);
+            }
+            ime2_cache_lru_.erase(last);
         }
-        while (ime2_cache_bytes_ + tile_size > limit && evict_ime2_victim_locked(expert_key.layer, expert_key, true)) {
-        }
-        if (segment.bytes + tile_size > segment_limit || ime2_cache_bytes_ + tile_size > limit) {
-            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
-            return nullptr;
-        }
-        ime2_cache_.emplace(key, ime2_tile_entry{packed, expert_key});
-        ime2_expert_entry & expert = ime2_experts_[expert_key];
-        expert.bytes += tile_size;
-        expert.tiles.push_back(key);
-        expert.last_use = ++ime2_cache_clock_;
-        segment.bytes += tile_size;
+        ime2_cache_lru_.push_front(key);
+        ime2_cache_.emplace(key, ime2_tile_entry{packed, ime2_cache_lru_.begin()});
         ime2_cache_bytes_ += tile_size;
-        ime2_cache_peak_bytes_ = std::max(ime2_cache_peak_bytes_, ime2_cache_bytes_);
         return packed;
     }
 
@@ -2083,7 +1892,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         const int64_t n_as     = ne02;
         const int64_t max_rows = ids->ne[0] * ids->ne[1];
         int64_t * matrix_row_counts = (int64_t *) incr_ptr_aligned(&wdata_cur, n_as * sizeof(int64_t), sizeof(int64_t));
-        uint8_t * matrix_cache_admitted = (uint8_t *) incr_ptr_aligned(&wdata_cur, n_as * sizeof(uint8_t), sizeof(int64_t));
         mmid_row_mapping * matrix_rows = (mmid_row_mapping *) incr_ptr_aligned(&wdata_cur, n_as * max_rows * sizeof(mmid_row_mapping), sizeof(int64_t));
         GGML_ASSERT(params->wsize >= (size_t) ((char *) wdata_cur - (char *) params->wdata));
 
@@ -2101,7 +1909,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 
         if (ith == 0) {
             memset(matrix_row_counts, 0, n_as * sizeof(int64_t));
-            memset(matrix_cache_admitted, 0, n_as * sizeof(uint8_t));
             for (int32_t iid1 = 0; iid1 < ids->ne[1]; ++iid1) {
                 for (int32_t id = 0; id < n_ids; ++id) {
                     const int32_t i02 = *(const int32_t *) ((const char *) ids->data + iid1 * ids->nb[1] + id * ids->nb[0]);
@@ -2115,17 +1922,6 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 
         if (use_ime2_tile) {
             const uint64_t tensor_fingerprint = ime2_tensor_fingerprint(src0);
-            const int64_t tensor_layer = ime2_tensor_layer(src0);
-            if (ith == 0) {
-                const size_t cache_limit = ime2_cache_limit();
-                for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
-                    if (matrix_row_counts[cur_a] > 0) {
-                        matrix_cache_admitted[cur_a] = admit_ime2_expert(
-                                {tensor_layer, cur_a}, src0, tensor_fingerprint, cache_limit);
-                    }
-                }
-            }
-            ggml_barrier(params->threadpool);
             for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
                 const int64_t cne1 = matrix_row_counts[cur_a];
                 if (cne1 == 0) {
@@ -2138,13 +1934,9 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                     const ime2_tile_key key = {
                         src0->data, tensor_fingerprint, ne00, ne01, nb01, nb02, cur_a, ni, nb_real,
                     };
-                    const ime2_expert_key expert_key = {tensor_layer, cur_a};
-                    std::shared_ptr<std::vector<uint8_t>> cached_tile;
-                    if (matrix_cache_admitted[cur_a]) {
-                        cached_tile = get_cached_iq_tile(
-                                key, expert_key, src0->type, to_float, src0_cur, nb01, ne00, ni, nb_real,
-                                ime2_b_tile_size, deq_row);
-                    }
+                    std::shared_ptr<std::vector<uint8_t>> cached_tile = get_cached_iq_tile(
+                            key, src0->type, to_float, src0_cur, nb01, ne00, ni, nb_real,
+                            ime2_b_tile_size, deq_row);
                     const uint8_t * b_tile = cached_tile ? cached_tile->data() : scratch_tile;
                     if (!cached_tile) {
                         pack_iq_tile_to_q8_0_32(src0->type, to_float, src0_cur, nb01, ne00,
