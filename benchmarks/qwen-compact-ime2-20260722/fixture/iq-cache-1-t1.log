@@ -1,0 +1,42 @@
+CPU_RISCV64_SPACEMIT: tcm is available, blk_size: 393216, blk_num: 8, is_fake_tcm: 0
+CPU_RISCV64_SPACEMIT: num_cores: 16, num_perfer_cores: 8, perfer_core_arch_id: a064, exclude_main_thread: 0, use_ime1: 0, use_ime2: 1, mem_backend: HPAGE, cpu_mask: ff00, aicpu_id_offset: 8
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+case type=q4_K tokens=1 threads=1 mode=1 plain_bytes=36864 alloc_bytes=40960 set_us=324 compute_us=0.000 bench_iters=0 max_abs=1.32837844 nmse=0.00399525647 bad=0/128
+case type=q4_K tokens=2 threads=1 mode=1 plain_bytes=36864 alloc_bytes=40960 set_us=794 compute_us=0.000 bench_iters=0 max_abs=1.28131092 nmse=0.0037231141 bad=0/256
+case type=q4_K tokens=4 threads=1 mode=1 plain_bytes=36864 alloc_bytes=40960 set_us=771 compute_us=0.000 bench_iters=0 max_abs=2.13257337 nmse=0.00592665067 bad=0/512
+case type=q4_K tokens=5 threads=1 mode=1 plain_bytes=36864 alloc_bytes=40960 set_us=768 compute_us=0.000 bench_iters=0 max_abs=1.73905659 nmse=0.00449464483 bad=0/640
+case type=q4_K tokens=8 threads=1 mode=1 plain_bytes=36864 alloc_bytes=40960 set_us=769 compute_us=0.000 bench_iters=0 max_abs=1.83528471 nmse=0.00378077018 bad=0/1024
+case type=q5_K tokens=1 threads=1 mode=1 plain_bytes=45056 alloc_bytes=47104 set_us=755 compute_us=0.000 bench_iters=0 max_abs=0.795628309 nmse=0.000822011143 bad=0/128
+case type=q5_K tokens=2 threads=1 mode=1 plain_bytes=45056 alloc_bytes=47104 set_us=728 compute_us=0.000 bench_iters=0 max_abs=0.73106575 nmse=0.00136524835 bad=0/256
+case type=q5_K tokens=4 threads=1 mode=1 plain_bytes=45056 alloc_bytes=47104 set_us=734 compute_us=0.000 bench_iters=0 max_abs=0.838698626 nmse=0.000913965712 bad=0/512
+case type=q5_K tokens=5 threads=1 mode=1 plain_bytes=45056 alloc_bytes=47104 set_us=736 compute_us=0.000 bench_iters=0 max_abs=0.773086548 nmse=0.000755105902 bad=0/640
+case type=q5_K tokens=8 threads=1 mode=1 plain_bytes=45056 alloc_bytes=47104 set_us=737 compute_us=0.000 bench_iters=0 max_abs=0.902901888 nmse=0.000900903217 bad=0/1024
+case type=iq2_xs tokens=1 threads=1 mode=1 plain_bytes=18944 alloc_bytes=18944 set_us=131 compute_us=0.000 bench_iters=0 max_abs=0.126063347 nmse=2.55897326e-05 bad=0/128
+case type=iq2_xs tokens=2 threads=1 mode=1 plain_bytes=18944 alloc_bytes=18944 set_us=124 compute_us=0.000 bench_iters=0 max_abs=0.108424187 nmse=2.37674543e-05 bad=0/256
+case type=iq2_xs tokens=4 threads=1 mode=1 plain_bytes=18944 alloc_bytes=18944 set_us=126 compute_us=0.000 bench_iters=0 max_abs=0.126966 nmse=2.76186855e-05 bad=0/512
+case type=iq2_xs tokens=5 threads=1 mode=1 plain_bytes=18944 alloc_bytes=18944 set_us=126 compute_us=0.000 bench_iters=0 max_abs=0.117521644 nmse=2.72950166e-05 bad=0/640
+case type=iq2_xs tokens=8 threads=1 mode=1 plain_bytes=18944 alloc_bytes=18944 set_us=135 compute_us=0.000 bench_iters=0 max_abs=0.12758255 nmse=2.45862334e-05 bad=0/1024
+case type=iq3_xxs tokens=1 threads=1 mode=1 plain_bytes=25088 alloc_bytes=25088 set_us=127 compute_us=0.000 bench_iters=0 max_abs=0.102871418 nmse=2.95874657e-05 bad=0/128
+case type=iq3_xxs tokens=2 threads=1 mode=1 plain_bytes=25088 alloc_bytes=25088 set_us=114 compute_us=0.000 bench_iters=0 max_abs=0.102170944 nmse=2.31556927e-05 bad=0/256
+case type=iq3_xxs tokens=4 threads=1 mode=1 plain_bytes=25088 alloc_bytes=25088 set_us=127 compute_us=0.000 bench_iters=0 max_abs=0.133452892 nmse=2.67315903e-05 bad=0/512
+case type=iq3_xxs tokens=5 threads=1 mode=1 plain_bytes=25088 alloc_bytes=25088 set_us=125 compute_us=0.000 bench_iters=0 max_abs=0.153777838 nmse=3.03459797e-05 bad=0/640
+case type=iq3_xxs tokens=8 threads=1 mode=1 plain_bytes=25088 alloc_bytes=25088 set_us=137 compute_us=0.000 bench_iters=0 max_abs=0.14747268 nmse=3.19744723e-05 bad=0/1024
+case type=iq4_xs tokens=1 threads=1 mode=1 plain_bytes=34816 alloc_bytes=34816 set_us=123 compute_us=0.000 bench_iters=0 max_abs=0.0817394257 nmse=2.02050094e-05 bad=0/128
+case type=iq4_xs tokens=2 threads=1 mode=1 plain_bytes=34816 alloc_bytes=34816 set_us=133 compute_us=0.000 bench_iters=0 max_abs=0.0705699921 nmse=1.28452597e-05 bad=0/256
+case type=iq4_xs tokens=4 threads=1 mode=1 plain_bytes=34816 alloc_bytes=34816 set_us=126 compute_us=0.000 bench_iters=0 max_abs=0.0810537338 nmse=1.48245849e-05 bad=0/512
+case type=iq4_xs tokens=5 threads=1 mode=1 plain_bytes=34816 alloc_bytes=34816 set_us=131 compute_us=0.000 bench_iters=0 max_abs=0.0954523087 nmse=1.56132587e-05 bad=0/640
+case type=iq4_xs tokens=8 threads=1 mode=1 plain_bytes=34816 alloc_bytes=34816 set_us=136 compute_us=0.000 bench_iters=0 max_abs=0.0961544514 nmse=1.44076425e-05 bad=0/1024
+case type=iq4_nl tokens=1 threads=1 mode=1 plain_bytes=36864 alloc_bytes=36864 set_us=123 compute_us=0.000 bench_iters=0 max_abs=0.0770788491 nmse=2.02641454e-05 bad=0/128
+case type=iq4_nl tokens=2 threads=1 mode=1 plain_bytes=36864 alloc_bytes=36864 set_us=121 compute_us=0.000 bench_iters=0 max_abs=0.0844402313 nmse=1.2633411e-05 bad=0/256
+case type=iq4_nl tokens=4 threads=1 mode=1 plain_bytes=36864 alloc_bytes=36864 set_us=125 compute_us=0.000 bench_iters=0 max_abs=0.0820536613 nmse=1.69693573e-05 bad=0/512
+case type=iq4_nl tokens=5 threads=1 mode=1 plain_bytes=36864 alloc_bytes=36864 set_us=123 compute_us=0.000 bench_iters=0 max_abs=0.0740795135 nmse=1.31963156e-05 bad=0/640
+case type=iq4_nl tokens=8 threads=1 mode=1 plain_bytes=36864 alloc_bytes=36864 set_us=137 compute_us=0.000 bench_iters=0 max_abs=0.0907020569 nmse=1.51072799e-05 bad=0/1024

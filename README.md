@@ -89,7 +89,7 @@ cmake --build build -j"$(nproc)"
 
 ### K3 optimisation progress
 
-The table records the state verified on a Milk-V K3 as of 21 July 2026. `Default` means the path is active without an experimental environment variable.
+The table records the state verified on a Milk-V K3 as of 22 July 2026. `Default` means the path is active without an experimental environment variable.
 
 | Area | Implementation and evidence | Measured result | State |
 |---|---|---:|---|
@@ -97,7 +97,7 @@ The table records the state verified on a Milk-V K3 as of 21 July 2026. `Default
 | Quantized weights | Load-time repacking for Q4_K, Q5_K, Q6_K and Q8_0 IME layouts | Avoids per-call weight conversion | Default |
 | Q4_K edges | Register-tiled m4/m1 family tested at activation rows 1–9 and 32 | All one- and eight-thread cases passed | Default |
 | Matmul scheduling | Profiled `auto`, `tcm-a`, `tcm-b` and `direct` across prompt and generation shapes | `direct` reduced Qwen generation by 8.2%; `auto` retained | Default: `auto` |
-| Compact-IQ MoE | Direct RVV, per-call IME2 packing and persistent IQ→Q8 repacking tested for IQ2_XS, IQ3_XXS, IQ4_XS and IQ4_NL | Persistent repacking was 3.13–40.42× faster after amortisation, but expanded weights 1.89–3.68× | Opt-in |
+| Compact-IQ MoE | Direct IQ2/IQ3/IQ4 packing into IME2 tiles plus a bounded cross-request LRU; direct RVV remains the fallback | Cached fixture computes fell to 35–70 µs; Q2_K_XL reached 2.41 tok/s warm at 16K with an 8 GiB tile cache | Opt-in |
 | Q4_K/Q5_K MoE edges | m4→m2→m1 contract and routed-row fixture for rows 1, 2, 4, 5 and 8 | 120 gate/type/row/thread combinations passed; m4 was 4.48% of Qwen MoE tiles | Opt-in |
 | Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
 | Qwen matrix campaign, 20 July | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance on the campaign corpus | Historical benchmark |
@@ -120,6 +120,8 @@ No experimental matrix or arithmetic kernel met the 2% end-to-end promotion thre
 | `GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE=1` | Count m4, m2 and m1 MoE dispatches | Off |
 | `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable the Q4_K/Q5_K m4 edge contract | Off |
 | `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense register-tiled i8×i8 m2 kernel | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1` | Pack compact-IQ routed-MoE tiles for IME2 and enable the bounded cross-request cache | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` | Set the compact-IQ IME2 LRU budget; `0` disables caching | 64 MiB when the tile gate is on |
 | `GGML_CPU_RECURRENT_PROFILE=1` | Count CPU `DUP`/`CPY` buckets and time GDN/SSM shapes | Off |
 | `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly into the recurrent-cache view | Off in library; on in the Qwen service |
 
@@ -128,6 +130,7 @@ Detailed measurements and reproduction instructions:
 - [Qwen3.6-35B-A3B matrix campaign](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
 - [Qwen recurrent-path campaign](benchmarks/qwen-recurrent-20260721/final-report.md)
 - [Qwen service parameter sweep](benchmarks/qwen-parameter-sweep-20260722/final-report.md)
+- [Compact-IQ IME2 tile and cache campaign](benchmarks/qwen-compact-ime2-20260722/report.md)
 - [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
 - [K3 benchmark harness](scripts/README-k3-matmul.md)
 
