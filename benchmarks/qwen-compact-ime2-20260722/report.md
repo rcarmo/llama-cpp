@@ -107,14 +107,15 @@ It provides four times the current live context and much more model-file headroo
 
 ## Further optimisation options
 
-Eviction churn limits sustained Q2 generation. The next experiments, in order, are:
+Eviction churn limits sustained Q2 generation. Equal fixed per-layer budgets were tested after this campaign and regressed warm 64-token generation to 0.50–0.57 tok/s; [the experiment report](../qwen-compact-ime2-segmented-20260722/report.md) records the result. A future policy needs one byte ceiling shared across compact formats, soft layer reservations and global frequency-aware expert eviction.
 
-1. Segment the cache by layer and admit tiles by expert frequency so sequential layer traversal cannot evict the whole recurrent working set.
-2. Persistently retain only hot experts and use the bounded cache for the routing tail. Routing telemetry is required to choose that set.
-3. Overlap miss packing with computation using double-buffered tiles. This can reduce cold-path latency but does not improve cache-hit arithmetic.
-4. Implement an IME2 kernel that consumes compact-IQ symbols without Q8 tile expansion. This would recover cache memory for context but requires a new kernel contract.
+Other possible experiments are:
 
-Increasing the global cache beyond 8 GiB would reduce the memory available for context. Q3 and IQ4 model variants require separate end-to-end service tests; file size alone does not predict performance on this backend.
+1. Persistently retain only hot experts and use the bounded cache for the routing tail. Routing telemetry is required to choose that set.
+2. Overlap miss packing with computation using double-buffered tiles. This can reduce cold-path latency but does not improve cache-hit arithmetic.
+3. Implement an IME2 kernel that consumes compact-IQ symbols without Q8 tile expansion. This would recover cache memory for context but requires a new kernel contract.
+
+Increasing the global cache beyond 8 GiB would reduce the memory available for context. IQ4_XS was tested and reached only 1.28 tok/s sustained warm generation with an 8 GiB cache. Q3 remains untested because the local filesystem lacks room for a model file.
 
 ## Live service after test
 

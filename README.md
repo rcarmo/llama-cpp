@@ -97,7 +97,7 @@ The table records the state verified on a Milk-V K3 as of 22 July 2026. `Default
 | Quantized weights | Load-time repacking for Q4_K, Q5_K, Q6_K and Q8_0 IME layouts | Avoids per-call weight conversion | Default |
 | Q4_K edges | Register-tiled m4/m1 family tested at activation rows 1–9 and 32 | All one- and eight-thread cases passed | Default |
 | Matmul scheduling | Profiled `auto`, `tcm-a`, `tcm-b` and `direct` across prompt and generation shapes | `direct` reduced Qwen generation by 8.2%; `auto` retained | Default: `auto` |
-| Compact-IQ MoE | Direct IQ2/IQ3/IQ4 packing into IME2 tiles plus a bounded cross-request LRU; disabling the IME2 gate selects direct RVV | Cached fixture computes fell to 35–70 µs; Q2_K_XL reached 2.41 tok/s warm at 16K with an 8 GiB tile cache | Opt-in |
+| Compact-IQ MoE | Direct IQ2/IQ3/IQ4 packing into IME2 tiles plus a bounded cross-request LRU; disabling the IME2 gate selects direct RVV | Q2_K_XL reached 2.41 tok/s warm at 16K; equal per-layer segmentation regressed to 0.50–0.57 tok/s and was reverted | Opt-in |
 | Q4_K/Q5_K MoE edges | m4→m2→m1 contract and routed-row fixture for rows 1, 2, 4, 5 and 8 | 120 gate/type/row/thread combinations passed; m4 was 4.48% of Qwen MoE tiles | Opt-in |
 | Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
 | Qwen matrix campaign, 20 July | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance on the campaign corpus | Historical benchmark |
@@ -131,6 +131,8 @@ Detailed measurements and reproduction instructions:
 - [Qwen recurrent-path campaign](benchmarks/qwen-recurrent-20260721/final-report.md)
 - [Qwen service parameter sweep](benchmarks/qwen-parameter-sweep-20260722/final-report.md)
 - [Compact-IQ IME2 tile and cache campaign](benchmarks/qwen-compact-ime2-20260722/report.md)
+- [Layer-segmented compact-IQ cache experiment](benchmarks/qwen-compact-ime2-segmented-20260722/report.md)
+- [Qwen quant comparison](benchmarks/qwen-quant-comparison-20260722/report.md)
 - [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
 - [K3 benchmark harness](scripts/README-k3-matmul.md)
 
