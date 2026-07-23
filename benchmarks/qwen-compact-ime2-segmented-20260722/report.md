@@ -16,11 +16,11 @@ The compact-IQ fixture passed all 80 format/row/worker/gate combinations with `b
 
 ## Q2 service result
 
-Model: `Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf`, 16K context, eight workers, 8 GiB configured cache.
+Model: `Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf`, 16K context, eight workers, `CACHE_MB=8192`. At this point each format trait still owned a separate manager, so this was not an aggregate 8 GiB ceiling.
 
 | Policy | Warm 64-token generation |
 |---|---:|
-| Global LRU baseline | 2.41 tok/s |
+| Historical per-format LRU | 2.41 tok/s |
 | 64 fixed segments, admit after second routing use | 0.50 tok/s |
 | 39 fixed segments, immediate admission | 0.57 tok/s |
 

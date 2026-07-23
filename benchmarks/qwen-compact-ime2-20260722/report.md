@@ -80,9 +80,9 @@ The recurrent working set exceeds 512 MiB. Short generations fit within 2 GiB, b
 |---:|---:|---:|---:|
 | 2 GiB | 0.585 tok/s | not run | 14.31 GiB |
 | 4 GiB | 1.069 tok/s | not run | 10.29 GiB |
-| 8 GiB | 4.356 tok/s | 2.429 tok/s | 6.29 GiB |
+| 8 GiB per format trait (not an aggregate ceiling) | 4.356 tok/s | 2.429 tok/s | 6.29 GiB |
 
-The 8 GiB profile successfully loaded at 16K context and reproduced after a complete server restart. Restart validation yielded 2.414 tok/s over 64 warm tokens.
+This profile successfully loaded at 16K context and reproduced after a complete server restart. Later telemetry found that each compact format trait owned a separate cache manager, so `CACHE_MB=8192` did not enforce an 8 GiB aggregate ceiling. The corrected shared-manager campaign supersedes this memory interpretation.
 
 Native MTP draft-1 did not help Q2: 2.380 tok/s warm over 64 tokens with 72% acceptance, versus 2.429 tok/s without speculation.
 
@@ -90,7 +90,7 @@ Native MTP draft-1 did not help Q2: 2.380 tok/s warm over 64 tokens with 72% acc
 
 The live Q4 service stays in production.
 
-The best validated Q2 profile is:
+The best profile measured during this campaign was:
 
 ```text
 GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1
@@ -103,7 +103,7 @@ KV=q8_0/q8_0
 MTP=off
 ```
 
-It provides four times the current live context and much more model-file headroom, but sustained warm generation is only about 2.4 tok/s. The restored Q4 service produced 6.10 tok/s in its final health request and remains the better interactive default.
+It provides four times the current live context, but its cache budget was applied independently per compact format. See [the corrected shared-cache report](../qwen-compact-ime2-soft-cache-20260723/report.md) for aggregate-ceiling results. The restored Q4 service produced 6.10 tok/s in its final health request and remains the better interactive default.
 
 ## Further optimisation options
 

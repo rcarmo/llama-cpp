@@ -90,6 +90,6 @@ Use `test-spacemit-iq-moe-correctness` before model tests. The current fixture c
 
 Run prompt-only and generation-only `llama-bench` processes when comparing Q2. Combined pp+tg Q2 invocations produced valid rows and then aborted with `malloc(): invalid size (unsorted)` during graph teardown/rebuild. The persistent server lifecycle completed short, cached, 16K-context and restart tests without that failure.
 
-The 22 July Q2 service sweep found that 512 MiB, 2 GiB and 4 GiB caches did not retain the sustained recurrent working set. An 8 GiB budget reached 2.41 tok/s over 64 warm tokens at 16K context and left about 6.3 GiB available. This is a benchmark profile, not the live default; Q4_K_M remains the production service.
+The original 22 July Q2 sweep used one cache manager per compact format, so its `CACHE_MB` value was not an aggregate ceiling. The corrected shared manager reaches 0.96, 1.20, 1.67 and 3.58 tok/s over 64 warm tokens at 16K with aggregate ceilings of 8, 10, 12 and 14 GiB respectively. The 14 GiB profile leaves about 4.4 GiB available. This is a benchmark profile, not the live default; Q4_K_M remains the production service.
 
 Benchmark result directories are not intended to be committed wholesale. Promote the selected immutable baseline and final tables into a report with links or checksums for retained raw artifacts.

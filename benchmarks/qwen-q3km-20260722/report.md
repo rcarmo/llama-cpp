@@ -42,7 +42,7 @@ MTP reduced generation by 16.1% despite accepting 61.5% of draft tokens.
 | Quant/profile | Context | Sustained warm generation |
 |---|---:|---:|
 | Q4_K_M + MTP | 4K | 6.11 tok/s final health check; 7.86 tok/s five-prompt mean |
-| Q2_K_XL, 8 GiB tile cache | 16K | 2.41 tok/s |
+| Q2_K_XL, 14 GiB shared tile cache | 16K | 3.58 tok/s |
 | Q3_K_M, speculation off | 16K | 1.05 tok/s |
 | IQ4_XS, 8 GiB tile cache | 4K | 1.28 tok/s |
 
