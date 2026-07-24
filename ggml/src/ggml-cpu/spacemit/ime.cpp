@@ -1297,6 +1297,12 @@ class tensor_traits_iq_compact : public tensor_traits_base {
     inline static std::atomic<uint64_t> ime2_cache_admissions_ {0};
     inline static std::atomic<uint64_t> ime2_cache_demotions_ {0};
     inline static std::atomic<uint64_t> ime2_cache_evicted_tiles_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_calls_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_direct_rows_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_fallback_rows_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_us_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_input_bytes_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_output_bytes_ {0};
     inline static std::atomic<bool> ime2_cache_profile_reported_ {false};
 
     struct mmid_row_mapping {
@@ -1419,11 +1425,15 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         std::fprintf(stderr,
                 "SPACEMIT_IQ_IME2_CACHE_PROFILE type=all hits=%" PRIu64 " misses=%" PRIu64
                 " bypasses=%" PRIu64 " admissions=%" PRIu64 " demotions=%" PRIu64
-                " evicted_tiles=%" PRIu64 " bytes=%zu protected_bytes=%zu peak_bytes=%zu"
-                " layers=%zu experts=%zu tiles=%zu\n",
+                " evicted_tiles=%" PRIu64 " pack_calls=%" PRIu64 " pack_direct_rows=%" PRIu64
+                " pack_fallback_rows=%" PRIu64 " pack_us=%" PRIu64
+                " pack_input_bytes=%" PRIu64 " pack_output_bytes=%" PRIu64
+                " bytes=%zu protected_bytes=%zu peak_bytes=%zu layers=%zu experts=%zu tiles=%zu\n",
                 ime2_cache_hits_.load(), ime2_cache_misses_.load(), ime2_cache_bypasses_.load(),
                 ime2_cache_admissions_.load(), ime2_cache_demotions_.load(),
-                ime2_cache_evicted_tiles_.load(), ime2_cache_bytes_, ime2_protected_bytes_, ime2_cache_peak_bytes_,
+                ime2_cache_evicted_tiles_.load(), ime2_pack_calls_.load(), ime2_pack_direct_rows_.load(),
+                ime2_pack_fallback_rows_.load(), ime2_pack_us_.load(), ime2_pack_input_bytes_.load(),
+                ime2_pack_output_bytes_.load(), ime2_cache_bytes_, ime2_protected_bytes_, ime2_cache_peak_bytes_,
                 ime2_layers_.size(), ime2_experts_.size(), ime2_cache_.size());
         funlockfile(stderr);
     }
@@ -1898,6 +1908,10 @@ class tensor_traits_iq_compact : public tensor_traits_base {
     static void pack_iq_tile_to_q8_0_32(ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
                                         int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real,
                                         uint8_t * tile, float * deq_block) {
+        const bool profile_pack = ime2_cache_profile_enabled();
+        const int64_t pack_start_us = profile_pack ? ggml_time_us() : 0;
+        uint64_t direct_rows = 0;
+        uint64_t fallback_rows = 0;
         const int64_t k_blks = spacemit_kernels::div_round_up(ne00, (int64_t) 32);
         const size_t b_blk_stride = IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32;
         const int64_t type_blck = ggml_blck_size(type);
@@ -1907,8 +1921,10 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         for (int64_t ci = 0; ci < nb_real; ++ci) {
             const char * src0_row = src0_cur + (ni + ci) * nb01;
             if (pack_iq_tile_direct(type, src0_row, k_blks, ci, b_blk_stride, tile)) {
+                ++direct_rows;
                 continue;
             }
+            ++fallback_rows;
             for (int64_t k0 = 0; k0 < ne00; k0 += IQ_IME2_DECODE_BLOCK) {
                 const int64_t kn = std::min<int64_t>(IQ_IME2_DECODE_BLOCK, ne00 - k0);
                 GGML_ASSERT(kn % type_blck == 0);
@@ -1923,6 +1939,14 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                     quantize_f32_to_q8_0_32(deq_block + block_k0, block_kn, scales + ci, qs + ci * 32);
                 }
             }
+        }
+        if (profile_pack) {
+            ime2_pack_calls_.fetch_add(1, std::memory_order_relaxed);
+            ime2_pack_direct_rows_.fetch_add(direct_rows, std::memory_order_relaxed);
+            ime2_pack_fallback_rows_.fetch_add(fallback_rows, std::memory_order_relaxed);
+            ime2_pack_us_.fetch_add(ggml_time_us() - pack_start_us, std::memory_order_relaxed);
+            ime2_pack_input_bytes_.fetch_add(ggml_row_size(type, ne00) * nb_real, std::memory_order_relaxed);
+            ime2_pack_output_bytes_.fetch_add((size_t) k_blks * b_blk_stride, std::memory_order_relaxed);
         }
     }
 

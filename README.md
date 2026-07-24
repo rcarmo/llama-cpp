@@ -89,7 +89,7 @@ cmake --build build -j"$(nproc)"
 
 ### K3 optimisation progress
 
-The table records the state verified on a Milk-V K3 as of 22 July 2026. `Default` means the path is active without an experimental environment variable.
+The table records the state verified on a Milk-V K3 through 24 July 2026. `Default` means the path is active without an experimental environment variable.
 
 | Area | Implementation and evidence | Measured result | State |
 |---|---|---:|---|
@@ -102,7 +102,7 @@ The table records the state verified on a Milk-V K3 as of 22 July 2026. `Default
 | Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
 | Qwen matrix campaign, 20 July | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance on the campaign corpus | Historical benchmark |
 | Qwen live service, 22 July | Q4_K_M, draft maximum 1, eight threads, batch 2,048, microbatch 512, one 4K slot | 7.86 generation tok/s across five varied prompts; 77.4% draft acceptance | Live default |
-| Qwen Q4 16K test, 23 July | Same Q4_K_M profile with one 16K slot | 7.05 tok/s at short context; 2.67 tok/s with 4,122 active tokens; 8.33 GiB available after load | Tested, not live default |
+| Qwen Q4 16K test, 23 July | Same Q4_K_M profile with one 16K slot | 7.05 tok/s at short context; new 4,122-token prefill ran at 6.42 tok/s and took 642 s; generation with that active context was 2.67 tok/s; 8.33 GiB available after load | Tested, not live default |
 | Qwen context/cache | 3,042-token README prompt and cached follow-up | 3,038 cached tokens reused; 54 new tokens processed | Live-verified |
 | Qwen recurrent state | GDN writes rollback snapshots directly into the strided recurrent-cache view, removing the second 8 MiB state copy | +8.33–8.99% in three paired runs; +5.05% across five prompts | Live default |
 | F32 dot reduction | LMUL=8 split and four-accumulator LMUL=4 variants tested at the dominant 128-element shape | 23–43% slower than the current RVV reduction | Rejected |
@@ -122,9 +122,13 @@ No experimental matrix or arithmetic kernel met the 2% end-to-end promotion thre
 | `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable the Q4_K/Q5_K m4 edge contract | Off |
 | `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense register-tiled i8×i8 m2 kernel | Off |
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1` | Pack compact-IQ routed-MoE tiles for IME2 and enable the bounded cross-request cache | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_BYTES=<bytes>` | Set the exact aggregate compact-IQ IME2 cache ceiling | Unset |
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` | Set one aggregate compact-IQ IME2 cache ceiling; `0` uses per-thread scratch packing | 64 MiB when the tile gate is on |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_ROUTES=<n>` | Require repeated expert routes before cache admission; diagnostic because tested thresholds regressed Qwen | `1` |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_LAYER_RESERVE_PCT=<0-100>` | Soft per-layer reserve inside the shared ceiling; used only with protected experts | `50` |
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT=<0-100>` | Reserve an optional protected expert pool inside the shared ceiling | `0` |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` | Emit aggregate cache hit, miss, promotion, demotion, eviction and byte telemetry | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` | Emit aggregate cache telemetry plus tile-pack calls, direct/fallback rows, pack time and staging bytes | Off |
+| `GGML_CPU_WHOLE_TOKEN_PROFILE=1` | Emit cumulative exit-time CPU operation/family totals with active-thread time and logical bytes; profiling adds per-node barriers | Off |
 | `GGML_CPU_RECURRENT_PROFILE=1` | Count CPU `DUP`/`CPY` buckets and time GDN/SSM shapes | Off |
 | `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly into the recurrent-cache view | Off in library; on in the Qwen service |
 

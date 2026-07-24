@@ -74,19 +74,21 @@ Three-token generation after one repeat:
 
 The recurrent working set exceeds 512 MiB. Short generations fit within 2 GiB, but longer expert-routing sequences expand the working set.
 
-### 16K context and sustained generation
+### Historical 16K context result — not an aggregate cache ceiling
 
 | Cache budget | Warm 16-token generation | Warm 64-token generation | Available memory after fill |
 |---:|---:|---:|---:|
 | 2 GiB | 0.585 tok/s | not run | 14.31 GiB |
 | 4 GiB | 1.069 tok/s | not run | 10.29 GiB |
-| 8 GiB per format trait (not an aggregate ceiling) | 4.356 tok/s | 2.429 tok/s | 6.29 GiB |
+| **Invalid as an aggregate 8 GiB comparison:** 8 GiB per format trait | 4.356 tok/s | 2.429 tok/s | 6.29 GiB |
 
 This profile successfully loaded at 16K context and reproduced after a complete server restart. Later telemetry found that each compact format trait owned a separate cache manager, so `CACHE_MB=8192` did not enforce an 8 GiB aggregate ceiling. The corrected shared-manager campaign supersedes this memory interpretation.
 
 Native MTP draft-1 did not help Q2: 2.380 tok/s warm over 64 tokens with 72% acceptance, versus 2.429 tok/s without speculation.
 
 ## Deployment decision
+
+> **Superseded:** this 22 July decision used per-format cache managers. The valid shared-ceiling result is the 23 July 14 GiB global tile-LRU profile at 3.58 tok/s. Q4_K_M remains the production default.
 
 The live Q4 service stays in production.
 
@@ -107,7 +109,7 @@ It provides four times the current live context, but its cache budget was applie
 
 ## Further optimisation options
 
-Eviction churn limits sustained Q2 generation. Equal fixed per-layer budgets were tested after this campaign and regressed warm 64-token generation to 0.50–0.57 tok/s; [the experiment report](../qwen-compact-ime2-segmented-20260722/report.md) records the result. A future policy needs one byte ceiling shared across compact formats, soft layer reservations and global frequency-aware expert eviction.
+Eviction churn limits sustained Q2 generation. Equal fixed per-layer budgets were tested after this campaign and regressed warm 64-token generation to 0.50–0.57 tok/s; [the experiment report](../qwen-compact-ime2-segmented-20260722/report.md) records the result. The shared cross-format byte ceiling and soft layer metadata were implemented on 23 July. Global tile LRU is the default. Protected-expert pools and whole-expert eviction were tested and regressed Qwen, so they remain disabled rather than becoming the promoted policy.
 
 Other possible experiments are:
 

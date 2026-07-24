@@ -65,6 +65,17 @@ GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=direct  # bypass both TCM paths
 
 Forced TCM modes fall through to the direct scheduler when their capacity constraint is not met. This selector does not change arithmetic kernels or the separate MoE scheduler.
 
+
+### Whole-token profiling
+
+Use the opt-in aggregate profiler for short, isolated requests:
+
+```bash
+GGML_CPU_WHOLE_TOKEN_PROFILE=1 build-upstream/bin/llama-server ...
+```
+
+It emits cumulative process totals at exit for matrix, attention, recurrent, copy and other work, including node wall time, summed active-thread time, thread capacity, estimated idle/synchronization time and logical source/destination bytes. Profiling mode adds barriers at node boundaries to make wall measurements well-defined, so use separately measured unprofiled throughput for performance claims and use active-thread shares to locate dominant families. Fused nodes are attributed to the first operation in the fused pair. In a tiny 100-process fixture, profiler-enabled and disabled wall time was indistinguishable (36.633 s versus 36.640 s), but this does not bound enabled overhead on a model graph with many short nodes. The environment-unset path retains the original barrier schedule.
+
 ## Compact-IQ IME2 controls
 
 The compact-IQ routed-MoE path is separate from the standard matmul scheduler:
@@ -84,7 +95,11 @@ GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=0 \
   build-upstream/bin/test-spacemit-iq-moe-correctness 8
 ```
 
-The cache budget is in MiB. When the tile gate is enabled and the variable is unset, the budget is 64 MiB. Cache allocation failure uses per-thread scratch packing; it does not switch the current operation to RVV.
+`GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_BYTES` sets an exact byte ceiling and takes precedence over the MiB setting. The cache budget is shared across IQ2, IQ3 and IQ4 formats. `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_ROUTES`, `GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT` and `GGML_RISCV64_SPACEMIT_IQ_IME2_LAYER_RESERVE_PCT` expose diagnostic admission/protection policies; global tile LRU with a 0% protected pool is the default because tested protected-expert and whole-expert policies regressed Qwen.
+
+The cache profile now reports hits, misses, bypasses, admission/demotion/eviction counts and current/peak bytes. `pack_calls` counts pack-function invocations; `pack_direct_rows` and `pack_fallback_rows` count source rows; `pack_us` is pack-function wall time; `pack_input_bytes` is compact source-row storage consumed; and `pack_output_bytes` is the full Q8 tile-buffer footprint materialized per call, including unused row capacity in a partial tile. These fields separate direct compact block packing and float-fallback staging from IME2 matrix execution.
+
+When the tile gate is enabled and neither byte nor MiB ceiling is set, the budget is 64 MiB. Cache allocation failure uses per-thread scratch packing; it does not switch the current operation to RVV.
 
 Use `test-spacemit-iq-moe-correctness` before model tests. The current fixture covers IQ2_XS, IQ3_XXS, IQ4_XS and IQ4_NL at routed row counts 1, 2, 4, 5 and 8 with one and eight workers.
 

@@ -16,6 +16,8 @@ The compact-IQ fixture passed all 80 format/row/worker/gate combinations with `b
 
 ## Q2 service result
 
+> The historical 2.41 tok/s row below is invalid as an aggregate 8 GiB baseline: each compact format had its own manager. It is retained only to explain why segmentation was attempted.
+
 Model: `Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf`, 16K context, eight workers, `CACHE_MB=8192`. At this point each format trait still owned a separate manager, so this was not an aggregate 8 GiB ceiling.
 
 | Policy | Warm 64-token generation |
@@ -30,4 +32,4 @@ Telemetry also exposed a pre-existing accounting problem: the cache manager is s
 
 ## Decision
 
-Revert the equal-segment policy. A future implementation needs one cache manager shared across compact formats, soft layer reservations that can borrow unused global capacity, and global frequency-aware whole-expert eviction. The global LRU remains the better measured policy until that design is implemented and service-tested.
+Revert the equal-segment policy. The 23 July implementation replaced the four managers with one shared cross-format ceiling and retained global tile LRU. Soft layer reservations and expert metadata are available, but global whole-expert eviction and protected-pool policies regressed Qwen in service tests, so protection remains disabled by default.

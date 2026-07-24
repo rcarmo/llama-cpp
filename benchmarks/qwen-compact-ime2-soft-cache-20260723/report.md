@@ -60,6 +60,10 @@ The earlier report described 2.41 tok/s as an 8 GiB cache result. The cache stat
 
 ## Controls
 
+The default policy is one shared global tile LRU with `PROTECTED_PCT=0`. Expert protection is diagnostic only: tested 5% and 25% pools, plus whole-expert eviction, regressed Qwen.
+
+`GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` emits aggregate hit/miss/bypass/admission/demotion/eviction and byte telemetry. `pack_calls` counts pack invocations; `pack_direct_rows` and `pack_fallback_rows` count source rows; `pack_us` is pack-function wall time; `pack_input_bytes` is compact source storage consumed; and `pack_output_bytes` is the full Q8 tile-buffer footprint materialized, including unused capacity in partial tiles.
+
 | Variable | Meaning | Default |
 |---|---|---:|
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB` | Aggregate cache ceiling in MiB | 64 |
