@@ -1331,23 +1331,32 @@ void ggml_vec_dot_q8_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const voi
     float sumf = 0;
 
 #if defined(__AVX2__)
-    // Initialize accumulator with zeros
-    __m256 acc = _mm256_setzero_ps();
+    __m256 acc0 = _mm256_setzero_ps();
+    __m256 acc1 = _mm256_setzero_ps();
 
-    // Main loop
-    for (; ib < nb; ++ib) {
-        // Compute combined scale for the block
-        const __m256 d = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib].d) * GGML_CPU_FP16_TO_FP32(y[ib].d));
-        __m256i qx = _mm256_loadu_si256((const __m256i *)x[ib].qs);
-        __m256i qy = _mm256_loadu_si256((const __m256i *)y[ib].qs);
+    for (; ib + 1 < nb; ib += 2) {
+        const __m256i qx0 = _mm256_loadu_si256((const __m256i *) x[ib + 0].qs);
+        const __m256i qx1 = _mm256_loadu_si256((const __m256i *) x[ib + 1].qs);
+        const __m256i qy0 = _mm256_loadu_si256((const __m256i *) y[ib + 0].qs);
+        const __m256i qy1 = _mm256_loadu_si256((const __m256i *) y[ib + 1].qs);
 
-        const __m256 q = mul_sum_i8_pairs_float(qx, qy);
-
-        // Multiply q with scale and accumulate
-        acc = _mm256_fmadd_ps( d, q, acc );
+        const __m256 q0 = mul_sum_i8_pairs_float(qx0, qy0);
+        const __m256 q1 = mul_sum_i8_pairs_float(qx1, qy1);
+        const __m256 d0 = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib + 0].d) * GGML_CPU_FP16_TO_FP32(y[ib + 0].d));
+        const __m256 d1 = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib + 1].d) * GGML_CPU_FP16_TO_FP32(y[ib + 1].d));
+        acc0 = _mm256_fmadd_ps(d0, q0, acc0);
+        acc1 = _mm256_fmadd_ps(d1, q1, acc1);
     }
 
-    sumf = hsum_float_8(acc);
+    for (; ib < nb; ++ib) {
+        const __m256i qx = _mm256_loadu_si256((const __m256i *) x[ib].qs);
+        const __m256i qy = _mm256_loadu_si256((const __m256i *) y[ib].qs);
+        const __m256 q = mul_sum_i8_pairs_float(qx, qy);
+        const __m256 d = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib].d) * GGML_CPU_FP16_TO_FP32(y[ib].d));
+        acc0 = _mm256_fmadd_ps(d, q, acc0);
+    }
+
+    sumf = hsum_float_8(_mm256_add_ps(acc0, acc1));
 #elif defined(__AVX__)
     __m256 accum = _mm256_setzero_ps();
 
