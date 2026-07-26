@@ -63,4 +63,15 @@ claims.
 - `q4_1 x q8_1`: a similar direct two-block AVX2 unroll was also tried and
   reverted after the same focused microtest segfaulted. Treat q*_1/q8_1 offset
   kernels as a separate follow-up rather than a mechanical unroll target.
+## Current scope boundary
+
+The plain q*_0 AVX2 dot kernels with simple `q8_0` partners now have the
+K3/llamafile-style independent-accumulator unroll applied where it was a
+mechanical, testable change: `q4_0`, `q5_0`, and `q8_0`. Other inspected
+q8_0 partners such as `iq4_nl`, `mxfp4`, and `nvfp4` already use two-block
+AVX2 accumulator structure.
+
+Offset/min kernels with `q8_1` partners (`q4_1`, `q5_1`) are deliberately
+excluded from this pass after focused tests showed direct mechanical unrolls
+are unsafe.
 
