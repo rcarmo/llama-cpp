@@ -60,4 +60,7 @@ claims.
   the focused q4/q5/q8 dot microtest segfaulted. The offset/min contribution
   and q8_1 pairing make this path less mechanical than q4_0/q5_0/q8_0, so keep
   it paused until there is a narrower q5_1-specific debugger run and oracle.
+- `q4_1 x q8_1`: a similar direct two-block AVX2 unroll was also tried and
+  reverted after the same focused microtest segfaulted. Treat q*_1/q8_1 offset
+  kernels as a separate follow-up rather than a mechanical unroll target.
 
