@@ -434,7 +434,8 @@ extern "C" {
         GGML_TYPE_TURBO4_0 = 44, // TurboQuant 4-bit KV cache: WHT + 4-bit PolarQuant
         GGML_TYPE_TQ3_1S  = 45, // TurboQuant 3-bit weight: WHT-rotated 8-level Lloyd-Max, block_size=32
         GGML_TYPE_TQ4_1S  = 46, // TurboQuant 4-bit weight: WHT-rotated 16-level Lloyd-Max, block_size=32
-        GGML_TYPE_COUNT   = 47,
+        GGML_TYPE_Q2_0    = 47,
+        GGML_TYPE_COUNT   = 48,
     };
 
     // precision
@@ -478,6 +479,7 @@ extern "C" {
         GGML_FTYPE_MOSTLY_MXFP4   = 25, // except 1d tensors
         GGML_FTYPE_MOSTLY_NVFP4   = 26, // except 1d tensors
         GGML_FTYPE_MOSTLY_Q1_0    = 27, // except 1d tensors
+        GGML_FTYPE_MOSTLY_Q2_0    = 28, // except 1d tensors
     };
 
     // available tensor operations:
@@ -573,6 +575,7 @@ extern "C" {
         GGML_OP_RWKV_WKV7,
         GGML_OP_SOLVE_TRI,
         GGML_OP_GATED_DELTA_NET,
+        GGML_OP_LIGHTNING_INDEXER,
 
         GGML_OP_UNARY,
 
@@ -781,6 +784,10 @@ extern "C" {
     GGML_API bool ggml_is_contiguous_0(const struct ggml_tensor * tensor); // same as ggml_is_contiguous()
     GGML_API bool ggml_is_contiguous_1(const struct ggml_tensor * tensor); // contiguous for dims >= 1
     GGML_API bool ggml_is_contiguous_2(const struct ggml_tensor * tensor); // contiguous for dims >= 2
+
+    GGML_API bool ggml_is_contiguous_to_1(const struct ggml_tensor * tensor); // contiguous for dims < 1
+    GGML_API bool ggml_is_contiguous_to_2(const struct ggml_tensor * tensor); // contiguous for dims < 2
+    GGML_API bool ggml_is_contiguous_to_3(const struct ggml_tensor * tensor); // contiguous for dims < 3
 
     // returns whether the tensor elements are allocated as one contiguous block of memory (no gaps, but permutation ok)
     GGML_API bool ggml_is_contiguously_allocated(const struct ggml_tensor * tensor);
@@ -2577,6 +2584,24 @@ extern "C" {
             struct ggml_tensor  * beta,
             struct ggml_tensor  * state,
             int64_t               K);
+
+    // DSA lightning indexer
+    //
+    // q:       [n_embd_idx, n_head_idx, n_batch, ne3 ]
+    // k:       [n_embd_idx, 1,          n_kv,    ne3 ]
+    // weights: [n_head_idx, n_batch,    1,       ne3 ] !! prescaled !!
+    // mask:    [n_kv,       n_batch,    1,       ne33] !! f16 !!
+    // res:     [n_kv,       n_batch,    1,       ne3 ]
+    //
+    // broadcast:
+    //   ne3 % ne33 == 0
+    //
+    GGML_API struct ggml_tensor * ggml_lightning_indexer(
+        struct ggml_context * ctx,
+        struct ggml_tensor  * q,
+        struct ggml_tensor  * k,
+        struct ggml_tensor  * weights,
+        struct ggml_tensor  * mask);
 
     // custom operators
 
