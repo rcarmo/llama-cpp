@@ -54,3 +54,10 @@ for q4/q8 inference across this i7 and those low-power Intel chips.
 
 All timings are short, local microbenchmarks only; repeat before making broader
 claims.
+## Rejected/paused targets
+
+- `q5_1 x q8_1`: a direct two-block AVX2 unroll was tried and reverted after
+  the focused q4/q5/q8 dot microtest segfaulted. The offset/min contribution
+  and q8_1 pairing make this path less mechanical than q4_0/q5_0/q8_0, so keep
+  it paused until there is a narrower q5_1-specific debugger run and oracle.
+
