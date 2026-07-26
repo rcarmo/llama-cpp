@@ -57,6 +57,9 @@ int main() {
     if (int rc = test_dot(GGML_TYPE_Q4_0, GGML_TYPE_Q8_0, "q4_0*q8_0")) {
         return rc;
     }
+    if (int rc = test_dot(GGML_TYPE_Q5_0, GGML_TYPE_Q8_0, "q5_0*q8_0")) {
+        return rc;
+    }
     if (int rc = test_dot(GGML_TYPE_Q8_0, GGML_TYPE_Q8_0, "q8_0*q8_0")) {
         return rc;
     }
