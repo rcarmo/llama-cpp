@@ -42,6 +42,11 @@ for q4/q8 inference across this i7 and those low-power Intel chips.
 - Short `test-quantize-perf` q4_0 vec-dot run at 4096 values / 200 iterations:
   - baseline merge commit `69e55f3e5`: avg `3.38` cycles / 32 values
   - unrolled commit `7ae4202cd`: avg `2.98` cycles / 32 values
+  - delta: about `11.8%` fewer cycles per 32 values
+- Short `test-quantize-perf` q8_0 vec-dot run at 4096 values / 200 iterations:
+  - baseline merge commit `69e55f3e5`: avg `3.05` cycles / 32 values
+  - unrolled commit `3071e2772`: avg `2.52` cycles / 32 values
+  - delta: about `17.4%` fewer cycles per 32 values
 
 All timings are short, local microbenchmarks only; repeat before making broader
 claims.
