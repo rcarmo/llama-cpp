@@ -63,6 +63,10 @@ claims.
 - `q4_1 x q8_1`: a similar direct two-block AVX2 unroll was also tried and
   reverted after the same focused microtest segfaulted. Treat q*_1/q8_1 offset
   kernels as a separate follow-up rather than a mechanical unroll target.
+- `q1_0 x q8_0`: a two-block outer unroll passed the focused correctness test
+  but was reverted because the short 4096-value benchmark regressed from avg
+  `1.97` to `2.51` cycles / 32 values. Its existing inner four-q8-block
+  structure is already better than the attempted outer unroll on this i7.
 ## Current scope boundary
 
 The plain q*_0 AVX2 dot kernels with simple `q8_0` partners now have the
