@@ -90,3 +90,22 @@ Keeping these changes at AVX2+FMA preserves a wider baseline and avoids a second
 dispatch/debug matrix. A future VNNI pass should be separate and benchmarked on
 real N100/N95/U300 hardware rather than inferred from this i7 VM.
 
+
+## Repro commands
+
+Use short, spaced runs when validating on low-power systems:
+
+```bash
+# focused correctness oracle for the AVX2 q*_0 dot paths
+cmake --build build-simd-test --target test-q4-avx2-dot -j 2
+./build-simd-test/bin/test-q4-avx2-dot
+
+# short microbenchmarks used for the numbers above
+./build-simd-test/bin/test-quantize-perf --type q4_0 --op vec_dot_q --size 4096 --iterations 200
+./build-simd-test/bin/test-quantize-perf --type q5_0 --op vec_dot_q --size 4096 --iterations 200
+./build-simd-test/bin/test-quantize-perf --type q8_0 --op vec_dot_q --size 4096 --iterations 200
+```
+
+For N100/N95/U300 validation, run the same commands on the target host and
+record `lscpu` flags beside the results. Do not infer AVX-VNNI behavior from
+this i7 VM; add a separate VNNI-specific benchmark if a future patch uses it.
