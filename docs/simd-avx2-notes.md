@@ -1,11 +1,11 @@
 # SIMD AVX2 notes for q4/q8 CPU inference
 
-This branch keeps the first CPU SIMD change intentionally narrow: the AVX2
-`q4_0 x q8_0` dot-product kernel now processes two quant blocks per loop with
-independent `__m256` accumulators and defers the horizontal reduction. This is
-in the same spirit as the K3/llamafile-style kernels: keep independent register
-work live, reduce loop overhead, and avoid serial accumulator dependencies in
-the hot loop.
+This branch keeps the CPU SIMD changes intentionally narrow: the AVX2
+`q4_0 x q8_0`, `q5_0 x q8_0`, and `q8_0 x q8_0` dot-product kernels now
+process two quant blocks per loop with independent `__m256` accumulators and
+defer the horizontal reduction. This is in the same spirit as the
+K3/llamafile-style kernels: keep independent register work live, reduce loop
+overhead, and avoid serial accumulator dependencies in the hot loop.
 
 ## Local test CPU
 
