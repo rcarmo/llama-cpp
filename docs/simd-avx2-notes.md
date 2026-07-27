@@ -22,17 +22,20 @@ x86-64 target for this box without relying on AVX-512 or AMX.
 
 ## Alder Lake-N / N100 / N95 / U300 notes
 
-Public Intel specs for N100/N95/U300-class small-core parts indicate the same
-practical baseline for llama.cpp CPU quant kernels:
+Public Intel specs and the known Gracemont/Alder Lake-N feature set indicate
+the following practical baseline for llama.cpp CPU quant kernels:
 
-- AVX2 and FMA are available.
-- AVX-VNNI is commonly available on Alder Lake-N / related Gracemont parts, but
-  code should still keep AVX2 as the baseline because packaging/VM exposure can
-  differ.
-- AVX-512 and AMX should not be assumed.
+| Chip family | Likely core class | SIMD baseline to assume | Do not assume | Notes |
+|---|---|---|---|---|
+| Core i7-12700 local VM | Alder Lake P/E mix exposed through KVM | AVX2, FMA, F16C; local flags also expose AVX-VNNI | AVX-512, AMX | This is the measurement host. |
+| N100 | Alder Lake-N / Gracemont E-cores | AVX2, FMA; AVX-VNNI is commonly listed for Alder Lake-N | AVX-512, AMX | Low-power target; prefer AVX2 unless runtime dispatch proves VNNI. |
+| N95 | Alder Lake-N / Gracemont E-cores | AVX2, FMA; AVX-VNNI likely in the same class | AVX-512, AMX | Same optimization posture as N100. |
+| U300 | low-power Intel mobile class, often E-core heavy | AVX2 and FMA are the safe common denominator; AVX-VNNI may be present depending on stepping/exposure | AVX-512, AMX | Verify on real hardware before enabling any VNNI-specific path. |
 
 That makes AVX2 register blocking/unrolling the right first optimization layer
-for q4/q8 inference across this i7 and those low-power Intel chips.
+for q4/q8 inference across this i7 and those low-power Intel chips. The current
+code changes intentionally stop at AVX2+FMA and leave AVX-VNNI as a separate
+future dispatch path.
 
 ## Focused validation so far
 
