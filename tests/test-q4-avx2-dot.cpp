@@ -54,6 +54,9 @@ static int test_dot(ggml_type lhs, ggml_type rhs, const char * name) {
 
 int main() {
     ggml_cpu_init();
+    if (int rc = test_dot(GGML_TYPE_Q1_0, GGML_TYPE_Q8_0, "q1_0*q8_0")) {
+        return rc;
+    }
     if (int rc = test_dot(GGML_TYPE_Q4_0, GGML_TYPE_Q8_0, "q4_0*q8_0")) {
         return rc;
     }
