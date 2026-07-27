@@ -78,4 +78,12 @@ AVX2 accumulator structure.
 Offset/min kernels with `q8_1` partners (`q4_1`, `q5_1`) are deliberately
 excluded from this pass after focused tests showed direct mechanical unrolls
 are unsafe.
+## AVX-VNNI note
+
+This i7 exposes `avx_vnni`, and N100/N95/U300-class Intel parts often expose
+AVX-VNNI too. The tree already has AVX-VNNI/AVX512-VNNI usage in x86 repack
+kernels, but this pass deliberately did not add VNNI-specific q*_0 dot kernels.
+Keeping these changes at AVX2+FMA preserves a wider baseline and avoids a second
+dispatch/debug matrix. A future VNNI pass should be separate and benchmarked on
+real N100/N95/U300 hardware rather than inferred from this i7 VM.
 
