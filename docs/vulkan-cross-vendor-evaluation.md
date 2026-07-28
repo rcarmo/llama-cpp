@@ -195,3 +195,22 @@ test after installing the missing shader tools. Keep CUDA as the NVIDIA default.
 Use Vulkan as the cross-vendor deployment path, with runtime feature tiers and
 explicit device selection. Intel Xe is the strongest next validation target;
 ARM/Qualcomm should follow only on real hardware with driver and thermal data.
+
+## Memory audit findings
+
+The backend uses `VK_EXT_memory_budget` heap budget minus heap usage when
+available, caps maximum allocations/buffers from Vulkan maintenance properties,
+and supports `GGML_VK_FORCE_MAX_ALLOCATION_SIZE` / `GGML_VK_FORCE_MAX_BUFFER_SIZE`
+for driver workarounds. Oversized buffers throw explicit out-of-device-memory
+errors. Staging buffers grow on demand and are recreated when larger transfers
+are required.
+
+UMA is currently inferred from Vulkan integrated-GPU device type. On Intel Xe
+and ARM integrated GPUs, heap budget is shared system memory and must not be
+reported as dedicated VRAM. Deployment should cap allocation/offload based on
+budget headroom and system stability, not total heap size.
+
+Observed RTX 3060 peaks were 1,799 MiB at 4K context, 1,981 MiB at 32K, and
+1,831 MiB in full-offload llama-bench. Partial offload reached 1,342 MiB before
+a scheduler split-input assertion; this was not OOM. Full offload is therefore
+both simpler and more stable for this small model.
