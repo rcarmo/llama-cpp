@@ -39,9 +39,9 @@ future dispatch path.
 
 ## Focused validation so far
 
-- Added `test-q4-avx2-dot`, a q4-only correctness test that compares the q4/q8
+- Added `test-x86-quant-dot`, a q4-only correctness test that compares the q4/q8
   dot result against dequantized reference data for small and medium sizes.
-- `test-q4-avx2-dot` passed on the local AVX2 build.
+- `test-x86-quant-dot` passed on the local AVX2 build.
 - Short `test-quantize-perf` q4_0 vec-dot run at 4096 values / 200 iterations:
   - baseline merge commit `69e55f3e5`: avg `3.38` cycles / 32 values
   - unrolled commit `7ae4202cd`: avg `2.98` cycles / 32 values
@@ -107,8 +107,8 @@ Use short, spaced runs when validating on low-power systems:
 
 ```bash
 # focused correctness oracle for the AVX2 q*_0 dot paths
-cmake --build build-simd-test --target test-q4-avx2-dot -j 2
-./build-simd-test/bin/test-q4-avx2-dot
+cmake --build build-simd-test --target test-x86-quant-dot -j 2
+./build-simd-test/bin/test-x86-quant-dot
 
 # short microbenchmarks used for the numbers above
 ./build-simd-test/bin/test-quantize-perf --type q4_0 --op vec_dot_q --size 4096 --iterations 200
