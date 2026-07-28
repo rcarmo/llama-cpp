@@ -96,3 +96,12 @@ Recorded versions:
 
 `vulkaninfo --summary` lists RTX 3060 as GPU0 and llvmpipe as GPU1. Device pinning
 and software-ICD rejection remain mandatory.
+
+## Vulkan build profiles
+
+`tools/vulkan-build-profiles.sh` defines Release, validation/result-checking,
+and CUDA+Vulkan multi-backend configurations. Release was built with one job
+after exposing workspace-local SPIR-V headers; it completed in 410 seconds and
+raised one-minute load from 0.99 to 1.68. The live CUDA service remained on its
+original PID/configuration. Validation and multi profiles are configured and
+reserved for focused use rather than built eagerly, to limit CPU/energy cost.
