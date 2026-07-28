@@ -129,3 +129,22 @@ low-load samples for AVX2 q5_0/65,536 and VNNI q4_0/65,536.
 VNNI wins eight of nine cells. The only regression is q5_0 at the smallest
 4,096-value size; larger q5_0 rows improve 8–11%. For this i7, explicit VNNI is
 the preferred profile, while explicit AVX2 remains the portable fallback.
+
+## Bounded end-to-end CPU inference gate
+
+Fixed model and parameters: Gemma4 E2B Q4_0, 6 threads, `-ngl 0`, 128 prompt
+tokens, 32 generated tokens, one repetition. Runs were guarded to start below
+1.0 one-minute load.
+
+| Build | Prompt tok/s | Generation tok/s | Wall time | Start load | End load |
+|---|---:|---:|---:|---:|---:|
+| baseline `69e55f3e5` native | 182.56 | 18.32 | 5 s | 0.76 | 1.26 |
+| current explicit AVX2 | 125.99 | 20.85 | 7 s | 0.51 | 1.39 |
+| current explicit AVX2+VNNI | 185.00 | 24.09 | 4 s | 0.49 | 0.53 |
+
+Against the same current commit/profile construction, VNNI improves prompt
+throughput by 46.8% and generation throughput by 15.5% over explicit AVX2.
+The old native baseline differs by commit/build composition, so its comparison
+is directional only: VNNI is +1.3% prompt and +31.5% generation versus that
+single baseline sample. These bounded one-repetition numbers are not confidence
+intervals, but the VNNI advantage over explicit AVX2 is large enough to retain.
