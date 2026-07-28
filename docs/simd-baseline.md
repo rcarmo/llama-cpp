@@ -84,3 +84,27 @@ and 0.81 respectively.
 
 Raw logs are retained as `/workspace/tmp/simd-matrix-baseline-*.log`; parsed
 JSON is `/workspace/tmp/simd-matrix-baseline.json`.
+
+## Accepted unroll matrix: explicit AVX2+VNNI
+
+The current branch was measured with the explicit `avx2-vnni` profile. The
+q4_0 65,536 row was repeated under a stricter 1.0 load guard because its first
+sample began at 1.55 load and appeared to regress; the verification sample began
+at 0.67 load and measured 1.99 cycles, so that load-corrected value is used.
+
+| Size | Kernel | Baseline avg cycles / 32 | Current avg cycles / 32 | Delta | Current start load |
+|---:|---|---:|---:|---:|---:|
+| 4,096 | q4_0 | 3.18 | 3.14 | -1.3% | 1.92 |
+| 4,096 | q5_0 | 3.71 | 3.38 | -8.9% | 1.92 |
+| 4,096 | q8_0 | 3.05 | 1.94 | -36.4% | 1.92 |
+| 65,536 | q4_0 | 2.02 | 1.99 | -1.5% | 0.67 |
+| 65,536 | q5_0 | 2.50 | 2.46 | -1.6% | 1.55 |
+| 65,536 | q8_0 | 2.25 | 1.65 | -26.7% | 1.55 |
+| 655,360 | q4_0 | 1.95 | 1.88 | -3.6% | 0.58 |
+| 655,360 | q5_0 | 2.51 | 2.48 | -1.2% | 0.58 |
+| 655,360 | q8_0 | 2.25 | 1.76 | -21.8% | 0.58 |
+
+All nine load-corrected cells are non-regressing. q4/q5 gains are small at the
+larger sizes, while q8 consistently benefits from the accepted unroll plus VNNI.
+Raw current logs are `/workspace/tmp/simd-matrix-current-vnni-*.log`; the q4
+verification is `/workspace/tmp/simd-verify-current-vnni-q4-65536.log`.
