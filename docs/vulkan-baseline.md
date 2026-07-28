@@ -78,3 +78,21 @@ no historical CUDA throughput value is inferred from the idle service.
   wall time, backend logs, selected device, and unsupported-op/fallback warnings.
 - Defer tests when unrelated GPU compute is active or when one-minute CPU load
   exceeds the configured threshold.
+
+## Workspace-local build toolchain
+
+No system packages were changed. Debian packages were downloaded and extracted
+to `/workspace/.local/vulkan-toolchain`; source
+`tools/vulkan-toolchain-env.sh` before configuring.
+
+Recorded versions:
+
+- glslc/shaderc: 2023.8-1build1
+- bundled glslang: 14.0.0-2
+- glslc SPIR-V Tools: 2023.6~rc1-2
+- standalone SPIR-V Tools: 2025.1
+- vulkaninfo/loader headers: 1.3.275
+- NVIDIA Vulkan driver: 580.173.02, device API 1.4.312
+
+`vulkaninfo --summary` lists RTX 3060 as GPU0 and llvmpipe as GPU1. Device pinning
+and software-ICD rejection remain mandatory.
