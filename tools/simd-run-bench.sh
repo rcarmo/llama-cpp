@@ -8,7 +8,7 @@ max_load=${4:-2.0}
 iterations=${SIMD_BENCH_ITERATIONS:-200}
 
 read -r load1 _ </proc/loadavg
-if ! awk -v load="$load1" -v max="$max_load" 'BEGIN { exit !(load <= max) }'; then
+if ! awk -v current_load="$load1" -v max_load="$max_load" 'BEGIN { exit !(current_load <= max_load) }'; then
   echo "refusing benchmark: 1-minute load $load1 exceeds limit $max_load" >&2
   exit 75
 fi
