@@ -105,3 +105,16 @@ after exposing workspace-local SPIR-V headers; it completed in 410 seconds and
 raised one-minute load from 0.99 to 1.68. The live CUDA service remained on its
 original PID/configuration. Validation and multi profiles are configured and
 reserved for focused use rather than built eagerly, to limit CPU/energy cost.
+
+## Device enumeration findings
+
+The built backend exposes only `Vulkan0: NVIDIA GeForce RTX 3060`; llvmpipe is
+filtered from llama.cpp enumeration. Invalid `GGML_VK_VISIBLE_DEVICES` values
+still make `llama-bench --list-devices` exit 0 with `(none)`, so
+`tools/vulkan-require-device.sh` adds the required fail-closed output check.
+
+llama.cpp reports `int dot: 0` on this RTX 3060 even though the raw feature bit
+and extension are present. The backend additionally requires
+`integerDotProduct4x8BitPackedSignedAccelerated`; this driver/device does not
+report that acceleration property. Capability tiers must therefore use the
+backend-qualified acceleration flag, not extension presence alone.
