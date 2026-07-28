@@ -118,3 +118,25 @@ and extension are present. The backend additionally requires
 `integerDotProduct4x8BitPackedSignedAccelerated`; this driver/device does not
 report that acceleration property. Capability tiers must therefore use the
 backend-qualified acceleration flag, not extension presence alone.
+
+## Correctness and fixed-model smoke
+
+A bounded common-op suite on Vulkan0 tested MUL_MAT, MUL_MAT_ID,
+FLASH_ATTN_EXT, RMS_NORM, ROPE, SOFT_MAX, and CPY with one worker:
+
+- supported cases passed: 7,421 / 7,421
+- correctness mismatches: 0
+- unsupported parameter cases: 1,152
+  - MUL_MAT: 504
+  - FLASH_ATTN_EXT: 340
+  - CPY: 308
+
+Unsupported cases are explicit rather than silent correctness failures, but a
+model can still incur CPU fallback/synchronization when it uses one of those
+shape/type combinations.
+
+The fixed Gemma4 E2B Q4_0 model loaded and ran with full Vulkan offload. One
+bounded sample measured 3,049.73 prompt tok/s and 131.35 generation tok/s. The
+run took 7 seconds. Start/end telemetry was 428 MiB idle allocation, 14.77/57 W,
+54/57 C; point snapshots missed peak benchmark VRAM, so subsequent performance
+runs use an interval sampler.
