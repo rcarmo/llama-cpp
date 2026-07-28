@@ -166,3 +166,21 @@ The 4K request includes first-use shader/pipeline compilation and is not
 comparable as steady-state throughput. The 32K request reused the compiled
 pipeline. Both contexts are viable; the useful result is memory/stability, not
 a claim that 32K is intrinsically faster than 4K.
+
+## Same-commit CUDA versus Vulkan
+
+A CUDA+Vulkan multi-backend build at the same source revision used identical
+model and benchmark settings.
+
+| Backend | Prompt tok/s | Generation tok/s | Peak VRAM | Peak GPU | Peak power | Peak temp |
+|---|---:|---:|---:|---:|---:|---:|
+| Vulkan0 | 3,070.42 | 132.81 | 1,831 MiB | 96% | 65.91 W | 60 C |
+| CUDA0 | 3,522.81 | 153.38 | 1,836 MiB | 98% | 62.50 W | 62 C |
+
+CUDA is 14.7% faster for prompt processing and 15.5% faster for generation,
+with essentially identical memory use and power. CUDA remains the preferred
+NVIDIA backend. Vulkan is nevertheless viable and fast enough to serve as the
+portable Intel/ARM path.
+
+The multi-backend build itself took 1,823 seconds (30.4 minutes) with one build
+job, so it should not be rebuilt routinely.
