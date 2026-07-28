@@ -148,3 +148,22 @@ The old native baseline differs by commit/build composition, so its comparison
 is directional only: VNNI is +1.3% prompt and +31.5% generation versus that
 single baseline sample. These bounded one-repetition numbers are not confidence
 intervals, but the VNNI advantage over explicit AVX2 is large enough to retain.
+
+## Portable CPU dispatch audit
+
+llama.cpp already provides a portable x86 dispatch build through
+`GGML_BACKEND_DL=ON` plus `GGML_CPU_ALL_VARIANTS=ON`. Each CPU backend exports a
+score function. A variant returns score 0 when CPUID lacks any feature it was
+compiled for; the backend loader selects the highest-scoring supported variant.
+
+Relevant predefined variants include:
+
+- `haswell`: AVX2/FMA/F16C fallback without AVX-VNNI.
+- `alderlake`: AVX2/FMA/F16C plus AVX-VNNI.
+
+The profile helper now exposes `dispatch` configuration. This is the preferred
+portable deployment shape for mixed N100/N95/U300 fleets. Direct `avx2-vnni`
+binaries remain appropriate only when deployment guarantees AVX-VNNI support.
+The existing x86 scorer has a FIXME about checking OS state separately from
+CPUID, so production rollout should still smoke-test the selected variant on
+each target class.

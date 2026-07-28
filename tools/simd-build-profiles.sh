@@ -17,8 +17,12 @@ case "$profile" in
     build="$root/build-simd-native"
     opts=(-DGGML_NATIVE=ON -DGGML_AVX_VNNI=OFF)
     ;;
+  dispatch)
+    build="$root/build-simd-dispatch"
+    opts=(-DGGML_NATIVE=OFF -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DBUILD_SHARED_LIBS=ON)
+    ;;
   *)
-    echo "usage: $0 {avx2|avx2-vnni|native} [configure-only|build]" >&2
+    echo "usage: $0 {avx2|avx2-vnni|native|dispatch} [configure-only|build]" >&2
     exit 2
     ;;
 esac
