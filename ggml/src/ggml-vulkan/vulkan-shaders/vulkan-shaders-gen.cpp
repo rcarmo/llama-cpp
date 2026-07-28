@@ -725,11 +725,7 @@ void process_shaders() {
         true, false, true, false);
 #endif
 
-    std::map<std::string, std::string> base_dict = {
-        {"FLOAT_TYPE", "float"},
-        {"FLOAT_TYPEV2", "vec2"},
-        {"MMVQ_UNROLL", std::to_string(GGML_VULKAN_MMVQ_UNROLL)},
-    };
+    std::map<std::string, std::string> base_dict = {{"FLOAT_TYPE", "float"}, {"FLOAT_TYPEV2", "vec2"}};
 
     for (const auto& tname : type_names) {
         // mul mat vec
