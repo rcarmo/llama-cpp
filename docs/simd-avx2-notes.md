@@ -84,11 +84,21 @@ are unsafe.
 ## AVX-VNNI note
 
 This i7 exposes `avx_vnni`, and N100/N95/U300-class Intel parts often expose
-AVX-VNNI too. The tree already has AVX-VNNI/AVX512-VNNI usage in x86 repack
-kernels, but this pass deliberately did not add VNNI-specific q*_0 dot kernels.
-Keeping these changes at AVX2+FMA preserves a wider baseline and avoids a second
-dispatch/debug matrix. A future VNNI pass should be separate and benchmarked on
-real N100/N95/U300 hardware rather than inferred from this i7 VM.
+AVX-VNNI too. The signed q*_0 dot helper already converts signed-byte operands
+to unsigned-absolute x signed form and routes through the AVX-VNNI
+`_mm256_dpbusd_avx_epi32` intrinsic when `__AVXVNNI__` is defined.
+
+The local `-march=native` build defines `__AVXVNNI__` even though the explicit
+`GGML_AVX_VNNI` CMake cache option is off. Disassembly confirms `vpdpbusd` plus
+`vfmadd231ps` inside the accepted `q4_0 x q8_0`, `q5_0 x q8_0`, and
+`q8_0 x q8_0` kernels. Therefore no additional VNNI helper patch is needed for
+this build: the AVX2 unrolls already benefit from VNNI where the compiler target
+supports it.
+
+For portable binaries, do not assume that `-march=native` on this i7 matches the
+actual N100/N95/U300 target. A future deployment pass should build on the real
+target or use llama.cpp's explicit CPU-feature dispatch and verify the emitted
+instructions there.
 
 
 ## Repro commands
