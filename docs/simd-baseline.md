@@ -49,3 +49,17 @@ Measured at baseline commit `69e55f3e5`:
 | Generation, 32 tokens | 18.32 tok/s | 1.75 s | 0.76 / 0.64 / 0.57 | 1.26 / 0.75 / 0.61 |
 
 The complete command process took 5 seconds. Raw JSON and load snapshots are retained under `/workspace/tmp/simd-baseline-llama-bench.json` and `/workspace/tmp/simd-baseline-llama-bench-load.txt`. Single-repetition numbers are intentionally bounded and should be treated as directional, not confidence intervals.
+
+## Explicit CPU build profiles
+
+The reproducible profile scripts are `tools/simd-build-profiles.sh` and
+`tools/simd-inspect-profile.sh`.
+
+| Profile | Effective flags | Quant-dot instructions | Build duration | Load change (1m) |
+|---|---|---|---:|---:|
+| `avx2` | `-mavx -mavx2 -mfma -mf16c`, VNNI off | `vpmaddubsw`, `vpmaddwd`, `vfmadd231ps` | 47 s | 0.57 → 1.46 |
+| `avx2-vnni` | AVX2 flags plus `-mavxvnni` | `vpdpbusd`, `vfmadd231ps` | 49 s | 0.53 → 1.41 |
+| `native` | `-march=native` | `vpdpbusd`, `vfmadd231ps` | 50 s | 0.45 → 1.39 |
+
+Raw build and disassembly reports are retained under
+`/workspace/tmp/simd-build-*.log` and `/workspace/tmp/simd-inspect-*.txt`.
