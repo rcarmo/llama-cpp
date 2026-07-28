@@ -140,3 +140,29 @@ bounded sample measured 3,049.73 prompt tok/s and 131.35 generation tok/s. The
 run took 7 seconds. Start/end telemetry was 428 MiB idle allocation, 14.77/57 W,
 54/57 C; point snapshots missed peak benchmark VRAM, so subsequent performance
 runs use an interval sampler.
+
+## Bounded RTX 3060 performance baseline
+
+All runs use the same Vulkan Release build and Gemma4 E2B Q4_0 model.
+
+| Mode | Prompt tok/s | Generation tok/s | Peak VRAM | Peak GPU | Peak power | Peak temp |
+|---|---:|---:|---:|---:|---:|---:|
+| CPU control (`-ngl 0`) | 44.11 | 9.59 | 439 MiB | 3% | 41.88 W | 54 C |
+| Partial (`-ngl 20`) | aborted | aborted | 1,342 MiB | 0% | 41.96 W | 54 C |
+| Full Vulkan (`-ngl 999`) | 3,070.42 | 132.81 | 1,831 MiB | 96% | 65.91 W | 60 C |
+
+Partial offload aborts in `GGML_SCHED_MAX_SPLIT_INPUTS`; it is a scheduler
+partitioning limitation for this Gemma4 graph, not an OOM condition. Full
+offload is the valid Vulkan mode for this model on the RTX 3060.
+
+Short-lived server smoke tests also succeeded:
+
+| Context | Prompt tok/s | Generation tok/s | Peak VRAM | Peak power | Peak temp |
+|---:|---:|---:|---:|---:|---:|
+| 4K | 18.48 | 51.02 | 1,799 MiB | 42.58 W | 53 C |
+| 32K | 346.02 | 126.39 | 1,981 MiB | 64.00 W | 57 C |
+
+The 4K request includes first-use shader/pipeline compilation and is not
+comparable as steady-state throughput. The 32K request reused the compiled
+pipeline. Both contexts are viable; the useful result is memory/stability, not
+a claim that 32K is intrinsically faster than 4K.
