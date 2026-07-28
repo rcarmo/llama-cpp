@@ -63,3 +63,24 @@ The reproducible profile scripts are `tools/simd-build-profiles.sh` and
 
 Raw build and disassembly reports are retained under
 `/workspace/tmp/simd-build-*.log` and `/workspace/tmp/simd-inspect-*.txt`.
+
+## Three-size baseline matrix
+
+Each row uses 200 iterations and was load-guarded at a maximum 1-minute load of
+2.0. The first 4096 run started at 1.65 load; the larger rows started at 0.82
+and 0.81 respectively.
+
+| Size | Kernel | Avg cycles / 32 values | Quantized throughput |
+|---:|---|---:|---:|
+| 4,096 | q4_0 | 3.18 | 8.58 GB/s |
+| 4,096 | q5_0 | 3.71 | 9.54 GB/s |
+| 4,096 | q8_0 | 3.05 | 18.01 GB/s |
+| 65,536 | q4_0 | 2.02 | 17.21 GB/s |
+| 65,536 | q5_0 | 2.50 | 16.92 GB/s |
+| 65,536 | q8_0 | 2.25 | 29.02 GB/s |
+| 655,360 | q4_0 | 1.95 | 18.08 GB/s |
+| 655,360 | q5_0 | 2.51 | 17.21 GB/s |
+| 655,360 | q8_0 | 2.25 | 29.69 GB/s |
+
+Raw logs are retained as `/workspace/tmp/simd-matrix-baseline-*.log`; parsed
+JSON is `/workspace/tmp/simd-matrix-baseline.json`.
