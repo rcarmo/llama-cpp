@@ -206,3 +206,19 @@ about 56–65% in MUL_MAT_VEC; RMS_NORM_MUL is the next visible cost. This makes
 quantized matvec the portable latency target and prompt cooperative-matrix GEMM
 a lower-priority target. Full-model logs showed no steady-state fallback
 warnings; unsupported cases remain shape/type-specific correctness inventory.
+
+## Tunney-style unroll experiment result
+
+An isolated compile-time q4 matvec K-loop unroll experiment increased the
+existing factor from 4 to 8. It passed 15/15 supported q4_0 n=1 correctness
+cases, but bounded end-to-end results rejected it:
+
+- prompt: 3,070.42 -> 3,070.81 tok/s (+0.01%, noise)
+- generation: 132.81 -> 128.45 tok/s (-3.28%)
+- peak VRAM: unchanged at 1,831 MiB
+- peak power: 65.91 -> 70.94 W
+
+The likely cause is higher register pressure/instruction footprint outweighing
+additional loop-level parallelism. The experiment was reverted; the default
+4-way unroll remains. This demonstrates that CPU-style deeper unrolling does
+not transfer automatically to Vulkan shaders.
