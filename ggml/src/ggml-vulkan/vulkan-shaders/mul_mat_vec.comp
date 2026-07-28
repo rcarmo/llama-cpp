@@ -161,7 +161,10 @@ void compute_outputs(const uint32_t first_row, const uint32_t num_rows) {
     if (num_iters * K_PER_ITER * BLOCK_SIZE + K_PER_ITER*tid < p.ncols) {
         num_iters++;
     }
-    int unroll_count = 4;
+#ifndef MMVQ_UNROLL
+#define MMVQ_UNROLL 4
+#endif
+    int unroll_count = MMVQ_UNROLL;
     uint unrolled_iters = num_iters & ~(unroll_count - 1);
 
     uint i = 0;

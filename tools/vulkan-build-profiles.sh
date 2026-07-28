@@ -23,6 +23,10 @@ case "$profile" in
     build="$root/build-vulkan-release"
     opts=()
     ;;
+  release-unroll8)
+    build="$root/build-vulkan-release-unroll8"
+    opts=(-DGGML_VULKAN_MMVQ_UNROLL=8)
+    ;;
   validation)
     build="$root/build-vulkan-validation"
     opts=(
@@ -40,7 +44,7 @@ case "$profile" in
     )
     ;;
   *)
-    echo "usage: $0 {release|validation|multi} [configure-only|build]" >&2
+    echo "usage: $0 {release|release-unroll8|validation|multi} [configure-only|build]" >&2
     exit 2
     ;;
 esac
