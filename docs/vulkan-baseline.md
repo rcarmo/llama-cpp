@@ -184,3 +184,18 @@ portable Intel/ARM path.
 
 The multi-backend build itself took 1,823 seconds (30.4 minutes) with one build
 job, so it should not be rebuilt routinely.
+
+## Pipeline profile
+
+`GGML_VK_PERF_LOGGER=1` shows two distinct regimes:
+
+- prompt passes: about 46–47.5 ms, dominated by large q4_0 MUL_MAT cooperative-
+  matrix kernels plus FLASH_ATTN_EXT;
+- decode passes: about 8.9 ms, dominated by q4_0 MUL_MAT_VEC (~1.65 ms for the
+  largest sampled kernel) and fused RMS_NORM_MUL (~0.9 ms).
+
+The first portable Tunney-style target should therefore be q4_0 matvec/decode,
+not prompt GEMM: prompt already reaches roughly 21.5 TFLOP/s in sampled q4_0
+cooperative-matrix kernels, while decode remains latency-bound by matvec and
+normalization. Copy operations are a support/fallback concern but were not a
+leading steady-state timing cost in this profile.
