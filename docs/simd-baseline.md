@@ -108,3 +108,24 @@ All nine load-corrected cells are non-regressing. q4/q5 gains are small at the
 larger sizes, while q8 consistently benefits from the accepted unroll plus VNNI.
 Raw current logs are `/workspace/tmp/simd-matrix-current-vnni-*.log`; the q4
 verification is `/workspace/tmp/simd-verify-current-vnni-q4-65536.log`.
+
+## Explicit AVX2 versus AVX2+VNNI
+
+Both explicit profiles pass `test-x86-quant-dot`. Values below use corrected
+low-load samples for AVX2 q5_0/65,536 and VNNI q4_0/65,536.
+
+| Size | Kernel | AVX2 cycles / 32 | VNNI cycles / 32 | VNNI delta |
+|---:|---|---:|---:|---:|
+| 4,096 | q4_0 | 3.53 | 3.14 | -11.1% |
+| 4,096 | q5_0 | 3.03 | 3.38 | +11.6% |
+| 4,096 | q8_0 | 2.08 | 1.94 | -6.7% |
+| 65,536 | q4_0 | 2.22 | 1.99 | -10.4% |
+| 65,536 | q5_0 | 2.76 | 2.46 | -10.9% |
+| 65,536 | q8_0 | 1.83 | 1.65 | -9.8% |
+| 655,360 | q4_0 | 2.06 | 1.88 | -8.7% |
+| 655,360 | q5_0 | 2.70 | 2.48 | -8.1% |
+| 655,360 | q8_0 | 1.80 | 1.76 | -2.2% |
+
+VNNI wins eight of nine cells. The only regression is q5_0 at the smallest
+4,096-value size; larger q5_0 rows improve 8–11%. For this i7, explicit VNNI is
+the preferred profile, while explicit AVX2 remains the portable fallback.
