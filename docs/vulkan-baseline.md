@@ -199,3 +199,10 @@ not prompt GEMM: prompt already reaches roughly 21.5 TFLOP/s in sampled q4_0
 cooperative-matrix kernels, while decode remains latency-bound by matvec and
 normalization. Copy operations are a support/fallback concern but were not a
 leading steady-state timing cost in this profile.
+
+The corrected parser found 35 timing blocks. Prompt blocks are 46–47.5 ms and
+spend about 81% in MUL_MAT. Decode blocks are roughly 8.9–9.1 ms and spend
+about 56–65% in MUL_MAT_VEC; RMS_NORM_MUL is the next visible cost. This makes
+quantized matvec the portable latency target and prompt cooperative-matrix GEMM
+a lower-priority target. Full-model logs showed no steady-state fallback
+warnings; unsupported cases remain shape/type-specific correctness inventory.
