@@ -1,5 +1,7 @@
 # K3 compact-IQ MoE correctness — 2026-07-20
 
+> Historical fixture result: the 22 July campaign extended routed row coverage from 1, 4 and 5 to 1, 2, 4, 5 and 8, replaced full-row per-call packing with direct block packing and added bounded cache validation. See [the current compact-IQ IME2 report](qwen-compact-ime2-20260722/report.md).
+
 ## Fixture
 
 `test-spacemit-iq-moe-correctness` creates deterministic two-expert `MUL_MAT_ID` graphs with:
@@ -56,4 +58,4 @@ For each thread count:
 - Per-call IME2: 12 compact trace lines.
 - Persistent repack: 12 standard IME trace lines.
 
-This fixture is now the correctness gate for compact-IQ packing and crossover experiments.
+This fixture remains the correctness gate for compact-IQ packing and crossover experiments. The current gate covers 80 compact-IQ combinations: four formats, five routed-row counts, one/eight workers and IME2 off/on.

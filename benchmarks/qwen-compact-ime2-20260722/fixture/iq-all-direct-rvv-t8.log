@@ -1,0 +1,42 @@
+CPU_RISCV64_SPACEMIT: tcm is available, blk_size: 393216, blk_num: 8, is_fake_tcm: 0
+CPU_RISCV64_SPACEMIT: num_cores: 16, num_perfer_cores: 8, perfer_core_arch_id: a064, exclude_main_thread: 0, use_ime1: 0, use_ime2: 1, mem_backend: HPAGE, cpu_mask: ff00, aicpu_id_offset: 8
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q4_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+repack: repack tensor blk.0.ffn_gate_exps.weight with q5_K_32x32
+case type=q4_K tokens=1 threads=8 mode=0 plain_bytes=36864 alloc_bytes=40960 set_us=294 compute_us=26.033 bench_iters=30 max_abs=1.32837844 nmse=0.00399525647 bad=0/128
+case type=q4_K tokens=2 threads=8 mode=0 plain_bytes=36864 alloc_bytes=40960 set_us=777 compute_us=24.600 bench_iters=30 max_abs=1.28131092 nmse=0.0037231141 bad=0/256
+case type=q4_K tokens=4 threads=8 mode=0 plain_bytes=36864 alloc_bytes=40960 set_us=792 compute_us=26.067 bench_iters=30 max_abs=2.13257337 nmse=0.00592665067 bad=0/512
+case type=q4_K tokens=5 threads=8 mode=0 plain_bytes=36864 alloc_bytes=40960 set_us=773 compute_us=30.567 bench_iters=30 max_abs=1.73905659 nmse=0.00449464483 bad=0/640
+case type=q4_K tokens=8 threads=8 mode=0 plain_bytes=36864 alloc_bytes=40960 set_us=770 compute_us=35.233 bench_iters=30 max_abs=1.83528471 nmse=0.00378077018 bad=0/1024
+case type=q5_K tokens=1 threads=8 mode=0 plain_bytes=45056 alloc_bytes=47104 set_us=742 compute_us=25.433 bench_iters=30 max_abs=0.795628309 nmse=0.000822011143 bad=0/128
+case type=q5_K tokens=2 threads=8 mode=0 plain_bytes=45056 alloc_bytes=47104 set_us=737 compute_us=25.300 bench_iters=30 max_abs=0.73106575 nmse=0.00136524835 bad=0/256
+case type=q5_K tokens=4 threads=8 mode=0 plain_bytes=45056 alloc_bytes=47104 set_us=764 compute_us=29.300 bench_iters=30 max_abs=0.838698626 nmse=0.000913965712 bad=0/512
+case type=q5_K tokens=5 threads=8 mode=0 plain_bytes=45056 alloc_bytes=47104 set_us=741 compute_us=35.867 bench_iters=30 max_abs=0.773086548 nmse=0.000755105902 bad=0/640
+case type=q5_K tokens=8 threads=8 mode=0 plain_bytes=45056 alloc_bytes=47104 set_us=741 compute_us=41.033 bench_iters=30 max_abs=0.902901888 nmse=0.000900903217 bad=0/1024
+case type=iq2_xs tokens=1 threads=8 mode=0 plain_bytes=18944 alloc_bytes=18944 set_us=130 compute_us=107.067 bench_iters=30 max_abs=0.0812358856 nmse=1.47593193e-05 bad=0/128
+case type=iq2_xs tokens=2 threads=8 mode=0 plain_bytes=18944 alloc_bytes=18944 set_us=123 compute_us=184.133 bench_iters=30 max_abs=0.0888717771 nmse=1.61144428e-05 bad=0/256
+case type=iq2_xs tokens=4 threads=8 mode=0 plain_bytes=18944 alloc_bytes=18944 set_us=123 compute_us=343.033 bench_iters=30 max_abs=0.0896959305 nmse=1.52087994e-05 bad=0/512
+case type=iq2_xs tokens=5 threads=8 mode=0 plain_bytes=18944 alloc_bytes=18944 set_us=128 compute_us=410.167 bench_iters=30 max_abs=0.101867676 nmse=1.47280391e-05 bad=0/640
+case type=iq2_xs tokens=8 threads=8 mode=0 plain_bytes=18944 alloc_bytes=18944 set_us=124 compute_us=636.033 bench_iters=30 max_abs=0.0917918682 nmse=1.52611416e-05 bad=0/1024
+case type=iq3_xxs tokens=1 threads=8 mode=0 plain_bytes=25088 alloc_bytes=25088 set_us=118 compute_us=86.267 bench_iters=30 max_abs=0.0817303658 nmse=1.68980421e-05 bad=0/128
+case type=iq3_xxs tokens=2 threads=8 mode=0 plain_bytes=25088 alloc_bytes=25088 set_us=115 compute_us=145.267 bench_iters=30 max_abs=0.101387262 nmse=1.5186356e-05 bad=0/256
+case type=iq3_xxs tokens=4 threads=8 mode=0 plain_bytes=25088 alloc_bytes=25088 set_us=120 compute_us=269.800 bench_iters=30 max_abs=0.10374999 nmse=1.56475006e-05 bad=0/512
+case type=iq3_xxs tokens=5 threads=8 mode=0 plain_bytes=25088 alloc_bytes=25088 set_us=122 compute_us=332.367 bench_iters=30 max_abs=0.108250618 nmse=1.67085647e-05 bad=0/640
+case type=iq3_xxs tokens=8 threads=8 mode=0 plain_bytes=25088 alloc_bytes=25088 set_us=116 compute_us=518.533 bench_iters=30 max_abs=0.108027458 nmse=1.57899229e-05 bad=0/1024
+case type=iq4_xs tokens=1 threads=8 mode=0 plain_bytes=34816 alloc_bytes=34816 set_us=117 compute_us=69.100 bench_iters=30 max_abs=0.0739045143 nmse=1.6102301e-05 bad=0/128
+case type=iq4_xs tokens=2 threads=8 mode=0 plain_bytes=34816 alloc_bytes=34816 set_us=117 compute_us=111.167 bench_iters=30 max_abs=0.0944747925 nmse=1.65444272e-05 bad=0/256
+case type=iq4_xs tokens=4 threads=8 mode=0 plain_bytes=34816 alloc_bytes=34816 set_us=123 compute_us=202.367 bench_iters=30 max_abs=0.081182003 nmse=1.47323517e-05 bad=0/512
+case type=iq4_xs tokens=5 threads=8 mode=0 plain_bytes=34816 alloc_bytes=34816 set_us=122 compute_us=243.033 bench_iters=30 max_abs=0.0974721909 nmse=1.50104606e-05 bad=0/640
+case type=iq4_xs tokens=8 threads=8 mode=0 plain_bytes=34816 alloc_bytes=34816 set_us=120 compute_us=387.567 bench_iters=30 max_abs=0.0942283273 nmse=1.51007092e-05 bad=0/1024
+case type=iq4_nl tokens=1 threads=8 mode=0 plain_bytes=36864 alloc_bytes=36864 set_us=117 compute_us=301.800 bench_iters=30 max_abs=2.86102295e-06 nmse=3.2903791e-14 bad=0/128
+case type=iq4_nl tokens=2 threads=8 mode=0 plain_bytes=36864 alloc_bytes=36864 set_us=117 compute_us=577.867 bench_iters=30 max_abs=4.29153442e-06 nmse=2.74823736e-14 bad=0/256
+case type=iq4_nl tokens=4 threads=8 mode=0 plain_bytes=36864 alloc_bytes=36864 set_us=122 compute_us=1131.133 bench_iters=30 max_abs=3.81469727e-06 nmse=2.81765772e-14 bad=0/512
+case type=iq4_nl tokens=5 threads=8 mode=0 plain_bytes=36864 alloc_bytes=36864 set_us=123 compute_us=1408.267 bench_iters=30 max_abs=3.81469727e-06 nmse=2.37917652e-14 bad=0/640
+case type=iq4_nl tokens=8 threads=8 mode=0 plain_bytes=36864 alloc_bytes=36864 set_us=123 compute_us=2238.000 bench_iters=30 max_abs=4.76837158e-06 nmse=2.60936317e-14 bad=0/1024

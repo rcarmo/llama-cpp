@@ -54,6 +54,8 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
         ggml-cpu/ops.cpp
         ggml-cpu/recurrent-profile.h
         ggml-cpu/recurrent-profile.cpp
+        ggml-cpu/whole-token-profile.h
+        ggml-cpu/whole-token-profile.cpp
         )
 
     target_compile_features(${GGML_CPU_NAME} PRIVATE c_std_11 cxx_std_17)

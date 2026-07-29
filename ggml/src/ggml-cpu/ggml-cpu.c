@@ -12,6 +12,7 @@
 #include "binary-ops.h"
 #include "vec.h"
 #include "ops.h"
+#include "whole-token-profile.h"
 #include "ggml.h"
 #include "common.h"
 
@@ -3212,6 +3213,10 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
     GGML_PRINT_DEBUG("thread #%d compute-start cplan %p last-graph %d\n", state->ith, (const void *)cplan, state->last_graph);
 #endif
 
+    const bool whole_token_profile = ggml_cpu_whole_token_profile_enabled();
+    const int64_t graph_profile_start = whole_token_profile && state->ith == 0 ? ggml_cpu_whole_token_profile_time_us() : 0;
+    if (whole_token_profile && state->ith == 0) ggml_cpu_whole_token_profile_graph_begin();
+
     for (int node_n = 0; node_n < cgraph->n_nodes && atomic_load_explicit(&tp->abort, memory_order_relaxed) != node_n; node_n++) {
         struct ggml_tensor * node = cgraph->nodes[node_n];
 
@@ -3224,6 +3229,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
             continue;
         }
 
+        const int64_t node_profile_wall_start = whole_token_profile && state->ith == 0 ? ggml_cpu_whole_token_profile_time_us() : 0;
+        if (whole_token_profile) ggml_barrier(state->threadpool);
+        const int64_t node_profile_active_start = whole_token_profile ? ggml_cpu_whole_token_profile_time_us() : 0;
         // TODO: move fused-op detection into ggml_graph_plan so fusion decisions are made once at planning time
         // Try fused ops, fall back to normal compute
         const int n_fused = ggml_cpu_try_fuse_ops(cgraph, node_n, &params, cplan);
@@ -3233,13 +3241,21 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
             ggml_compute_forward(&params, node);
         }
 
+        if (whole_token_profile) {
+            ggml_cpu_whole_token_profile_node_active(node->op, ggml_cpu_whole_token_profile_time_us() - node_profile_active_start);
+        }
+
         if (state->ith == 0 && cplan->abort_callback &&
                 cplan->abort_callback(cplan->abort_callback_data)) {
             atomic_store_explicit(&tp->abort, node_n + 1, memory_order_relaxed);
             tp->ec    = GGML_STATUS_ABORTED;
         }
 
-        if (node_n + 1 < cgraph->n_nodes) {
+        if (whole_token_profile) {
+            ggml_barrier(state->threadpool);
+            if (state->ith == 0) ggml_cpu_whole_token_profile_node_wall(node, params.nth,
+                    ggml_cpu_whole_token_profile_time_us() - node_profile_wall_start);
+        } else if (node_n + 1 < cgraph->n_nodes) {
             ggml_barrier(state->threadpool);
         }
     }
@@ -3251,6 +3267,7 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
 #endif
 
     ggml_barrier(state->threadpool);
+    if (whole_token_profile && state->ith == 0) ggml_cpu_whole_token_profile_graph_end(graph_profile_start);
 
 #ifdef GGML_USE_CPU_RISCV64_SPACEMIT
     ggml_backend_cpu_riscv64_spacemit_clear_numa_thread_affinity_threaded(state->ith);

@@ -32,8 +32,15 @@
 #include <cstdio>  // for GGML_ASSERT
 #include <cstdlib>
 #include <cstring>
+#include <limits>
+#include <list>
+#include <memory>
+#include <mutex>
 #include <stdexcept>
+#include <string>
 #include <thread>
+#include <unordered_map>
+#include <vector>
 // clang-format off
 #if defined(__riscv)
 
@@ -1198,6 +1205,106 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS> class tensor_
 class tensor_traits_iq_compact : public tensor_traits_base {
     ggml_type type_;
 
+    struct ime2_tile_key {
+        const void * data;
+        uint64_t fingerprint;
+        int64_t ne00;
+        int64_t ne01;
+        int64_t nb01;
+        int64_t nb02;
+        int64_t expert;
+        int64_t row;
+        int64_t rows;
+
+        bool operator==(const ime2_tile_key & other) const {
+            return data == other.data && fingerprint == other.fingerprint && ne00 == other.ne00 &&
+                   ne01 == other.ne01 && nb01 == other.nb01 && nb02 == other.nb02 &&
+                   expert == other.expert && row == other.row && rows == other.rows;
+        }
+    };
+
+    struct ime2_tile_key_hash {
+        size_t operator()(const ime2_tile_key & key) const {
+            size_t h = std::hash<const void *>{}(key.data);
+            auto mix = [&h](uint64_t v) {
+                h ^= std::hash<uint64_t>{}(v) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
+            };
+            mix(key.fingerprint);
+            mix((uint64_t) key.ne00);
+            mix((uint64_t) key.ne01);
+            mix((uint64_t) key.nb01);
+            mix((uint64_t) key.nb02);
+            mix((uint64_t) key.expert);
+            mix((uint64_t) key.row);
+            mix((uint64_t) key.rows);
+            return h;
+        }
+    };
+
+    struct ime2_expert_key {
+        int64_t layer;
+        int64_t expert;
+
+        bool operator==(const ime2_expert_key & other) const {
+            return layer == other.layer && expert == other.expert;
+        }
+    };
+
+    struct ime2_expert_key_hash {
+        size_t operator()(const ime2_expert_key & key) const {
+            size_t h = std::hash<int64_t>{}(key.layer);
+            h ^= std::hash<int64_t>{}(key.expert) + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2);
+            return h;
+        }
+    };
+
+    using ime2_tile_queue = std::list<ime2_tile_key>;
+
+    struct ime2_tile_entry {
+        std::shared_ptr<std::vector<uint8_t>> data;
+        ime2_expert_key expert;
+        bool protected_queue = false;
+        ime2_tile_queue::iterator queue;
+    };
+
+    struct ime2_expert_entry {
+        uint64_t routes = 0;
+        uint64_t last_use = 0;
+        bool protected_queue = false;
+        size_t bytes = 0;
+        std::vector<ime2_tile_key> tiles;
+    };
+
+    struct ime2_layer_entry {
+        size_t protected_bytes = 0;
+    };
+
+    inline static std::mutex ime2_cache_mutex_;
+    inline static std::unordered_map<ime2_tile_key, ime2_tile_entry, ime2_tile_key_hash> ime2_cache_;
+    inline static std::unordered_map<ime2_expert_key, ime2_expert_entry, ime2_expert_key_hash> ime2_experts_;
+    inline static std::unordered_map<int64_t, ime2_layer_entry> ime2_layers_;
+    inline static std::unordered_map<std::string, std::pair<const void *, uint64_t>> ime2_tensor_identities_;
+    inline static ime2_tile_queue ime2_probationary_lru_;
+    inline static ime2_tile_queue ime2_protected_lru_;
+    inline static size_t ime2_cache_bytes_ = 0;
+    inline static size_t ime2_protected_bytes_ = 0;
+    inline static size_t ime2_cache_peak_bytes_ = 0;
+    inline static size_t ime2_cache_limit_ = 0;
+    inline static uint64_t ime2_cache_clock_ = 0;
+    inline static std::atomic<uint64_t> ime2_cache_hits_ {0};
+    inline static std::atomic<uint64_t> ime2_cache_misses_ {0};
+    inline static std::atomic<uint64_t> ime2_cache_bypasses_ {0};
+    inline static std::atomic<uint64_t> ime2_cache_admissions_ {0};
+    inline static std::atomic<uint64_t> ime2_cache_demotions_ {0};
+    inline static std::atomic<uint64_t> ime2_cache_evicted_tiles_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_calls_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_direct_rows_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_fallback_rows_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_us_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_input_bytes_ {0};
+    inline static std::atomic<uint64_t> ime2_pack_output_bytes_ {0};
+    inline static std::atomic<bool> ime2_cache_profile_reported_ {false};
+
     struct mmid_row_mapping {
         int32_t i1;
         int32_t i2;
@@ -1215,10 +1322,121 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
     }
 
-    static constexpr int64_t IQ_IME2_TILE_N = 32;
+    static size_t ime2_cache_limit() {
+        if (const char * bytes_v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_BYTES")) {
+            char * end = nullptr;
+            const unsigned long long bytes = std::strtoull(bytes_v, &end, 10);
+            if (end != bytes_v) {
+                return (size_t) bytes;
+            }
+        }
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB");
+        if (!v || !*v) {
+            return 64ULL << 20;
+        }
+        char * end = nullptr;
+        const unsigned long long mb = std::strtoull(v, &end, 10);
+        return end != v ? (size_t) mb << 20 : 0;
+    }
+
+    static bool ime2_cache_profile_enabled() {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE");
+        return v && !(std::strcmp(v, "0") == 0 || std::strcmp(v, "off") == 0 || std::strcmp(v, "false") == 0);
+    }
+
+    static uint64_t ime2_cache_admit_routes() {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_ROUTES");
+        if (!v || !*v) {
+            return 1;
+        }
+        char * end = nullptr;
+        const unsigned long long routes = std::strtoull(v, &end, 10);
+        return end != v ? std::max<uint64_t>(1, routes) : 1;
+    }
+
+    static size_t ime2_cache_protected_limit(size_t limit) {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT");
+        unsigned long long pct = 0;
+        if (v && *v) {
+            char * end = nullptr;
+            const unsigned long long parsed = std::strtoull(v, &end, 10);
+            if (end != v) {
+                pct = std::min<unsigned long long>(100, parsed);
+            }
+        }
+        return limit * pct / 100;
+    }
+
+    static size_t ime2_cache_layer_reserve(size_t protected_limit, size_t layer_count) {
+        const char * v = std::getenv("GGML_RISCV64_SPACEMIT_IQ_IME2_LAYER_RESERVE_PCT");
+        unsigned long long pct = 50;
+        if (v && *v) {
+            char * end = nullptr;
+            const unsigned long long parsed = std::strtoull(v, &end, 10);
+            if (end != v) {
+                pct = std::min<unsigned long long>(100, parsed);
+            }
+        }
+        return layer_count > 0 ? (protected_limit * pct / 100) / layer_count : 0;
+    }
+
+    static bool ime2_is_routing_projection(const ggml_tensor * src0) {
+        return std::strstr(src0->name, "ffn_gate_exps") != nullptr;
+    }
+
+    static int64_t ime2_tensor_layer(const ggml_tensor * src0) {
+        const char * blk = std::strstr(src0->name, "blk.");
+        if (!blk) {
+            return -1;
+        }
+        char * end = nullptr;
+        const long long layer = std::strtoll(blk + 4, &end, 10);
+        return end != blk + 4 ? (int64_t) layer : -1;
+    }
+
+    static uint64_t ime2_tensor_fingerprint(const ggml_tensor * src0) {
+        const auto * data = (const uint8_t *) src0->data;
+        const size_t row_size = ggml_row_size(src0->type, src0->ne[0]);
+        const size_t total_size = src0->ne[2] > 0 ? (size_t) src0->nb[2] * (src0->ne[2] - 1) +
+                                                  (size_t) src0->nb[1] * (src0->ne[1] - 1) + row_size : 0;
+        uint64_t hash = 1469598103934665603ULL;
+        const size_t sample = std::min<size_t>(32, total_size);
+        for (size_t i = 0; i < sample; ++i) {
+            hash = (hash ^ data[i]) * 1099511628211ULL;
+        }
+        for (size_t i = total_size - sample; i < total_size; ++i) {
+            hash = (hash ^ data[i]) * 1099511628211ULL;
+        }
+        return hash;
+    }
+
+    static constexpr int64_t IQ_IME2_TILE_N      = 32;
+    static constexpr int64_t IQ_IME2_DECODE_BLOCK = QK_K;
 
   public:
-    explicit constexpr tensor_traits_iq_compact(ggml_type type) : type_(type) {}
+    explicit tensor_traits_iq_compact(ggml_type type) : type_(type) {}
+
+    ~tensor_traits_iq_compact() override {
+        if (!ime2_cache_profile_enabled() || ime2_cache_profile_reported_.exchange(true)) {
+            return;
+        }
+        std::fflush(stdout);
+        flockfile(stderr);
+        std::fprintf(stderr,
+                "SPACEMIT_IQ_IME2_CACHE_PROFILE type=all hits=%" PRIu64 " misses=%" PRIu64
+                " bypasses=%" PRIu64 " admissions=%" PRIu64 " demotions=%" PRIu64
+                " evicted_tiles=%" PRIu64 " pack_calls=%" PRIu64 " pack_direct_rows=%" PRIu64
+                " pack_fallback_rows=%" PRIu64 " pack_us=%" PRIu64
+                " pack_input_bytes=%" PRIu64 " pack_output_bytes=%" PRIu64
+                " bytes=%zu protected_bytes=%zu peak_bytes=%zu layers=%zu experts=%zu tiles=%zu\n",
+                ime2_cache_hits_.load(), ime2_cache_misses_.load(), ime2_cache_bypasses_.load(),
+                ime2_cache_admissions_.load(), ime2_cache_demotions_.load(),
+                ime2_cache_evicted_tiles_.load(), ime2_pack_calls_.load(), ime2_pack_direct_rows_.load(),
+                ime2_pack_fallback_rows_.load(), ime2_pack_us_.load(), ime2_pack_input_bytes_.load(),
+                ime2_pack_output_bytes_.load(), ime2_cache_bytes_, ime2_protected_bytes_, ime2_cache_peak_bytes_,
+                ime2_layers_.size(), ime2_experts_.size(), ime2_cache_.size());
+        funlockfile(stderr);
+    }
 
     bool work_size(int n_threads, const ggml_tensor * op, size_t & size) override {
         if (op->op != GGML_OP_MUL_MAT_ID || op->src[0]->type != type_) {
@@ -1247,12 +1465,16 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             size += (size_t) n_threads * ime2_b_tile_size;
             size = GGML_PAD(size, sizeof(int64_t));
         }
-        // One fallback/decode row per compute thread, also used by the experimental IME2 tile packer.
-        size += (size_t) n_threads * (size_t) src0->ne[0] * sizeof(float);
+        // IME2 decodes one compact block at a time. The direct fallback still needs a full row
+        // for formats without a compact x Q8_K dot implementation (currently IQ4_NL).
+        const size_t decode_elems = use_ime2_tile ? (size_t) IQ_IME2_DECODE_BLOCK : (size_t) src0->ne[0];
+        size += (size_t) n_threads * decode_elems * sizeof(float);
         size = GGML_PAD(size, sizeof(int64_t));
         const int64_t n_as     = src0->ne[2];
         const int64_t max_rows = ids->ne[0] * ids->ne[1];
         size += n_as * sizeof(int64_t);
+        size = GGML_PAD(size, sizeof(int64_t));
+        size += n_as * sizeof(uint8_t);
         size = GGML_PAD(size, sizeof(int64_t));
         size += n_as * max_rows * sizeof(mmid_row_mapping);
         size = GGML_PAD(size, CACHE_LINE_SIZE);
@@ -1561,23 +1783,390 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         }
     }
 
-    static void pack_iq_tile_to_q8_0_32(ggml_to_float_t to_float, const char * src0_cur, int64_t nb01, int64_t ne00,
-                                        int64_t ni, int64_t nb_real, uint8_t * tile, float * deq_row) {
-        const int64_t k_blks = spacemit_kernels::div_round_up(ne00, (int64_t) 32);
-        const size_t b_blk_stride = IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32;
-        memset(tile, 0, (size_t) k_blks * b_blk_stride);
-        for (int64_t ci = 0; ci < nb_real; ++ci) {
-            const char * src0_row = src0_cur + (ni + ci) * nb01;
-            to_float(src0_row, deq_row, ne00);
+    static void quantize_iq4_codes_to_q8_0_32(float scale, const uint8_t * packed,
+                                               ggml_fp16_t * d, int8_t * qs) {
+        int max_code = 0;
+        for (int j = 0; j < 16; ++j) {
+            max_code = std::max(max_code, std::abs((int) kvalues_iq4nl[packed[j] & 0xf]));
+            max_code = std::max(max_code, std::abs((int) kvalues_iq4nl[packed[j] >> 4]));
+        }
+        if (scale == 0.0f || max_code == 0) {
+            *d = GGML_FP32_TO_FP16(0.0f);
+            memset(qs, 0, 32);
+            return;
+        }
+        *d = GGML_FP32_TO_FP16(std::fabs(scale) * max_code / 127.0f);
+        const float multiplier = std::copysign(127.0f / max_code, scale);
+        for (int j = 0; j < 16; ++j) {
+            qs[j]      = (int8_t) std::nearbyintf(kvalues_iq4nl[packed[j] & 0xf] * multiplier);
+            qs[j + 16] = (int8_t) std::nearbyintf(kvalues_iq4nl[packed[j] >> 4] * multiplier);
+        }
+    }
+
+    static void quantize_iq_codes_to_q8_0_32(float scale, const int8_t * codes,
+                                              ggml_fp16_t * d, int8_t * qs) {
+        int max_code = 0;
+        for (int j = 0; j < 32; ++j) {
+            max_code = std::max(max_code, std::abs((int) codes[j]));
+        }
+        if (scale == 0.0f || max_code == 0) {
+            *d = GGML_FP32_TO_FP16(0.0f);
+            memset(qs, 0, 32);
+            return;
+        }
+        *d = GGML_FP32_TO_FP16(std::fabs(scale) * max_code / 127.0f);
+        const float multiplier = std::copysign(127.0f / max_code, scale);
+        for (int j = 0; j < 32; ++j) {
+            qs[j] = (int8_t) std::nearbyintf(codes[j] * multiplier);
+        }
+    }
+
+    static bool pack_iq_tile_direct(ggml_type type, const char * row, int64_t k_blks, int64_t ci,
+                                    size_t b_blk_stride, uint8_t * tile) {
+        if (type == GGML_TYPE_IQ4_NL) {
+            const auto * blocks = (const block_iq4_nl *) row;
             for (int64_t kb = 0; kb < k_blks; ++kb) {
                 uint8_t * blk = tile + (size_t) kb * b_blk_stride;
                 auto * scales = (ggml_fp16_t *) blk;
                 auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
-                const int64_t k0 = kb * 32;
-                const int64_t kn = std::min<int64_t>(32, ne00 - k0);
-                quantize_f32_to_q8_0_32(deq_row + k0, kn, scales + ci, qs + ci * 32);
+                quantize_iq4_codes_to_q8_0_32(GGML_FP16_TO_FP32(blocks[kb].d), blocks[kb].qs,
+                                               scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ4_XS) {
+            const auto * blocks = (const block_iq4_xs *) row;
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq4_xs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const int ls = ((block.scales_l[ib / 2] >> 4 * (ib % 2)) & 0xf) |
+                               (((block.scales_h >> 2 * ib) & 3) << 4);
+                const float scale = GGML_FP16_TO_FP32(block.d) * (ls - 32);
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_iq4_codes_to_q8_0_32(scale, block.qs + 16 * ib, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ3_XXS) {
+            const auto * blocks = (const block_iq3_xxs *) row;
+            int8_t codes[32];
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq3_xxs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const uint8_t * q = block.qs + 8 * ib;
+                uint32_t aux32;
+                memcpy(&aux32, block.qs + QK_K / 4 + 4 * ib, sizeof(aux32));
+                for (int l = 0; l < 4; ++l) {
+                    const uint8_t signs = ksigns_iq2xs[(aux32 >> (7 * l)) & 127];
+                    const uint8_t * grid1 = (const uint8_t *) (iq3xxs_grid + q[2 * l]);
+                    const uint8_t * grid2 = (const uint8_t *) (iq3xxs_grid + q[2 * l + 1]);
+                    for (int j = 0; j < 4; ++j) {
+                        codes[8 * l + j] = (int8_t) (grid1[j] * (signs & kmask_iq2xs[j] ? -1 : 1));
+                        codes[8 * l + j + 4] = (int8_t) (grid2[j] * (signs & kmask_iq2xs[j + 4] ? -1 : 1));
+                    }
+                }
+                const float scale = GGML_FP16_TO_FP32(block.d) * (0.5f + (aux32 >> 28)) * 0.5f;
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_iq_codes_to_q8_0_32(scale, codes, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        if (type == GGML_TYPE_IQ2_XS) {
+            const auto * blocks = (const block_iq2_xs *) row;
+            float values[32];
+            for (int64_t kb = 0; kb < k_blks; ++kb) {
+                const block_iq2_xs & block = blocks[kb / (QK_K / 32)];
+                const int ib = kb % (QK_K / 32);
+                const float d = GGML_FP16_TO_FP32(block.d);
+                const float subscales[2] = {
+                    (0.5f + (block.scales[ib] & 0xf)) * 0.25f,
+                    (0.5f + (block.scales[ib] >> 4)) * 0.25f,
+                };
+                for (int l = 0; l < 4; ++l) {
+                    const uint16_t packed = block.qs[4 * ib + l];
+                    const uint8_t * grid = (const uint8_t *) (iq2xs_grid + (packed & 511));
+                    const uint8_t signs = ksigns_iq2xs[packed >> 9];
+                    for (int j = 0; j < 8; ++j) {
+                        values[8 * l + j] = d * subscales[l / 2] * grid[j] *
+                                            (signs & kmask_iq2xs[j] ? -1.0f : 1.0f);
+                    }
+                }
+                uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                auto * scales = (ggml_fp16_t *) blk;
+                auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                quantize_f32_to_q8_0_32(values, 32, scales + ci, qs + ci * 32);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static void pack_iq_tile_to_q8_0_32(ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
+                                        int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real,
+                                        uint8_t * tile, float * deq_block) {
+        const bool profile_pack = ime2_cache_profile_enabled();
+        const int64_t pack_start_us = profile_pack ? ggml_time_us() : 0;
+        uint64_t direct_rows = 0;
+        uint64_t fallback_rows = 0;
+        const int64_t k_blks = spacemit_kernels::div_round_up(ne00, (int64_t) 32);
+        const size_t b_blk_stride = IQ_IME2_TILE_N * sizeof(ggml_fp16_t) + IQ_IME2_TILE_N * 32;
+        const int64_t type_blck = ggml_blck_size(type);
+        const size_t type_size = ggml_type_size(type);
+        GGML_ASSERT(IQ_IME2_DECODE_BLOCK % type_blck == 0);
+        memset(tile, 0, (size_t) k_blks * b_blk_stride);
+        for (int64_t ci = 0; ci < nb_real; ++ci) {
+            const char * src0_row = src0_cur + (ni + ci) * nb01;
+            if (pack_iq_tile_direct(type, src0_row, k_blks, ci, b_blk_stride, tile)) {
+                ++direct_rows;
+                continue;
+            }
+            ++fallback_rows;
+            for (int64_t k0 = 0; k0 < ne00; k0 += IQ_IME2_DECODE_BLOCK) {
+                const int64_t kn = std::min<int64_t>(IQ_IME2_DECODE_BLOCK, ne00 - k0);
+                GGML_ASSERT(kn % type_blck == 0);
+                const char * src_block = src0_row + (k0 / type_blck) * type_size;
+                to_float(src_block, deq_block, kn);
+                for (int64_t block_k0 = 0; block_k0 < kn; block_k0 += 32) {
+                    const int64_t kb = (k0 + block_k0) / 32;
+                    uint8_t * blk = tile + (size_t) kb * b_blk_stride;
+                    auto * scales = (ggml_fp16_t *) blk;
+                    auto * qs = (int8_t *) (blk + IQ_IME2_TILE_N * sizeof(ggml_fp16_t));
+                    const int64_t block_kn = std::min<int64_t>(32, kn - block_k0);
+                    quantize_f32_to_q8_0_32(deq_block + block_k0, block_kn, scales + ci, qs + ci * 32);
+                }
             }
         }
+        if (profile_pack) {
+            ime2_pack_calls_.fetch_add(1, std::memory_order_relaxed);
+            ime2_pack_direct_rows_.fetch_add(direct_rows, std::memory_order_relaxed);
+            ime2_pack_fallback_rows_.fetch_add(fallback_rows, std::memory_order_relaxed);
+            ime2_pack_us_.fetch_add(ggml_time_us() - pack_start_us, std::memory_order_relaxed);
+            ime2_pack_input_bytes_.fetch_add(ggml_row_size(type, ne00) * nb_real, std::memory_order_relaxed);
+            ime2_pack_output_bytes_.fetch_add((size_t) k_blks * b_blk_stride, std::memory_order_relaxed);
+        }
+    }
+
+    static void reset_ime2_cache_locked(size_t limit) {
+        ime2_cache_.clear();
+        ime2_experts_.clear();
+        ime2_layers_.clear();
+        ime2_tensor_identities_.clear();
+        ime2_probationary_lru_.clear();
+        ime2_protected_lru_.clear();
+        ime2_cache_bytes_ = 0;
+        ime2_protected_bytes_ = 0;
+        ime2_cache_peak_bytes_ = 0;
+        ime2_cache_limit_ = limit;
+        ime2_cache_clock_ = 0;
+    }
+
+    static void touch_ime2_tile_locked(ime2_tile_entry & tile, const ime2_tile_key & key) {
+        ime2_tile_queue & queue = tile.protected_queue ? ime2_protected_lru_ : ime2_probationary_lru_;
+        queue.splice(queue.begin(), queue, tile.queue);
+        tile.queue = queue.begin();
+        auto expert_it = ime2_experts_.find(tile.expert);
+        if (expert_it != ime2_experts_.end()) {
+            expert_it->second.last_use = ++ime2_cache_clock_;
+        }
+        (void) key;
+    }
+
+    static void promote_ime2_expert_locked(const ime2_expert_key & key) {
+        auto expert_it = ime2_experts_.find(key);
+        if (expert_it == ime2_experts_.end() || expert_it->second.protected_queue) {
+            return;
+        }
+        expert_it->second.protected_queue = true;
+        for (const ime2_tile_key & tile_key : expert_it->second.tiles) {
+            auto tile_it = ime2_cache_.find(tile_key);
+            if (tile_it == ime2_cache_.end() || tile_it->second.protected_queue) {
+                continue;
+            }
+            ime2_probationary_lru_.erase(tile_it->second.queue);
+            ime2_protected_lru_.push_front(tile_key);
+            tile_it->second.queue = ime2_protected_lru_.begin();
+            tile_it->second.protected_queue = true;
+            ime2_protected_bytes_ += tile_it->second.data->size();
+            ime2_layers_[key.layer].protected_bytes += tile_it->second.data->size();
+        }
+        ime2_cache_admissions_.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    static bool demote_ime2_victim_locked(size_t protected_limit) {
+        const size_t reserve = ime2_cache_layer_reserve(protected_limit, ime2_layers_.size());
+        auto choose = [&](bool above_reserve) {
+            auto victim = ime2_experts_.end();
+            for (auto it = ime2_experts_.begin(); it != ime2_experts_.end(); ++it) {
+                if (!it->second.protected_queue || it->second.bytes == 0) {
+                    continue;
+                }
+                const auto layer_it = ime2_layers_.find(it->first.layer);
+                const bool layer_above = layer_it != ime2_layers_.end() && layer_it->second.protected_bytes > reserve;
+                if (above_reserve != layer_above) {
+                    continue;
+                }
+                if (victim == ime2_experts_.end() || it->second.routes < victim->second.routes ||
+                        (it->second.routes == victim->second.routes && it->second.last_use < victim->second.last_use)) {
+                    victim = it;
+                }
+            }
+            return victim;
+        };
+        auto victim = choose(true);
+        if (victim == ime2_experts_.end()) {
+            victim = choose(false);
+        }
+        if (victim == ime2_experts_.end()) {
+            return false;
+        }
+        victim->second.protected_queue = false;
+        for (const ime2_tile_key & tile_key : victim->second.tiles) {
+            auto tile_it = ime2_cache_.find(tile_key);
+            if (tile_it == ime2_cache_.end() || !tile_it->second.protected_queue) {
+                continue;
+            }
+            const size_t bytes = tile_it->second.data->size();
+            ime2_protected_lru_.erase(tile_it->second.queue);
+            ime2_probationary_lru_.push_front(tile_key);
+            tile_it->second.queue = ime2_probationary_lru_.begin();
+            tile_it->second.protected_queue = false;
+            ime2_protected_bytes_ -= std::min(ime2_protected_bytes_, bytes);
+            ime2_layers_[victim->first.layer].protected_bytes -=
+                    std::min(ime2_layers_[victim->first.layer].protected_bytes, bytes);
+        }
+        ime2_cache_demotions_.fetch_add(1, std::memory_order_relaxed);
+        return true;
+    }
+
+    static bool evict_ime2_probationary_tile_locked() {
+        if (ime2_probationary_lru_.empty()) {
+            return false;
+        }
+        const ime2_tile_key key = ime2_probationary_lru_.back();
+        auto tile_it = ime2_cache_.find(key);
+        ime2_probationary_lru_.pop_back();
+        if (tile_it == ime2_cache_.end()) {
+            return true;
+        }
+        const size_t bytes = tile_it->second.data->size();
+        auto expert_it = ime2_experts_.find(tile_it->second.expert);
+        if (expert_it != ime2_experts_.end()) {
+            expert_it->second.bytes -= std::min(expert_it->second.bytes, bytes);
+            auto & tiles = expert_it->second.tiles;
+            tiles.erase(std::remove(tiles.begin(), tiles.end(), key), tiles.end());
+        }
+        ime2_cache_bytes_ -= std::min(ime2_cache_bytes_, bytes);
+        ime2_cache_.erase(tile_it);
+        ime2_cache_evicted_tiles_.fetch_add(1, std::memory_order_relaxed);
+        return true;
+    }
+
+    static bool note_ime2_expert_route(const ime2_expert_key & key, const ggml_tensor * src0,
+                                       uint64_t fingerprint, size_t limit) {
+        if (limit == 0) {
+            return false;
+        }
+        std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+        if (ime2_cache_limit_ != limit) {
+            reset_ime2_cache_locked(limit);
+        }
+        const std::string tensor_name = src0->name;
+        auto identity = ime2_tensor_identities_.find(tensor_name);
+        if (identity != ime2_tensor_identities_.end() &&
+                (identity->second.first != src0->data || identity->second.second != fingerprint)) {
+            reset_ime2_cache_locked(limit);
+        }
+        ime2_tensor_identities_[tensor_name] = {src0->data, fingerprint};
+        ime2_layers_.try_emplace(key.layer);
+        ime2_expert_entry & expert = ime2_experts_[key];
+        if (ime2_is_routing_projection(src0)) {
+            expert.routes += 1;
+        }
+        expert.last_use = ++ime2_cache_clock_;
+        const size_t protected_limit = ime2_cache_protected_limit(limit);
+        if (protected_limit > 0 && !expert.protected_queue && expert.routes >= ime2_cache_admit_routes()) {
+            promote_ime2_expert_locked(key);
+        }
+        while (ime2_protected_bytes_ > protected_limit && demote_ime2_victim_locked(protected_limit)) {
+        }
+        return expert.protected_queue;
+    }
+
+    static std::shared_ptr<std::vector<uint8_t>> get_cached_iq_tile(
+            const ime2_tile_key & key, const ime2_expert_key & expert_key, bool protect,
+            ggml_type type, ggml_to_float_t to_float, const char * src0_cur,
+            int64_t nb01, int64_t ne00, int64_t ni, int64_t nb_real, size_t tile_size, float * deq_block) {
+        const size_t limit = ime2_cache_limit();
+        if (limit == 0 || tile_size > limit) {
+            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
+            return nullptr;
+        }
+        {
+            std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+            auto it = ime2_cache_.find(key);
+            if (it != ime2_cache_.end()) {
+                touch_ime2_tile_locked(it->second, key);
+                ime2_cache_hits_.fetch_add(1, std::memory_order_relaxed);
+                return it->second.data;
+            }
+        }
+        ime2_cache_misses_.fetch_add(1, std::memory_order_relaxed);
+
+        std::shared_ptr<std::vector<uint8_t>> packed;
+        try {
+            packed = std::make_shared<std::vector<uint8_t>>(tile_size);
+        } catch (const std::bad_alloc &) {
+            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
+            return nullptr;
+        }
+        pack_iq_tile_to_q8_0_32(type, to_float, src0_cur, nb01, ne00, ni, nb_real,
+                                packed->data(), deq_block);
+
+        std::lock_guard<std::mutex> lock(ime2_cache_mutex_);
+        auto existing = ime2_cache_.find(key);
+        if (existing != ime2_cache_.end()) {
+            touch_ime2_tile_locked(existing->second, key);
+            ime2_cache_hits_.fetch_add(1, std::memory_order_relaxed);
+            return existing->second.data;
+        }
+        const size_t protected_limit = ime2_cache_protected_limit(limit);
+        auto expert_it = ime2_experts_.find(expert_key);
+        protect = protect && expert_it != ime2_experts_.end() && expert_it->second.protected_queue;
+        while (ime2_protected_bytes_ + (protect ? tile_size : 0) > protected_limit &&
+               demote_ime2_victim_locked(protected_limit)) {
+        }
+        expert_it = ime2_experts_.find(expert_key);
+        protect = protect && expert_it != ime2_experts_.end() && expert_it->second.protected_queue;
+        while (ime2_cache_bytes_ + tile_size > limit) {
+            if (!evict_ime2_probationary_tile_locked()) {
+                if (!demote_ime2_victim_locked(protected_limit)) {
+                    break;
+                }
+            }
+        }
+        if (ime2_cache_bytes_ + tile_size > limit) {
+            ime2_cache_bypasses_.fetch_add(1, std::memory_order_relaxed);
+            return nullptr;
+        }
+        ime2_tile_queue & queue = protect ? ime2_protected_lru_ : ime2_probationary_lru_;
+        queue.push_front(key);
+        ime2_cache_.emplace(key, ime2_tile_entry{packed, expert_key, protect, queue.begin()});
+        ime2_expert_entry & expert = ime2_experts_[expert_key];
+        expert.bytes += tile_size;
+        expert.tiles.push_back(key);
+        expert.last_use = ++ime2_cache_clock_;
+        if (protect) {
+            expert.protected_queue = true;
+            ime2_protected_bytes_ += tile_size;
+            ime2_layers_[expert_key.layer].protected_bytes += tile_size;
+        }
+        ime2_cache_bytes_ += tile_size;
+        ime2_cache_peak_bytes_ = std::max(ime2_cache_peak_bytes_, ime2_cache_bytes_);
+        return packed;
     }
 
     void forward_mul_mat_id(ggml_compute_params * params, ggml_tensor * op) const {
@@ -1615,13 +2204,16 @@ class tensor_traits_iq_compact : public tensor_traits_base {
             ime2_b_tiles = (uint8_t *) incr_ptr_aligned(&wdata_cur, (size_t) nth * ime2_b_tile_size, sizeof(int64_t));
         }
 
-        float * deq_rows = (float *) incr_ptr_aligned(&wdata_cur, (size_t) nth * (size_t) ne00 * sizeof(float), sizeof(int64_t));
-        float * deq_row  = deq_rows + (size_t) ith * (size_t) ne00;
+        const size_t decode_elems = use_ime2_tile ? (size_t) IQ_IME2_DECODE_BLOCK : (size_t) ne00;
+        float * deq_rows = (float *) incr_ptr_aligned(&wdata_cur,
+                (size_t) nth * decode_elems * sizeof(float), sizeof(int64_t));
+        float * deq_row  = deq_rows + (size_t) ith * decode_elems;
 
         const int64_t n_ids    = ids->ne[0];
         const int64_t n_as     = ne02;
         const int64_t max_rows = ids->ne[0] * ids->ne[1];
         int64_t * matrix_row_counts = (int64_t *) incr_ptr_aligned(&wdata_cur, n_as * sizeof(int64_t), sizeof(int64_t));
+        uint8_t * matrix_cache_admitted = (uint8_t *) incr_ptr_aligned(&wdata_cur, n_as * sizeof(uint8_t), sizeof(int64_t));
         mmid_row_mapping * matrix_rows = (mmid_row_mapping *) incr_ptr_aligned(&wdata_cur, n_as * max_rows * sizeof(mmid_row_mapping), sizeof(int64_t));
         GGML_ASSERT(params->wsize >= (size_t) ((char *) wdata_cur - (char *) params->wdata));
 
@@ -1639,6 +2231,7 @@ class tensor_traits_iq_compact : public tensor_traits_base {
 
         if (ith == 0) {
             memset(matrix_row_counts, 0, n_as * sizeof(int64_t));
+            memset(matrix_cache_admitted, 0, n_as * sizeof(uint8_t));
             for (int32_t iid1 = 0; iid1 < ids->ne[1]; ++iid1) {
                 for (int32_t id = 0; id < n_ids; ++id) {
                     const int32_t i02 = *(const int32_t *) ((const char *) ids->data + iid1 * ids->nb[1] + id * ids->nb[0]);
@@ -1651,6 +2244,18 @@ class tensor_traits_iq_compact : public tensor_traits_base {
         ggml_barrier(params->threadpool);
 
         if (use_ime2_tile) {
+            const uint64_t tensor_fingerprint = ime2_tensor_fingerprint(src0);
+            const int64_t tensor_layer = ime2_tensor_layer(src0);
+            if (ith == 0) {
+                const size_t cache_limit = ime2_cache_limit();
+                for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
+                    if (matrix_row_counts[cur_a] > 0) {
+                        matrix_cache_admitted[cur_a] = note_ime2_expert_route(
+                                {tensor_layer, cur_a}, src0, tensor_fingerprint, cache_limit);
+                    }
+                }
+            }
+            ggml_barrier(params->threadpool);
             for (int64_t cur_a = 0; cur_a < n_as; ++cur_a) {
                 const int64_t cne1 = matrix_row_counts[cur_a];
                 if (cne1 == 0) {
@@ -1659,8 +2264,19 @@ class tensor_traits_iq_compact : public tensor_traits_base {
                 const char * src0_cur = (const char *) src0->data + cur_a * nb02;
                 for (int64_t ni = (int64_t) ith * IQ_IME2_TILE_N; ni < ne01; ni += (int64_t) nth * IQ_IME2_TILE_N) {
                     const int64_t nb_real = std::min<int64_t>(IQ_IME2_TILE_N, ne01 - ni);
-                    uint8_t * b_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
-                    pack_iq_tile_to_q8_0_32(to_float, src0_cur, nb01, ne00, ni, nb_real, b_tile, deq_row);
+                    uint8_t * scratch_tile = ime2_b_tiles + (size_t) ith * ime2_b_tile_size;
+                    const ime2_tile_key key = {
+                        src0->data, tensor_fingerprint, ne00, ne01, nb01, nb02, cur_a, ni, nb_real,
+                    };
+                    const ime2_expert_key expert_key = {tensor_layer, cur_a};
+                    std::shared_ptr<std::vector<uint8_t>> cached_tile = get_cached_iq_tile(
+                            key, expert_key, matrix_cache_admitted[cur_a], src0->type, to_float,
+                            src0_cur, nb01, ne00, ni, nb_real, ime2_b_tile_size, deq_row);
+                    const uint8_t * b_tile = cached_tile ? cached_tile->data() : scratch_tile;
+                    if (!cached_tile) {
+                        pack_iq_tile_to_q8_0_32(src0->type, to_float, src0_cur, nb01, ne00,
+                                                ni, nb_real, scratch_tile, deq_row);
+                    }
 
                     for (int64_t ir1 = 0; ir1 < cne1; ++ir1) {
                         const mmid_row_mapping row_mapping = matrix_rows[cur_a * max_rows + ir1];
