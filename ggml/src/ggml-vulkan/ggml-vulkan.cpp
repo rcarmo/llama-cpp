@@ -6972,10 +6972,16 @@ static void ggml_vk_print_gpu_info(size_t idx) {
     const bool fp4 = false;
 #endif
 
+    const int capability_tier = coopmat2_support ? 3 : coopmat_support ? 2 : (fp16 && integer_dot_product) ? 1 : 0;
+    const char * capability_path = capability_tier == 3 ? "vendor-cooperative-matrix"
+                                 : capability_tier == 2 ? "khr-cooperative-matrix"
+                                 : capability_tier == 1 ? "fp16-integer-dot"
+                                                        : "generic";
+
     std::string device_name = props2.properties.deviceName.data();
-    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
+    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s | tier: %d (%s)\n",
               idx, device_name.c_str(), driver_props.driverName.data(), uma, fp16_str, bf16, fp4, subgroup_size,
-              props2.properties.limits.maxComputeSharedMemorySize, integer_dot_product, matrix_cores.c_str());
+              props2.properties.limits.maxComputeSharedMemorySize, integer_dot_product, matrix_cores.c_str(), capability_tier, capability_path);
 
     if (props2.properties.deviceType == vk::PhysicalDeviceType::eCpu) {
         GGML_LOG_DEBUG("ggml_vulkan: Warning: Device type is CPU. This is probably not the device you want.\n");
