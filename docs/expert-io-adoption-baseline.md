@@ -304,3 +304,18 @@ expert storage I/O of at least 10% of token wall time after bounded advice.
 The raw expert cache remains conceptually separate from the compact-IQ IME2 tile
 cache; no slot cache or pinned-buffer prototype is implemented without that
 go/no-go threshold being met.
+
+## Platform advice abstraction
+
+`ggml_expert_io_advise_memory()` provides one mapped-memory advice primitive:
+
+- Linux/macOS: page-aligned `madvise(MADV_WILLNEED)`;
+- Windows: `PrefetchVirtualMemory`;
+- other platforms: `ENOTSUP` safe fallback.
+
+Darwin `F_RDADVISE` is intentionally deferred because current execution hooks
+have mapped addresses but not stable owning file descriptors/offsets. The
+common range planner and metrics remain portable; automatic miss filtering and
+worker scheduling currently run only on Linux/macOS where `mincore` residency
+checks are available. Windows compiles the primitive but does not claim runtime
+policy parity yet.

@@ -56,6 +56,8 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
         ggml-cpu/recurrent-profile.cpp
         ggml-cpu/expert-io-plan.h
         ggml-cpu/expert-io-plan.cpp
+        ggml-cpu/expert-io-advice.h
+        ggml-cpu/expert-io-advice.cpp
         ggml-cpu/whole-token-profile.h
         ggml-cpu/whole-token-profile.cpp
         )

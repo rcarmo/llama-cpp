@@ -3,6 +3,7 @@
 #include "ggml.h"
 #include "ggml-cpu.h"
 #include "expert-io-plan.h"
+#include "expert-io-advice.h"
 
 #include <algorithm>
 #include <array>
@@ -125,7 +126,7 @@ private:
             for (const auto & range : ranges) {
                 ++calls;
                 bytes += range.bytes;
-                if (madvise(range.address, range.length, MADV_WILLNEED) != 0) ++failures;
+                if (ggml_expert_io_advise_memory(range.address, range.length) != 0) ++failures;
             }
             const uint64_t elapsed = static_cast<uint64_t>(ggml_time_us() - started);
             const uint64_t granted_us = reserve_up_to(graph_advice_us_left, elapsed);

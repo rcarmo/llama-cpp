@@ -1,4 +1,5 @@
 #include "expert-io-plan.h"
+#include "expert-io-advice.h"
 
 #include <cassert>
 #include <cstdint>
@@ -58,10 +59,17 @@ static void test_invalid_layout_and_overflow() {
     assert(!overflow.error.empty());
 }
 
+static void test_advice_invalid_args() {
+    assert(ggml_expert_io_advise_memory(nullptr, 4096) != 0);
+    int value = 0;
+    assert(ggml_expert_io_advise_memory(&value, 0) != 0);
+}
+
 int main() {
     test_three_ranges_and_dedup();
     test_overlap_and_gap_coalescing();
     test_limits();
     test_invalid_layout_and_overflow();
+    test_advice_invalid_args();
     return 0;
 }
