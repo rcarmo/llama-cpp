@@ -212,3 +212,19 @@ therefore issued zero advice calls/bytes. This is correct miss-only behavior and
 also demonstrates that same-node advice after model load cannot help a fully
 resident run. Safe lookahead/overlap is required to test useful advice under
 page pressure.
+
+## Bounded asynchronous advice worker
+
+Advice execution uses one lazily created worker thread with a bounded queue
+(default depth 1). Jobs contain only page-aligned address/length pairs. Graph end
+drains outstanding work, preventing mapped ranges from outliving graph/model
+use. There is no unbounded thread pool.
+
+`GGML_CPU_EXPERT_IO_ADVISE_QUEUE_DEPTH` controls queue depth. For diagnostics
+only, `GGML_CPU_EXPERT_IO_ADVISE_RESIDENT=1` bypasses miss filtering to exercise
+the worker/circuit path; normal operation must leave it unset.
+
+A forced-resident p1/n1 validation with tight graph limits reported 32 advice
+calls, 10.29 MB advised, 0 failures, 88 us total advice time, 98 skipped ranges,
+and 463 nodes disabled after graph budgets were exhausted. Queue depth remained
+1. Normal warm mode still issued zero calls and skipped 2,880 resident experts.

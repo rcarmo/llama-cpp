@@ -9,11 +9,14 @@
 #include <atomic>
 #include <cerrno>
 #include <cinttypes>
+#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <limits>
 #include <mutex>
+#include <thread>
 #include <unordered_set>
 #include <vector>
 
@@ -65,6 +68,92 @@ std::atomic<uint64_t> graph_advice_bytes_left {0};
 std::atomic<uint64_t> graph_advice_ranges_left {0};
 std::atomic<uint64_t> graph_advice_us_left {0};
 std::atomic<bool> advice_circuit_open {false};
+
+uint64_t env_u64(const char * name, uint64_t fallback);
+uint64_t reserve_up_to(std::atomic<uint64_t> & remaining, uint64_t requested);
+
+#if defined(__linux__) || defined(__APPLE__)
+struct expert_advice_range {
+    void * address = nullptr;
+    size_t length = 0;
+    uint64_t bytes = 0;
+};
+
+class expert_advice_worker {
+public:
+    expert_advice_worker() : worker_([this] { run(); }) {}
+    ~expert_advice_worker() {
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            stopping_ = true;
+        }
+        ready_.notify_all();
+        worker_.join();
+    }
+
+    bool submit(std::vector<expert_advice_range> ranges, size_t max_depth) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (stopping_ || queue_.size() >= max_depth) return false;
+        queue_.push_back(std::move(ranges));
+        ready_.notify_one();
+        return true;
+    }
+
+    void drain() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        drained_.wait(lock, [this] { return queue_.empty() && !active_; });
+    }
+
+private:
+    void run() {
+        for (;;) {
+            std::vector<expert_advice_range> ranges;
+            {
+                std::unique_lock<std::mutex> lock(mutex_);
+                ready_.wait(lock, [this] { return stopping_ || !queue_.empty(); });
+                if (stopping_ && queue_.empty()) break;
+                ranges = std::move(queue_.front());
+                queue_.pop_front();
+                active_ = true;
+            }
+            const int64_t started = ggml_time_us();
+            uint64_t calls = 0, bytes = 0, failures = 0;
+            for (const auto & range : ranges) {
+                ++calls;
+                bytes += range.bytes;
+                if (madvise(range.address, range.length, MADV_WILLNEED) != 0) ++failures;
+            }
+            const uint64_t elapsed = static_cast<uint64_t>(ggml_time_us() - started);
+            const uint64_t granted_us = reserve_up_to(graph_advice_us_left, elapsed);
+            const uint64_t slow_us = env_u64("GGML_CPU_EXPERT_IO_ADVISE_SLOW_US", 500);
+            if (elapsed > slow_us) expert_io.advice_slow.fetch_add(1, std::memory_order_relaxed);
+            if (elapsed > granted_us || failures != 0) advice_circuit_open.store(true, std::memory_order_relaxed);
+            expert_io.advice_calls.fetch_add(calls, std::memory_order_relaxed);
+            expert_io.advice_bytes.fetch_add(bytes, std::memory_order_relaxed);
+            expert_io.advice_failures.fetch_add(failures, std::memory_order_relaxed);
+            expert_io.advice_us.fetch_add(elapsed, std::memory_order_relaxed);
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                active_ = false;
+            }
+            drained_.notify_all();
+        }
+    }
+
+    std::mutex mutex_;
+    std::condition_variable ready_;
+    std::condition_variable drained_;
+    std::deque<std::vector<expert_advice_range>> queue_;
+    bool active_ = false;
+    bool stopping_ = false;
+    std::thread worker_;
+};
+
+expert_advice_worker & advice_worker() {
+    static expert_advice_worker worker;
+    return worker;
+}
+#endif
 
 const char * family(enum ggml_op op) {
     switch (op) {
@@ -257,7 +346,12 @@ extern "C" void ggml_cpu_whole_token_profile_graph_begin(void) {
         graph_advice_us_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_US", 2000), std::memory_order_relaxed);
     }
 }
-extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) { graph_us.fetch_add(ggml_time_us() - start_us, std::memory_order_relaxed); }
+extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) {
+#if defined(__linux__) || defined(__APPLE__)
+    if (expert_advice_enabled()) advice_worker().drain();
+#endif
+    graph_us.fetch_add(ggml_time_us() - start_us, std::memory_order_relaxed);
+}
 extern "C" void ggml_cpu_whole_token_profile_node_active(enum ggml_op op, int64_t active_us) {
     if (op >= 0 && op < GGML_OP_COUNT) counters[op].active_us.fetch_add(active_us, std::memory_order_relaxed);
 }
@@ -323,6 +417,7 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
                 const uintptr_t page_size = static_cast<uintptr_t>(page_size_raw);
                 std::vector<int32_t> selected;
                 selected.reserve(static_cast<size_t>(n_ids));
+                const bool include_resident = env_enabled("GGML_CPU_EXPERT_IO_ADVISE_RESIDENT");
                 uint64_t resident_skips = 0;
                 for (int64_t i = 0; i < n_ids; ++i) {
                     const int32_t id = ggml_get_i32_1d(ids, static_cast<int>(i));
@@ -332,7 +427,7 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
                     }
                     const void * address = static_cast<const uint8_t *>(weights->data) + static_cast<uint64_t>(id) * expert_bytes;
                     bool known = false;
-                    if (page_is_resident(address, page_size, known) && known) {
+                    if (!include_resident && page_is_resident(address, page_size, known) && known) {
                         ++resident_skips;
                     } else {
                         selected.push_back(id);
@@ -350,30 +445,24 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
                 const auto plan = ggml_expert_io_plan_ranges(selected, {span}, limits);
                 expert_io.advice_skips.fetch_add(plan.skipped_ranges + (plan.error.empty() ? 0 : 1), std::memory_order_relaxed);
                 if (plan.error.empty() && !plan.ranges.empty()) {
-                    reserve_up_to(graph_advice_bytes_left, plan.planned_bytes);
-                    reserve_up_to(graph_advice_ranges_left, plan.ranges.size());
-                    const int64_t advice_start = ggml_time_us();
-                    uint64_t calls = 0, advice_bytes = 0, failures = 0;
+                    std::vector<expert_advice_range> ranges;
+                    ranges.reserve(plan.ranges.size());
                     for (const auto & range : plan.ranges) {
                         const uintptr_t address = reinterpret_cast<uintptr_t>(weights->data) + range.offset;
                         const uintptr_t page_address = address & ~(page_size - 1);
                         const uint64_t prefix = address - page_address;
-                        if (range.length > max_u64 - prefix) { ++failures; continue; }
+                        if (range.length > max_u64 - prefix) continue;
                         const uint64_t length = range.length + prefix;
-                        if (length > std::numeric_limits<size_t>::max()) { ++failures; continue; }
-                        ++calls;
-                        advice_bytes += range.length;
-                        if (madvise(reinterpret_cast<void *>(page_address), static_cast<size_t>(length), MADV_WILLNEED) != 0) ++failures;
+                        if (length > std::numeric_limits<size_t>::max()) continue;
+                        ranges.push_back({reinterpret_cast<void *>(page_address), static_cast<size_t>(length), range.length});
                     }
-                    const uint64_t elapsed = static_cast<uint64_t>(ggml_time_us() - advice_start);
-                    const uint64_t granted_us = reserve_up_to(graph_advice_us_left, elapsed);
-                    const uint64_t slow_us = env_u64("GGML_CPU_EXPERT_IO_ADVISE_SLOW_US", 500);
-                    if (elapsed > slow_us) expert_io.advice_slow.fetch_add(1, std::memory_order_relaxed);
-                    if (elapsed > granted_us || failures != 0) advice_circuit_open.store(true, std::memory_order_relaxed);
-                    expert_io.advice_calls.fetch_add(calls, std::memory_order_relaxed);
-                    expert_io.advice_bytes.fetch_add(advice_bytes, std::memory_order_relaxed);
-                    expert_io.advice_failures.fetch_add(failures, std::memory_order_relaxed);
-                    expert_io.advice_us.fetch_add(elapsed, std::memory_order_relaxed);
+                    const size_t queue_depth = static_cast<size_t>(std::max<uint64_t>(1, env_u64("GGML_CPU_EXPERT_IO_ADVISE_QUEUE_DEPTH", 1)));
+                    if (!ranges.empty() && advice_worker().submit(std::move(ranges), queue_depth)) {
+                        reserve_up_to(graph_advice_bytes_left, plan.planned_bytes);
+                        reserve_up_to(graph_advice_ranges_left, plan.ranges.size());
+                    } else {
+                        expert_io.advice_skips.fetch_add(plan.ranges.size(), std::memory_order_relaxed);
+                    }
                 }
             }
         }
