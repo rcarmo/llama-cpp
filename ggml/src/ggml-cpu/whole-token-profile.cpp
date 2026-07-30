@@ -229,7 +229,7 @@ bool expert_advice_enabled_impl() {
 }
 
 bool enabled_impl() {
-    return env_enabled("GGML_CPU_WHOLE_TOKEN_PROFILE") || expert_io_enabled_impl() || expert_advice_enabled_impl();
+    return env_enabled("GGML_CPU_WHOLE_TOKEN_PROFILE");
 }
 
 uint64_t env_u64(const char * name, uint64_t fallback) {
@@ -345,8 +345,13 @@ void dump() {
     }
 }
 
+void register_dump() {
+    static const bool registered = [] { std::atexit(dump); return true; }();
+    (void) registered;
+}
+
 bool enabled() {
-    static const bool value = [] { const bool on = enabled_impl(); if (on) std::atexit(dump); return on; }();
+    static const bool value = [] { const bool on = enabled_impl(); if (on) register_dump(); return on; }();
     return value;
 }
 
@@ -363,6 +368,11 @@ bool expert_advice_enabled() {
 } // namespace
 
 extern "C" bool ggml_cpu_whole_token_profile_enabled(void) { return enabled(); }
+extern "C" bool ggml_cpu_expert_io_active(void) {
+    const bool active = expert_io_enabled() || expert_advice_enabled();
+    if (active) register_dump();
+    return active;
+}
 extern "C" void ggml_cpu_get_expert_io_metrics(struct ggml_cpu_expert_io_metrics * metrics) {
     if (metrics == nullptr) return;
     *metrics = {
@@ -390,16 +400,20 @@ extern "C" bool ggml_cpu_expert_io_profile_enabled(void) { return expert_io_enab
 extern "C" int64_t ggml_cpu_whole_token_profile_time_us(void) { return ggml_time_us(); }
 extern "C" void ggml_cpu_whole_token_profile_graph_begin(void) {
     graph_calls.fetch_add(1, std::memory_order_relaxed);
+}
+extern "C" void ggml_cpu_expert_io_graph_begin(void) {
     if (expert_advice_enabled()) {
         graph_advice_bytes_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_BYTES", 64ULL * 1024ULL * 1024ULL), std::memory_order_relaxed);
         graph_advice_ranges_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_RANGES", 128), std::memory_order_relaxed);
         graph_advice_us_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_US", 2000), std::memory_order_relaxed);
     }
 }
-extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) {
+extern "C" void ggml_cpu_expert_io_graph_end(void) {
 #if defined(__linux__) || defined(__APPLE__)
     if (expert_advice_enabled()) advice_worker().drain();
 #endif
+}
+extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) {
     graph_us.fetch_add(ggml_time_us() - start_us, std::memory_order_relaxed);
 }
 extern "C" void ggml_cpu_whole_token_profile_node_active(enum ggml_op op, int64_t active_us) {

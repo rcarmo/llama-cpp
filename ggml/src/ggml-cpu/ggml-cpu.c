@@ -3214,8 +3214,12 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
 #endif
 
     const bool whole_token_profile = ggml_cpu_whole_token_profile_enabled();
+    const bool expert_io_active = ggml_cpu_expert_io_active();
     const int64_t graph_profile_start = whole_token_profile && state->ith == 0 ? ggml_cpu_whole_token_profile_time_us() : 0;
-    if (whole_token_profile && state->ith == 0) ggml_cpu_whole_token_profile_graph_begin();
+    if (state->ith == 0) {
+        if (whole_token_profile) ggml_cpu_whole_token_profile_graph_begin();
+        if (expert_io_active) ggml_cpu_expert_io_graph_begin();
+    }
 
     for (int node_n = 0; node_n < cgraph->n_nodes && atomic_load_explicit(&tp->abort, memory_order_relaxed) != node_n; node_n++) {
         struct ggml_tensor * node = cgraph->nodes[node_n];
@@ -3230,7 +3234,7 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
         }
 
         const int64_t node_profile_wall_start = whole_token_profile && state->ith == 0 ? ggml_cpu_whole_token_profile_time_us() : 0;
-        if (whole_token_profile && state->ith == 0) ggml_cpu_expert_io_profile_observe(node);
+        if (expert_io_active && state->ith == 0) ggml_cpu_expert_io_profile_observe(node);
         if (whole_token_profile) ggml_barrier(state->threadpool);
         const int64_t node_profile_active_start = whole_token_profile ? ggml_cpu_whole_token_profile_time_us() : 0;
         // TODO: move fused-op detection into ggml_graph_plan so fusion decisions are made once at planning time
@@ -3268,7 +3272,10 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
 #endif
 
     ggml_barrier(state->threadpool);
-    if (whole_token_profile && state->ith == 0) ggml_cpu_whole_token_profile_graph_end(graph_profile_start);
+    if (state->ith == 0) {
+        if (expert_io_active) ggml_cpu_expert_io_graph_end();
+        if (whole_token_profile) ggml_cpu_whole_token_profile_graph_end(graph_profile_start);
+    }
 
 #ifdef GGML_USE_CPU_RISCV64_SPACEMIT
     ggml_backend_cpu_riscv64_spacemit_clear_numa_thread_affinity_threaded(state->ith);

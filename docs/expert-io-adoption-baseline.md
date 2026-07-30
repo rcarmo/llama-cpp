@@ -252,3 +252,15 @@ server started with `--metrics` publishes `llamacpp:expert_io_*` Prometheus
 counters for nodes, selections, unique/repeated experts, selected range bytes,
 advice calls/bytes/failures/skips/time, and resident skips. Disabled mode
 exports zeros and does not enable profiling or advice.
+
+## Advice-only execution overhead
+
+Expert advice/observability is decoupled from `GGML_CPU_WHOLE_TOKEN_PROFILE`.
+Advice-only mode does not insert the profiler's per-node barriers. Thread 0
+plans/submits bounded jobs while other CPU workers may begin current-node
+compute, and graph end drains the single worker for lifetime safety.
+
+A forced advice-only p1/n1 validation (no whole-token timing enabled) issued 32
+calls / 10.31 MB in 72 us with no failures. The shared exit dumper still emits
+a zero-valued whole-token summary alongside expert counters; that output does
+not imply profiling barriers were active.
