@@ -264,3 +264,16 @@ A forced advice-only p1/n1 validation (no whole-token timing enabled) issued 32
 calls / 10.31 MB in 72 us with no failures. The shared exit dumper still emits
 a zero-valued whole-token summary alongside expert counters; that output does
 not imply profiling barriers were active.
+
+## Dependency-safe same-block lookahead
+
+The CPU graph loop advises the next `MUL_MAT_ID` only when it reuses the exact
+same already-materialized `src[2]` IDs tensor and appears within a bounded
+16-node scan. This covers gate/up/down work inside one MoE block without reading
+future-layer router outputs early. Cross-layer lookahead is intentionally
+forbidden.
+
+A forced diagnostic doubled bounded advice work to 64 calls / 20.61 MB while
+observation remained 480 nodes / 3,840 selections (no double counting). Advice
+completed in 152 us with zero failures. Normal miss-only mode remains a no-op
+when selected pages are resident.

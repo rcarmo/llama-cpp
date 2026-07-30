@@ -419,9 +419,9 @@ extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) {
 extern "C" void ggml_cpu_whole_token_profile_node_active(enum ggml_op op, int64_t active_us) {
     if (op >= 0 && op < GGML_OP_COUNT) counters[op].active_us.fetch_add(active_us, std::memory_order_relaxed);
 }
-extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * node) {
-    const bool profile = expert_io_enabled();
-    const bool advise = expert_advice_enabled();
+static void expert_io_process(const struct ggml_tensor * node, bool count_stats, bool do_advice) {
+    const bool profile = count_stats && expert_io_enabled();
+    const bool advise = do_advice && expert_advice_enabled();
     if ((!profile && !advise) || node == nullptr || node->op != GGML_OP_MUL_MAT_ID) return;
     const ggml_tensor * weights = node->src[0];
     const ggml_tensor * ids = node->src[2];
@@ -444,7 +444,7 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
     }
 
     uint64_t repeated = 0;
-    {
+    if (count_stats) {
         std::lock_guard<std::mutex> lock(expert_seen_mutex);
         const uint64_t max_seen = env_u64("GGML_CPU_EXPERT_IO_MAX_SEEN", 65536);
         if (max_seen != 0 && expert_seen.size() >= max_seen) expert_seen.clear();
@@ -459,14 +459,16 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
     const uint64_t expert_bytes = weights->nb[2];
     const uint64_t max_u64 = std::numeric_limits<uint64_t>::max();
     const uint64_t bytes = unique != 0 && expert_bytes > max_u64 / unique ? max_u64 : unique * expert_bytes;
-    expert_io.nodes.fetch_add(1, std::memory_order_relaxed);
-    expert_io.selections.fetch_add(static_cast<uint64_t>(n_ids), std::memory_order_relaxed);
-    expert_io.unique.fetch_add(unique, std::memory_order_relaxed);
-    expert_io.duplicates.fetch_add(static_cast<uint64_t>(n_ids) - unique - invalid, std::memory_order_relaxed);
-    expert_io.repeated.fetch_add(repeated, std::memory_order_relaxed);
-    expert_io.invalid_ids.fetch_add(invalid, std::memory_order_relaxed);
-    expert_io.range_count.fetch_add(unique, std::memory_order_relaxed);
-    expert_io.range_bytes.fetch_add(bytes, std::memory_order_relaxed);
+    if (count_stats) {
+        expert_io.nodes.fetch_add(1, std::memory_order_relaxed);
+        expert_io.selections.fetch_add(static_cast<uint64_t>(n_ids), std::memory_order_relaxed);
+        expert_io.unique.fetch_add(unique, std::memory_order_relaxed);
+        expert_io.duplicates.fetch_add(static_cast<uint64_t>(n_ids) - unique - invalid, std::memory_order_relaxed);
+        expert_io.repeated.fetch_add(repeated, std::memory_order_relaxed);
+        expert_io.invalid_ids.fetch_add(invalid, std::memory_order_relaxed);
+        expert_io.range_count.fetch_add(unique, std::memory_order_relaxed);
+        expert_io.range_bytes.fetch_add(bytes, std::memory_order_relaxed);
+    }
 
 #if defined(__linux__) || defined(__APPLE__)
     if (advise && weights->data != nullptr) {
@@ -556,6 +558,13 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
         }
     }
 #endif
+}
+
+extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * node) {
+    expert_io_process(node, true, false);
+}
+extern "C" void ggml_cpu_expert_io_advise(const struct ggml_tensor * node) {
+    expert_io_process(node, false, true);
 }
 
 extern "C" void ggml_cpu_whole_token_profile_node_wall(const struct ggml_tensor * node, int n_threads, int64_t wall_us) {

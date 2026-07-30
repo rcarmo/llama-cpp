@@ -21,6 +21,7 @@ void ggml_cpu_whole_token_profile_node_active(enum ggml_op op, int64_t active_us
 void ggml_cpu_whole_token_profile_node_wall(const struct ggml_tensor * node, int n_threads,
                                             int64_t wall_us);
 void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * node);
+void ggml_cpu_expert_io_advise(const struct ggml_tensor * node);
 
 #ifdef __cplusplus
 }
