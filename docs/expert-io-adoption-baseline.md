@@ -106,3 +106,35 @@ Raw evidence:
 /workspace/tmp/expert-io-qwen-warm.{json,stdout,stderr}
 /workspace/tmp/expert-io-qwen-cold.{json,stdout,stderr}
 ```
+
+## Routed-expert storage map
+
+`tools/inspect-expert-gguf-layout.py` validates the target GGUF and emits exact
+per-expert file ranges.
+
+For Qwen3.6-35B-A3B Q2_K_XL:
+
+- 41 routed-expert layers;
+- 256 experts per layer;
+- three tensors/ranges per expert: gate, up, down;
+- the expert index is the outer storage dimension;
+- every expert slice is contiguous and 32-byte aligned;
+- tensor data is mmap-backed;
+- no missing/mismatched projections or offset errors;
+- routed-expert tensors occupy 10,779,361,280 bytes of the model file.
+
+Per-expert storage patterns:
+
+| Layers | Gate | Up | Down | Total per expert |
+|---:|---:|---:|---:|---:|
+| 37 | 303,104 B | 303,104 B | 401,408 B | 1,007,616 B |
+| 2 | 303,104 B | 303,104 B | 557,056 B | 1,163,264 B |
+| 1 | 401,408 B | 401,408 B | 557,056 B | 1,359,872 B |
+| 1 | 344,064 B | 344,064 B | 450,560 B | 1,138,688 B |
+
+A selected expert can therefore be represented as exactly three stable file
+ranges, usually about 984 KiB total. With eight routed experts per layer, an
+uncapped advice request could approach 7.7–10.4 MiB per layer, which reinforces
+the need for strict miss/byte/range limits and range deduplication.
+
+Raw mapping evidence is `/workspace/tmp/qwen-expert-layout.json`.
