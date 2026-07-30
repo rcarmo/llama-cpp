@@ -155,7 +155,22 @@ N=2 improves aggregate Vulkan decode by 45.4%, but N=4 adds no further throughpu
 
 Q2-A3B multi-session Vulkan decode lost the device during the batched test. This matches the earlier bounded `MUL_MAT_ID` device-loss risk and prevents deployment of an Iris Xe MoE batch profile.
 
-The smallest transferable optimisation target is an Intel Xe N=2 exact-row Vulkan path for the dense Q2_K model, starting with QKV and FFN projections. It requires shader-level A/B tests and backend correctness coverage. Generic ubatch tuning cannot substitute for it.
+### MMVQ policy matrix
+
+Dense-27B N=1/N=2/N=4 decode was repeated with the existing Vulkan policy controls. Values are aggregate tok/s for 16 generated tokens per sequence.
+
+| Vulkan policy | N=1 | N=2 | N=4 |
+|---|---:|---:|---:|
+| Automatic | 1.77 | 2.62 | 2.57 |
+| Force MMVQ | 1.74 | 2.62 | 2.59 |
+| Disable MMVQ | 1.51 | 1.48 | 0.67 |
+| Disable integer dot product | 1.56 | 1.52 | 0.68 |
+
+Automatic and forced MMVQ are equivalent at N=2/N=4. The automatic policy already selects MMVQ whenever the decode column count exceeds one. Disabling MMVQ removes the two-row gain and causes N=4 to collapse. Disabling integer dot product also halves prefill throughput and produces the same decode collapse.
+
+The N=2 improvement is therefore real weight-decode reuse through the Q8_1/integer-dot MMVQ path. The N=4 plateau is not a policy error or a handover between physical micro-batches. It occurs inside the generic multi-column shader after MMVQ has already been selected.
+
+The smallest transferable optimisation target is an Intel Xe N=2 exact-row Vulkan path for the dense Q2_K model, starting with QKV and FFN projections. It requires shader-level A/B tests and backend correctness coverage. Generic ubatch tuning or another runtime policy toggle cannot substitute for it.
 
 ## Deployment
 
