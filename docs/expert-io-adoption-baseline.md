@@ -68,3 +68,41 @@ rather than labeling the run perfectly cold.
 - mmap/direct-I/O/GPU/CPU-MoE placement.
 
 No expert advice/cache behavior is enabled in this baseline.
+
+## Measured Qwen CPU/mmap baseline
+
+Host storage: `/dev/sdb`, ext4 at `/srv`, QEMU non-rotational 512 GiB disk.
+Model file: 12,574,128,416 bytes. Direct I/O off; mmap on; CPU-only, 6 threads,
+32 prompt tokens, 8 generated tokens, one repetition.
+
+| Mode | Wrapper wall | Prompt tok/s | Generation tok/s | Minor / major faults | Sampled physical reads | Max RSS |
+|---|---:|---:|---:|---:|---:|---:|
+| warm | 16.94 s | 35.54 | 15.03 | 381,403 / 0 | 12.574 GB | 12,662,312 KiB |
+| best-effort cold | 18.01 s | 42.84 | 15.18 | 381,534 / 0 | 12.574 GB | 12,662,188 KiB |
+
+The cold hint increases full process wall time by about 6.3%. Single benchmark
+throughput samples are noisy and occur after model loading, so they do not by
+themselves measure cold-start penalty.
+
+Whole-token profiling shows a clearer execution difference:
+
+| Mode | Graph time | Matrix time | MUL_MAT_ID time | Total idle/sync |
+|---|---:|---:|---:|---:|
+| warm | 2.282 s | 2.025 s | 1.002 s | 1.932 s |
+| cold | 3.892 s | 2.468 s | 1.070 s | 10.188 s |
+
+Across 11 graphs, routed `MUL_MAT_ID` performs 1,320 calls and accounts for
+115.47 GB of logical reads. Matrix operations account for 131.09 GB of 141.79
+GB total logical reads. Expert-aware instrumentation should therefore focus on
+MUL_MAT_ID/router selections and persistent-server page residency.
+
+Both fresh processes physically read roughly the whole model. Future advice
+A/B tests should use a persistent server and per-request counters so process
+startup/model mapping does not dominate the storage signal.
+
+Raw evidence:
+
+```text
+/workspace/tmp/expert-io-qwen-warm.{json,stdout,stderr}
+/workspace/tmp/expert-io-qwen-cold.{json,stdout,stderr}
+```
