@@ -277,3 +277,30 @@ A forced diagnostic doubled bounded advice work to 64 calls / 20.61 MB while
 observation remained 480 nodes / 3,840 selections (no double counting). Advice
 completed in 152 us with zero failures. Normal miss-only mode remains a no-op
 when selected pages are resident.
+
+## Persistent-server warm A/B and cache decision
+
+After server health, `POSIX_FADV_DONTNEED` was issued for the model file and one
+identical deterministic p4/n8 request was measured per mode with five-minute
+spacing:
+
+| Mode | Request wall | Physical reads | Major faults | Minor faults | Advice calls |
+|---|---:|---:|---:|---:|---:|
+| off | 0.982 s | 0 | 0 | 19,470 | 0 |
+| bounded | 0.986 s | 0 | 0 | 19,366 | 0 |
+| adaptive | 0.994 s | 0 | 0 | 19,349 | 0 |
+
+All modes produced the same token counts and output prefix. Selected expert
+pages were already resident; advice modes skipped all misses and issued no
+syscalls. Bounded/adaptive deltas (+0.4%/+1.2%) are within single-run noise.
+
+Because the active mmap kept the 12.6 GB model resident on this 64 GB host,
+file-level `POSIX_FADV_DONTNEED` could not manufacture request-time misses. The
+current host therefore provides no evidence that fixed raw-expert slots would
+help. The fixed-slot/pread cache is a **no-go here** until testing on a
+memory-constrained machine or under controlled page pressure shows residual
+expert storage I/O of at least 10% of token wall time after bounded advice.
+
+The raw expert cache remains conceptually separate from the compact-IQ IME2 tile
+cache; no slot cache or pinned-buffer prototype is implemented without that
+go/no-go threshold being met.
