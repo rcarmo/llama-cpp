@@ -23,7 +23,7 @@ No additional non-protected remote branches remained after pruning.
 default branch is still `master`, so it was retained for compatibility and
 advanced to the consolidated `main` tip rather than deleted.
 
-After consolidation:
+At the end of this dated audit (later commits have advanced both trunks):
 
 ```text
 main   = c90afe80f9502967f426b277c0e5abfa52b45eb2

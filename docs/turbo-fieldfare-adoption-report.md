@@ -115,3 +115,28 @@ generic mmap prefetch. Apple10 TensorOps and Metal `bytesNoCopy` were not ported
 All behavior is off by default. Unset `GGML_CPU_EXPERT_IO_PROFILE`,
 `GGML_CPU_EXPERT_IO_ADVISE`, and `GGML_CPU_EXPERT_IO_ADVISE_MODE` to restore the
 original execution path. The default server metrics remain zero-valued.
+
+## Environment reference
+
+All expert-I/O behavior is opt-in.
+
+| Variable | Purpose | Default |
+|---|---|---:|
+| `GGML_CPU_EXPERT_IO_PROFILE` | Selection/reuse/range/residency diagnostics | off |
+| `GGML_CPU_EXPERT_IO_SAMPLE_PAGES` | Maximum selected experts sampled per node | 16 |
+| `GGML_CPU_EXPERT_IO_MAX_SEEN` | Bound repeated-selection profiler keys | 65,536 |
+| `GGML_CPU_EXPERT_IO_ADVISE_MODE` | `off`, `bounded`, or `adaptive` | off |
+| `GGML_CPU_EXPERT_IO_ADVISE` | Legacy alias enabling bounded mode | off |
+| `GGML_CPU_EXPERT_IO_ADVISE_MAX_BYTES` | Per-node advice byte cap | 8 MiB |
+| `GGML_CPU_EXPERT_IO_ADVISE_MAX_RANGES` | Per-node advice range cap | 16 |
+| `GGML_CPU_EXPERT_IO_ADVISE_COALESCE_GAP` | Maximum gap merged into one range | 0 |
+| `GGML_CPU_EXPERT_IO_ADVISE_GRAPH_BYTES` | Per-graph advice byte cap | 64 MiB |
+| `GGML_CPU_EXPERT_IO_ADVISE_GRAPH_RANGES` | Per-graph advice range cap | 128 |
+| `GGML_CPU_EXPERT_IO_ADVISE_GRAPH_US` | Per-graph advice time budget | 2,000 us |
+| `GGML_CPU_EXPERT_IO_ADVISE_QUEUE_DEPTH` | Bounded worker queue depth | 1 |
+| `GGML_CPU_EXPERT_IO_ADVISE_SLOW_US` | Slow-call threshold | 500 us |
+| `GGML_CPU_EXPERT_IO_ADVISE_MAX_SLOW` | Adaptive slow-call streak limit | 3 |
+| `GGML_CPU_EXPERT_IO_ADVISE_RESIDENT` | Diagnostic-only bypass of resident-page filtering | off |
+
+`GGML_CPU_EXPERT_IO_ADVISE_RESIDENT` is for exercising budgets/worker/circuit
+logic only and should not be used as a production setting.

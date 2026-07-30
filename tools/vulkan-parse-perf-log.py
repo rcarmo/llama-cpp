@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
+import argparse
 import collections
 import re
-import sys
 from pathlib import Path
 
-if len(sys.argv) != 2:
-    raise SystemExit(f"usage: {sys.argv[0]} PERF_LOG")
+parser = argparse.ArgumentParser()
+parser.add_argument("perf_log")
+parser.add_argument("--prompt-size", type=int, default=128,
+                    help="matrix N dimension used to classify prompt blocks; 0 disables classification")
+args = parser.parse_args()
 
 blocks = []
 entries = []
 in_block = False
-for raw in Path(sys.argv[1]).read_text(errors="replace").splitlines():
+for raw in Path(args.perf_log).read_text(errors="replace").splitlines():
     line = raw.strip()
     if line == "Vulkan Timings:":
         entries = []
@@ -30,7 +33,13 @@ for raw in Path(sys.argv[1]).read_text(errors="replace").splitlines():
 
 print(f"blocks={len(blocks)}")
 for idx, (total, block_entries) in enumerate(blocks):
-    kind = "prompt" if any(" n=128 " in f" {name} " for name, _, _, _ in block_entries) else "decode"
+    # This is a benchmark-specific heuristic: prompt blocks contain a matrix N
+    # dimension equal to the configured prompt size. Use 0 for "unknown".
+    if args.prompt_size == 0:
+        kind = "unknown"
+    else:
+        marker = f" n={args.prompt_size} "
+        kind = "prompt" if any(marker in f" {name} " for name, _, _, _ in block_entries) else "decode"
     groups = collections.Counter()
     for name, _, usec, _ in block_entries:
         groups[name.split()[0] if name else "unknown"] += usec

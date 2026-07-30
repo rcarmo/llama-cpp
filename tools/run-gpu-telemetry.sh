@@ -7,6 +7,11 @@ shift
 shift
 [[ $# -gt 0 ]] || { echo "missing command" >&2; exit 2; }
 
+if ! command -v nvidia-smi >/dev/null 2>&1; then
+  echo "run-gpu-telemetry.sh currently supports NVIDIA only (nvidia-smi not found)" >&2
+  exit 2
+fi
+
 mkdir -p "$(dirname "$out")"
 : > "$out"
 (

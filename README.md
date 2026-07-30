@@ -75,7 +75,9 @@ The `llama.cpp` project is the main playground for developing new features for t
 
 ## rcarmo fork: SpaceMIT K3
 
-This fork adds a RISC-V CPU backend for the Milk-V K3 and compatible SpaceMIT SoCs. The backend uses RVV for activation processing, IME1/IME2 matrix kernels, TCM staging, quantized-weight repacking and GGML's worker pool. The fork's mainline branch is `master`.
+This fork adds a RISC-V CPU backend for the Milk-V K3 and compatible SpaceMIT SoCs. The backend uses RVV for activation processing, IME1/IME2 matrix kernels, TCM staging, quantized-weight repacking and GGML's worker pool. The protected `main` and compatibility/default `master` branches are kept synchronized; development and integration use `main`.
+
+Fork-specific implementation reports and validation guides are indexed in [docs/README.md](docs/README.md).
 
 Configure a native release build with:
 
@@ -129,6 +131,8 @@ No experimental matrix or arithmetic kernel met the 2% end-to-end promotion thre
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT=<0-100>` | Reserve an optional protected expert pool inside the shared ceiling | `0` |
 | `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` | Emit aggregate cache telemetry plus tile-pack calls, direct/fallback rows, pack time and staging bytes | Off |
 | `GGML_CPU_WHOLE_TOKEN_PROFILE=1` | Emit cumulative exit-time CPU operation/family totals with active-thread time and logical bytes; profiling adds per-node barriers | Off |
+| `GGML_CPU_EXPERT_IO_PROFILE=1` | Emit opt-in routed-expert selection/reuse/range/residency metrics | Off |
+| `GGML_CPU_EXPERT_IO_ADVISE_MODE=off\|bounded\|adaptive` | Enable bounded miss-only expert page advice; see the expert-I/O guide for safety limits | `off` |
 | `GGML_CPU_RECURRENT_PROFILE=1` | Count CPU `DUP`/`CPY` buckets and time GDN/SSM shapes | Off |
 | `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly into the recurrent-cache view | Off in library; on in the Qwen service |
 

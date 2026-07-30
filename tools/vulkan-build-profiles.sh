@@ -34,9 +34,14 @@ case "$profile" in
     ;;
   multi)
     build="$root/build-vulkan-multi"
+    cuda_compiler=${CUDACXX:-$(command -v nvcc || true)}
+    if [[ -z "$cuda_compiler" || ! -x "$cuda_compiler" ]]; then
+      echo "CUDA compiler not found; set CUDACXX or add nvcc to PATH" >&2
+      exit 2
+    fi
     opts=(
       -DGGML_CUDA=ON
-      -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.8/bin/nvcc
+      -DCMAKE_CUDA_COMPILER="$cuda_compiler"
     )
     ;;
   *)
