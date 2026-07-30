@@ -143,6 +143,12 @@ LLAMA_PORT=8080 tools/run-intel-qwen.sh qwen36-27b-q2
 
 All three launchers returned `{"status":"ok"}` in 1K smoke tests. Q4 and Q2-A3B also completed the 4K MTP service campaign. The embedded Web UI is available at `/`, and the default `LLAMA_HOST=0.0.0.0` exposes it on every interface. Set `LLAMA_HOST=127.0.0.1` when remote access is not required. Override `LLAMA_CTX`, `LLAMA_PORT`, `LLAMA_CPUS`, `LLAMA_THREADS`, `LLAMA_BUILD` or `LLAMA_MODELS` as needed.
 
+## CPU and Vulkan interleaving
+
+[The interleaving campaign](cpu-vulkan-interleaving-report-20260731.md) rejected per-conversation backend handoff, static CPU/Vulkan generation splits and CPU-MoE placement. Qwen's hybrid recurrent state forces full prompt reprocessing after a cross-backend slot restore. Independent CPU generation and Vulkan prefill can overlap for separate requests, reducing their combined makespan by 18.6% while increasing CPU request latency by 38.3%.
+
+CPU continuous batching is the supported capacity path. Q2-A3B aggregate generation rises from 14.93 tok/s with one stream to 18.04 with two and 21.22 with four. Dense 27B rises from 2.89 to 3.33 and 3.64 tok/s. Per-request latency increases, so single-slot MTP remains the interactive default.
+
 ## Evidence
 
 - Final repeated results: `final/`

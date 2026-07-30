@@ -1,0 +1,56 @@
+=== prefill ===
+{
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 1966,
+    "prompt_ms": 96067.27,
+    "prompt_per_token_ms": 48.864328585961346,
+    "prompt_per_second": 20.46482636594128,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0.001,
+    "predicted_per_second": 1000000.0
+  },
+  "content": "\""
+}
+=== save ===
+{"id_slot":0,"filename":"dense27-prefill.bin","n_saved":1966,"n_written":225390208,"timings":{"save_ms":123.791}}
+=== restore ===
+{"id_slot":0,"filename":"dense27-prefill.bin","n_restored":1966,"n_read":225390208,"timings":{"restore_ms":43.247}}
+=== generation ===
+{
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 1966,
+    "prompt_ms": 472068.965,
+    "prompt_per_token_ms": 240.11646236012209,
+    "prompt_per_second": 4.16464573137105,
+    "predicted_n": 64,
+    "predicted_ms": 22774.318,
+    "predicted_per_token_ms": 355.84871875,
+    "predicted_per_second": 2.8101829437878227
+  },
+  "content": "Iteration 051 measured memory\n\n<think>\nHere's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Input Text:** A long list of iterations (001 to 051, cut off at 051) where each iteration measures the exact same set"
+}
+=== walls ===
+1-vulkan-prefill-wall.txt 96.08
+2-vulkan-save-wall.txt 0.12
+3-cpu-restore-wall.txt 0.04
+4-cpu-generate-wall.txt 494.85
+=== state ===
+225390208 bytes
+=== memory loaded ===
+               total        used        free      shared  buff/cache   available
+Mem:     33359691776 15402504192  1872257024 11839107072 28382605312 17957187584
+Swap:     8589930496   302714880  8287215616
+MemAvailable:   17536316 kB
+SwapFree:        8092984 kB
+    PID   RSS    VSZ PSR CMD
+ 596510 13574304 15337904 7 build-intel-clang/bin/llama-server -m /var/home/agent/workspace/projects/llama-cpp-intel/../models/qwen3.6/Qwen3.6-27B-UD-Q2_K_XL.gguf -ngl 0 -t 8 --cpu-range 0-7 --cpu-strict 1 --ctx-size 4096 --parallel 1 --batch-size 2048 --ubatch-size 512 --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on --slot-save-path /var/home/agent/workspace/projects/llama-cpp-intel/benchmarks/intel-1340p/cpu-vulkan-handoff/slots/ --no-webui --host 127.0.0.1 --port 8110
+ 596511 912576 13896904 2 build-intel-vulkan/bin/llama-server -m /var/home/agent/workspace/projects/llama-cpp-intel/../models/qwen3.6/Qwen3.6-27B-UD-Q2_K_XL.gguf -ngl 99 -t 8 --ctx-size 4096 --parallel 1 --batch-size 2048 --ubatch-size 512 --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on --slot-save-path /var/home/agent/workspace/projects/llama-cpp-intel/benchmarks/intel-1340p/cpu-vulkan-handoff/slots/ --no-webui --host 127.0.0.1 --port 8111
+=== memory after ===
+               total        used        free      shared  buff/cache   available
+Mem:     33359691776 16369942528  1844621312 11926745088 27530452992 16989749248
+Swap:     8589930496   298704896  8291225600
+MemAvailable:   16591552 kB
+SwapFree:        8096900 kB
