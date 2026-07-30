@@ -11,6 +11,7 @@
 #include "common.h"
 #include "fit.h"
 #include "llama.h"
+#include "ggml-cpu.h"
 #include "log.h"
 #include "sampling.h"
 #include "speculative.h"
@@ -4412,6 +4413,21 @@ void server_routes::init_routes() {
                     {"value",  (float) res_task->n_busy_slots_total / std::max((float) res_task->n_decode_total, 1.f)}
             }}}
         };
+
+        ggml_cpu_expert_io_metrics expert_io {};
+        ggml_cpu_get_expert_io_metrics(&expert_io);
+        auto & expert_counters = all_metrics_def["counter"];
+        expert_counters.push_back({{"name", "expert_io_nodes_total"}, {"help", "Observed routed expert matrix nodes."}, {"value", expert_io.nodes}});
+        expert_counters.push_back({{"name", "expert_io_selections_total"}, {"help", "Routed expert IDs selected."}, {"value", expert_io.selections}});
+        expert_counters.push_back({{"name", "expert_io_unique_total"}, {"help", "Unique experts selected per routed node."}, {"value", expert_io.unique_experts}});
+        expert_counters.push_back({{"name", "expert_io_repeated_total"}, {"help", "Repeated weight-tensor/expert selections."}, {"value", expert_io.repeated_experts}});
+        expert_counters.push_back({{"name", "expert_io_range_bytes_total"}, {"help", "Logical selected expert range bytes."}, {"value", expert_io.range_bytes}});
+        expert_counters.push_back({{"name", "expert_io_advice_calls_total"}, {"help", "Expert page-advice syscalls."}, {"value", expert_io.advice_calls}});
+        expert_counters.push_back({{"name", "expert_io_advice_bytes_total"}, {"help", "Expert bytes submitted for page advice."}, {"value", expert_io.advice_bytes}});
+        expert_counters.push_back({{"name", "expert_io_advice_failures_total"}, {"help", "Failed expert page-advice calls."}, {"value", expert_io.advice_failures}});
+        expert_counters.push_back({{"name", "expert_io_advice_skips_total"}, {"help", "Expert ranges skipped by policy or queue limits."}, {"value", expert_io.advice_skips}});
+        expert_counters.push_back({{"name", "expert_io_advice_microseconds_total"}, {"help", "Time spent in expert page-advice workers."}, {"value", expert_io.advice_us}});
+        expert_counters.push_back({{"name", "expert_io_resident_skips_total"}, {"help", "Selected experts skipped because pages were resident."}, {"value", expert_io.resident_skips}});
 
         std::stringstream prometheus;
 

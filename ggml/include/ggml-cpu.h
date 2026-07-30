@@ -109,6 +109,29 @@ extern "C" {
     GGML_BACKEND_API int ggml_cpu_has_wasm_simd  (void);
     GGML_BACKEND_API int ggml_cpu_has_llamafile  (void);
 
+    struct ggml_cpu_expert_io_metrics {
+        uint64_t nodes;
+        uint64_t selections;
+        uint64_t unique_experts;
+        uint64_t duplicate_experts;
+        uint64_t repeated_experts;
+        uint64_t invalid_ids;
+        uint64_t range_count;
+        uint64_t range_bytes;
+        uint64_t resident_pages;
+        uint64_t sampled_pages;
+        uint64_t advice_calls;
+        uint64_t advice_bytes;
+        uint64_t advice_failures;
+        uint64_t advice_skips;
+        uint64_t advice_us;
+        uint64_t advice_slow;
+        uint64_t advice_disabled;
+        uint64_t resident_skips;
+    };
+
+    GGML_BACKEND_API void ggml_cpu_get_expert_io_metrics(struct ggml_cpu_expert_io_metrics * metrics);
+
     // Internal types and functions exposed for tests and benchmarks
 
     typedef void (*ggml_vec_dot_t)  (int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT x, size_t bx,

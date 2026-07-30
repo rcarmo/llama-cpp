@@ -363,6 +363,29 @@ bool expert_advice_enabled() {
 } // namespace
 
 extern "C" bool ggml_cpu_whole_token_profile_enabled(void) { return enabled(); }
+extern "C" void ggml_cpu_get_expert_io_metrics(struct ggml_cpu_expert_io_metrics * metrics) {
+    if (metrics == nullptr) return;
+    *metrics = {
+        expert_io.nodes.load(std::memory_order_relaxed),
+        expert_io.selections.load(std::memory_order_relaxed),
+        expert_io.unique.load(std::memory_order_relaxed),
+        expert_io.duplicates.load(std::memory_order_relaxed),
+        expert_io.repeated.load(std::memory_order_relaxed),
+        expert_io.invalid_ids.load(std::memory_order_relaxed),
+        expert_io.range_count.load(std::memory_order_relaxed),
+        expert_io.range_bytes.load(std::memory_order_relaxed),
+        expert_io.resident_pages.load(std::memory_order_relaxed),
+        expert_io.sampled_pages.load(std::memory_order_relaxed),
+        expert_io.advice_calls.load(std::memory_order_relaxed),
+        expert_io.advice_bytes.load(std::memory_order_relaxed),
+        expert_io.advice_failures.load(std::memory_order_relaxed),
+        expert_io.advice_skips.load(std::memory_order_relaxed),
+        expert_io.advice_us.load(std::memory_order_relaxed),
+        expert_io.advice_slow.load(std::memory_order_relaxed),
+        expert_io.advice_disabled.load(std::memory_order_relaxed),
+        expert_io.resident_skips.load(std::memory_order_relaxed),
+    };
+}
 extern "C" bool ggml_cpu_expert_io_profile_enabled(void) { return expert_io_enabled(); }
 extern "C" int64_t ggml_cpu_whole_token_profile_time_us(void) { return ggml_time_us(); }
 extern "C" void ggml_cpu_whole_token_profile_graph_begin(void) {

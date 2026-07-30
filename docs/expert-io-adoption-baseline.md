@@ -244,3 +244,11 @@ Use `GGML_CPU_EXPERT_IO_ADVISE_MODE=off|bounded|adaptive`. The legacy
 threshold 0 and max-slow 1 issued one 7-range/2.42 MB job in 17 us, classified it
 slow by construction, and disabled 479 later nodes. This validates circuit
 behavior; production values must use real latency thresholds.
+
+## Metrics endpoint
+
+`ggml_cpu_get_expert_io_metrics()` exposes a stable cumulative snapshot. A
+server started with `--metrics` publishes `llamacpp:expert_io_*` Prometheus
+counters for nodes, selections, unique/repeated experts, selected range bytes,
+advice calls/bytes/failures/skips/time, and resident skips. Disabled mode
+exports zeros and does not enable profiling or advice.
