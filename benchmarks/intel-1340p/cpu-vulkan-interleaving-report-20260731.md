@@ -113,6 +113,50 @@ True intra-token interleaving would require a scheduler extension that can ident
 
 A combined Clang-native plus Vulkan build loaded the Iris Xe device, but the focused backend corpus lost the device during a Q8_0 `MUL_MAT_ID` case after earlier cases passed. The established GCC Vulkan build passed the bounded 1,544-case corpus used by the main campaign. Keep the Clang+Vulkan build experimental until the Mesa/device-loss failure is isolated.
 
+## Physical micro-batch boundaries
+
+A fixed 256-token dense-27B prompt was tested with physical micro-batches of 32, 64, 128 and 256. Larger physical batches substantially improve prefill:
+
+| Backend placement | ubatch 32 | ubatch 64 | ubatch 128 | ubatch 256 |
+|---|---:|---:|---:|---:|
+| CPU in Vulkan build, pp256 | 7.43 | 12.62 | 14.70 | 16.11 |
+| 16 Vulkan layers, pp256 | 7.84 | 13.25 | 15.11 | 16.31 |
+| Full Vulkan, pp256 | 9.97 | 16.15 | 16.81 | 17.12 |
+
+The same ubatch sweep has no meaningful effect on one-slot decode:
+
+| Backend placement | ubatch 32 | ubatch 64 | ubatch 128 | ubatch 256 |
+|---|---:|---:|---:|---:|
+| CPU in Vulkan build, tg32 | 2.29 | 2.28 | 2.28 | 2.27 |
+| 16 Vulkan layers, tg32 | 2.06 | 2.09 | 2.08 | 2.07 |
+| Full Vulkan, tg32 | 1.73 | 1.72 | 1.72 | 1.73 |
+
+A single interactive decode graph has one new token, so there is no multi-token physical micro-batch handover to optimise. The hybrid generation loss comes from per-token backend placement, synchronisation and shared-memory contention.
+
+## Comparison with antirez/ds4
+
+DwarfStar uses two mechanisms:
+
+- distributed prefill pipelines prompt chunks through different layer ranges and explicitly states that this does not accelerate autoregressive generation;
+- server decode batching waits up to 2 ms for decode-ready tokens from separate resident sessions, then invokes model-specific N-row GPU paths.
+
+`ds4.c` contains native session-batch QKV and shared-FFN paths which gather rows from separate sessions, call exact-row matrix kernels, scatter results back, and preserve each session checkpoint. Its CUDA oracle exercises N=2, N=4 and N=8 batches and compares every batched frontier with isolated-session logits. The public 120 tok/s figure is aggregate multi-user generation on eight L40S GPUs.
+
+llama.cpp also has Vulkan decode pipelines specialised for one through eight columns. Dense-27B full-Vulkan batching confirms that the right dimension helps:
+
+| Decode rows | Aggregate tg64 | Effective per stream |
+|---:|---:|---:|
+| 1 | 1.75 tok/s | 1.75 tok/s |
+| 2 | 2.55 tok/s | 1.28 tok/s |
+| 4 | 2.56 tok/s | 0.64 tok/s |
+| 8 | 1.88 tok/s | 0.23 tok/s |
+
+N=2 improves aggregate Vulkan decode by 45.4%, but N=4 adds no further throughput and N=8 regresses. Vulkan profiling still reports 161 `MUL_MAT_VEC` operations for N=1 and N=2. The generic shader specialises `NUM_COLS` and reuses weight dequantisation across columns, but increasing columns also raises accumulator/register state and activation reads without adding workgroups. DwarfStar goes further by fusing model-specific QKV and shared-FFN row operations.
+
+Q2-A3B multi-session Vulkan decode lost the device during the batched test. This matches the earlier bounded `MUL_MAT_ID` device-loss risk and prevents deployment of an Iris Xe MoE batch profile.
+
+The smallest transferable optimisation target is an Intel Xe N=2 exact-row Vulkan path for the dense Q2_K model, starting with QKV and FFN projections. It requires shader-level A/B tests and backend correctness coverage. Generic ubatch tuning cannot substitute for it.
+
 ## Deployment
 
 Single interactive user:
