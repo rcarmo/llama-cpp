@@ -1,0 +1,7 @@
+FROM docker.io/library/fedora:44
+RUN dnf -y install \
+    binutils ccache clang cmake file gcc gcc-c++ git lld llvm ninja-build \
+    libomp-devel numactl perf hwloc \
+    curl-devel openssl-devel && \
+    dnf clean all
+ENV CCACHE_DIR=/ccache
