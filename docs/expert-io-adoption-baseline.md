@@ -138,3 +138,37 @@ uncapped advice request could approach 7.7–10.4 MiB per layer, which reinforce
 the need for strict miss/byte/range limits and range deduplication.
 
 Raw mapping evidence is `/workspace/tmp/qwen-expert-layout.json`.
+
+## Behavior-neutral expert observability
+
+Set `GGML_CPU_EXPERT_IO_PROFILE=1` to extend the existing whole-token CPU
+profiler. The hook runs immediately before CPU `MUL_MAT_ID` execution and emits
+one aggregate line at exit. Default execution is unchanged when the variable is
+unset.
+
+Captured fields:
+
+- routed matrix nodes;
+- total selected IDs;
+- unique and duplicate IDs within each node;
+- repeated `(weight tensor, expert)` selections across graphs;
+- invalid IDs;
+- derived selected expert ranges/bytes from `nb[2]`;
+- bounded first-page residency sampling using `mincore` on Linux/macOS.
+
+`GGML_CPU_EXPERT_IO_SAMPLE_PAGES` controls the maximum selected experts sampled
+per node (default 16). Sampling is diagnostic only; it does not advise or read
+pages.
+
+Tiny Qwen validation (`p4/n2`) reported:
+
+```text
+nodes=360 selections=2880 unique=2880 duplicates=0 repeated=684
+invalid_ids=0 ranges=2880 range_bytes=983236608
+resident_pages=2880 sampled_pages=2880
+```
+
+The 684 repeated selections show meaningful reuse potential. All sampled pages
+were resident immediately before execution in this post-load warm process;
+cold/persistent-server request boundaries are needed to observe nonresident
+expert pages.

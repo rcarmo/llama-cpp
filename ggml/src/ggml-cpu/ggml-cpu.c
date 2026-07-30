@@ -3230,6 +3230,7 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
         }
 
         const int64_t node_profile_wall_start = whole_token_profile && state->ith == 0 ? ggml_cpu_whole_token_profile_time_us() : 0;
+        if (whole_token_profile && state->ith == 0) ggml_cpu_expert_io_profile_observe(node);
         if (whole_token_profile) ggml_barrier(state->threadpool);
         const int64_t node_profile_active_start = whole_token_profile ? ggml_cpu_whole_token_profile_time_us() : 0;
         // TODO: move fused-op detection into ggml_graph_plan so fusion decisions are made once at planning time
