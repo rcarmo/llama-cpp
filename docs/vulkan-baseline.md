@@ -1,5 +1,9 @@
 # Vulkan baseline contract
 
+Recorded 2026-07-28. These are bounded single-repetition measurements, not
+confidence intervals; refresh after material source, compiler, driver, or model
+changes.
+
 Baseline source commit: `87511aa7490469587ba8f53dd11532bb13c5aa5a`
 
 ## Development host
@@ -47,7 +51,7 @@ KV and backend allocations.
 Bounded command pattern:
 
 ```bash
-GGML_VK_VISIBLE_DEVICES=0 ./build-vulkan/bin/llama-bench \
+GGML_VK_VISIBLE_DEVICES=0 ./build-vulkan-release/bin/llama-bench \
   --device Vulkan0 \
   -m /workspace/models/gguf-misc/gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf \
   -ngl 999 -t 6 -p 128 -n 32 -r 1 -o json
@@ -222,3 +226,11 @@ The likely cause is higher register pressure/instruction footprint outweighing
 additional loop-level parallelism. The experiment was reverted; the default
 4-way unroll remains. This demonstrates that CPU-style deeper unrolling does
 not transfer automatically to Vulkan shaders.
+
+## Measurement caveats
+
+GPU telemetry samples every 0.25 seconds and reports observed maxima. Peak VRAM
+includes transient backend allocations; the steady working set can be lower.
+Single-run throughput deltas should be repeated before production decisions.
+The rejected -3.28% matvec-unroll result was retained because it also increased
+power and had no prompt benefit, but it is still a bounded directional result.

@@ -1,5 +1,9 @@
 # Vulkan target validation: Intel Xe and ARM GPUs
 
+See [Portable feature tiers](vulkan-cross-vendor-evaluation.md#portable-feature-tiers)
+for Tier 0–3 requirements and [Vulkan deployment](vulkan-deployment.md) for
+canonical build/device-selection commands.
+
 No Intel Xe, Mali, Adreno, or other ARM GPU is exposed to the current host.
 These targets are prepared but remain unmeasured; no performance is inferred
 from the RTX 3060.
@@ -60,3 +64,7 @@ A target is accepted only when:
 - no dominant CPU fallback or scheduler assertion occurs;
 - memory/thermal behavior is stable for repeated short requests;
 - performance is reported only for that exact device/driver.
+
+Power and thermal capture is platform-specific. `tools/run-gpu-telemetry.sh` is
+NVIDIA-only; Intel Xe and ARM targets must record a native telemetry source or
+mark those fields unavailable rather than substituting NVIDIA tooling.

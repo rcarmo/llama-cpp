@@ -1,8 +1,13 @@
 # Vulkan deployment and rollback
 
+Last validated: 2026-07-30 on NVIDIA driver 580.173.02. Refresh bounded
+baselines after material compiler, driver, backend, or model changes.
+
 ## Build
 
-Source the local toolchain and choose a profile:
+Source the workspace-local toolchain and choose a profile. On another checkout,
+set `VULKAN_LOCAL_PREFIX`; when system `glslc`/SPIR-V packages are installed,
+you may skip the helper entirely:
 
 ```bash
 source tools/vulkan-toolchain-env.sh
@@ -14,7 +19,8 @@ tools/vulkan-build-profiles.sh multi build
 ```
 
 Builds default to two jobs. The CUDA+Vulkan profile is expensive; avoid routine
-rebuilds.
+rebuilds. It discovers `nvcc` from `CUDACXX` or `PATH` and fails cleanly when no
+CUDA compiler is available.
 
 ## Select hardware explicitly
 
@@ -26,6 +32,22 @@ GGML_VK_VISIBLE_DEVICES=0 ./build-vulkan-release/bin/llama-server \
 
 Never accept llvmpipe/lavapipe. Note that invalid visible-device indices may
 make llama tools exit zero with `(none)`; use the guard script.
+
+## Profiling and telemetry
+
+`tools/run-gpu-telemetry.sh` samples at 0.25-second intervals and reports peak
+memory, utilization, power, and temperature. It is NVIDIA-only and fails
+explicitly when `nvidia-smi` is unavailable; Intel/ARM targets need their native
+telemetry or manual capture.
+
+`GGML_VK_PERF_LOGGER=1` emits `Vulkan Timings:` blocks. Parse them with:
+
+```bash
+tools/vulkan-parse-perf-log.py --prompt-size 128 PERF_LOG
+```
+
+The prompt/decode classification is a benchmark-specific N-dimension heuristic;
+pass `--prompt-size 0` when classification is not meaningful.
 
 ## Debugging
 
@@ -45,7 +67,10 @@ Use validation/result-checking builds only for focused tests; they are slower.
 
 ## Known limitations
 
-- Partial Gemma4 offload can hit `GGML_SCHED_MAX_SPLIT_INPUTS`.
+- Partial Gemma4 offload can exceed the scheduler's fixed split-input capacity
+  (`GGML_SCHED_MAX_SPLIT_INPUTS`) when many host/device boundaries feed one
+  split. Use full Vulkan offload for the measured E2B model or reduce model/
+  partition complexity; this failure is not OOM.
 - Support gaps are shape/type-specific, especially MUL_MAT, FLASH_ATTN_EXT, and
   CPY; check logs for fallback/synchronization.
 - Extension presence does not imply accelerated integer dot. Use the backend-

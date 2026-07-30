@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Source this file to use the workspace-local Vulkan shader/tooling packages.
+# Override VULKAN_LOCAL_PREFIX on installations outside this workspace, or use
+# system packages and skip this helper entirely.
 _vulkan_prefix=${VULKAN_LOCAL_PREFIX:-/workspace/.local/vulkan-toolchain/usr}
 export PATH="$_vulkan_prefix/bin:$PATH"
 export LD_LIBRARY_PATH="$_vulkan_prefix/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
