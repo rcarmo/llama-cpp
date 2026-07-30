@@ -16,7 +16,7 @@ Branch: `perf/intel-1340p-vulkan-20260731`
 - Placement: eight threads restricted to logical CPUs 0-7, covering the four P-cores.
 - Benchmark geometry: batch 512, microbatch 128, five repetitions in one loaded process; prompt and generation cases use separate processes.
 
-`tools/build-intel-1340p.sh` reproduces the CPU build in Fedora 44. `tools/intel-benchmark.sh` records raw JSON, RSS and temperatures. `tools/run-intel-qwen.sh` starts the accepted server profiles.
+`tools/build-intel-1340p.sh` reproduces the CPU build with the embedded Web UI in Fedora 44. `tools/intel-benchmark.sh` records raw JSON, RSS and temperatures. `tools/run-intel-qwen.sh` starts the accepted server profiles and listens on all interfaces by default.
 
 ## Installed models
 
@@ -141,7 +141,7 @@ LLAMA_PORT=8080 tools/run-intel-qwen.sh qwen36-35b-a3b-q2
 LLAMA_PORT=8080 tools/run-intel-qwen.sh qwen36-27b-q2
 ```
 
-All three launchers returned `{"status":"ok"}` in 1K smoke tests. Q4 and Q2-A3B also completed the 4K MTP service campaign. Override `LLAMA_CTX`, `LLAMA_PORT`, `LLAMA_CPUS`, `LLAMA_THREADS`, `LLAMA_BUILD` or `LLAMA_MODELS` as needed.
+All three launchers returned `{"status":"ok"}` in 1K smoke tests. Q4 and Q2-A3B also completed the 4K MTP service campaign. The embedded Web UI is available at `/`, and the default `LLAMA_HOST=0.0.0.0` exposes it on every interface. Set `LLAMA_HOST=127.0.0.1` when remote access is not required. Override `LLAMA_CTX`, `LLAMA_PORT`, `LLAMA_CPUS`, `LLAMA_THREADS`, `LLAMA_BUILD` or `LLAMA_MODELS` as needed.
 
 ## Evidence
 
@@ -151,3 +151,7 @@ All three launchers returned `{"status":"ok"}` in 1K smoke tests. Q4 and Q2-A3B 
 - Topology and Vulkan sweeps: `sweeps/` and `smoke/`
 - Rejected VNNI A/B: `vnni-kquant-ab/`
 - Launcher health checks: `launcher-smoke/`
+
+## Web UI deployment verification
+
+The accepted build sets `LLAMA_BUILD_UI=ON`. A browser-equivalent request with gzip support returned HTTP 200, `Content-Type: text/html; charset=utf-8`, and the embedded HTML. The launcher socket was verified as `0.0.0.0:8105`, and `/health` returned `{"status":"ok"}`.

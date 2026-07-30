@@ -34,7 +34,7 @@ podman --root "$storage" --runroot "$runroot" --storage-driver vfs --cgroup-mana
       -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
       -DGGML_NATIVE=ON -DGGML_AVX_VNNI=ON -DGGML_OPENMP=ON \
       -DGGML_VULKAN=OFF \
-      -DLLAMA_BUILD_TESTS=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_BUILD_UI=OFF
+      -DLLAMA_BUILD_TESTS=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_BUILD_UI=ON
     cmake --build build-intel-clang \
       --target llama-cli llama-server llama-bench test-x86-quant-dot test-backend-ops \
       -j '"$jobs"'

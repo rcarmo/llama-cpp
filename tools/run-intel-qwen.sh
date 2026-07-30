@@ -7,6 +7,7 @@ shift || true
 
 build=${LLAMA_BUILD:-$root/build-intel-clang}
 models=${LLAMA_MODELS:-$root/../models/qwen3.6}
+host=${LLAMA_HOST:-0.0.0.0}
 port=${LLAMA_PORT:-8080}
 ctx=${LLAMA_CTX:-4096}
 cpus=${LLAMA_CPUS:-0-7}
@@ -47,5 +48,5 @@ exec taskset -c "$cpus" "$server" \
   --batch-size 2048 --ubatch-size 512 \
   --cache-type-k q8_0 --cache-type-v q8_0 \
   --flash-attn on --cache-prompt \
-  --host 127.0.0.1 --port "$port" \
+  --host "$host" --port "$port" \
   "${spec[@]}" "$@"
