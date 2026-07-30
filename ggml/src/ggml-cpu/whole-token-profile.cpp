@@ -2,9 +2,12 @@
 
 #include "ggml.h"
 #include "ggml-cpu.h"
+#include "expert-io-plan.h"
 
+#include <algorithm>
 #include <array>
 #include <atomic>
+#include <cerrno>
 #include <cinttypes>
 #include <cstdio>
 #include <cstdlib>
@@ -45,11 +48,23 @@ struct expert_io_counters {
     std::atomic<uint64_t> range_bytes    {0};
     std::atomic<uint64_t> resident_pages {0};
     std::atomic<uint64_t> sampled_pages  {0};
+    std::atomic<uint64_t> advice_calls   {0};
+    std::atomic<uint64_t> advice_bytes   {0};
+    std::atomic<uint64_t> advice_failures{0};
+    std::atomic<uint64_t> advice_skips   {0};
+    std::atomic<uint64_t> advice_us      {0};
+    std::atomic<uint64_t> advice_slow    {0};
+    std::atomic<uint64_t> advice_disabled{0};
+    std::atomic<uint64_t> resident_skips {0};
 };
 
 expert_io_counters expert_io;
 std::mutex expert_seen_mutex;
 std::unordered_set<uint64_t> expert_seen;
+std::atomic<uint64_t> graph_advice_bytes_left {0};
+std::atomic<uint64_t> graph_advice_ranges_left {0};
+std::atomic<uint64_t> graph_advice_us_left {0};
+std::atomic<bool> advice_circuit_open {false};
 
 const char * family(enum ggml_op op) {
     switch (op) {
@@ -93,20 +108,52 @@ bool expert_io_enabled_impl() {
     return env_enabled("GGML_CPU_EXPERT_IO_PROFILE");
 }
 
+bool expert_advice_enabled_impl() {
+    return env_enabled("GGML_CPU_EXPERT_IO_ADVISE");
+}
+
 bool enabled_impl() {
-    return env_enabled("GGML_CPU_WHOLE_TOKEN_PROFILE") || expert_io_enabled_impl();
+    return env_enabled("GGML_CPU_WHOLE_TOKEN_PROFILE") || expert_io_enabled_impl() || expert_advice_enabled_impl();
+}
+
+uint64_t env_u64(const char * name, uint64_t fallback) {
+    const char * raw = std::getenv(name);
+    if (raw == nullptr || raw[0] == '\0') return fallback;
+    char * end = nullptr;
+    errno = 0;
+    const unsigned long long parsed = std::strtoull(raw, &end, 10);
+    return end != raw && errno != ERANGE ? uint64_t(parsed) : fallback;
+}
+
+uint64_t reserve_up_to(std::atomic<uint64_t> & remaining, uint64_t requested) {
+    uint64_t current = remaining.load(std::memory_order_relaxed);
+    while (current != 0) {
+        const uint64_t granted = std::min(current, requested);
+        if (remaining.compare_exchange_weak(current, current - granted, std::memory_order_relaxed)) return granted;
+    }
+    return 0;
 }
 
 uint64_t expert_io_sample_pages() {
     static const uint64_t value = [] {
-        const char * raw = std::getenv("GGML_CPU_EXPERT_IO_SAMPLE_PAGES");
-        if (raw == nullptr || raw[0] == '\0') return uint64_t(16);
-        char * end = nullptr;
-        const unsigned long long parsed = std::strtoull(raw, &end, 10);
-        return end != raw ? uint64_t(parsed) : uint64_t(16);
+        return env_u64("GGML_CPU_EXPERT_IO_SAMPLE_PAGES", 16);
     }();
     return value;
 }
+
+#if defined(__linux__) || defined(__APPLE__)
+bool page_is_resident(const void * address, uintptr_t page_size, bool & known) {
+    const uintptr_t raw = reinterpret_cast<uintptr_t>(address);
+    void * page = reinterpret_cast<void *>(raw & ~(page_size - 1));
+#if defined(__APPLE__)
+    char state = 0;
+#else
+    unsigned char state = 0;
+#endif
+    known = mincore(page, page_size, &state) == 0;
+    return known && (static_cast<unsigned char>(state) & 1U) != 0;
+}
+#endif
 
 void dump() {
     struct family_counters {
@@ -151,12 +198,16 @@ void dump() {
         " idle_or_sync_us=%" PRIu64 " logical_read_bytes=%" PRIu64 " logical_write_bytes=%" PRIu64 "\n",
         graph_calls.load(std::memory_order_relaxed), graph_us.load(std::memory_order_relaxed), total_wall,
         total_active, total_capacity, idle, total_read, total_write);
-    if (expert_io_enabled_impl()) {
+    if (expert_io_enabled_impl() || expert_advice_enabled_impl()) {
         std::fprintf(stderr,
             "GGML_CPU_EXPERT_IO_PROFILE nodes=%" PRIu64 " selections=%" PRIu64
             " unique=%" PRIu64 " duplicates=%" PRIu64 " repeated=%" PRIu64 " invalid_ids=%" PRIu64
             " ranges=%" PRIu64 " range_bytes=%" PRIu64 " resident_pages=%" PRIu64
-            " sampled_pages=%" PRIu64 "\n",
+            " sampled_pages=%" PRIu64 " advice_calls=%" PRIu64
+            " advice_bytes=%" PRIu64 " advice_failures=%" PRIu64
+            " advice_skips=%" PRIu64 " advice_us=%" PRIu64
+            " advice_slow=%" PRIu64 " advice_disabled=%" PRIu64
+            " resident_skips=%" PRIu64 "\n",
             expert_io.nodes.load(std::memory_order_relaxed),
             expert_io.selections.load(std::memory_order_relaxed),
             expert_io.unique.load(std::memory_order_relaxed),
@@ -166,7 +217,15 @@ void dump() {
             expert_io.range_count.load(std::memory_order_relaxed),
             expert_io.range_bytes.load(std::memory_order_relaxed),
             expert_io.resident_pages.load(std::memory_order_relaxed),
-            expert_io.sampled_pages.load(std::memory_order_relaxed));
+            expert_io.sampled_pages.load(std::memory_order_relaxed),
+            expert_io.advice_calls.load(std::memory_order_relaxed),
+            expert_io.advice_bytes.load(std::memory_order_relaxed),
+            expert_io.advice_failures.load(std::memory_order_relaxed),
+            expert_io.advice_skips.load(std::memory_order_relaxed),
+            expert_io.advice_us.load(std::memory_order_relaxed),
+            expert_io.advice_slow.load(std::memory_order_relaxed),
+            expert_io.advice_disabled.load(std::memory_order_relaxed),
+            expert_io.resident_skips.load(std::memory_order_relaxed));
     }
 }
 
@@ -180,25 +239,40 @@ bool expert_io_enabled() {
     return value;
 }
 
+bool expert_advice_enabled() {
+    static const bool value = expert_advice_enabled_impl();
+    return value;
+}
+
 } // namespace
 
 extern "C" bool ggml_cpu_whole_token_profile_enabled(void) { return enabled(); }
 extern "C" bool ggml_cpu_expert_io_profile_enabled(void) { return expert_io_enabled(); }
 extern "C" int64_t ggml_cpu_whole_token_profile_time_us(void) { return ggml_time_us(); }
-extern "C" void ggml_cpu_whole_token_profile_graph_begin(void) { graph_calls.fetch_add(1, std::memory_order_relaxed); }
+extern "C" void ggml_cpu_whole_token_profile_graph_begin(void) {
+    graph_calls.fetch_add(1, std::memory_order_relaxed);
+    if (expert_advice_enabled()) {
+        graph_advice_bytes_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_BYTES", 64ULL * 1024ULL * 1024ULL), std::memory_order_relaxed);
+        graph_advice_ranges_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_RANGES", 128), std::memory_order_relaxed);
+        graph_advice_us_left.store(env_u64("GGML_CPU_EXPERT_IO_ADVISE_GRAPH_US", 2000), std::memory_order_relaxed);
+    }
+}
 extern "C" void ggml_cpu_whole_token_profile_graph_end(int64_t start_us) { graph_us.fetch_add(ggml_time_us() - start_us, std::memory_order_relaxed); }
 extern "C" void ggml_cpu_whole_token_profile_node_active(enum ggml_op op, int64_t active_us) {
     if (op >= 0 && op < GGML_OP_COUNT) counters[op].active_us.fetch_add(active_us, std::memory_order_relaxed);
 }
 extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * node) {
-    if (!expert_io_enabled() || node == nullptr || node->op != GGML_OP_MUL_MAT_ID) return;
+    const bool profile = expert_io_enabled();
+    const bool advise = expert_advice_enabled();
+    if ((!profile && !advise) || node == nullptr || node->op != GGML_OP_MUL_MAT_ID) return;
     const ggml_tensor * weights = node->src[0];
     const ggml_tensor * ids = node->src[2];
     if (weights == nullptr || ids == nullptr || ids->type != GGML_TYPE_I32 || ids->data == nullptr ||
-            !ggml_is_contiguous(ids) || weights->ne[2] <= 0 || weights->nb[2] == 0) return;
+            !ggml_is_contiguous(ids) || !ggml_is_contiguous(weights) || weights->ne[2] <= 0 || weights->nb[2] == 0) return;
 
     const int64_t n_expert = weights->ne[2];
     const int64_t n_ids = ggml_nelements(ids);
+    if (n_expert > std::numeric_limits<uint32_t>::max() || n_ids < 0 || n_ids > std::numeric_limits<int>::max()) return;
     std::vector<uint8_t> seen(static_cast<size_t>(n_expert), 0);
     uint64_t unique = 0, invalid = 0;
     for (int64_t i = 0; i < n_ids; ++i) {
@@ -214,6 +288,8 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
     uint64_t repeated = 0;
     {
         std::lock_guard<std::mutex> lock(expert_seen_mutex);
+        const uint64_t max_seen = env_u64("GGML_CPU_EXPERT_IO_MAX_SEEN", 65536);
+        if (max_seen != 0 && expert_seen.size() >= max_seen) expert_seen.clear();
         for (int64_t id = 0; id < n_expert; ++id) {
             if (!seen[static_cast<size_t>(id)]) continue;
             const uint64_t tensor_key = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(weights)) >> 4;
@@ -235,7 +311,75 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
     expert_io.range_bytes.fetch_add(bytes, std::memory_order_relaxed);
 
 #if defined(__linux__) || defined(__APPLE__)
-    if (weights->data != nullptr && expert_io_sample_pages() != 0) {
+    if (advise && weights->data != nullptr) {
+        if (advice_circuit_open.load(std::memory_order_relaxed) ||
+                graph_advice_bytes_left.load(std::memory_order_relaxed) == 0 ||
+                graph_advice_ranges_left.load(std::memory_order_relaxed) == 0 ||
+                graph_advice_us_left.load(std::memory_order_relaxed) == 0) {
+            expert_io.advice_disabled.fetch_add(1, std::memory_order_relaxed);
+        } else {
+            const long page_size_raw = sysconf(_SC_PAGESIZE);
+            if (page_size_raw > 0) {
+                const uintptr_t page_size = static_cast<uintptr_t>(page_size_raw);
+                std::vector<int32_t> selected;
+                selected.reserve(static_cast<size_t>(n_ids));
+                uint64_t resident_skips = 0;
+                for (int64_t i = 0; i < n_ids; ++i) {
+                    const int32_t id = ggml_get_i32_1d(ids, static_cast<int>(i));
+                    if (id < 0 || id >= n_expert) {
+                        selected.push_back(id);
+                        continue;
+                    }
+                    const void * address = static_cast<const uint8_t *>(weights->data) + static_cast<uint64_t>(id) * expert_bytes;
+                    bool known = false;
+                    if (page_is_resident(address, page_size, known) && known) {
+                        ++resident_skips;
+                    } else {
+                        selected.push_back(id);
+                    }
+                }
+                expert_io.resident_skips.fetch_add(resident_skips, std::memory_order_relaxed);
+
+                ggml_expert_io_plan_limits limits;
+                const uint64_t per_call_bytes = env_u64("GGML_CPU_EXPERT_IO_ADVISE_MAX_BYTES", 8ULL * 1024ULL * 1024ULL);
+                const uint64_t per_call_ranges = env_u64("GGML_CPU_EXPERT_IO_ADVISE_MAX_RANGES", 16);
+                limits.max_bytes = std::min(per_call_bytes, graph_advice_bytes_left.load(std::memory_order_relaxed));
+                limits.max_ranges = static_cast<size_t>(std::min(per_call_ranges, graph_advice_ranges_left.load(std::memory_order_relaxed)));
+                limits.coalesce_gap = env_u64("GGML_CPU_EXPERT_IO_ADVISE_COALESCE_GAP", 0);
+                const ggml_expert_tensor_span span {0, expert_bytes, static_cast<uint32_t>(n_expert)};
+                const auto plan = ggml_expert_io_plan_ranges(selected, {span}, limits);
+                expert_io.advice_skips.fetch_add(plan.skipped_ranges + (plan.error.empty() ? 0 : 1), std::memory_order_relaxed);
+                if (plan.error.empty() && !plan.ranges.empty()) {
+                    reserve_up_to(graph_advice_bytes_left, plan.planned_bytes);
+                    reserve_up_to(graph_advice_ranges_left, plan.ranges.size());
+                    const int64_t advice_start = ggml_time_us();
+                    uint64_t calls = 0, advice_bytes = 0, failures = 0;
+                    for (const auto & range : plan.ranges) {
+                        const uintptr_t address = reinterpret_cast<uintptr_t>(weights->data) + range.offset;
+                        const uintptr_t page_address = address & ~(page_size - 1);
+                        const uint64_t prefix = address - page_address;
+                        if (range.length > max_u64 - prefix) { ++failures; continue; }
+                        const uint64_t length = range.length + prefix;
+                        if (length > std::numeric_limits<size_t>::max()) { ++failures; continue; }
+                        ++calls;
+                        advice_bytes += range.length;
+                        if (madvise(reinterpret_cast<void *>(page_address), static_cast<size_t>(length), MADV_WILLNEED) != 0) ++failures;
+                    }
+                    const uint64_t elapsed = static_cast<uint64_t>(ggml_time_us() - advice_start);
+                    const uint64_t granted_us = reserve_up_to(graph_advice_us_left, elapsed);
+                    const uint64_t slow_us = env_u64("GGML_CPU_EXPERT_IO_ADVISE_SLOW_US", 500);
+                    if (elapsed > slow_us) expert_io.advice_slow.fetch_add(1, std::memory_order_relaxed);
+                    if (elapsed > granted_us || failures != 0) advice_circuit_open.store(true, std::memory_order_relaxed);
+                    expert_io.advice_calls.fetch_add(calls, std::memory_order_relaxed);
+                    expert_io.advice_bytes.fetch_add(advice_bytes, std::memory_order_relaxed);
+                    expert_io.advice_failures.fetch_add(failures, std::memory_order_relaxed);
+                    expert_io.advice_us.fetch_add(elapsed, std::memory_order_relaxed);
+                }
+            }
+        }
+    }
+
+    if (profile && weights->data != nullptr && expert_io_sample_pages() != 0) {
         const long page_size_raw = sysconf(_SC_PAGESIZE);
         if (page_size_raw > 0) {
             const uintptr_t page_size = static_cast<uintptr_t>(page_size_raw);
@@ -243,12 +387,9 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
             for (int64_t id = 0; id < n_expert && sampled < expert_io_sample_pages(); ++id) {
                 if (!seen[static_cast<size_t>(id)]) continue;
                 const uintptr_t address = reinterpret_cast<uintptr_t>(weights->data) + static_cast<uint64_t>(id) * expert_bytes;
-                void * page = reinterpret_cast<void *>(address & ~(page_size - 1));
-                unsigned char state = 0;
-                if (mincore(page, page_size, &state) == 0) {
-                    ++sampled;
-                    resident += (state & 1U) != 0;
-                }
+                bool known = false;
+                resident += page_is_resident(reinterpret_cast<void *>(address), page_size, known);
+                sampled += known;
             }
             expert_io.sampled_pages.fetch_add(sampled, std::memory_order_relaxed);
             expert_io.resident_pages.fetch_add(resident, std::memory_order_relaxed);

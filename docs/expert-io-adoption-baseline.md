@@ -172,3 +172,43 @@ The 684 repeated selections show meaningful reuse potential. All sampled pages
 were resident immediately before execution in this post-load warm process;
 cold/persistent-server request boundaries are needed to observe nonresident
 expert pages.
+
+## Bounded Linux advice proof
+
+`GGML_CPU_EXPERT_IO_ADVISE=1` enables Linux/macOS mapped-range
+`madvise(MADV_WILLNEED)` for nonresident experts only. It is off by default and
+shares the pure range planner.
+
+Per-node controls:
+
+```text
+GGML_CPU_EXPERT_IO_ADVISE_MAX_BYTES       default 8 MiB
+GGML_CPU_EXPERT_IO_ADVISE_MAX_RANGES      default 16
+GGML_CPU_EXPERT_IO_ADVISE_COALESCE_GAP    default 0
+```
+
+Per-graph controls:
+
+```text
+GGML_CPU_EXPERT_IO_ADVISE_GRAPH_BYTES     default 64 MiB
+GGML_CPU_EXPERT_IO_ADVISE_GRAPH_RANGES    default 128
+GGML_CPU_EXPERT_IO_ADVISE_GRAPH_US        default 2000 us
+```
+
+Safety/adaptation controls:
+
+```text
+GGML_CPU_EXPERT_IO_ADVISE_SLOW_US         default 500 us
+GGML_CPU_EXPERT_IO_MAX_SEEN               default 65536 profiler keys
+```
+
+The implementation skips resident first pages, invalid/noncontiguous layouts,
+exhausted graph budgets, and an open failure/time circuit breaker. Advice is
+page-aligned and overflow-checked. Linux and macOS mincore vector types are
+handled separately.
+
+A warm p4/n2 validation observed all 2,880 selected expert slices resident and
+therefore issued zero advice calls/bytes. This is correct miss-only behavior and
+also demonstrates that same-node advice after model load cannot help a fully
+resident run. Safe lookahead/overlap is required to test useful advice under
+page pressure.
