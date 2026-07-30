@@ -228,3 +228,19 @@ A forced-resident p1/n1 validation with tight graph limits reported 32 advice
 calls, 10.29 MB advised, 0 failures, 88 us total advice time, 98 skipped ranges,
 and 463 nodes disabled after graph budgets were exhausted. Queue depth remained
 1. Normal warm mode still issued zero calls and skipped 2,880 resident experts.
+
+## Advice policy modes
+
+Use `GGML_CPU_EXPERT_IO_ADVISE_MODE=off|bounded|adaptive`. The legacy
+`GGML_CPU_EXPERT_IO_ADVISE=1` maps to bounded mode.
+
+- `off`: no worker or advice/profile output unless profiling is enabled.
+- `bounded`: obey per-node/per-graph caps; slow calls are counted but do not
+  permanently disable later graphs.
+- `adaptive`: failures open the process circuit immediately; consecutive slow
+  jobs open it after `GGML_CPU_EXPERT_IO_ADVISE_MAX_SLOW` (default 3).
+
+`GGML_CPU_EXPERT_IO_ADVISE_SLOW_US` defaults to 500 us. A forced diagnostic with
+threshold 0 and max-slow 1 issued one 7-range/2.42 MB job in 17 us, classified it
+slow by construction, and disabled 479 later nodes. This validates circuit
+behavior; production values must use real latency thresholds.

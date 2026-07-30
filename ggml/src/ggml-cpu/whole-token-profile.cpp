@@ -68,8 +68,12 @@ std::atomic<uint64_t> graph_advice_bytes_left {0};
 std::atomic<uint64_t> graph_advice_ranges_left {0};
 std::atomic<uint64_t> graph_advice_us_left {0};
 std::atomic<bool> advice_circuit_open {false};
+std::atomic<uint64_t> advice_slow_streak {0};
+
+enum class expert_advice_mode { off, bounded, adaptive };
 
 uint64_t env_u64(const char * name, uint64_t fallback);
+expert_advice_mode advice_mode();
 uint64_t reserve_up_to(std::atomic<uint64_t> & remaining, uint64_t requested);
 
 #if defined(__linux__) || defined(__APPLE__)
@@ -126,8 +130,18 @@ private:
             const uint64_t elapsed = static_cast<uint64_t>(ggml_time_us() - started);
             const uint64_t granted_us = reserve_up_to(graph_advice_us_left, elapsed);
             const uint64_t slow_us = env_u64("GGML_CPU_EXPERT_IO_ADVISE_SLOW_US", 500);
-            if (elapsed > slow_us) expert_io.advice_slow.fetch_add(1, std::memory_order_relaxed);
-            if (elapsed > granted_us || failures != 0) advice_circuit_open.store(true, std::memory_order_relaxed);
+            if (elapsed > slow_us) {
+                expert_io.advice_slow.fetch_add(1, std::memory_order_relaxed);
+                const uint64_t streak = advice_slow_streak.fetch_add(1, std::memory_order_relaxed) + 1;
+                if (advice_mode() == expert_advice_mode::adaptive &&
+                        streak >= env_u64("GGML_CPU_EXPERT_IO_ADVISE_MAX_SLOW", 3)) {
+                    advice_circuit_open.store(true, std::memory_order_relaxed);
+                }
+            } else {
+                advice_slow_streak.store(0, std::memory_order_relaxed);
+            }
+            if (failures != 0) advice_circuit_open.store(true, std::memory_order_relaxed);
+            if (elapsed > granted_us) expert_io.advice_disabled.fetch_add(1, std::memory_order_relaxed);
             expert_io.advice_calls.fetch_add(calls, std::memory_order_relaxed);
             expert_io.advice_bytes.fetch_add(bytes, std::memory_order_relaxed);
             expert_io.advice_failures.fetch_add(failures, std::memory_order_relaxed);
@@ -197,8 +211,21 @@ bool expert_io_enabled_impl() {
     return env_enabled("GGML_CPU_EXPERT_IO_PROFILE");
 }
 
+expert_advice_mode advice_mode() {
+    static const expert_advice_mode value = [] {
+        const char * raw = std::getenv("GGML_CPU_EXPERT_IO_ADVISE_MODE");
+        if (raw != nullptr) {
+            if (std::strcmp(raw, "adaptive") == 0) return expert_advice_mode::adaptive;
+            if (std::strcmp(raw, "bounded") == 0) return expert_advice_mode::bounded;
+            return expert_advice_mode::off;
+        }
+        return env_enabled("GGML_CPU_EXPERT_IO_ADVISE") ? expert_advice_mode::bounded : expert_advice_mode::off;
+    }();
+    return value;
+}
+
 bool expert_advice_enabled_impl() {
-    return env_enabled("GGML_CPU_EXPERT_IO_ADVISE");
+    return advice_mode() != expert_advice_mode::off;
 }
 
 bool enabled_impl() {
