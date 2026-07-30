@@ -483,6 +483,7 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
                 selected.reserve(static_cast<size_t>(n_ids));
                 const bool include_resident = env_enabled("GGML_CPU_EXPERT_IO_ADVISE_RESIDENT");
                 uint64_t resident_skips = 0;
+                uint64_t residency_known = 0;
                 for (int64_t i = 0; i < n_ids; ++i) {
                     const int32_t id = ggml_get_i32_1d(ids, static_cast<int>(i));
                     if (id < 0 || id >= n_expert) {
@@ -491,13 +492,19 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
                     }
                     const void * address = static_cast<const uint8_t *>(weights->data) + static_cast<uint64_t>(id) * expert_bytes;
                     bool known = false;
-                    if (!include_resident && page_is_resident(address, page_size, known) && known) {
+                    const bool resident = page_is_resident(address, page_size, known);
+                    residency_known += known;
+                    if (!include_resident && resident && known) {
                         ++resident_skips;
                     } else {
                         selected.push_back(id);
                     }
                 }
                 expert_io.resident_skips.fetch_add(resident_skips, std::memory_order_relaxed);
+                if (profile) {
+                    expert_io.sampled_pages.fetch_add(residency_known, std::memory_order_relaxed);
+                    expert_io.resident_pages.fetch_add(resident_skips, std::memory_order_relaxed);
+                }
 
                 ggml_expert_io_plan_limits limits;
                 const uint64_t per_call_bytes = env_u64("GGML_CPU_EXPERT_IO_ADVISE_MAX_BYTES", 8ULL * 1024ULL * 1024ULL);
@@ -532,7 +539,7 @@ extern "C" void ggml_cpu_expert_io_profile_observe(const struct ggml_tensor * no
         }
     }
 
-    if (profile && weights->data != nullptr && expert_io_sample_pages() != 0) {
+    if (profile && !advise && weights->data != nullptr && expert_io_sample_pages() != 0) {
         const long page_size_raw = sysconf(_SC_PAGESIZE);
         if (page_size_raw > 0) {
             const uintptr_t page_size = static_cast<uintptr_t>(page_size_raw);
