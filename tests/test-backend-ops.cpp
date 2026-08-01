@@ -8841,6 +8841,38 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
         }
     }
 
+    // Qwen3.6 35B-A3B dense projection shapes used by target and MTP verification.
+    for (ggml_type type_a : {GGML_TYPE_Q2_K, GGML_TYPE_Q4_K}) {
+        for (int64_t m : {2048, 5120, 11008}) {
+            for (int64_t n : {1, 2, 3, 4}) {
+                for (int64_t k : {2048, 5120}) {
+                    test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, m, n, k, {1, 1}, {1, 1}));
+                }
+            }
+        }
+    }
+
+    // Ornith 1.0 35B MoE APEX-I-Mini routed expert projection shapes.
+    // The file-level quant is IQ2_XXS, while gate/up/down are Q3_K. Use 16
+    // synthetic experts to keep routine correctness allocations bounded; model
+    // validation covers the production 256-expert / 8-selected routing geometry.
+    for (int bs : {1, 2, 3, 4, 8}) {
+        test_cases.emplace_back(new test_mul_mat_id(GGML_TYPE_Q3_K, GGML_TYPE_F32, 16, 8, false, 512,  bs, 2048));
+        test_cases.emplace_back(new test_mul_mat_id(GGML_TYPE_Q3_K, GGML_TYPE_F32, 16, 8, false, 2048, bs, 512));
+    }
+
+    // Gemma 4 E4B QAT target and four-block Q8_0 assistant projection shapes.
+    for (int bs : {1, 2, 3, 4}) {
+        for (auto [m, k] : std::initializer_list<std::pair<int64_t, int64_t>>{
+                {10240, 2560}, {2560, 10240}, {512, 2560}, {2048, 2560}, {4096, 2560}}) {
+            test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, m, bs, k, {1, 1}, {1, 1}));
+        }
+        for (auto [m, k] : std::initializer_list<std::pair<int64_t, int64_t>>{
+                {2048, 256}, {256, 2048}, {1024, 256}, {2560, 256}, {256, 5120}}) {
+            test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q8_0, GGML_TYPE_F32, m, bs, k, {1, 1}, {1, 1}));
+        }
+    }
+
     test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 2880, 32, 2880, {1, 1}, {1, 1}));
     test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q8_0, GGML_TYPE_F32, 2880, 32, 2880, {1, 1}, {1, 1}));
     test_cases.emplace_back(new test_mul_mat(GGML_TYPE_MXFP4, GGML_TYPE_F32, 2880, 32, 2880, {1, 1}, {1, 1}));
@@ -9726,6 +9758,17 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
 static std::vector<std::unique_ptr<test_case>> make_test_cases_perf() {
     std::vector<std::unique_ptr<test_case>> test_cases;
 
+    // Qwen3.6 35B-A3B dense projection shapes used by target and MTP verification.
+    for (ggml_type type_a : {GGML_TYPE_Q2_K, GGML_TYPE_Q4_K}) {
+        for (int64_t m : {2048, 5120, 11008}) {
+            for (int64_t n : {1, 2, 3, 4}) {
+                for (int64_t k : {2048, 5120}) {
+                    test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, m, n, k, {1, 1}, {1, 1}));
+                }
+            }
+        }
+    }
+
     // Conv2d: K=CRS=NPQ=4096 matmul performance
     uint32_t                        iwh_idx  = 0;
     uint32_t                        kwh_idx  = 1;
@@ -9878,6 +9921,20 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_perf() {
                 test_cases.emplace_back(new test_mul_mat(type_a, type_b, 4096, bs, 14336, {1,  1}, {1, 1}));
             }
         }
+    }
+
+    // Ornith 1.0 35B MoE APEX-I-Mini routed Q3_K projection microbenchmarks.
+    for (int bs : {1, 2, 4, 8}) {
+        test_cases.emplace_back(new test_mul_mat_id(GGML_TYPE_Q3_K, GGML_TYPE_F32, 16, 8, false, 512,  bs, 2048));
+        test_cases.emplace_back(new test_mul_mat_id(GGML_TYPE_Q3_K, GGML_TYPE_F32, 16, 8, false, 2048, bs, 512));
+    }
+
+    // Gemma 4 E4B QAT target Q4_0 projection microbenchmarks.
+    for (int bs : {1, 2, 4}) {
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 10240, bs, 2560, {1, 1}, {1, 1}));
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 2560, bs, 10240, {1, 1}, {1, 1}));
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 2048,  bs, 2560, {1, 1}, {1, 1}));
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 4096,  bs, 2560, {1, 1}, {1, 1}));
     }
 
     // qwen3-30b-a3b
@@ -10420,7 +10477,7 @@ static void show_test_coverage() {
 
 static void usage(char ** argv) {
     printf("Usage: %s [mode] [-o <op,..>] [-b <backend>] [-p <params regex>] [--output <console|sql|csv>] [--list-ops]", argv[0]);
-    printf(" [--show-coverage] [--test-file <path>] [-j <n>]\n");
+    printf(" [--show-coverage] [--test-file <path>] [-j <n>] [-t <n>]\n");
     printf("    valid modes:\n");
     printf("      - test (default, compare with CPU backend for correctness)\n");
     printf("      - grad (compare gradients from backpropagation with method of finite differences)\n");
@@ -10433,6 +10490,7 @@ static void usage(char ** argv) {
     printf("    --show-coverage shows test coverage\n");
     printf("    --test-file reads test operators from a test file generated by test-export-graph-ops\n");
     printf("    -j <n> runs tests using <n> parallel worker threads (default: 1, test mode only)\n");
+    printf("    -t, --threads <n> sets backend compute threads (default: hardware concurrency)\n");
 }
 
 int main(int argc, char ** argv) {
@@ -10443,6 +10501,7 @@ int main(int argc, char ** argv) {
     const char * params_filter = nullptr;
     const char * test_file_path = nullptr;
     int parallel_workers = 1;
+    int backend_threads = N_THREADS;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "test") == 0) {
@@ -10508,6 +10567,17 @@ int main(int argc, char ** argv) {
                 usage(argv);
                 return 1;
             }
+        } else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--threads") == 0) {
+            if (i + 1 < argc) {
+                backend_threads = atoi(argv[++i]);
+                if (backend_threads < 1) {
+                    usage(argv);
+                    return 1;
+                }
+            } else {
+                usage(argv);
+                return 1;
+            }
         } else {
             usage(argv);
             return 1;
@@ -10550,8 +10620,7 @@ int main(int argc, char ** argv) {
         ggml_backend_reg_t reg = ggml_backend_dev_backend_reg(dev);
         auto ggml_backend_set_n_threads_fn = (ggml_backend_set_n_threads_t) ggml_backend_reg_get_proc_address(reg, "ggml_backend_set_n_threads");
         if (ggml_backend_set_n_threads_fn) {
-            // TODO: better value for n_threads
-            ggml_backend_set_n_threads_fn(backend.get(), N_THREADS);
+            ggml_backend_set_n_threads_fn(backend.get(), backend_threads);
         }
 
         size_t free, total;  // NOLINT
