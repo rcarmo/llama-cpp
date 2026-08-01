@@ -1432,6 +1432,9 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
         auto * ctx_dft = this->params.ctx_dft;
 
         const size_t row_bytes = (size_t) n_embd * sizeof(float);
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
+        const int64_t catchup_start_us = profile ? ggml_time_us() : 0;
 
         // if kv is shared with target (e.g Gemma4), then we can skip this catch-up decode
         if (!is_mem_shared) {
@@ -1495,7 +1498,12 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                 return false;
             }
         }
+        if (profile) {
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=%d us=%lld\n",
+                    n_tokens, (long long) (ggml_time_us() - catchup_start_us));
+        }
 
+        const int64_t extract_start_us = profile ? ggml_time_us() : 0;
         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
             if (i_batch_end[seq_id] < 0) {
                 continue;
@@ -1512,6 +1520,10 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
 
             std::memcpy(pending_h[seq_id].data(),
                     verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
+        }
+        if (profile) {
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=%d us=%lld\n",
+                    n_tokens, (long long) (ggml_time_us() - extract_start_us));
         }
 
         return true;
@@ -2563,8 +2575,15 @@ bool common_speculative_process(common_speculative * spec, const llama_batch & b
         return result;
     }
 
+    const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+            getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
+    const int64_t t_start_us = profile ? ggml_time_us() : 0;
     for (auto & impl : spec->impls) {
         result = result && impl->process(batch);
+    }
+    if (profile) {
+        SPC_INF("GGML_SPECULATIVE_PROFILE phase=process rows=%d us=%lld ok=%d\n",
+                batch.n_tokens, (long long) (ggml_time_us() - t_start_us), result ? 1 : 0);
     }
 
     return result;
@@ -2623,9 +2642,20 @@ void common_speculative_draft(common_speculative * spec) {
 
     for (auto & impl : spec->impls) {
         {
+            const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                    getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
+            const int64_t draft_start_us = profile ? ggml_time_us() : 0;
             common_time_meas tm(impl->t_draft_us, !impl->gen_perf);
             impl->draft(dparams);
             impl->n_call_draft++;
+            if (profile) {
+                size_t n_tokens = 0;
+                for (const auto & dp : dparams) {
+                    n_tokens += dp.result ? dp.result->size() : 0;
+                }
+                SPC_INF("GGML_SPECULATIVE_PROFILE phase=draft tokens=%zu us=%lld\n",
+                        n_tokens, (long long) (ggml_time_us() - draft_start_us));
+            }
         }
 
         int n_drafting = 0;

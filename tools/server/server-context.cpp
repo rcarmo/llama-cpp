@@ -2854,7 +2854,17 @@ private:
                 // TODO @ngxson : maybe handle n_batch == 1 here instead of inside decode()
 
                 batch_view = batch.get_view(off, n_tokens);
+                const bool mtp_profile = (getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                        getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr) &&
+                        std::any_of(slots.begin(), slots.end(), [](const server_slot & slot) {
+                            return !slot.spec_i_batch.empty();
+                        });
+                const int64_t mtp_decode_start_us = mtp_profile ? ggml_time_us() : 0;
                 bool ok = decode(n_batch, off, batch_view);
+                if (mtp_profile) {
+                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=target_decode rows=%d us=%lld ok=%d\n",
+                            batch_view.n_tokens, (long long) (ggml_time_us() - mtp_decode_start_us), ok ? 1 : 0);
+                }
 #ifdef DEBUG_TIMINGS
                 llama_synchronize(ctx_tgt);
 #endif
@@ -3856,9 +3866,17 @@ private:
                 // save the sampler sampler state in case we need to restore it
                 common_sampler_ptr smpl_save(common_sampler_clone(slot.smpl.get()));
 
+                const bool mtp_profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                        getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
+                const int64_t mtp_accept_start_us = mtp_profile ? ggml_time_us() : 0;
                 GGML_ASSERT(slot.spec_i_batch.size() == n_draft + 1);
                 auto accepted = common_sampler_sample_and_accept_n(slot.smpl.get(), slot.ctx_tgt, slot.spec_i_batch, slot.spec_draft);
                 slot.spec_i_batch.clear();
+                if (mtp_profile) {
+                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=sample_accept rows=%zu accepted=%zu us=%lld\n",
+                            n_draft + 1, accepted.size() - 1,
+                            (long long) (ggml_time_us() - mtp_accept_start_us));
+                }
 
                 GGML_ASSERT(accepted.size() >= 1);
 
@@ -3882,6 +3900,7 @@ private:
 
                         SLT_DBG(slot, "restoring speculative checkpoint (pos_min = %d, pos_max = %d, size = %zu)\n", ckpt.pos_min, ckpt.pos_max, ckpt.size());
 
+                        const int64_t mtp_restore_start_us = mtp_profile ? ggml_time_us() : 0;
                         ckpt.load_tgt(slot.ctx_tgt, slot.id, LLAMA_STATE_SEQ_FLAGS_PARTIAL_ONLY);
 
                         if (slot.ctx_dft) {
@@ -3892,6 +3911,10 @@ private:
 
                         slot.prompt.tokens.keep_first(ckpt.n_tokens);
                         slot.smpl = std::move(smpl_save);
+                        if (mtp_profile) {
+                            SRV_INF("GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=%u us=%lld\n",
+                                    n_rollback, (long long) (ggml_time_us() - mtp_restore_start_us));
+                        }
 
                         return;
                     }
@@ -4457,7 +4480,15 @@ void server_routes::init_routes() {
         };
 
         ggml_cpu_expert_io_metrics expert_io {};
-        ggml_cpu_get_expert_io_metrics(&expert_io);
+        if (ggml_backend_dev_t cpu_dev = ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_CPU)) {
+            ggml_backend_reg_t cpu_reg = ggml_backend_dev_backend_reg(cpu_dev);
+            using get_expert_io_metrics_t = void (*)(ggml_cpu_expert_io_metrics *);
+            auto get_expert_io_metrics = (get_expert_io_metrics_t)
+                    ggml_backend_reg_get_proc_address(cpu_reg, "ggml_cpu_get_expert_io_metrics");
+            if (get_expert_io_metrics) {
+                get_expert_io_metrics(&expert_io);
+            }
+        }
         auto & expert_counters = all_metrics_def["counter"];
         expert_counters.push_back({{"name", "expert_io_nodes_total"}, {"help", "Observed routed expert matrix nodes."}, {"value", expert_io.nodes}});
         expert_counters.push_back({{"name", "expert_io_selections_total"}, {"help", "Routed expert IDs selected."}, {"value", expert_io.selections}});
