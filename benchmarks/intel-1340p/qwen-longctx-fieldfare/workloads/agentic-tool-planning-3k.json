@@ -1,0 +1,52 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a coding agent. Repository evidence must be obtained with the supplied search_repository tool. Do not answer from memory."
+    },
+    {
+      "role": "user",
+      "content": "The following generated repository manifest is intentionally long. Find the implementation that observes Qwen routed-expert page residency and submits bounded asynchronous mmap advice. Use search_repository with a narrow query and path, then report the first three files to inspect. Do not modify anything.\n\n000 src/common/module-000.h owner=backend-0 status=experimental\n001 src/ggml-cpu/module-001.cpp owner=backend-1 status=stable\n002 src/ggml-vulkan/module-002.cpp owner=backend-2 status=stable\n003 src/server/module-003.glsl owner=backend-3 status=stable\n004 src/tests/module-004.cpp owner=backend-4 status=stable\n005 src/tools/module-005.h owner=backend-5 status=stable\n006 src/common/module-006.glsl owner=backend-6 status=stable\n007 src/ggml-cpu/module-007.cpp owner=backend-7 status=stable\n008 src/ggml-vulkan/module-008.cpp owner=backend-8 status=stable\n009 src/server/module-009.glsl owner=backend-0 status=stable\n010 src/tests/module-010.h owner=backend-1 status=stable\n011 src/tools/module-011.cpp owner=backend-2 status=experimental\n012 src/common/module-012.glsl owner=backend-3 status=stable\n013 src/ggml-cpu/module-013.cpp owner=backend-4 status=stable\n014 src/ggml-vulkan/module-014.cpp owner=backend-5 status=stable\n015 src/server/module-015.h owner=backend-6 status=stable\n016 src/tests/module-016.cpp owner=backend-7 status=stable\n017 src/tools/module-017.cpp owner=backend-8 status=stable\n018 src/common/module-018.glsl owner=backend-0 status=stable\n019 src/ggml-cpu/module-019.cpp owner=backend-1 status=stable\n020 src/ggml-vulkan/module-020.h owner=backend-2 status=stable\n021 src/server/module-021.glsl owner=backend-3 status=stable\n022 src/tests/module-022.cpp owner=backend-4 status=experimental\n023 src/tools/module-023.cpp owner=backend-5 status=stable\n024 src/common/module-024.glsl owner=backend-6 status=stable\n025 src/ggml-cpu/module-025.h owner=backend-7 status=stable\n026 src/ggml-vulkan/module-026.cpp owner=backend-8 status=stable\n027 src/server/module-027.glsl owner=backend-0 status=stable\n028 src/tests/module-028.cpp owner=backend-1 status=stable\n029 src/tools/module-029.cpp owner=backend-2 status=stable\n030 src/common/module-030.h owner=backend-3 status=stable\n031 src/ggml-cpu/module-031.cpp owner=backend-4 status=stable\n032 src/ggml-vulkan/module-032.cpp owner=backend-5 status=stable\n033 src/server/module-033.glsl owner=backend-6 status=experimental\n034 src/tests/module-034.cpp owner=backend-7 status=stable\n035 src/tools/module-035.h owner=backend-8 status=stable\n036 src/common/module-036.glsl owner=backend-0 status=stable\n037 src/ggml-cpu/module-037.cpp owner=backend-1 status=stable\n038 src/ggml-vulkan/module-038.cpp owner=backend-2 status=stable\n039 src/server/module-039.glsl owner=backend-3 status=stable\n040 src/tests/module-040.h owner=backend-4 status=stable\n041 src/tools/module-041.cpp owner=backend-5 status=stable\n042 src/common/module-042.glsl owner=backend-6 status=stable\n043 src/ggml-cpu/module-043.cpp owner=backend-7 status=stable\n044 src/ggml-vulkan/module-044.cpp owner=backend-8 status=experimental\n045 src/server/module-045.h owner=backend-0 status=stable\n046 src/tests/module-046.cpp owner=backend-1 status=stable\n047 src/tools/module-047.cpp owner=backend-2 status=stable\n048 src/common/module-048.glsl owner=backend-3 status=stable\n049 src/ggml-cpu/module-049.cpp owner=backend-4 status=stable\n050 src/ggml-vulkan/module-050.h owner=backend-5 status=stable\n051 src/server/module-051.glsl owner=backend-6 status=stable\n052 src/tests/module-052.cpp owner=backend-7 status=stable\n053 src/tools/module-053.cpp owner=backend-8 status=stable\n054 src/common/module-054.glsl owner=backend-0 status=stable\n055 src/ggml-cpu/module-055.h owner=backend-1 status=experimental\n056 src/ggml-vulkan/module-056.cpp owner=backend-2 status=stable\n057 src/server/module-057.glsl owner=backend-3 status=stable\n058 src/tests/module-058.cpp owner=backend-4 status=stable\n059 src/tools/module-059.cpp owner=backend-5 status=stable\n060 src/common/module-060.h owner=backend-6 status=stable\n061 src/ggml-cpu/module-061.cpp owner=backend-7 status=stable\n062 src/ggml-vulkan/module-062.cpp owner=backend-8 status=stable\n063 src/server/module-063.glsl owner=backend-0 status=stable\n064 src/tests/module-064.cpp owner=backend-1 status=stable\n065 src/tools/module-065.h owner=backend-2 status=stable\n066 src/common/module-066.glsl owner=backend-3 status=experimental\n067 src/ggml-cpu/module-067.cpp owner=backend-4 status=stable\n068 src/ggml-vulkan/module-068.cpp owner=backend-5 status=stable\n069 src/server/module-069.glsl owner=backend-6 status=stable\n070 src/tests/module-070.h owner=backend-7 status=stable\n071 src/tools/module-071.cpp owner=backend-8 status=stable\n072 src/common/module-072.glsl owner=backend-0 status=stable\n073 src/ggml-cpu/module-073.cpp owner=backend-1 status=stable\n074 src/ggml-vulkan/module-074.cpp owner=backend-2 status=stable\n075 src/server/module-075.h owner=backend-3 status=stable\n076 src/tests/module-076.cpp owner=backend-4 status=stable\n077 src/tools/module-077.cpp owner=backend-5 status=experimental\n078 src/common/module-078.glsl owner=backend-6 status=stable\n079 src/ggml-cpu/module-079.cpp owner=backend-7 status=stable\n080 src/ggml-vulkan/module-080.h owner=backend-8 status=stable\n081 src/server/module-081.glsl owner=backend-0 status=stable\n082 src/tests/module-082.cpp owner=backend-1 status=stable\n083 src/tools/module-083.cpp owner=backend-2 status=stable\n084 src/common/module-084.glsl owner=backend-3 status=stable\n085 src/ggml-cpu/module-085.h owner=backend-4 status=stable\n086 src/ggml-vulkan/module-086.cpp owner=backend-5 status=stable\nNEEDLE ggml/src/ggml-cpu/whole-token-profile.cpp owns routed MUL_MAT_ID expert residency, bounded mmap range planning, and async MADV_WILLNEED submission\nRELATED ggml/src/ggml-cpu/expert-io-plan.cpp coalesces selected expert address ranges under byte and range budgets\nRELATED tools/server/server-context.cpp exports expert I/O counters through the Prometheus metrics endpoint\n087 src/server/module-087.glsl owner=backend-6 status=stable\n088 src/tests/module-088.cpp owner=backend-7 status=experimental\n089 src/tools/module-089.cpp owner=backend-8 status=stable\n090 src/common/module-090.h owner=backend-0 status=stable\n091 src/ggml-cpu/module-091.cpp owner=backend-1 status=stable\n092 src/ggml-vulkan/module-092.cpp owner=backend-2 status=stable\n093 src/server/module-093.glsl owner=backend-3 status=stable\n094 src/tests/module-094.cpp owner=backend-4 status=stable\n095 src/tools/module-095.h owner=backend-5 status=stable\n096 src/common/module-096.glsl owner=backend-6 status=stable\n097 src/ggml-cpu/module-097.cpp owner=backend-7 status=stable\n098 src/ggml-vulkan/module-098.cpp owner=backend-8 status=stable\n099 src/server/module-099.glsl owner=backend-0 status=experimental\n100 src/tests/module-100.h owner=backend-1 status=stable\n101 src/tools/module-101.cpp owner=backend-2 status=stable\n102 src/common/module-102.glsl owner=backend-3 status=stable\n103 src/ggml-cpu/module-103.cpp owner=backend-4 status=stable\n104 src/ggml-vulkan/module-104.cpp owner=backend-5 status=stable\n105 src/server/module-105.h owner=backend-6 status=stable\n106 src/tests/module-106.cpp owner=backend-7 status=stable\n107 src/tools/module-107.cpp owner=backend-8 status=stable\n108 src/common/module-108.glsl owner=backend-0 status=stable\n109 src/ggml-cpu/module-109.cpp owner=backend-1 status=stable\n110 src/ggml-vulkan/module-110.h owner=backend-2 status=experimental\n111 src/server/module-111.glsl owner=backend-3 status=stable\n112 src/tests/module-112.cpp owner=backend-4 status=stable\n113 src/tools/module-113.cpp owner=backend-5 status=stable\n114 src/common/module-114.glsl owner=backend-6 status=stable\n115 src/ggml-cpu/module-115.h owner=backend-7 status=stable\n116 src/ggml-vulkan/module-116.cpp owner=backend-8 status=stable\n117 src/server/module-117.glsl owner=backend-0 status=stable\n118 src/tests/module-118.cpp owner=backend-1 status=stable\n119 src/tools/module-119.cpp owner=backend-2 status=stable"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "search_repository",
+        "description": "Search repository source files for a symbol or phrase.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "query",
+            "path",
+            "max_results"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "tool_choice": "required",
+  "parallel_tool_calls": false,
+  "max_tokens": 384,
+  "temperature": 0,
+  "seed": 731,
+  "stream": false,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  }
+}
