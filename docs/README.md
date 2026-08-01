@@ -35,6 +35,8 @@ Recommended reading order:
 - [TurboFieldfare technique audit](turbo-fieldfare-audit.md)
 - [Expert-I/O baseline, controls, and evidence](expert-io-adoption-baseline.md)
 - [Final TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md)
+- [Intel i5-1340P Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md)
+- [Intel i5-1340P Ornith 1.0 35B and Gemma 4 E4B campaign](intel-1340p-ornith-gemma-campaign.md)
 
 ## Benchmark reports
 
