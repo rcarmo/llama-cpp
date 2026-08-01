@@ -1,0 +1,1095 @@
+load_backend: loaded SYCL backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so
+load_backend: loaded CPU backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-cpu-alderlake.so
+[SYCL] call ggml_check_sycl
+Build with Macros:
+  GGML_SYCL_DNNL: yes
+  GGML_SYCL_F16: yes
+  GGML_SYCL_FORCE_MMQ: no
+  GGML_SYCL_GRAPH: yes
+  GGML_SYCL_SUPPORT_LEVEL_ZERO_API: yes
+  GGML_SYCL_SUPPORT_VMM: yes
+Running with Environment Variables:
+  GGML_SYCL_DEBUG: 1
+  GGML_SYCL_DEV2DEV_MEMCPY: 0 (SYCL API)
+  GGML_SYCL_ENABLE_DNN: 1
+  GGML_SYCL_FA_ONEDNN: 1
+  GGML_SYCL_FA_ONEDNN_MAX_KV: 0
+  GGML_SYCL_ENABLE_FLASH_ATTN: 1
+  GGML_SYCL_ENABLE_GRAPH: 0
+  GGML_SYCL_ENABLE_OPT: 1
+  GGML_SYCL_ENABLE_VMM: 1
+  GGML_SYCL_ENABLE_FUSION: 1
+  GGML_SYCL_PRIORITIZE_DMMV: 0
+  GGML_SYCL_USE_ASYNC_MEM_OP: 1
+  GGML_SYCL_USE_LEVEL_ZERO_API: 1
+  GGML_SYCL_USM_SYSTEM: 0
+[SYCL] call ggml_backend_sycl_print_sycl_devices
+Found 1 SYCL devices:
+|  |                   |                                       |       |Max    |        |Max  |Global |                     |
+|  |                   |                                       |       |compute|Max work|sub  |mem    |                     |
+|ID|        Device Type|                                   Name|Version|units  |group   |group|size   |       Driver version|
+|--|-------------------|---------------------------------------|-------|-------|--------|-----|-------|---------------------|
+| 0| [level_zero:gpu:0]|                 Intel Iris Xe Graphics|   12.3|     96|     512|   32| 30886M|         1.14.37020+3|
+SYCL Optimization Feature:
+|ID|        Device Type|Reorder|
+|--|-------------------|-------|
+| 0| [level_zero:gpu:0]|      Y|
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536]	src2='view_of_ids':type=i32;ne=[8, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 1, 1, 1];nb=[4, 64, 64, 64] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 1, 1];nb=[4, 2048, 16384, 16384]	src2='view_of_ids':type=i32;ne=[8, 1, 1, 1];nb=[4, 64, 64, 64]
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 1, 1];nb=[4, 8192, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 2, 1, 1];nb=[4, 64, 128, 128];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=128 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]	src2='view_of_ids':type=i32;ne=[8, 2, 1, 1];nb=[4, 64, 128, 128];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 2, 1, 1];nb=[4, 64, 128, 128];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 2, 1, 1];nb=[4, 64, 128, 128] size=128 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]	src2='view_of_ids':type=i32;ne=[8, 2, 1, 1];nb=[4, 64, 128, 128];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 2, 1];nb=[4, 2048, 16384, 32768]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 2, 1];nb=[4, 8192, 65536, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 3, 1, 1];nb=[4, 64, 192, 192];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] size=196608 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] size=196608 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]	src2='view_of_ids':type=i32;ne=[8, 3, 1, 1];nb=[4, 64, 192, 192];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 3, 1, 1];nb=[4, 64, 192, 192];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] size=196608 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 3, 1, 1];nb=[4, 64, 192, 192] size=192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] size=196608 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]	src2='view_of_ids':type=i32;ne=[8, 3, 1, 1];nb=[4, 64, 192, 192];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 3, 1];nb=[4, 2048, 16384, 49152]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 3, 1];nb=[4, 8192, 65536, 196608] size=196608 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 4, 1, 1];nb=[4, 64, 256, 256];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=192
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] size=262144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=256 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] size=262144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]	src2='view_of_ids':type=i32;ne=[8, 4, 1, 1];nb=[4, 64, 256, 256];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 4, 1, 1];nb=[4, 64, 256, 256];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=64 offset=192
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] size=262144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 4, 1, 1];nb=[4, 64, 256, 256] size=256 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] size=262144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]	src2='view_of_ids':type=i32;ne=[8, 4, 1, 1];nb=[4, 64, 256, 256];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 4, 1];nb=[4, 2048, 16384, 65536] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 4, 1];nb=[4, 8192, 65536, 262144] size=262144 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 8, 1, 1];nb=[4, 64, 512, 512];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=192
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=256
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=320
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=384
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=448
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] size=524288 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=512 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] size=524288 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]	src2='view_of_ids':type=i32;ne=[8, 8, 1, 1];nb=[4, 64, 512, 512];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 5, 1, 1];nb=[4, 2048, 10240, 10240]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 5, 1, 1];nb=[4, 2048, 10240, 10240]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 5, 1, 1];nb=[4, 2048, 10240, 10240]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 5, 1, 1];nb=[4, 2048, 10240, 10240]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 6, 1, 1];nb=[4, 2048, 12288, 12288]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 6, 1, 1];nb=[4, 2048, 12288, 12288]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=6
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 6, 1, 1];nb=[4, 2048, 12288, 12288]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 6, 1, 1];nb=[4, 2048, 12288, 12288]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=6
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 7, 1, 1];nb=[4, 2048, 14336, 14336]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 7, 1, 1];nb=[4, 2048, 14336, 14336]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=7
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='as':type=q3_K;ne=[2048, 512, 16, 1];nb=[110, 880, 450560, 7208960]	src1='b':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q3_K -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=VIEW op->type=i32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT_ID op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='view_of_ids':type=i32;ne=[8, 8, 1, 1];nb=[4, 64, 512, 512];strided
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=64
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=128
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=192
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=256
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=320
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=384
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=64 offset=448
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] size=524288 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='ids':type=i32;ne=[16, 8, 1, 1];nb=[4, 64, 512, 512] size=512 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] size=524288 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960] size=7208960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] size=131072 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL][OP] call ggml_sycl_mul_mat_id: dst='out':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]	src2='view_of_ids':type=i32;ne=[8, 8, 1, 1];nb=[4, 64, 512, 512];strided
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 6, 1, 1];nb=[4, 8192, 49152, 49152]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 6, 1, 1];nb=[4, 8192, 49152, 49152]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=6
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 5, 1, 1];nb=[4, 8192, 40960, 40960]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=5
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='as':type=q3_K;ne=[512, 2048, 16, 1];nb=[110, 220, 450560, 7208960]	src1='b':type=f32;ne=[512, 8, 8, 1];nb=[4, 2048, 16384, 131072] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling mul_mat_vec_q3_K_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL][OP] call ggml_sycl_mul_mat_id done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 8, 8, 1];nb=[4, 8192, 65536, 524288] size=524288 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_4':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0

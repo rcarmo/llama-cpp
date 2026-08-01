@@ -1,0 +1,50 @@
+0.00.004.201 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.334 I srv          init: The UI is disabled
+0.00.004.336 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.004.443 W srv  llama_server: -----------------
+0.00.004.444 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.445 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.445 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.445 W srv  llama_server: -----------------
+0.00.005.754 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.00.554.080 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+0.00.620.887 W srv    load_model: [spec] failed to measure draft model memory: failed to create llama_context from model
+0.01.625.095 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.625.626 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.657.018 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.515.051 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+0.02.972.022 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.02.972.552 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.02.974.203 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.03.002.738 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.03.029.978 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7fb372f76040, v = 0x7fb3733b6040
+0.03.030.131 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7fb1afd9b040, v = 0x7fb1afecd040
+0.03.030.132 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7fb1afd9b040, v = 0x7fb1afecd040
+0.03.030.134 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7fb1afd9b040, v = 0x7fb1afecd040
+0.03.136.570 I srv    load_model: initializing, n_slots = 4, n_ctx_slot = 4096, kv_unified = 'true'
+0.03.160.661 I srv  llama_server: model loaded
+0.03.160.676 I srv  llama_server: listening on http://127.0.0.1:8291
+0.04.043.903 I slot get_availabl: id  3 | task -1 | selected slot by LRU, t_last = -1
+0.04.043.971 I slot launch_slot_: id  3 | task 0 | processing task, is_child = 0
+0.04.114.294 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=1 us=2
+0.04.114.314 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=1 us=14
+0.04.114.315 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=29 ok=1
+0.04.278.721 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=7 us=2
+0.04.278.747 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=7 us=18
+0.04.278.748 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=7 us=35 ok=1
+0.04.376.807 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=4 us=2
+0.04.376.823 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=4 us=10
+0.04.376.823 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=4 us=24 ok=1
+0.04.382.213 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=4459
+0.04.482.126 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=2 us=2
+0.04.482.139 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=2 us=6
+0.04.482.140 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=22 ok=1
+0.04.482.142 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=99898 ok=1
+0.04.483.528 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=2 accepted=1 us=945
+0.04.483.575 I slot print_timing: id  3 | task 0 | prompt eval time =     333.67 ms /    12 tokens (   27.81 ms per token,    35.96 tokens per second)
+0.04.483.577 I slot print_timing: id  3 | task 0 |        eval time =     105.83 ms /     2 tokens (   52.92 ms per token,    18.90 tokens per second)
+0.04.483.577 I slot print_timing: id  3 | task 0 |       total time =     439.50 ms /    14 tokens
+0.04.483.580 I slot print_timing: id  3 | task 0 |    graphs reused =          0
+0.04.483.582 I slot print_timing: id  3 | task 0 | draft acceptance = 1.00000 (    1 accepted /     1 generated), mean len =  2.00
+0.04.483.648 I slot      release: id  3 | task 0 | stop processing: n_tokens = 14, truncated = 0
+0.04.485.000 I srv    operator(): operator(): cleaning up before exit...

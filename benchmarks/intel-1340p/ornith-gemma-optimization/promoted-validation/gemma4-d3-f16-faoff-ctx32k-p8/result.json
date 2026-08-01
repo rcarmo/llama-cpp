@@ -1,0 +1,29 @@
+{
+  "model": "gemma4",
+  "run_name": "gemma4-d3-f16-faoff-ctx32k-p8",
+  "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+  "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+  "draft_depth": 3,
+  "context": 32768,
+  "batch": 512,
+  "ubatch": 128,
+  "kv": "f16",
+  "advice_mode": "off",
+  "load_mode": "mmap",
+  "flash_attn": "off",
+  "prompt_cache": "on",
+  "pressure_gib": 8,
+  "wall_seconds": 231.459523,
+  "prompt_tokens": 12481,
+  "generated_tokens": 45,
+  "prompt_tps": 54.53432317375482,
+  "generation_tps": 17.92486613112478,
+  "draft_tokens": 42,
+  "accepted_draft_tokens": 32,
+  "tool_name": "search_repository",
+  "tool_args": {
+    "max_results": 3,
+    "path": "src/ggml-cpu/",
+    "query": "Qwen routed-expert page residency AND bounded asynchronous mmap advice"
+  }
+}

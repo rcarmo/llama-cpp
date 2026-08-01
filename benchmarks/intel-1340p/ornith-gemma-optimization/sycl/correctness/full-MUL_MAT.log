@@ -1,0 +1,51 @@
+load_backend: loaded SYCL backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so
+load_backend: loaded CPU backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-cpu-alderlake.so
+Build with Macros:
+  GGML_SYCL_DNNL: yes
+  GGML_SYCL_F16: yes
+  GGML_SYCL_FORCE_MMQ: no
+  GGML_SYCL_GRAPH: yes
+  GGML_SYCL_SUPPORT_LEVEL_ZERO_API: yes
+  GGML_SYCL_SUPPORT_VMM: yes
+Running with Environment Variables:
+  GGML_SYCL_DEBUG: 0
+  GGML_SYCL_DEV2DEV_MEMCPY: 0 (SYCL API)
+  GGML_SYCL_ENABLE_DNN: 1
+  GGML_SYCL_FA_ONEDNN: 1
+  GGML_SYCL_FA_ONEDNN_MAX_KV: 0
+  GGML_SYCL_ENABLE_FLASH_ATTN: 1
+  GGML_SYCL_ENABLE_GRAPH: 0
+  GGML_SYCL_ENABLE_OPT: 1
+  GGML_SYCL_ENABLE_VMM: 1
+  GGML_SYCL_ENABLE_FUSION: 1
+  GGML_SYCL_PRIORITIZE_DMMV: 0
+  GGML_SYCL_USE_ASYNC_MEM_OP: 1
+  GGML_SYCL_USE_LEVEL_ZERO_API: 1
+  GGML_SYCL_USM_SYSTEM: 0
+Found 1 SYCL devices:
+|  |                   |                                       |       |Max    |        |Max  |Global |                     |
+|  |                   |                                       |       |compute|Max work|sub  |mem    |                     |
+|ID|        Device Type|                                   Name|Version|units  |group   |group|size   |       Driver version|
+|--|-------------------|---------------------------------------|-------|-------|--------|-----|-------|---------------------|
+| 0| [level_zero:gpu:0]|                 Intel Iris Xe Graphics|   12.3|     96|     512|   32| 30886M|         1.14.37020+3|
+SYCL Optimization Feature:
+|ID|        Device Type|Reorder|
+|--|-------------------|-------|
+| 0| [level_zero:gpu:0]|      Y|
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-sycl/mmvq.cpp:2386: fatal error: unsupport data type=q2_0
+
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-base.so.0(+0x17d68)[0x7f7607d5bd68]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-base.so.0(ggml_print_backtrace+0x285)[0x7f7607d5bd45]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-base.so.0(ggml_abort+0x109)[0x7f7607d5adb9]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so(_Z26ggml_sycl_op_mul_mat_vec_qR25ggml_backend_sycl_contextPK11ggml_tensorS3_PS1_PKcPKfS6_PfllllRKPN4sycl3_V15queueE+0x9f28)[0x7f76005adc08]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so(+0x1d8292)[0x7f76003d8292]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so(+0x1c6a40)[0x7f76003c6a40]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so(+0x1c50e8)[0x7f76003c50e8]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so(+0x1c3bf7)[0x7f76003c3bf7]
+/var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-base.so.0(ggml_backend_compare_graph_backend+0x31c)[0x7f7607d8546c]
+build-intel-sycl/bin/test-backend-ops[0x513831]
+build-intel-sycl/bin/test-backend-ops[0x45fbed]
+build-intel-sycl/bin/test-backend-ops[0x4612df]
+/lib/x86_64-linux-gnu/libstdc++.so.6(+0xecdb4)[0x7f76070ecdb4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9caa4)[0x7f7606c9caa4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x129c6c)[0x7f7606d29c6c]

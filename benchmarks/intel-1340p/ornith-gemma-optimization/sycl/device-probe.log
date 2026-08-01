@@ -1,0 +1,319 @@
+=== sycl-ls ===
+<LOADER>[INFO]: failed to load adapter 'libur_adapter_cuda.so.0' with error: libur_adapter_cuda.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter '/opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_cuda.so.0' with error: /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_cuda.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter 'libur_adapter_hip.so.0' with error: libur_adapter_hip.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter '/opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_hip.so.0' with error: /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_hip.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: loaded adapter 0x0x5601e565ce40 (libur_adapter_level_zero.so.0) from /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_level_zero.so.0
+<LOADER>[INFO]: loaded adapter 0x0x5601e5660750 (libur_adapter_level_zero_v2.so.0) from /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_level_zero_v2.so.0
+<LOADER>[INFO]: failed to load adapter 'libur_adapter_native_cpu.so.0' with error: libur_adapter_native_cpu.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter '/opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_native_cpu.so.0' with error: /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_native_cpu.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter 'libur_adapter_offload.so.0' with error: libur_adapter_offload.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: failed to load adapter '/opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_offload.so.0' with error: /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_offload.so.0: cannot open shared object file: No such file or directory
+<LOADER>[INFO]: loaded adapter 0x0x5601e5663cc0 (libur_adapter_opencl.so.0) from /opt/intel/oneapi/compiler/2025.3/lib/libur_adapter_opencl.so.0
+[level_zero:gpu][level_zero:0] Intel(R) oneAPI Unified Runtime over Level-Zero, Intel(R) Iris(R) Xe Graphics 12.3.0 [1.14.37020+3]
+[opencl:cpu][opencl:0] Intel(R) OpenCL, 13th Gen Intel(R) Core(TM) i5-1340P OpenCL 3.0 (Build 0) [2026.20.3.0.19_160000.xmain-hotfix]
+[opencl:gpu][opencl:1] Intel(R) OpenCL Graphics, Intel(R) Iris(R) Xe Graphics OpenCL 3.0 NEO  [26.05.37020.3]
+
+Platforms: 3
+Platform [#1]:
+    Version  : 1.14
+    Name     : Intel(R) oneAPI Unified Runtime over Level-Zero
+    Vendor   : Intel(R) Corporation
+    Devices  : 1
+        Device [#0]:
+        Type              : gpu
+        Version           : 12.3.0
+        Name              : Intel(R) Iris(R) Xe Graphics
+        Vendor            : Intel(R) Corporation
+        Driver            : 1.14.37020+3
+        UUID              : 8680a0a7-0400-0000-0002-000000000000
+        DeviceID          : 42912
+        Num SubDevices    : 0
+        Num SubSubDevices : 0
+        Aspects           : gpu fp16 online_compiler online_linker queue_profiling usm_device_allocations usm_host_allocations usm_shared_allocations ext_intel_pci_address ext_intel_gpu_eu_count ext_intel_gpu_eu_simd_width ext_intel_gpu_slices ext_intel_gpu_subslices_per_slice ext_intel_gpu_eu_count_per_subslice atomic64 ext_intel_device_info_uuid ext_intel_gpu_hw_threads_per_eu ext_intel_free_memory ext_intel_device_id ext_intel_memory_clock_rate ext_intel_memory_bus_width ext_intel_legacy_image ext_oneapi_external_memory_import ext_oneapi_external_semaphore_import ext_intel_esimd ext_oneapi_ballot_group ext_oneapi_fixed_size_group ext_oneapi_opportunistic_group ext_oneapi_tangle_group ext_oneapi_limited_graph ext_oneapi_private_alloca ext_oneapi_bindless_sampled_image_fetch_1d_usm ext_oneapi_bindless_sampled_image_fetch_1d ext_oneapi_bindless_sampled_image_fetch_2d_usm ext_oneapi_bindless_sampled_image_fetch_2d ext_oneapi_bindless_sampled_image_fetch_3d ext_oneapi_queue_profiling_tag ext_oneapi_virtual_mem ext_oneapi_image_array ext_oneapi_virtual_functions ext_intel_spill_memory_size ext_intel_current_clock_throttle_reasons ext_oneapi_async_memory_alloc ext_oneapi_exportable_device_mem
+        info::device::sub_group_sizes: 8 16 32
+        Architecture: intel_gpu_adl_p
+Platform [#2]:
+    Version  : OpenCL 3.0 LINUX
+    Name     : Intel(R) OpenCL
+    Vendor   : Intel(R) Corporation
+    Devices  : 1
+        Device [#0]:
+        Type              : cpu
+        Version           : OpenCL 3.0 (Build 0)
+        Name              : 13th Gen Intel(R) Core(TM) i5-1340P
+        Vendor            : Intel(R) Corporation
+        Driver            : 2026.20.3.0.19_160000.xmain-hotfix
+        UUID              : 8680a206-0b00-fffb-fa7f-fffbebbf0000
+        DeviceID          : 722594
+        Num SubDevices    : 0
+        Num SubSubDevices : 0
+        Aspects           : cpu fp16 fp64 online_compiler online_linker queue_profiling usm_device_allocations usm_host_allocations usm_shared_allocations usm_system_allocations ext_intel_gpu_slices ext_intel_gpu_subslices_per_slice ext_intel_gpu_eu_count_per_subslice usm_atomic_host_allocations usm_atomic_shared_allocations atomic64 ext_intel_device_info_uuid ext_oneapi_srgb ext_oneapi_native_assert ext_intel_gpu_hw_threads_per_eu ext_intel_device_id ext_intel_legacy_image ext_oneapi_ballot_group ext_oneapi_fixed_size_group ext_oneapi_opportunistic_group ext_oneapi_tangle_group ext_oneapi_limited_graph ext_oneapi_private_alloca ext_oneapi_atomic16 ext_oneapi_virtual_functions ext_intel_device_info_node_mask
+        info::device::sub_group_sizes: 4 8 16 32 64
+        Architecture: x86_64
+Platform [#3]:
+    Version  : OpenCL 3.0
+    Name     : Intel(R) OpenCL Graphics
+    Vendor   : Intel(R) Corporation
+    Devices  : 1
+        Device [#1]:
+        Type              : gpu
+        Version           : OpenCL 3.0 NEO
+        Name              : Intel(R) Iris(R) Xe Graphics
+        Vendor            : Intel(R) Corporation
+        Driver            : 26.05.37020.3
+        UUID              : 8680a0a7-0400-0000-0002-000000000000
+        DeviceID          : 42912
+        Num SubDevices    : 0
+        Num SubSubDevices : 0
+        Aspects           : gpu fp16 online_compiler online_linker queue_profiling usm_device_allocations usm_host_allocations usm_shared_allocations ext_intel_pci_address ext_intel_gpu_eu_count ext_intel_gpu_slices ext_intel_gpu_subslices_per_slice ext_intel_gpu_eu_count_per_subslice atomic64 ext_intel_device_info_uuid ext_oneapi_srgb ext_intel_gpu_hw_threads_per_eu ext_intel_device_id ext_intel_legacy_image ext_intel_esimd ext_oneapi_ballot_group ext_oneapi_fixed_size_group ext_oneapi_opportunistic_group ext_oneapi_tangle_group ext_oneapi_private_alloca ext_oneapi_atomic16 ext_oneapi_virtual_functions ext_intel_device_info_node_mask
+        info::device::sub_group_sizes: 8 16 32
+        Architecture: intel_gpu_adl_p
+default_selector()      : gpu, Intel(R) oneAPI Unified Runtime over Level-Zero, Intel(R) Iris(R) Xe Graphics 12.3.0 [1.14.37020+3]
+accelerator_selector()  : No device of requested type available. Please chec...
+cpu_selector()          : cpu, Intel(R) OpenCL, 13th Gen Intel(R) Core(TM) i5-1340P OpenCL 3.0 (Build 0) [2026.20.3.0.19_160000.xmain-hotfix]
+gpu_selector()          : gpu, Intel(R) oneAPI Unified Runtime over Level-Zero, Intel(R) Iris(R) Xe Graphics 12.3.0 [1.14.37020+3]
+custom_selector(gpu)    : gpu, Intel(R) oneAPI Unified Runtime over Level-Zero, Intel(R) Iris(R) Xe Graphics 12.3.0 [1.14.37020+3]
+custom_selector(cpu)    : cpu, Intel(R) OpenCL, 13th Gen Intel(R) Core(TM) i5-1340P OpenCL 3.0 (Build 0) [2026.20.3.0.19_160000.xmain-hotfix]
+custom_selector(acc)    : No device of requested type available. Please chec...
+sycl_ls_rc=0
+=== level zero libs ===
+	libze_loader.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libze_loader.so.1
+	libze_loader.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libze_loader.so
+	libze_intel_gpu_raytracing.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libze_intel_gpu_raytracing.so
+	libze_intel_gpu.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libze_intel_gpu.so.1
+	libopencl-clang.so.16 (libc6,x86-64) => /lib/x86_64-linux-gnu/libopencl-clang.so.16
+	libOpenCL.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libOpenCL.so.1
+=== device nodes ===
+total 0
+crw-rw----+ 1 nobody nogroup 226,   0 Jul 30 23:55 card0
+crw-rw-rw-. 1 nobody nogroup 226, 128 Jul 30 23:55 renderD128
+=== llama device probe ===
+load_backend: loaded SYCL backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so
+load_backend: loaded CPU backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-cpu-alderlake.so
+[SYCL] call ggml_check_sycl
+Build with Macros:
+  GGML_SYCL_DNNL: yes
+  GGML_SYCL_F16: yes
+  GGML_SYCL_FORCE_MMQ: no
+  GGML_SYCL_GRAPH: yes
+  GGML_SYCL_SUPPORT_LEVEL_ZERO_API: yes
+  GGML_SYCL_SUPPORT_VMM: yes
+Running with Environment Variables:
+  GGML_SYCL_DEBUG: 1
+  GGML_SYCL_DEV2DEV_MEMCPY: 0 (SYCL API)
+  GGML_SYCL_ENABLE_DNN: 1
+  GGML_SYCL_FA_ONEDNN: 1
+  GGML_SYCL_FA_ONEDNN_MAX_KV: 0
+  GGML_SYCL_ENABLE_FLASH_ATTN: 1
+  GGML_SYCL_ENABLE_GRAPH: 0
+  GGML_SYCL_ENABLE_OPT: 1
+  GGML_SYCL_ENABLE_VMM: 1
+  GGML_SYCL_ENABLE_FUSION: 1
+  GGML_SYCL_PRIORITIZE_DMMV: 0
+  GGML_SYCL_USE_ASYNC_MEM_OP: 1
+  GGML_SYCL_USE_LEVEL_ZERO_API: 1
+  GGML_SYCL_USM_SYSTEM: 0
+[SYCL] call ggml_backend_sycl_print_sycl_devices
+Found 1 SYCL devices:
+|  |                   |                                       |       |Max    |        |Max  |Global |                     |
+|  |                   |                                       |       |compute|Max work|sub  |mem    |                     |
+|ID|        Device Type|                                   Name|Version|units  |group   |group|size   |       Driver version|
+|--|-------------------|---------------------------------------|-------|-------|--------|-----|-------|---------------------|
+| 0| [level_zero:gpu:0]|                 Intel Iris Xe Graphics|   12.3|     96|     512|   32| 30886M|         1.14.37020+3|
+SYCL Optimization Feature:
+|ID|        Device Type|Reorder|
+|--|-------------------|-------|
+| 0| [level_zero:gpu:0]|      Y|
+Testing 2 devices
+
+Backend 1/2: SYCL0
+  Device description: Intel(R) Iris(R) Xe Graphics
+  Device memory: 29455 MB (1716 MB free)
+
+  ADD(type=f16,ne=[1,1,8,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1,1],nr=[32,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,320,320],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[2,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,2,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,2,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,1,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,2,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[2,2,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,8,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1,1],nr=[32,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,320,320],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,1,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[2,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,2,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,2,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,1,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,1,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[1,2,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,3],nr=[2,2,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,6],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[10,5,4,5],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,120,120],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,4,320],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,65536,1],nr=[256,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1280,1,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1280,1,1,1],nr=[1,16,16,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1280,16,16,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1280,1,1,1],nr=[1,256,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1280,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[16,16,1280,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1920,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,2560,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1280,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,1920,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[1,1,640,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[5120,1,1,1],nr=[1,256,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[640,1,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f16,ne=[64,262144,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,8,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1,1],nr=[32,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,320,320],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[2,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,2,1,1],nf=1,perm1=0,src_overlap=0): [SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f16 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,2,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,1,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,2,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[2,2,2,2],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,8,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1,1],nr=[32,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,320,320],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,1,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,1],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[2,1,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,2,1,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,2,1],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,1,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,1,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[1,2,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,3],nr=[2,2,2,2],nf=1,perm1=1,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,6],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[10,5,4,5],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,120,120],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,4,320],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=1): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,65536,1],nr=[256,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1280,1,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1280,1,1,1],nr=[1,16,16,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1280,16,16,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1280,1,1,1],nr=[1,256,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1280,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[16,16,1280,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1920,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,2560,1],nr=[16,16,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1280,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=ADD op->type=f32 -> true
+[1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,1920,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[1,1,640,1],nr=[32,32,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[5120,1,1,1],nr=[1,256,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[640,1,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  ADD(type=f32,ne=[64,262144,1,1],nr=[1,1,1,1],nf=1,perm1=0,src_overlap=0): [1;32mSUPPORTED[0m
+  Backend SYCL0: [1;32mOK[0m
+Backend 2/2: CPU
+  Skipping CPU backend
+2/2 backends passed
+[1;32mOK[0m
+probe_rc=0
