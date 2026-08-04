@@ -1,0 +1,106 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 01880a434..2454fe176 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -858,6 +858,7 @@ struct vk_device_struct {
+     vk_pipeline pipeline_dequant_mul_mat_vec_id_f32[DMMV_WG_SIZE_COUNT][GGML_TYPE_COUNT];
+ 
+     vk_pipeline pipeline_dequant_mul_mat_vec_q8_1_f32[DMMV_WG_SIZE_COUNT][GGML_TYPE_COUNT][mul_mat_vec_max_cols];
++    vk_pipeline pipeline_qwen_exact_rows_q4_k_q8_1_f32[DMMV_WG_SIZE_COUNT][mul_mat_vec_max_cols];
+     vk_pipeline pipeline_dequant_mul_mat_vec_id_q8_1_f32[DMMV_WG_SIZE_COUNT][GGML_TYPE_COUNT];
+ 
+     vk_pipeline pipeline_mul_mat_vec_p021_f16_f32[p021_max_gqa_ratio];
+@@ -5112,7 +5113,8 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+ 
+                 ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q2_K][i], "mul_mat_vec_q2_k_q8_1_f32", arr_dmmv_q2_k_q8_1_f32_len[reduc], arr_dmmv_q2_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {2*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 2*rm_kq_int, i+1}, 1, true, use_subgroups, subgroup_size_int);
+                 ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q3_K][i], "mul_mat_vec_q3_k_q8_1_f32", arr_dmmv_q3_k_q8_1_f32_len[reduc], arr_dmmv_q3_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1}, 1, true, use_subgroups, subgroup_size_int);
+-                ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q4_K][i], "mul_mat_vec_q4_k_q8_1_f32", arr_dmmv_q4_k_q8_1_f32_len[reduc], arr_dmmv_q4_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1}, 1, true, use_subgroups, subgroup_size_int);
++                ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q4_K][i], "mul_mat_vec_q4_k_q8_1_f32", arr_dmmv_q4_k_q8_1_f32_len[reduc], arr_dmmv_q4_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1, 0}, 1, true, use_subgroups, subgroup_size_int);
++                ggml_vk_create_pipeline(device, device->pipeline_qwen_exact_rows_q4_k_q8_1_f32[w][i], "qwen_exact_rows_q4_k_q8_1_f32", arr_dmmv_q4_k_q8_1_f32_len[reduc], arr_dmmv_q4_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1, 1}, 1, true, use_subgroups, subgroup_size_int);
+                 ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q5_K][i], "mul_mat_vec_q5_k_q8_1_f32", arr_dmmv_q5_k_q8_1_f32_len[reduc], arr_dmmv_q5_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1}, 1, true, use_subgroups, subgroup_size_int);
+                 ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_q8_1_f32[w][GGML_TYPE_Q6_K][i], "mul_mat_vec_q6_k_q8_1_f32", arr_dmmv_q6_k_q8_1_f32_len[reduc], arr_dmmv_q6_k_q8_1_f32_data[reduc], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {1*rm_kq_int, 1, 1}, {wg_size_subgroup_int, 1*rm_kq_int, i+1}, 1, true, use_subgroups, subgroup_size_int);
+ 
+@@ -7616,6 +7618,12 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+         if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
+             dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
+         }
++        const bool qwen_exact_rows = getenv("GGML_VK_QWEN_EXACT_ROWS") != nullptr &&
++                ctx->device->vendor_id == VK_VENDOR_ID_INTEL && a_type == GGML_TYPE_Q4_K && num_cols == 4 &&
++                (m == 2048 || m == 5120 || m == 11008) && (k == 2048 || k == 5120);
++        if (qwen_exact_rows) {
++            return ctx->device->pipeline_qwen_exact_rows_q4_k_q8_1_f32[dmmv_wg][num_cols-1];
++        }
+         return ctx->device->pipeline_dequant_mul_mat_vec_q8_1_f32[dmmv_wg][a_type][num_cols-1];
+     }
+ 
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq.comp
+index 18d441ead..f69163e68 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq.comp
+@@ -10,6 +10,7 @@
+ #include "mul_mat_vec_base.glsl"
+ 
+ layout(local_size_x_id = 0, local_size_y = 1, local_size_z = 1) in;
++layout(constant_id = 3) const uint QWEN_EXACT_ROWS = 0;
+ 
+ #if defined(DATA_A_Q2_0) || defined(DATA_A_QUANT_K)
+ #define K_PER_ITER 16
+@@ -29,6 +30,29 @@ vec2 cache_b_ds;
+ #include "mul_mat_vecq_funcs.glsl"
+ 
+ void iter(inout FLOAT_TYPE temp[NUM_COLS][NUM_ROWS], const uint first_row, const uint num_rows, const uint col, const uint b_qs_idx) {
++#if defined(DATA_A_Q4_K)
++    if (QWEN_EXACT_ROWS != 0) {
++        uint ibi = first_row*p.ncols;
++        [[unroll]] for (uint n = 0; n < num_rows; ++n) {
++            const uint a_block_idx = (ibi + col)/QUANT_K_Q8_1 + a_offset;
++            ibi += p.ncols;
++            const i32vec4 qs_a = repack4(a_block_idx, b_qs_idx * 4);
++            const vec2 dm_scale = get_dm_scale(a_block_idx, b_qs_idx * 4);
++            [[unroll]] for (uint j = 0; j < NUM_COLS; ++j) {
++                const uint b_block_idx = (j*p.batch_stride_b + col) / QUANT_K_Q8_1 + b_offset;
++                const uint b_block_idx_outer = b_block_idx / 4;
++                const uint b_block_idx_inner = b_block_idx % 4;
++                cache_b_ds = vec2(data_b[b_block_idx_outer].ds[b_block_idx_inner]);
++                cache_b_qs[0] = data_b[b_block_idx_outer].qs[b_block_idx_inner * 8 + b_qs_idx * 4    ];
++                cache_b_qs[1] = data_b[b_block_idx_outer].qs[b_block_idx_inner * 8 + b_qs_idx * 4 + 1];
++                cache_b_qs[2] = data_b[b_block_idx_outer].qs[b_block_idx_inner * 8 + b_qs_idx * 4 + 2];
++                cache_b_qs[3] = data_b[b_block_idx_outer].qs[b_block_idx_inner * 8 + b_qs_idx * 4 + 3];
++                temp[j][n] += mmvq_dot_product_q4_k_cached(qs_a, dm_scale);
++            }
++        }
++        return;
++    }
++#endif
+     [[unroll]] for (uint j = 0; j < NUM_COLS; ++j) {
+         // Preload data_b block
+         const uint b_block_idx = (j*p.batch_stride_b + col) / QUANT_K_Q8_1 + b_offset;
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq_funcs.glsl b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq_funcs.glsl
+index a5403ac82..2831f5098 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq_funcs.glsl
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mat_vecq_funcs.glsl
+@@ -365,19 +365,18 @@ vec2 get_dm_scale(uint ib, uint iqs) {
+     return FLOAT_TYPEV2(data_a_packed32[ib_k].dm) * FLOAT_TYPEV2(scale_dm);
+ }
+ 
+-FLOAT_TYPE mmvq_dot_product(const uint ib_a, const uint iqs) {
++FLOAT_TYPE mmvq_dot_product_q4_k_cached(const i32vec4 qs_a, const vec2 dm_scale) {
+     int32_t q_sum = 0;
+-
+-    const i32vec4 qs_a = repack4(ib_a, iqs * 4);
+-    const vec2 dm_scale = get_dm_scale(ib_a, iqs * 4);
+-
+     q_sum += dotPacked4x8EXT(qs_a.x, cache_b_qs[0]);
+     q_sum += dotPacked4x8EXT(qs_a.y, cache_b_qs[1]);
+     q_sum += dotPacked4x8EXT(qs_a.z, cache_b_qs[2]);
+     q_sum += dotPacked4x8EXT(qs_a.w, cache_b_qs[3]);
+-
+     return FLOAT_TYPE(float(cache_b_ds.x) * float(dm_scale.x) * float(q_sum) - float(dm_scale.y) * float(cache_b_ds.y / 2));
+ }
++
++FLOAT_TYPE mmvq_dot_product(const uint ib_a, const uint iqs) {
++    return mmvq_dot_product_q4_k_cached(repack4(ib_a, iqs * 4), get_dm_scale(ib_a, iqs * 4));
++}
+ #endif
+ 
+ #if defined(DATA_A_Q6_K)

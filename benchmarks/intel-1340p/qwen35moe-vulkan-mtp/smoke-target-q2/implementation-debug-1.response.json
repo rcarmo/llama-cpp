@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a thinking thinking sequence\n\n1.  **Deconstruct and Analyze the Problem Statement:**\n    *   *Context:* Performance-sensitive Vulkan backend, Q2_K decode shader.\n    *   *Symptom:* Correct at N=1, N=2. N=3 produces *occasional* wrong logits only on Intel Xe1.\n    *   *Shader Details:* Decodes weight scales in shared memory, subgroup size 16, three activation-row accumulators per output row.\n    *   *Performance:* N=2 is 18% faster than generic MMVQ. N=3 is only 3% faster and increases register pressure.\n    *   *Validation:* No out-of-bounds accesses reported. Generic fallback is correct.\n    *   *Goal:* Ranked diagnosis, minimal experiment matrix, identify violated invariants, define debugging sequence, accept/reject criteria. No code yet.\n\n2.  **Initial Brainstorming and Hypothesis Generation:**\n    *   *N=1 vs N=2 vs N=3:* Why does N=3 break? N=1 and N=2 work. N=3 is the \"odd\" one out here. Usually, N refers to the number of rows or some dimension. \"Three activation-row accumulators per output row\" suggests N might be related to the number of accumulators or rows being processed. If N=3 means processing 3 rows, maybe there's a boundary condition?\n    *   *Intel Xe1 Specific:* Intel Xe1"
+      }
+    }
+  ],
+  "created": 1785454327,
+  "model": "/var/home/agent/workspace/projects/llama-cpp-vulkan-mtp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+  "system_fingerprint": "b10498-603f26c86",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 210,
+    "total_tokens": 530,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-wU8FEwwWE6ZIMDWZYL9AQziXxwV6ST5B",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 22040.688,
+    "prompt_per_token_ms": 104.95565714285713,
+    "prompt_per_second": 9.527833250940262,
+    "predicted_n": 320,
+    "predicted_ms": 123165.365,
+    "predicted_per_token_ms": 384.891765625,
+    "predicted_per_second": 2.5981330059794
+  }
+}

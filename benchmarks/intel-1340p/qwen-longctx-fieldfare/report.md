@@ -120,4 +120,4 @@ Source files:
 - `benchmarks/intel-1340p/qwen-longctx-fieldfare/validate-service.sh`;
 - `benchmarks/intel-1340p/qwen-longctx-fieldfare/service.md`.
 
-The repository prohibits autonomous pushes. The agent will not run `git push`; the user must push reviewed commits manually.
+Repository publication follows the contributor policy in `AGENTS.md`: review and test locally before updating the private fork, and do not submit automated pull requests to upstream.

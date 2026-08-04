@@ -1,0 +1,736 @@
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/campaign.json b/benchmarks/intel-1340p/ornith-gemma-optimization/campaign.json
+new file mode 100644
+index 000000000..54d932d71
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/campaign.json
+@@ -0,0 +1,55 @@
++{
++  "created": "2026-07-31",
++  "host": "sigma",
++  "source": {
++    "repository": "/var/home/agent/workspace/projects/llama-cpp",
++    "head": "603f26c869b6700eaa5c6d52068ed583419eeacf",
++    "working_diff_sha256": "c807d00610b197704f21870aac9ed50a93eb415809eb08545f917ae6d683aecb",
++    "build": "build-intel-clang",
++    "compiler": "Clang 22.1.8",
++    "cpu_backend": true,
++    "vulkan_backend": false
++  },
++  "hardware": {
++    "cpu": "Intel Core i5-1340P",
++    "model_cpus": "0-7",
++    "process_cpus": "0-15",
++    "threads": 8,
++    "ram_bytes": 33359691776,
++    "swap_bytes": 8589930496
++  },
++  "models": {
++    "ornith": {
++      "target": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
++      "target_sha256": "91358f1059f029330de497e8c5637869347374468e98ca13fa4357cd8a811a4d",
++      "mmproj": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/mmproj-F16.gguf",
++      "mmproj_sha256": "a516ab92e8240da4734d68352bdfba84c16e830ee40010b8fac80d69c77272ff",
++      "architecture": "qwen35moe",
++      "embedded_mtp_layers": 1,
++      "context_train": 262144
++    },
++    "gemma4": {
++      "target": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
++      "target_sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
++      "draft": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
++      "draft_sha256": "49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc",
++      "mmproj": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-mmproj.gguf",
++      "mmproj_sha256": "7498a37cb619e55f2fcf87eb931f56e99389ed6d432e4c5c66110694c0d65578",
++      "architecture": "gemma4",
++      "assistant_architecture": "gemma4-assistant",
++      "assistant_mtp_layers": 4,
++      "context_train": 131072
++    }
++  },
++  "baseline": {
++    "context": 8192,
++    "batch": 512,
++    "ubatch": 128,
++    "kv": "q8_0",
++    "agentic_workload": "../qwen-longctx-fieldfare/workloads/agentic-tool-planning-3k.json",
++    "repetitions": 1,
++    "cooldown_load_max": 1.5,
++    "cooldown_temperature_max_mC": 55000,
++    "promotion_gate_percent": 2.0
++  }
++}
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json b/benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json
+new file mode 100644
+index 000000000..bdab29fcc
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json
+@@ -0,0 +1,157 @@
++{
++  "generated_at": "2026-07-31T23:24:15.064Z",
++  "source_head": "603f26c869b6700eaa5c6d52068ed583419eeacf",
++  "promotion_gate_pct": 2,
++  "selected_profiles": {
++    "ornith": {
++      "mtp_depth": 2,
++      "kv": "f16",
++      "flash_attn": "off",
++      "load_mode": "mmap",
++      "threads": 8,
++      "batch": 512,
++      "ubatch": 128,
++      "advice_mode": "off",
++      "validated_context": 32768,
++      "gate": {
++        "wall_speedup_pct": 6.915819758466624,
++        "prompt_speedup_pct": 6.733371578113134,
++        "generation_speedup_pct": 11.317056861165643
++      },
++      "long_context_pressure_result": {
++        "model": "ornith",
++        "run_name": "ornith-d2-f16-faoff-ctx32k-p8",
++        "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
++        "draft_path": "",
++        "draft_depth": 2,
++        "context": 32768,
++        "batch": 512,
++        "ubatch": 128,
++        "kv": "f16",
++        "advice_mode": "off",
++        "load_mode": "mmap",
++        "flash_attn": "off",
++        "prompt_cache": "on",
++        "pressure_gib": 8,
++        "wall_seconds": 341.07128,
++        "prompt_tokens": 11288,
++        "generated_tokens": 60,
++        "prompt_tps": 33.504972906147856,
++        "generation_tps": 14.770557847043488,
++        "draft_tokens": 40,
++        "accepted_draft_tokens": 39,
++        "tool_name": "search_repository",
++        "tool_args": {
++          "max_results": 3,
++          "path": "ggml/src/ggml-cpu",
++          "query": "MADV_WILLNEED"
++        }
++      }
++    },
++    "gemma4": {
++      "mtp_depth": 3,
++      "kv": "f16",
++      "flash_attn": "off",
++      "load_mode": "mmap",
++      "threads": 8,
++      "batch": 512,
++      "ubatch": 128,
++      "advice_mode": "off",
++      "validated_context": 32768,
++      "gate": {
++        "wall_speedup_pct": 12.969927262247683,
++        "prompt_speedup_pct": 13.158481429834179,
++        "generation_speedup_pct": 7.237076022548639
++      },
++      "long_context_pressure_result": {
++        "model": "gemma4",
++        "run_name": "gemma4-d3-f16-faoff-ctx32k-p8",
++        "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
++        "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
++        "draft_depth": 3,
++        "context": 32768,
++        "batch": 512,
++        "ubatch": 128,
++        "kv": "f16",
++        "advice_mode": "off",
++        "load_mode": "mmap",
++        "flash_attn": "off",
++        "prompt_cache": "on",
++        "pressure_gib": 8,
++        "wall_seconds": 231.459523,
++        "prompt_tokens": 12481,
++        "generated_tokens": 45,
++        "prompt_tps": 54.53432317375482,
++        "generation_tps": 17.92486613112478,
++        "draft_tokens": 42,
++        "accepted_draft_tokens": 32,
++        "tool_name": "search_repository",
++        "tool_args": {
++          "max_results": 3,
++          "path": "src/ggml-cpu/",
++          "query": "Qwen routed-expert page residency AND bounded asynchronous mmap advice"
++        }
++      }
++    }
++  },
++  "model_role_decision": {
++    "throughput_finalist": "gemma4",
++    "rationale": "Highest repeated 3K prompt, generation, and wall-time improvement; 32K plus 8 GiB pressure validation passed.",
++    "long_context_default": "qwen3.6-35b-a3b-q2_k_xl",
++    "rationale_long_context": "The existing Qwen profile is validated at 131072 tokens; this campaign validated Ornith and Gemma through 32768 tokens only."
++  },
++  "baseline_mtp": {
++    "ornith_d2_vs_d0": {
++      "generation_pct": 20.335265606383945,
++      "wall_speedup_pct": -2.440105370933976,
++      "prompt_pct": -3.448377445719464,
++      "draft": [
++        37,
++        42
++      ]
++    },
++    "gemma_d3_vs_d0": {
++      "generation_pct": 73.39592832393309,
++      "wall_speedup_pct": 3.152470298653509,
++      "prompt_pct": 0.7520392699086775,
++      "draft": [
++        31,
++        39
++      ]
++    }
++  },
++  "rejected": {
++    "routed_chunk32": {
++      "reason": "focused microbenchmark below 2% gate",
++      "geomean_speedup_pct": 1.1945343786315732,
++      "artifact": "chunk-size-diagnostic/rejected-chunk32.patch"
++    },
++    "gemma_mtp4": {
++      "reason": "2.31% generation regression versus depth 3",
++      "artifact": "baseline/gemma4-d4/result.json"
++    },
++    "expert_advice": {
++      "reason": "bounded -2.19% and adaptive -0.86% generation versus off; all sampled expert ranges already resident",
++      "selected": "off",
++      "artifacts": [
++        "expert-advice/ornith-d2-bounded/result.json",
++        "expert-advice/ornith-d2-adaptive/result.json"
++      ]
++    },
++    "q8_to_f16_with_flash_on": {
++      "reason": "prompt and wall improved but repeated generation regressed 3.38%",
++      "artifact": "kv-f16-gate/summary.json"
++    },
++    "sycl": {
++      "reason": "full and partial offload regressed decode; broader q1_0/q2_0 correctness failures and graph-mode crash",
++      "artifacts": [
++        "sycl/correctness/full-MUL_MAT.csv",
++        "sycl/correctness/full-MUL_MAT_ID.csv",
++        "sycl/model-sweep/gemma4-ngl4-graph1/server.log"
++      ]
++    },
++    "source_optimizations": {
++      "reason": "no exact-row, scheduler, graph, expert-cache, or quant-kernel source candidate cleared the 2% end-to-end gate"
++    }
++  }
++}
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/run-agentic-baseline.sh b/benchmarks/intel-1340p/ornith-gemma-optimization/run-agentic-baseline.sh
+new file mode 100755
+index 000000000..bae375fac
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/run-agentic-baseline.sh
+@@ -0,0 +1,164 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++root=$(cd "$(dirname "$0")/../../.." && pwd)
++model_name=${1:?ornith|gemma4}
++draft_depth=${2:?0..4}
++port=${3:?port}
++run_name=${RUN_NAME:-${model_name}-d${draft_depth}}
++out_root=${OUT_ROOT:-$root/benchmarks/intel-1340p/ornith-gemma-optimization/baseline}
++out=$out_root/$run_name
++request=${REQUEST:-$root/benchmarks/intel-1340p/qwen-longctx-fieldfare/workloads/agentic-tool-planning-3k.json}
++context=${CTX:-8192}
++batch=${BATCH:-512}
++ubatch=${UBATCH:-128}
++kv=${KV:-q8_0}
++threads=${THREADS:-8}
++cpus=${CPUS:-0-7}
++process_cpus=${PROCESS_CPUS:-0-15}
++pressure_gib=${PRESSURE_GIB:-0}
++advice_mode=${GGML_CPU_EXPERT_IO_ADVISE_MODE:-off}
++load_mode=${LOAD_MODE:-mmap}
++flash_attn=${FLASH_ATTN:-on}
++prompt_cache=${PROMPT_CACHE:-on}
++
++case "$model_name" in
++  ornith)
++    model=/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf
++    draft_model=
++    ;;
++  gemma4)
++    model=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf
++    draft_model=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf
++    ;;
++  *) echo "unknown model: $model_name" >&2; exit 2;;
++esac
++
++[[ $draft_depth =~ ^[0-4]$ ]] || { echo "draft depth must be 0..4" >&2; exit 2; }
++if [[ $model_name == ornith && $draft_depth -gt 3 ]]; then
++  echo "Ornith embedded MTP supports benchmark depths 0..3" >&2
++  exit 2
++fi
++case "$prompt_cache" in
++  on)  prompt_cache_args=(--cache-prompt) ;;
++  off) prompt_cache_args=(--no-cache-prompt) ;;
++  *) echo "PROMPT_CACHE must be on or off" >&2; exit 2 ;;
++esac
++[[ $flash_attn == on || $flash_attn == off || $flash_attn == auto ]] || { echo "FLASH_ATTN must be on, off or auto" >&2; exit 2; }
++[[ $load_mode == none || $load_mode == mmap || $load_mode == mlock || $load_mode == mmap+mlock || $load_mode == dio ]] || { echo "invalid LOAD_MODE" >&2; exit 2; }
++
++rm -rf "$out"; mkdir -p "$out"
++
++export LD_LIBRARY_PATH="$root/build-intel-clang/bin:$root/build-intel-clang/runtime${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
++export GGML_CPU_EXPERT_IO_PROFILE=${GGML_CPU_EXPERT_IO_PROFILE:-1}
++export GGML_CPU_EXPERT_IO_ADVISE_MODE=$advice_mode
++export GGML_SPECULATIVE_PROFILE=${GGML_SPECULATIVE_PROFILE:-1}
++if [[ ${WHOLE_TOKEN_PROFILE:-0} == 1 ]]; then
++  export GGML_CPU_WHOLE_TOKEN_PROFILE=1
++else
++  unset GGML_CPU_WHOLE_TOKEN_PROFILE || true
++fi
++
++spec=(--spec-type none)
++if (( draft_depth > 0 )); then
++  spec=(--spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max "$draft_depth"
++        --spec-draft-threads "$threads" --spec-draft-threads-batch "$threads"
++        --spec-draft-type-k "$kv" --spec-draft-type-v "$kv")
++  [[ -z $draft_model ]] || spec+=(--model-draft "$draft_model")
++fi
++
++before_swap_in=$(awk '/^pswpin /{print $2}' /proc/vmstat)
++before_swap_out=$(awk '/^pswpout /{print $2}' /proc/vmstat)
++before_major=$(awk '/^pgmajfault /{print $2}' /proc/vmstat)
++start=$(date +%s)
++
++printf 'epoch\tphase\telapsed\trss_kib\tpss_kib\tread_bytes\tminflt\tmajflt\tmem_available_kib\tswap_free_kib\tpswpin_delta\tpswpout_delta\tpgmaj_delta\tpkg_temp_mC\n' > "$out/samples.tsv"
++
++taskset -c "$process_cpus" "$root/build-intel-clang/bin/llama-server" \
++  --model "$model" --gpu-layers 0 \
++  --threads "$threads" --cpu-range "$cpus" --cpu-strict 1 \
++  --ctx-size "$context" --parallel 1 --batch-size "$batch" --ubatch-size "$ubatch" \
++  --cache-type-k "$kv" --cache-type-v "$kv" --flash-attn "$flash_attn" \
++  "${prompt_cache_args[@]}" --cache-ram 0 --no-cache-idle-slots \
++  --load-mode "$load_mode" --no-warmup --metrics --no-ui --host 127.0.0.1 --port "$port" \
++  "${spec[@]}" > "$out/server.log" 2>&1 &
++pid=$!
++pressure_pid=
++cleanup(){
++  kill -TERM "$pid" 2>/dev/null || true
++  wait "$pid" 2>/dev/null || true
++  if [[ -n ${pressure_pid:-} ]]; then
++    kill -TERM "$pressure_pid" 2>/dev/null || true
++    wait "$pressure_pid" 2>/dev/null || true
++  fi
++}
++trap cleanup EXIT INT TERM
++
++sample(){
++  local phase=$1 now rss pss read_bytes minflt majflt mem_avail swap_free si so major temp
++  now=$(date +%s); [[ -r /proc/$pid/status ]] || return 0
++  rss=$(awk '/^VmRSS:/{print $2}' /proc/$pid/status)
++  pss=$(awk '/^Pss:/{print $2}' /proc/$pid/smaps_rollup 2>/dev/null || echo 0)
++  read_bytes=$(awk '/^read_bytes:/{print $2}' /proc/$pid/io 2>/dev/null || echo 0)
++  read -r minflt majflt < <(awk '{print $10,$12}' /proc/$pid/stat)
++  mem_avail=$(awk '/^MemAvailable:/{print $2}' /proc/meminfo)
++  swap_free=$(awk '/^SwapFree:/{print $2}' /proc/meminfo)
++  si=$(awk '/^pswpin /{print $2}' /proc/vmstat); so=$(awk '/^pswpout /{print $2}' /proc/vmstat); major=$(awk '/^pgmajfault /{print $2}' /proc/vmstat)
++  temp=$(cat /sys/class/thermal/thermal_zone1/temp)
++  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$now" "$phase" "$((now-start))" "${rss:-0}" "$pss" "$read_bytes" "$minflt" "$majflt" "$mem_avail" "$swap_free" "$((si-before_swap_in))" "$((so-before_swap_out))" "$((major-before_major))" "$temp" >> "$out/samples.tsv"
++}
++
++ready=0
++for _ in $(seq 1 360); do
++  sample startup
++  if curl -fsS "http://127.0.0.1:$port/health" > "$out/health.json" 2>/dev/null; then ready=1; break; fi
++  kill -0 "$pid" 2>/dev/null || break
++  sleep 1
++done
++(( ready )) || { tail -100 "$out/server.log"; exit 1; }
++
++curl -fsS "http://127.0.0.1:$port/metrics" > "$out/metrics-before.txt"
++
++# Optional controlled pressure is established only after model loading so it
++# exercises mmap residency/reclaim without changing startup behavior.
++if [[ $pressure_gib != 0 ]]; then
++  rm -f "$out/pressure.ready"
++  python3 "$root/benchmarks/intel-1340p/qwen-longctx-fieldfare/memory-pressure.py" \
++    --gib "$pressure_gib" --ready "$out/pressure.ready" > "$out/pressure.log" 2>&1 &
++  pressure_pid=$!
++  for _ in $(seq 1 180); do
++    sample pressure
++    [[ -s "$out/pressure.ready" ]] && break
++    kill -0 "$pressure_pid" 2>/dev/null || break
++    sleep 1
++  done
++  [[ -s "$out/pressure.ready" ]] || { echo "memory pressure holder failed" >&2; exit 1; }
++  sleep 5
++  sample pressure
++fi
++
++curl -fsS --max-time 1800 -H 'Content-Type: application/json' --data-binary "@$request" \
++  -w '%{time_total}\n' -o "$out/response.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/wall-seconds.txt" &
++curl_pid=$!
++while kill -0 "$curl_pid" 2>/dev/null; do sample request; sleep 1; done
++wait "$curl_pid"
++sample after
++curl -fsS "http://127.0.0.1:$port/metrics" > "$out/metrics-after.txt"
++
++jq -n \
++  --arg model "$model_name" --arg run_name "$run_name" --arg model_path "$model" --arg draft_path "$draft_model" --arg kv "$kv" \
++  --arg advice_mode "$advice_mode" --arg load_mode "$load_mode" --arg flash_attn "$flash_attn" --arg prompt_cache "$prompt_cache" --argjson pressure_gib "$pressure_gib" \
++  --argjson draft_depth "$draft_depth" --argjson context "$context" --argjson batch "$batch" --argjson ubatch "$ubatch" \
++  --argjson wall "$(cat "$out/wall-seconds.txt")" \
++  --arg tool_name "$(jq -r '.choices[0].message.tool_calls[0].function.name // ""' "$out/response.json")" \
++  --arg tool_args "$(jq -cS '.choices[0].message.tool_calls[0].function.arguments | fromjson' "$out/response.json" 2>/dev/null || echo null)" \
++  --argjson prompt_tokens "$(jq '.timings.prompt_n // .usage.prompt_tokens // 0' "$out/response.json")" \
++  --argjson generated_tokens "$(jq '.timings.predicted_n // .usage.completion_tokens // 0' "$out/response.json")" \
++  --argjson prompt_tps "$(jq '.timings.prompt_per_second // null' "$out/response.json")" \
++  --argjson generation_tps "$(jq '.timings.predicted_per_second // null' "$out/response.json")" \
++  --argjson draft_tokens "$(jq '.timings.draft_n // 0' "$out/response.json")" \
++  --argjson accepted_draft_tokens "$(jq '.timings.draft_n_accepted // 0' "$out/response.json")" \
++  '{model:$model,run_name:$run_name,model_path:$model_path,draft_path:$draft_path,draft_depth:$draft_depth,context:$context,batch:$batch,ubatch:$ubatch,kv:$kv,advice_mode:$advice_mode,load_mode:$load_mode,flash_attn:$flash_attn,prompt_cache:$prompt_cache,pressure_gib:$pressure_gib,wall_seconds:$wall,prompt_tokens:$prompt_tokens,generated_tokens:$generated_tokens,prompt_tps:$prompt_tps,generation_tps:$generation_tps,draft_tokens:$draft_tokens,accepted_draft_tokens:$accepted_draft_tokens,tool_name:$tool_name,tool_args:($tool_args|fromjson)}' > "$out/result.json"
++
++cleanup; trap - EXIT INT TERM
++cat "$out/result.json"
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/run-graph-profile.sh b/benchmarks/intel-1340p/ornith-gemma-optimization/run-graph-profile.sh
+new file mode 100755
+index 000000000..a9a6aee75
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/run-graph-profile.sh
+@@ -0,0 +1,33 @@
++#!/usr/bin/env bash
++set -euo pipefail
++root=$(cd "$(dirname "$0")/../../.." && pwd)
++model=${1:?ornith|gemma4}
++depth=${2:?depth}
++port=${3:?port}
++out=$root/benchmarks/intel-1340p/ornith-gemma-optimization/graph-profile/${model}-d${depth}
++rm -rf "$out"; mkdir -p "$out"
++
++export WHOLE_TOKEN_PROFILE=1
++export GGML_SPECULATIVE_PROFILE=1
++export OUT_ROOT="$out/runner"
++export RUN_NAME=profile
++"$root/benchmarks/intel-1340p/ornith-gemma-optimization/run-agentic-baseline.sh" "$model" "$depth" "$port" > "$out/harness.stdout"
++mv "$out/runner/profile"/* "$out"/
++rmdir "$out/runner/profile" "$out/runner"
++
++grep 'GGML_CPU_WHOLE_TOKEN_PROFILE' "$out/server.log" > "$out/whole-token-profile.log"
++grep 'GGML_SPECULATIVE_PROFILE' "$out/server.log" > "$out/speculative-profile.log" || true
++grep 'GGML_CPU_EXPERT_IO_PROFILE' "$out/server.log" > "$out/expert-profile.log" || true
++
++python3 - "$out" <<'PY'
++import json,re,sys
++from pathlib import Path
++root=Path(sys.argv[1])
++rows=[]
++for line in (root/'whole-token-profile.log').read_text().splitlines():
++    fields=dict(re.findall(r'(\w+)=([^ ]+)',line))
++    if fields.get('kind') in ('op','family','total'):
++        rows.append(fields)
++(root/'profile.json').write_text(json.dumps(rows,indent=2)+'\n')
++PY
++cat "$out/result.json"
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-correctness.sh b/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-correctness.sh
+new file mode 100755
+index 000000000..808ebc7c5
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-correctness.sh
+@@ -0,0 +1,36 @@
++#!/usr/bin/env bash
++set -euo pipefail
++root=$(cd "$(dirname "$0")/../../.." && pwd)
++workspace=$(cd "$root/.." && pwd)
++storage=$workspace/.podman-llama-storage
++runroot=$workspace/.podman-llama-run
++image=${LLAMA_SYCL_BUILD_IMAGE:-localhost/llama-intel-sycl:oneapi-2025.3.3-l0-1.28.2}
++out=$root/benchmarks/intel-1340p/ornith-gemma-optimization/sycl/correctness
++mkdir -p "$out"
++
++podman --root "$storage" --runroot "$runroot" --storage-driver vfs --cgroup-manager=cgroupfs run --rm --network=none --security-opt label=disable \
++  --userns=keep-id --user "$(id -u):$(id -g)" --device /dev/dri/renderD128 --device /dev/dri/card0 \
++  -v /var/home/agent/workspace:/var/home/agent/workspace -w "$root" "$image" '
++set -euo pipefail
++export ONEAPI_DEVICE_SELECTOR=level_zero:gpu
++export ZES_ENABLE_SYSMAN=1
++export GGML_SYCL_DEBUG=1
++export SYCL_PROGRAM_COMPILE_OPTIONS=-cl-fp32-correctly-rounded-divide-sqrt
++export LD_LIBRARY_PATH="$PWD/build-intel-sycl/bin:$PWD/build-intel-sycl/runtime:${LD_LIBRARY_PATH:-}"
++out=benchmarks/intel-1340p/ornith-gemma-optimization/sycl/correctness
++build-intel-sycl/bin/test-backend-ops test -b SYCL0 -o MUL_MAT_ID \
++  -p "type_a=q3_K,type_b=f32,n_mats=16,n_used=8,b=0,m=(512|2048),n=(1|2|3|4|8),k=(2048|512)" \
++  --output csv > "$out/ornith-routed.csv" 2> "$out/ornith-routed.log"
++build-intel-sycl/bin/test-backend-ops test -b SYCL0 -o MUL_MAT \
++  -p "type_a=q4_0,type_b=f32,m=(10240|2560|512|2048|4096),n=(1|2|3|4),k=(2560|10240)" \
++  --output csv > "$out/gemma-target.csv" 2> "$out/gemma-target.log"
++build-intel-sycl/bin/test-backend-ops test -b SYCL0 -o MUL_MAT \
++  -p "type_a=q8_0,type_b=f32,m=(2048|256|1024|2560),n=(1|2|3|4),k=(256|2048|5120)" \
++  --output csv > "$out/gemma-assistant.csv" 2> "$out/gemma-assistant.log"
++'
++
++for name in ornith-routed gemma-target gemma-assistant; do
++  rows=$(grep -c '"test","1","",""' "$out/$name.csv" || true)
++  unsupported=$(grep -c '"test","0"' "$out/$name.csv" || true)
++  printf '%s passed=%s unsupported=%s\n' "$name" "$rows" "$unsupported"
++done
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-model-smoke.sh b/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-model-smoke.sh
+new file mode 100755
+index 000000000..3d639d582
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/run-sycl-model-smoke.sh
+@@ -0,0 +1,67 @@
++#!/usr/bin/env bash
++set -euo pipefail
++root=$(cd "$(dirname "$0")/../../.." && pwd)
++model_name=${1:?ornith|gemma4}
++port=${2:?port}
++workspace=$(cd "$root/.." && pwd)
++storage=$workspace/.podman-llama-storage
++runroot=$workspace/.podman-llama-run
++image=${LLAMA_SYCL_BUILD_IMAGE:-localhost/llama-intel-sycl:oneapi-2025.3.3-l0-1.28.2}
++ngl=${NGL:-99}
++ngld=${NGLD:-0}
++graph=${SYCL_GRAPH:-0}
++run_name=${RUN_NAME:-${model_name}-ngl${ngl}-ngld${ngld}-graph${graph}}
++out=$root/benchmarks/intel-1340p/ornith-gemma-optimization/sycl/model-sweep/$run_name
++rm -rf "$out"; mkdir -p "$out"
++
++case "$model_name" in
++ ornith)
++  model=/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf
++  draft=
++  depth=2
++  ;;
++ gemma4)
++  model=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf
++  draft=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf
++  depth=3
++  ;;
++ *) exit 2;;
++esac
++request=$root/benchmarks/intel-1340p/qwen-longctx-fieldfare/workloads/agentic-tool-planning-3k.json
++
++podman --root "$storage" --runroot "$runroot" --storage-driver vfs --cgroup-manager=cgroupfs run --rm --network=host --security-opt label=disable \
++ --userns=keep-id --user "$(id -u):$(id -g)" --device /dev/dri/renderD128 --device /dev/dri/card0 \
++ -v /var/home/agent/workspace:/var/home/agent/workspace -w "$root" \
++ -e MODEL="$model" -e DRAFT="$draft" -e DEPTH="$depth" -e PORT="$port" -e REQUEST="$request" -e OUT="$out" \
++ -e NGL="$ngl" -e NGLD="$ngld" -e SYCL_GRAPH="$graph" "$image" '
++set -euo pipefail
++export ONEAPI_DEVICE_SELECTOR=level_zero:gpu
++export ZES_ENABLE_SYSMAN=1
++export GGML_SYCL_DEBUG=1
++export GGML_SYCL_ENABLE_GRAPH="$SYCL_GRAPH"
++export GGML_SYCL_ENABLE_FLASH_ATTN=1
++export GGML_SYCL_USE_LEVEL_ZERO_API=1
++export SYCL_PROGRAM_COMPILE_OPTIONS=-cl-fp32-correctly-rounded-divide-sqrt
++export GGML_SPECULATIVE_PROFILE=1
++export LD_LIBRARY_PATH="$PWD/build-intel-sycl/bin:$PWD/build-intel-sycl/runtime:${LD_LIBRARY_PATH:-}"
++spec=(--spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max "$DEPTH" --spec-draft-type-k q8_0 --spec-draft-type-v q8_0)
++[[ -z "$DRAFT" ]] || spec+=(--model-draft "$DRAFT")
++build-intel-sycl/bin/llama-server --model "$MODEL" --gpu-layers "$NGL" --spec-draft-ngl "$NGLD" --split-mode none --main-gpu 0 \
++ --threads 8 --ctx-size 4096 --parallel 1 --batch-size 512 --ubatch-size 128 \
++ --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on --load-mode mmap --no-warmup --no-ui \
++ --host 127.0.0.1 --port "$PORT" "${spec[@]}" > "$OUT/server.log" 2>&1 & pid=$!
++cleanup(){ kill -TERM "$pid" 2>/dev/null||true; wait "$pid" 2>/dev/null||true; }; trap cleanup EXIT
++for _ in $(seq 1 360); do curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null 2>&1 && break; kill -0 "$pid" 2>/dev/null || { tail -100 "$OUT/server.log"; exit 1; }; sleep 1; done
++curl -fsS --max-time 1800 -H Content-Type:application/json --data-binary "@$REQUEST" "http://127.0.0.1:$PORT/v1/chat/completions" > "$OUT/response.json"
++awk "/VmRSS:|VmSwap:/{print}" /proc/$pid/status > "$OUT/memory.txt"
++cleanup; trap - EXIT
++'
++
++jq -n --arg model "$model_name" --arg run_name "$run_name" --argjson ngl "$ngl" --argjson ngld "$ngld" --argjson graph "$graph" \
++ --arg tool "$(jq -r '.choices[0].message.tool_calls[0].function.name // ""' "$out/response.json")" \
++ --argjson prompt_tps "$(jq '.timings.prompt_per_second // null' "$out/response.json")" \
++ --argjson generation_tps "$(jq '.timings.predicted_per_second // null' "$out/response.json")" \
++ --argjson drafts "$(jq '.timings.draft_n // 0' "$out/response.json")" \
++ --argjson accepted "$(jq '.timings.draft_n_accepted // 0' "$out/response.json")" \
++ '{model:$model,run_name:$run_name,ngl:$ngl,ngld:$ngld,sycl_graph:$graph,tool_name:$tool,prompt_tps:$prompt_tps,generation_tps:$generation_tps,draft_tokens:$drafts,accepted_draft_tokens:$accepted}' > "$out/result.json"
++cat "$out/result.json"
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/test-profile-alias.sh b/benchmarks/intel-1340p/ornith-gemma-optimization/test-profile-alias.sh
+new file mode 100755
+index 000000000..31911124e
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/test-profile-alias.sh
+@@ -0,0 +1,27 @@
++#!/usr/bin/env bash
++set -euo pipefail
++root=$(cd "$(dirname "$0")/../../.." && pwd)
++out=$root/benchmarks/intel-1340p/ornith-gemma-optimization/profile-alias
++model=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf
++draft=/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf
++mkdir -p "$out"
++export LD_LIBRARY_PATH="$root/build-intel-clang/bin:$root/build-intel-clang/runtime"
++for mode in generic legacy; do
++  port=$([[ $mode == generic ]] && echo 8290 || echo 8291)
++  unset GGML_SPECULATIVE_PROFILE GGML_QWEN35MOE_MTP_PROFILE || true
++  [[ $mode == generic ]] && export GGML_SPECULATIVE_PROFILE=1 || export GGML_QWEN35MOE_MTP_PROFILE=1
++  "$root/build-intel-clang/bin/llama-server" -m "$model" -md "$draft" --spec-type draft-mtp --spec-draft-n-max 1 \
++    -t 8 --cpu-range 0-7 --cpu-strict 1 -c 4096 -b 512 -ub 128 -ctk q8_0 -ctv q8_0 -ctkd q8_0 -ctvd q8_0 \
++    --no-ui --no-warmup --host 127.0.0.1 --port "$port" > "$out/$mode.log" 2>&1 & pid=$!
++  cleanup(){ kill -TERM "$pid" 2>/dev/null||true; wait "$pid" 2>/dev/null||true; }; trap cleanup EXIT
++  for _ in $(seq 1 180); do curl -fsS "http://127.0.0.1:$port/health" >/dev/null 2>&1 && break; sleep 1; done
++  curl -fsS -H 'Content-Type: application/json' -d '{"messages":[{"role":"user","content":"Reply exactly OK"}],"temperature":0,"max_tokens":16,"chat_template_kwargs":{"enable_thinking":false}}' \
++    "http://127.0.0.1:$port/v1/chat/completions" > "$out/$mode.json"
++  cleanup; trap - EXIT
++done
++jq -cS '{content:.choices[0].message.content,draft:.timings.draft_n,accepted:.timings.draft_n_accepted}' "$out/generic.json" > "$out/generic.normalized.json"
++jq -cS '{content:.choices[0].message.content,draft:.timings.draft_n,accepted:.timings.draft_n_accepted}' "$out/legacy.json" > "$out/legacy.normalized.json"
++cmp "$out/generic.normalized.json" "$out/legacy.normalized.json"
++for mode in generic legacy; do grep -q 'GGML_SPECULATIVE_PROFILE phase=' "$out/$mode.log"; done
++printf 'profile_alias_equivalence=passed\n'
++cat "$out/generic.normalized.json"
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.json b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.json
+new file mode 100644
+index 000000000..f5fe453ff
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.json
+@@ -0,0 +1,52 @@
++{
++  "messages": [
++    {
++      "role": "system",
++      "content": "You are a coding agent. Repository evidence must be obtained with the supplied search_repository tool. Do not answer from memory."
++    },
++    {
++      "role": "user",
++      "content": "Repository snapshot copy 1/4:\nThe following generated repository manifest is intentionally long. Find the implementation that observes Qwen routed-expert page residency and submits bounded asynchronous mmap advice. Use search_repository with a narrow query and path, then report the first three files to inspect. Do not modify anything.\n\n000 src/common/module-000.h owner=backend-0 status=experimental\n001 src/ggml-cpu/module-001.cpp owner=backend-1 status=stable\n002 src/ggml-vulkan/module-002.cpp owner=backend-2 status=stable\n003 src/server/module-003.glsl owner=backend-3 status=stable\n004 src/tests/module-004.cpp owner=backend-4 status=stable\n005 src/tools/module-005.h owner=backend-5 status=stable\n006 src/common/module-006.glsl owner=backend-6 status=stable\n007 src/ggml-cpu/module-007.cpp owner=backend-7 status=stable\n008 src/ggml-vulkan/module-008.cpp owner=backend-8 status=stable\n009 src/server/module-009.glsl owner=backend-0 status=stable\n010 src/tests/module-010.h owner=backend-1 status=stable\n011 src/tools/module-011.cpp owner=backend-2 status=experimental\n012 src/common/module-012.glsl owner=backend-3 status=stable\n013 src/ggml-cpu/module-013.cpp owner=backend-4 status=stable\n014 src/ggml-vulkan/module-014.cpp owner=backend-5 status=stable\n015 src/server/module-015.h owner=backend-6 status=stable\n016 src/tests/module-016.cpp owner=backend-7 status=stable\n017 src/tools/module-017.cpp owner=backend-8 status=stable\n018 src/common/module-018.glsl owner=backend-0 status=stable\n019 src/ggml-cpu/module-019.cpp owner=backend-1 status=stable\n020 src/ggml-vulkan/module-020.h owner=backend-2 status=stable\n021 src/server/module-021.glsl owner=backend-3 status=stable\n022 src/tests/module-022.cpp owner=backend-4 status=experimental\n023 src/tools/module-023.cpp owner=backend-5 status=stable\n024 src/common/module-024.glsl owner=backend-6 status=stable\n025 src/ggml-cpu/module-025.h owner=backend-7 status=stable\n026 src/ggml-vulkan/module-026.cpp owner=backend-8 status=stable\n027 src/server/module-027.glsl owner=backend-0 status=stable\n028 src/tests/module-028.cpp owner=backend-1 status=stable\n029 src/tools/module-029.cpp owner=backend-2 status=stable\n030 src/common/module-030.h owner=backend-3 status=stable\n031 src/ggml-cpu/module-031.cpp owner=backend-4 status=stable\n032 src/ggml-vulkan/module-032.cpp owner=backend-5 status=stable\n033 src/server/module-033.glsl owner=backend-6 status=experimental\n034 src/tests/module-034.cpp owner=backend-7 status=stable\n035 src/tools/module-035.h owner=backend-8 status=stable\n036 src/common/module-036.glsl owner=backend-0 status=stable\n037 src/ggml-cpu/module-037.cpp owner=backend-1 status=stable\n038 src/ggml-vulkan/module-038.cpp owner=backend-2 status=stable\n039 src/server/module-039.glsl owner=backend-3 status=stable\n040 src/tests/module-040.h owner=backend-4 status=stable\n041 src/tools/module-041.cpp owner=backend-5 status=stable\n042 src/common/module-042.glsl owner=backend-6 status=stable\n043 src/ggml-cpu/module-043.cpp owner=backend-7 status=stable\n044 src/ggml-vulkan/module-044.cpp owner=backend-8 status=experimental\n045 src/server/module-045.h owner=backend-0 status=stable\n046 src/tests/module-046.cpp owner=backend-1 status=stable\n047 src/tools/module-047.cpp owner=backend-2 status=stable\n048 src/common/module-048.glsl owner=backend-3 status=stable\n049 src/ggml-cpu/module-049.cpp owner=backend-4 status=stable\n050 src/ggml-vulkan/module-050.h owner=backend-5 status=stable\n051 src/server/module-051.glsl owner=backend-6 status=stable\n052 src/tests/module-052.cpp owner=backend-7 status=stable\n053 src/tools/module-053.cpp owner=backend-8 status=stable\n054 src/common/module-054.glsl owner=backend-0 status=stable\n055 src/ggml-cpu/module-055.h owner=backend-1 status=experimental\n056 src/ggml-vulkan/module-056.cpp owner=backend-2 status=stable\n057 src/server/module-057.glsl owner=backend-3 status=stable\n058 src/tests/module-058.cpp owner=backend-4 status=stable\n059 src/tools/module-059.cpp owner=backend-5 status=stable\n060 src/common/module-060.h owner=backend-6 status=stable\n061 src/ggml-cpu/module-061.cpp owner=backend-7 status=stable\n062 src/ggml-vulkan/module-062.cpp owner=backend-8 status=stable\n063 src/server/module-063.glsl owner=backend-0 status=stable\n064 src/tests/module-064.cpp owner=backend-1 status=stable\n065 src/tools/module-065.h owner=backend-2 status=stable\n066 src/common/module-066.glsl owner=backend-3 status=experimental\n067 src/ggml-cpu/module-067.cpp owner=backend-4 status=stable\n068 src/ggml-vulkan/module-068.cpp owner=backend-5 status=stable\n069 src/server/module-069.glsl owner=backend-6 status=stable\n070 src/tests/module-070.h owner=backend-7 status=stable\n071 src/tools/module-071.cpp owner=backend-8 status=stable\n072 src/common/module-072.glsl owner=backend-0 status=stable\n073 src/ggml-cpu/module-073.cpp owner=backend-1 status=stable\n074 src/ggml-vulkan/module-074.cpp owner=backend-2 status=stable\n075 src/server/module-075.h owner=backend-3 status=stable\n076 src/tests/module-076.cpp owner=backend-4 status=stable\n077 src/tools/module-077.cpp owner=backend-5 status=experimental\n078 src/common/module-078.glsl owner=backend-6 status=stable\n079 src/ggml-cpu/module-079.cpp owner=backend-7 status=stable\n080 src/ggml-vulkan/module-080.h owner=backend-8 status=stable\n081 src/server/module-081.glsl owner=backend-0 status=stable\n082 src/tests/module-082.cpp owner=backend-1 status=stable\n083 src/tools/module-083.cpp owner=backend-2 status=stable\n084 src/common/module-084.glsl owner=backend-3 status=stable\n085 src/ggml-cpu/module-085.h owner=backend-4 status=stable\n086 src/ggml-vulkan/module-086.cpp owner=backend-5 status=stable\nNEEDLE ggml/src/ggml-cpu/whole-token-profile.cpp owns routed MUL_MAT_ID expert residency, bounded mmap range planning, and async MADV_WILLNEED submission\nRELATED ggml/src/ggml-cpu/expert-io-plan.cpp coalesces selected expert address ranges under byte and range budgets\nRELATED tools/server/server-context.cpp exports expert I/O counters through the Prometheus metrics endpoint\n087 src/server/module-087.glsl owner=backend-6 status=stable\n088 src/tests/module-088.cpp owner=backend-7 status=experimental\n089 src/tools/module-089.cpp owner=backend-8 status=stable\n090 src/common/module-090.h owner=backend-0 status=stable\n091 src/ggml-cpu/module-091.cpp owner=backend-1 status=stable\n092 src/ggml-vulkan/module-092.cpp owner=backend-2 status=stable\n093 src/server/module-093.glsl owner=backend-3 status=stable\n094 src/tests/module-094.cpp owner=backend-4 status=stable\n095 src/tools/module-095.h owner=backend-5 status=stable\n096 src/common/module-096.glsl owner=backend-6 status=stable\n097 src/ggml-cpu/module-097.cpp owner=backend-7 status=stable\n098 src/ggml-vulkan/module-098.cpp owner=backend-8 status=stable\n099 src/server/module-099.glsl owner=backend-0 status=experimental\n100 src/tests/module-100.h owner=backend-1 status=stable\n101 src/tools/module-101.cpp owner=backend-2 status=stable\n102 src/common/module-102.glsl owner=backend-3 status=stable\n103 src/ggml-cpu/module-103.cpp owner=backend-4 status=stable\n104 src/ggml-vulkan/module-104.cpp owner=backend-5 status=stable\n105 src/server/module-105.h owner=backend-6 status=stable\n106 src/tests/module-106.cpp owner=backend-7 status=stable\n107 src/tools/module-107.cpp owner=backend-8 status=stable\n108 src/common/module-108.glsl owner=backend-0 status=stable\n109 src/ggml-cpu/module-109.cpp owner=backend-1 status=stable\n110 src/ggml-vulkan/module-110.h owner=backend-2 status=experimental\n111 src/server/module-111.glsl owner=backend-3 status=stable\n112 src/tests/module-112.cpp owner=backend-4 status=stable\n113 src/tools/module-113.cpp owner=backend-5 status=stable\n114 src/common/module-114.glsl owner=backend-6 status=stable\n115 src/ggml-cpu/module-115.h owner=backend-7 status=stable\n116 src/ggml-vulkan/module-116.cpp owner=backend-8 status=stable\n117 src/server/module-117.glsl owner=backend-0 status=stable\n118 src/tests/module-118.cpp owner=backend-1 status=stable\n119 src/tools/module-119.cpp owner=backend-2 status=stable\n\nRepository snapshot copy 2/4:\nThe following generated repository manifest is intentionally long. Find the implementation that observes Qwen routed-expert page residency and submits bounded asynchronous mmap advice. Use search_repository with a narrow query and path, then report the first three files to inspect. Do not modify anything.\n\n000 src/common/module-000.h owner=backend-0 status=experimental\n001 src/ggml-cpu/module-001.cpp owner=backend-1 status=stable\n002 src/ggml-vulkan/module-002.cpp owner=backend-2 status=stable\n003 src/server/module-003.glsl owner=backend-3 status=stable\n004 src/tests/module-004.cpp owner=backend-4 status=stable\n005 src/tools/module-005.h owner=backend-5 status=stable\n006 src/common/module-006.glsl owner=backend-6 status=stable\n007 src/ggml-cpu/module-007.cpp owner=backend-7 status=stable\n008 src/ggml-vulkan/module-008.cpp owner=backend-8 status=stable\n009 src/server/module-009.glsl owner=backend-0 status=stable\n010 src/tests/module-010.h owner=backend-1 status=stable\n011 src/tools/module-011.cpp owner=backend-2 status=experimental\n012 src/common/module-012.glsl owner=backend-3 status=stable\n013 src/ggml-cpu/module-013.cpp owner=backend-4 status=stable\n014 src/ggml-vulkan/module-014.cpp owner=backend-5 status=stable\n015 src/server/module-015.h owner=backend-6 status=stable\n016 src/tests/module-016.cpp owner=backend-7 status=stable\n017 src/tools/module-017.cpp owner=backend-8 status=stable\n018 src/common/module-018.glsl owner=backend-0 status=stable\n019 src/ggml-cpu/module-019.cpp owner=backend-1 status=stable\n020 src/ggml-vulkan/module-020.h owner=backend-2 status=stable\n021 src/server/module-021.glsl owner=backend-3 status=stable\n022 src/tests/module-022.cpp owner=backend-4 status=experimental\n023 src/tools/module-023.cpp owner=backend-5 status=stable\n024 src/common/module-024.glsl owner=backend-6 status=stable\n025 src/ggml-cpu/module-025.h owner=backend-7 status=stable\n026 src/ggml-vulkan/module-026.cpp owner=backend-8 status=stable\n027 src/server/module-027.glsl owner=backend-0 status=stable\n028 src/tests/module-028.cpp owner=backend-1 status=stable\n029 src/tools/module-029.cpp owner=backend-2 status=stable\n030 src/common/module-030.h owner=backend-3 status=stable\n031 src/ggml-cpu/module-031.cpp owner=backend-4 status=stable\n032 src/ggml-vulkan/module-032.cpp owner=backend-5 status=stable\n033 src/server/module-033.glsl owner=backend-6 status=experimental\n034 src/tests/module-034.cpp owner=backend-7 status=stable\n035 src/tools/module-035.h owner=backend-8 status=stable\n036 src/common/module-036.glsl owner=backend-0 status=stable\n037 src/ggml-cpu/module-037.cpp owner=backend-1 status=stable\n038 src/ggml-vulkan/module-038.cpp owner=backend-2 status=stable\n039 src/server/module-039.glsl owner=backend-3 status=stable\n040 src/tests/module-040.h owner=backend-4 status=stable\n041 src/tools/module-041.cpp owner=backend-5 status=stable\n042 src/common/module-042.glsl owner=backend-6 status=stable\n043 src/ggml-cpu/module-043.cpp owner=backend-7 status=stable\n044 src/ggml-vulkan/module-044.cpp owner=backend-8 status=experimental\n045 src/server/module-045.h owner=backend-0 status=stable\n046 src/tests/module-046.cpp owner=backend-1 status=stable\n047 src/tools/module-047.cpp owner=backend-2 status=stable\n048 src/common/module-048.glsl owner=backend-3 status=stable\n049 src/ggml-cpu/module-049.cpp owner=backend-4 status=stable\n050 src/ggml-vulkan/module-050.h owner=backend-5 status=stable\n051 src/server/module-051.glsl owner=backend-6 status=stable\n052 src/tests/module-052.cpp owner=backend-7 status=stable\n053 src/tools/module-053.cpp owner=backend-8 status=stable\n054 src/common/module-054.glsl owner=backend-0 status=stable\n055 src/ggml-cpu/module-055.h owner=backend-1 status=experimental\n056 src/ggml-vulkan/module-056.cpp owner=backend-2 status=stable\n057 src/server/module-057.glsl owner=backend-3 status=stable\n058 src/tests/module-058.cpp owner=backend-4 status=stable\n059 src/tools/module-059.cpp owner=backend-5 status=stable\n060 src/common/module-060.h owner=backend-6 status=stable\n061 src/ggml-cpu/module-061.cpp owner=backend-7 status=stable\n062 src/ggml-vulkan/module-062.cpp owner=backend-8 status=stable\n063 src/server/module-063.glsl owner=backend-0 status=stable\n064 src/tests/module-064.cpp owner=backend-1 status=stable\n065 src/tools/module-065.h owner=backend-2 status=stable\n066 src/common/module-066.glsl owner=backend-3 status=experimental\n067 src/ggml-cpu/module-067.cpp owner=backend-4 status=stable\n068 src/ggml-vulkan/module-068.cpp owner=backend-5 status=stable\n069 src/server/module-069.glsl owner=backend-6 status=stable\n070 src/tests/module-070.h owner=backend-7 status=stable\n071 src/tools/module-071.cpp owner=backend-8 status=stable\n072 src/common/module-072.glsl owner=backend-0 status=stable\n073 src/ggml-cpu/module-073.cpp owner=backend-1 status=stable\n074 src/ggml-vulkan/module-074.cpp owner=backend-2 status=stable\n075 src/server/module-075.h owner=backend-3 status=stable\n076 src/tests/module-076.cpp owner=backend-4 status=stable\n077 src/tools/module-077.cpp owner=backend-5 status=experimental\n078 src/common/module-078.glsl owner=backend-6 status=stable\n079 src/ggml-cpu/module-079.cpp owner=backend-7 status=stable\n080 src/ggml-vulkan/module-080.h owner=backend-8 status=stable\n081 src/server/module-081.glsl owner=backend-0 status=stable\n082 src/tests/module-082.cpp owner=backend-1 status=stable\n083 src/tools/module-083.cpp owner=backend-2 status=stable\n084 src/common/module-084.glsl owner=backend-3 status=stable\n085 src/ggml-cpu/module-085.h owner=backend-4 status=stable\n086 src/ggml-vulkan/module-086.cpp owner=backend-5 status=stable\nNEEDLE ggml/src/ggml-cpu/whole-token-profile.cpp owns routed MUL_MAT_ID expert residency, bounded mmap range planning, and async MADV_WILLNEED submission\nRELATED ggml/src/ggml-cpu/expert-io-plan.cpp coalesces selected expert address ranges under byte and range budgets\nRELATED tools/server/server-context.cpp exports expert I/O counters through the Prometheus metrics endpoint\n087 src/server/module-087.glsl owner=backend-6 status=stable\n088 src/tests/module-088.cpp owner=backend-7 status=experimental\n089 src/tools/module-089.cpp owner=backend-8 status=stable\n090 src/common/module-090.h owner=backend-0 status=stable\n091 src/ggml-cpu/module-091.cpp owner=backend-1 status=stable\n092 src/ggml-vulkan/module-092.cpp owner=backend-2 status=stable\n093 src/server/module-093.glsl owner=backend-3 status=stable\n094 src/tests/module-094.cpp owner=backend-4 status=stable\n095 src/tools/module-095.h owner=backend-5 status=stable\n096 src/common/module-096.glsl owner=backend-6 status=stable\n097 src/ggml-cpu/module-097.cpp owner=backend-7 status=stable\n098 src/ggml-vulkan/module-098.cpp owner=backend-8 status=stable\n099 src/server/module-099.glsl owner=backend-0 status=experimental\n100 src/tests/module-100.h owner=backend-1 status=stable\n101 src/tools/module-101.cpp owner=backend-2 status=stable\n102 src/common/module-102.glsl owner=backend-3 status=stable\n103 src/ggml-cpu/module-103.cpp owner=backend-4 status=stable\n104 src/ggml-vulkan/module-104.cpp owner=backend-5 status=stable\n105 src/server/module-105.h owner=backend-6 status=stable\n106 src/tests/module-106.cpp owner=backend-7 status=stable\n107 src/tools/module-107.cpp owner=backend-8 status=stable\n108 src/common/module-108.glsl owner=backend-0 status=stable\n109 src/ggml-cpu/module-109.cpp owner=backend-1 status=stable\n110 src/ggml-vulkan/module-110.h owner=backend-2 status=experimental\n111 src/server/module-111.glsl owner=backend-3 status=stable\n112 src/tests/module-112.cpp owner=backend-4 status=stable\n113 src/tools/module-113.cpp owner=backend-5 status=stable\n114 src/common/module-114.glsl owner=backend-6 status=stable\n115 src/ggml-cpu/module-115.h owner=backend-7 status=stable\n116 src/ggml-vulkan/module-116.cpp owner=backend-8 status=stable\n117 src/server/module-117.glsl owner=backend-0 status=stable\n118 src/tests/module-118.cpp owner=backend-1 status=stable\n119 src/tools/module-119.cpp owner=backend-2 status=stable\n\nRepository snapshot copy 3/4:\nThe following generated repository manifest is intentionally long. Find the implementation that observes Qwen routed-expert page residency and submits bounded asynchronous mmap advice. Use search_repository with a narrow query and path, then report the first three files to inspect. Do not modify anything.\n\n000 src/common/module-000.h owner=backend-0 status=experimental\n001 src/ggml-cpu/module-001.cpp owner=backend-1 status=stable\n002 src/ggml-vulkan/module-002.cpp owner=backend-2 status=stable\n003 src/server/module-003.glsl owner=backend-3 status=stable\n004 src/tests/module-004.cpp owner=backend-4 status=stable\n005 src/tools/module-005.h owner=backend-5 status=stable\n006 src/common/module-006.glsl owner=backend-6 status=stable\n007 src/ggml-cpu/module-007.cpp owner=backend-7 status=stable\n008 src/ggml-vulkan/module-008.cpp owner=backend-8 status=stable\n009 src/server/module-009.glsl owner=backend-0 status=stable\n010 src/tests/module-010.h owner=backend-1 status=stable\n011 src/tools/module-011.cpp owner=backend-2 status=experimental\n012 src/common/module-012.glsl owner=backend-3 status=stable\n013 src/ggml-cpu/module-013.cpp owner=backend-4 status=stable\n014 src/ggml-vulkan/module-014.cpp owner=backend-5 status=stable\n015 src/server/module-015.h owner=backend-6 status=stable\n016 src/tests/module-016.cpp owner=backend-7 status=stable\n017 src/tools/module-017.cpp owner=backend-8 status=stable\n018 src/common/module-018.glsl owner=backend-0 status=stable\n019 src/ggml-cpu/module-019.cpp owner=backend-1 status=stable\n020 src/ggml-vulkan/module-020.h owner=backend-2 status=stable\n021 src/server/module-021.glsl owner=backend-3 status=stable\n022 src/tests/module-022.cpp owner=backend-4 status=experimental\n023 src/tools/module-023.cpp owner=backend-5 status=stable\n024 src/common/module-024.glsl owner=backend-6 status=stable\n025 src/ggml-cpu/module-025.h owner=backend-7 status=stable\n026 src/ggml-vulkan/module-026.cpp owner=backend-8 status=stable\n027 src/server/module-027.glsl owner=backend-0 status=stable\n028 src/tests/module-028.cpp owner=backend-1 status=stable\n029 src/tools/module-029.cpp owner=backend-2 status=stable\n030 src/common/module-030.h owner=backend-3 status=stable\n031 src/ggml-cpu/module-031.cpp owner=backend-4 status=stable\n032 src/ggml-vulkan/module-032.cpp owner=backend-5 status=stable\n033 src/server/module-033.glsl owner=backend-6 status=experimental\n034 src/tests/module-034.cpp owner=backend-7 status=stable\n035 src/tools/module-035.h owner=backend-8 status=stable\n036 src/common/module-036.glsl owner=backend-0 status=stable\n037 src/ggml-cpu/module-037.cpp owner=backend-1 status=stable\n038 src/ggml-vulkan/module-038.cpp owner=backend-2 status=stable\n039 src/server/module-039.glsl owner=backend-3 status=stable\n040 src/tests/module-040.h owner=backend-4 status=stable\n041 src/tools/module-041.cpp owner=backend-5 status=stable\n042 src/common/module-042.glsl owner=backend-6 status=stable\n043 src/ggml-cpu/module-043.cpp owner=backend-7 status=stable\n044 src/ggml-vulkan/module-044.cpp owner=backend-8 status=experimental\n045 src/server/module-045.h owner=backend-0 status=stable\n046 src/tests/module-046.cpp owner=backend-1 status=stable\n047 src/tools/module-047.cpp owner=backend-2 status=stable\n048 src/common/module-048.glsl owner=backend-3 status=stable\n049 src/ggml-cpu/module-049.cpp owner=backend-4 status=stable\n050 src/ggml-vulkan/module-050.h owner=backend-5 status=stable\n051 src/server/module-051.glsl owner=backend-6 status=stable\n052 src/tests/module-052.cpp owner=backend-7 status=stable\n053 src/tools/module-053.cpp owner=backend-8 status=stable\n054 src/common/module-054.glsl owner=backend-0 status=stable\n055 src/ggml-cpu/module-055.h owner=backend-1 status=experimental\n056 src/ggml-vulkan/module-056.cpp owner=backend-2 status=stable\n057 src/server/module-057.glsl owner=backend-3 status=stable\n058 src/tests/module-058.cpp owner=backend-4 status=stable\n059 src/tools/module-059.cpp owner=backend-5 status=stable\n060 src/common/module-060.h owner=backend-6 status=stable\n061 src/ggml-cpu/module-061.cpp owner=backend-7 status=stable\n062 src/ggml-vulkan/module-062.cpp owner=backend-8 status=stable\n063 src/server/module-063.glsl owner=backend-0 status=stable\n064 src/tests/module-064.cpp owner=backend-1 status=stable\n065 src/tools/module-065.h owner=backend-2 status=stable\n066 src/common/module-066.glsl owner=backend-3 status=experimental\n067 src/ggml-cpu/module-067.cpp owner=backend-4 status=stable\n068 src/ggml-vulkan/module-068.cpp owner=backend-5 status=stable\n069 src/server/module-069.glsl owner=backend-6 status=stable\n070 src/tests/module-070.h owner=backend-7 status=stable\n071 src/tools/module-071.cpp owner=backend-8 status=stable\n072 src/common/module-072.glsl owner=backend-0 status=stable\n073 src/ggml-cpu/module-073.cpp owner=backend-1 status=stable\n074 src/ggml-vulkan/module-074.cpp owner=backend-2 status=stable\n075 src/server/module-075.h owner=backend-3 status=stable\n076 src/tests/module-076.cpp owner=backend-4 status=stable\n077 src/tools/module-077.cpp owner=backend-5 status=experimental\n078 src/common/module-078.glsl owner=backend-6 status=stable\n079 src/ggml-cpu/module-079.cpp owner=backend-7 status=stable\n080 src/ggml-vulkan/module-080.h owner=backend-8 status=stable\n081 src/server/module-081.glsl owner=backend-0 status=stable\n082 src/tests/module-082.cpp owner=backend-1 status=stable\n083 src/tools/module-083.cpp owner=backend-2 status=stable\n084 src/common/module-084.glsl owner=backend-3 status=stable\n085 src/ggml-cpu/module-085.h owner=backend-4 status=stable\n086 src/ggml-vulkan/module-086.cpp owner=backend-5 status=stable\nNEEDLE ggml/src/ggml-cpu/whole-token-profile.cpp owns routed MUL_MAT_ID expert residency, bounded mmap range planning, and async MADV_WILLNEED submission\nRELATED ggml/src/ggml-cpu/expert-io-plan.cpp coalesces selected expert address ranges under byte and range budgets\nRELATED tools/server/server-context.cpp exports expert I/O counters through the Prometheus metrics endpoint\n087 src/server/module-087.glsl owner=backend-6 status=stable\n088 src/tests/module-088.cpp owner=backend-7 status=experimental\n089 src/tools/module-089.cpp owner=backend-8 status=stable\n090 src/common/module-090.h owner=backend-0 status=stable\n091 src/ggml-cpu/module-091.cpp owner=backend-1 status=stable\n092 src/ggml-vulkan/module-092.cpp owner=backend-2 status=stable\n093 src/server/module-093.glsl owner=backend-3 status=stable\n094 src/tests/module-094.cpp owner=backend-4 status=stable\n095 src/tools/module-095.h owner=backend-5 status=stable\n096 src/common/module-096.glsl owner=backend-6 status=stable\n097 src/ggml-cpu/module-097.cpp owner=backend-7 status=stable\n098 src/ggml-vulkan/module-098.cpp owner=backend-8 status=stable\n099 src/server/module-099.glsl owner=backend-0 status=experimental\n100 src/tests/module-100.h owner=backend-1 status=stable\n101 src/tools/module-101.cpp owner=backend-2 status=stable\n102 src/common/module-102.glsl owner=backend-3 status=stable\n103 src/ggml-cpu/module-103.cpp owner=backend-4 status=stable\n104 src/ggml-vulkan/module-104.cpp owner=backend-5 status=stable\n105 src/server/module-105.h owner=backend-6 status=stable\n106 src/tests/module-106.cpp owner=backend-7 status=stable\n107 src/tools/module-107.cpp owner=backend-8 status=stable\n108 src/common/module-108.glsl owner=backend-0 status=stable\n109 src/ggml-cpu/module-109.cpp owner=backend-1 status=stable\n110 src/ggml-vulkan/module-110.h owner=backend-2 status=experimental\n111 src/server/module-111.glsl owner=backend-3 status=stable\n112 src/tests/module-112.cpp owner=backend-4 status=stable\n113 src/tools/module-113.cpp owner=backend-5 status=stable\n114 src/common/module-114.glsl owner=backend-6 status=stable\n115 src/ggml-cpu/module-115.h owner=backend-7 status=stable\n116 src/ggml-vulkan/module-116.cpp owner=backend-8 status=stable\n117 src/server/module-117.glsl owner=backend-0 status=stable\n118 src/tests/module-118.cpp owner=backend-1 status=stable\n119 src/tools/module-119.cpp owner=backend-2 status=stable\n\nRepository snapshot copy 4/4:\nThe following generated repository manifest is intentionally long. Find the implementation that observes Qwen routed-expert page residency and submits bounded asynchronous mmap advice. Use search_repository with a narrow query and path, then report the first three files to inspect. Do not modify anything.\n\n000 src/common/module-000.h owner=backend-0 status=experimental\n001 src/ggml-cpu/module-001.cpp owner=backend-1 status=stable\n002 src/ggml-vulkan/module-002.cpp owner=backend-2 status=stable\n003 src/server/module-003.glsl owner=backend-3 status=stable\n004 src/tests/module-004.cpp owner=backend-4 status=stable\n005 src/tools/module-005.h owner=backend-5 status=stable\n006 src/common/module-006.glsl owner=backend-6 status=stable\n007 src/ggml-cpu/module-007.cpp owner=backend-7 status=stable\n008 src/ggml-vulkan/module-008.cpp owner=backend-8 status=stable\n009 src/server/module-009.glsl owner=backend-0 status=stable\n010 src/tests/module-010.h owner=backend-1 status=stable\n011 src/tools/module-011.cpp owner=backend-2 status=experimental\n012 src/common/module-012.glsl owner=backend-3 status=stable\n013 src/ggml-cpu/module-013.cpp owner=backend-4 status=stable\n014 src/ggml-vulkan/module-014.cpp owner=backend-5 status=stable\n015 src/server/module-015.h owner=backend-6 status=stable\n016 src/tests/module-016.cpp owner=backend-7 status=stable\n017 src/tools/module-017.cpp owner=backend-8 status=stable\n018 src/common/module-018.glsl owner=backend-0 status=stable\n019 src/ggml-cpu/module-019.cpp owner=backend-1 status=stable\n020 src/ggml-vulkan/module-020.h owner=backend-2 status=stable\n021 src/server/module-021.glsl owner=backend-3 status=stable\n022 src/tests/module-022.cpp owner=backend-4 status=experimental\n023 src/tools/module-023.cpp owner=backend-5 status=stable\n024 src/common/module-024.glsl owner=backend-6 status=stable\n025 src/ggml-cpu/module-025.h owner=backend-7 status=stable\n026 src/ggml-vulkan/module-026.cpp owner=backend-8 status=stable\n027 src/server/module-027.glsl owner=backend-0 status=stable\n028 src/tests/module-028.cpp owner=backend-1 status=stable\n029 src/tools/module-029.cpp owner=backend-2 status=stable\n030 src/common/module-030.h owner=backend-3 status=stable\n031 src/ggml-cpu/module-031.cpp owner=backend-4 status=stable\n032 src/ggml-vulkan/module-032.cpp owner=backend-5 status=stable\n033 src/server/module-033.glsl owner=backend-6 status=experimental\n034 src/tests/module-034.cpp owner=backend-7 status=stable\n035 src/tools/module-035.h owner=backend-8 status=stable\n036 src/common/module-036.glsl owner=backend-0 status=stable\n037 src/ggml-cpu/module-037.cpp owner=backend-1 status=stable\n038 src/ggml-vulkan/module-038.cpp owner=backend-2 status=stable\n039 src/server/module-039.glsl owner=backend-3 status=stable\n040 src/tests/module-040.h owner=backend-4 status=stable\n041 src/tools/module-041.cpp owner=backend-5 status=stable\n042 src/common/module-042.glsl owner=backend-6 status=stable\n043 src/ggml-cpu/module-043.cpp owner=backend-7 status=stable\n044 src/ggml-vulkan/module-044.cpp owner=backend-8 status=experimental\n045 src/server/module-045.h owner=backend-0 status=stable\n046 src/tests/module-046.cpp owner=backend-1 status=stable\n047 src/tools/module-047.cpp owner=backend-2 status=stable\n048 src/common/module-048.glsl owner=backend-3 status=stable\n049 src/ggml-cpu/module-049.cpp owner=backend-4 status=stable\n050 src/ggml-vulkan/module-050.h owner=backend-5 status=stable\n051 src/server/module-051.glsl owner=backend-6 status=stable\n052 src/tests/module-052.cpp owner=backend-7 status=stable\n053 src/tools/module-053.cpp owner=backend-8 status=stable\n054 src/common/module-054.glsl owner=backend-0 status=stable\n055 src/ggml-cpu/module-055.h owner=backend-1 status=experimental\n056 src/ggml-vulkan/module-056.cpp owner=backend-2 status=stable\n057 src/server/module-057.glsl owner=backend-3 status=stable\n058 src/tests/module-058.cpp owner=backend-4 status=stable\n059 src/tools/module-059.cpp owner=backend-5 status=stable\n060 src/common/module-060.h owner=backend-6 status=stable\n061 src/ggml-cpu/module-061.cpp owner=backend-7 status=stable\n062 src/ggml-vulkan/module-062.cpp owner=backend-8 status=stable\n063 src/server/module-063.glsl owner=backend-0 status=stable\n064 src/tests/module-064.cpp owner=backend-1 status=stable\n065 src/tools/module-065.h owner=backend-2 status=stable\n066 src/common/module-066.glsl owner=backend-3 status=experimental\n067 src/ggml-cpu/module-067.cpp owner=backend-4 status=stable\n068 src/ggml-vulkan/module-068.cpp owner=backend-5 status=stable\n069 src/server/module-069.glsl owner=backend-6 status=stable\n070 src/tests/module-070.h owner=backend-7 status=stable\n071 src/tools/module-071.cpp owner=backend-8 status=stable\n072 src/common/module-072.glsl owner=backend-0 status=stable\n073 src/ggml-cpu/module-073.cpp owner=backend-1 status=stable\n074 src/ggml-vulkan/module-074.cpp owner=backend-2 status=stable\n075 src/server/module-075.h owner=backend-3 status=stable\n076 src/tests/module-076.cpp owner=backend-4 status=stable\n077 src/tools/module-077.cpp owner=backend-5 status=experimental\n078 src/common/module-078.glsl owner=backend-6 status=stable\n079 src/ggml-cpu/module-079.cpp owner=backend-7 status=stable\n080 src/ggml-vulkan/module-080.h owner=backend-8 status=stable\n081 src/server/module-081.glsl owner=backend-0 status=stable\n082 src/tests/module-082.cpp owner=backend-1 status=stable\n083 src/tools/module-083.cpp owner=backend-2 status=stable\n084 src/common/module-084.glsl owner=backend-3 status=stable\n085 src/ggml-cpu/module-085.h owner=backend-4 status=stable\n086 src/ggml-vulkan/module-086.cpp owner=backend-5 status=stable\nNEEDLE ggml/src/ggml-cpu/whole-token-profile.cpp owns routed MUL_MAT_ID expert residency, bounded mmap range planning, and async MADV_WILLNEED submission\nRELATED ggml/src/ggml-cpu/expert-io-plan.cpp coalesces selected expert address ranges under byte and range budgets\nRELATED tools/server/server-context.cpp exports expert I/O counters through the Prometheus metrics endpoint\n087 src/server/module-087.glsl owner=backend-6 status=stable\n088 src/tests/module-088.cpp owner=backend-7 status=experimental\n089 src/tools/module-089.cpp owner=backend-8 status=stable\n090 src/common/module-090.h owner=backend-0 status=stable\n091 src/ggml-cpu/module-091.cpp owner=backend-1 status=stable\n092 src/ggml-vulkan/module-092.cpp owner=backend-2 status=stable\n093 src/server/module-093.glsl owner=backend-3 status=stable\n094 src/tests/module-094.cpp owner=backend-4 status=stable\n095 src/tools/module-095.h owner=backend-5 status=stable\n096 src/common/module-096.glsl owner=backend-6 status=stable\n097 src/ggml-cpu/module-097.cpp owner=backend-7 status=stable\n098 src/ggml-vulkan/module-098.cpp owner=backend-8 status=stable\n099 src/server/module-099.glsl owner=backend-0 status=experimental\n100 src/tests/module-100.h owner=backend-1 status=stable\n101 src/tools/module-101.cpp owner=backend-2 status=stable\n102 src/common/module-102.glsl owner=backend-3 status=stable\n103 src/ggml-cpu/module-103.cpp owner=backend-4 status=stable\n104 src/ggml-vulkan/module-104.cpp owner=backend-5 status=stable\n105 src/server/module-105.h owner=backend-6 status=stable\n106 src/tests/module-106.cpp owner=backend-7 status=stable\n107 src/tools/module-107.cpp owner=backend-8 status=stable\n108 src/common/module-108.glsl owner=backend-0 status=stable\n109 src/ggml-cpu/module-109.cpp owner=backend-1 status=stable\n110 src/ggml-vulkan/module-110.h owner=backend-2 status=experimental\n111 src/server/module-111.glsl owner=backend-3 status=stable\n112 src/tests/module-112.cpp owner=backend-4 status=stable\n113 src/tools/module-113.cpp owner=backend-5 status=stable\n114 src/common/module-114.glsl owner=backend-6 status=stable\n115 src/ggml-cpu/module-115.h owner=backend-7 status=stable\n116 src/ggml-vulkan/module-116.cpp owner=backend-8 status=stable\n117 src/server/module-117.glsl owner=backend-0 status=stable\n118 src/tests/module-118.cpp owner=backend-1 status=stable\n119 src/tools/module-119.cpp owner=backend-2 status=stable"
++    }
++  ],
++  "tools": [
++    {
++      "type": "function",
++      "function": {
++        "name": "search_repository",
++        "description": "Search repository source files for a symbol or phrase.",
++        "parameters": {
++          "type": "object",
++          "properties": {
++            "query": {
++              "type": "string"
++            },
++            "path": {
++              "type": "string"
++            },
++            "max_results": {
++              "type": "integer",
++              "minimum": 1,
++              "maximum": 20
++            }
++          },
++          "required": [
++            "query",
++            "path",
++            "max_results"
++          ],
++          "additionalProperties": false
++        }
++      }
++    }
++  ],
++  "tool_choice": "required",
++  "parallel_tool_calls": false,
++  "max_tokens": 384,
++  "temperature": 0,
++  "seed": 731,
++  "stream": false,
++  "chat_template_kwargs": {
++    "enable_thinking": false
++  }
++}
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.metadata.json b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.metadata.json
+new file mode 100644
+index 000000000..8c0c6b66f
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.metadata.json
+@@ -0,0 +1,47 @@
++{
++  "messages": [
++    {
++      "role": "system",
++      "content_chars": 129
++    },
++    {
++      "role": "user",
++      "content_chars": 32262
++    }
++  ],
++  "max_tokens": 384,
++  "seed": 731,
++  "temperature": 0,
++  "tool_choice": "required",
++  "tools": [
++    {
++      "type": "function",
++      "function": {
++        "name": "search_repository",
++        "description": "Search repository source files for a symbol or phrase.",
++        "parameters": {
++          "type": "object",
++          "properties": {
++            "query": {
++              "type": "string"
++            },
++            "path": {
++              "type": "string"
++            },
++            "max_results": {
++              "type": "integer",
++              "minimum": 1,
++              "maximum": 20
++            }
++          },
++          "required": [
++            "query",
++            "path",
++            "max_results"
++          ],
++          "additionalProperties": false
++        }
++      }
++    }
++  ]
++}
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/SHA256SUMS b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/SHA256SUMS
+new file mode 100644
+index 000000000..20189b8cf
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/workloads/SHA256SUMS
+@@ -0,0 +1,2 @@
++6b4e2b5925dc230067c77794b684c7c1f5365653a66a8c6c087a48196e17cba2  benchmarks/intel-1340p/qwen-longctx-fieldfare/workloads/agentic-tool-planning-3k.json
++28a476fe92429ffc5677092335376bf169eede00e91f7f267702614e4ea9809f  benchmarks/intel-1340p/ornith-gemma-optimization/workloads/agentic-tool-planning-12k.json
+diff --git a/benchmarks/intel-1340p/ornith-gemma-optimization/validation/final/README.md b/benchmarks/intel-1340p/ornith-gemma-optimization/validation/final/README.md
+new file mode 100644
+index 000000000..f500229ff
+--- /dev/null
++++ b/benchmarks/intel-1340p/ornith-gemma-optimization/validation/final/README.md
+@@ -0,0 +1,30 @@
++# Final verification
++
++Verified against source commit `603f26c869b6700eaa5c6d52068ed583419eeacf` with the dirty campaign working tree.
++
++- Release build: `../final-build.log`
++- Focused model operations:
++  - `ornith-routed.csv`: 10/10 passed
++  - `gemma-target.csv`: 20/20 passed
++  - `gemma-assistant.csv`: 20/20 passed
++- Native graphs:
++  - `ornith-target-mtp-support.csv`: 150/150 CPU-supported
++  - `gemma-target-assistant-mtp-support.csv`: 141/141 CPU-supported
++- Backend thread control:
++  - `backend-threads-t1.txt`: one-thread benchmark passed
++  - `backend-threads-invalid.txt`: `-t 0` rejected with exit 1
++- State and tails:
++  - `test-batch-alloc.txt`: 30 tests, 198 assertions, zero failures
++  - `test-recurrent-state-rollback.txt`: checkpoint restore and replay-logit identity passed
++- Speculative profiling:
++  - `profile-alias.txt`: generic and legacy environment names produced identical normalised output
++  - `expert-io-metrics.txt`: CPU expert-I/O metrics were resolved dynamically and exported
++- Launch artefacts:
++  - `ornith-candidate-dry-run.txt`
++  - `gemma4-candidate-dry-run.txt`
++  - `candidate-systemd-verify.txt`
++  - `candidate-service-state.txt`
++- Harness safety:
++  - `../invalid-preserves-output.log`: invalid options fail before output deletion
++
++`git diff --check` passed after the final build and focused tests.

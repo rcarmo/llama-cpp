@@ -336,6 +336,11 @@ if (NOT LLAMA_USE_SYSTEM_GGML)
 endif()
 
 llama_build(test-export-graph-ops.cpp)
+if (TARGET test-backend-ops)
+    add_test(NAME test-backend-ops-semantic-replay
+        COMMAND test-backend-ops test -b CPU --test-file ${CMAKE_CURRENT_SOURCE_DIR}/semantic-graph-replay.txt)
+    set_tests_properties(test-backend-ops-semantic-replay PROPERTIES LABELS "main")
+endif()
 if (TARGET gguf-model-data)
     target_link_libraries(test-export-graph-ops PRIVATE gguf-model-data)
     target_compile_definitions(test-export-graph-ops PRIVATE LLAMA_HF_FETCH)

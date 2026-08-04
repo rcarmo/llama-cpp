@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["case_id", "quant", "mtp_depth", "repetition", "wall_ms", "prompt_tokens", "generated_tokens", "prompt_tps", "generation_tps", "draft_tokens", "accepted_draft_tokens", "finish_reason", "semantic_ok", "semantic_error"],
+  "properties": {
+    "case_id": {"type": "string"},
+    "quant": {"enum": ["q2", "q4"]},
+    "mtp_depth": {"type": "integer", "minimum": 0, "maximum": 3},
+    "repetition": {"type": "integer", "minimum": 1},
+    "wall_ms": {"type": "number", "minimum": 0},
+    "prompt_tokens": {"type": "integer", "minimum": 0},
+    "generated_tokens": {"type": "integer", "minimum": 0},
+    "prompt_tps": {"type": "number", "minimum": 0},
+    "generation_tps": {"type": "number", "minimum": 0},
+    "draft_tokens": {"type": "integer", "minimum": 0},
+    "accepted_draft_tokens": {"type": "integer", "minimum": 0},
+    "finish_reason": {"type": ["string", "null"]},
+    "tool_name": {"type": ["string", "null"]},
+    "semantic_ok": {"type": "boolean"},
+    "semantic_error": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}

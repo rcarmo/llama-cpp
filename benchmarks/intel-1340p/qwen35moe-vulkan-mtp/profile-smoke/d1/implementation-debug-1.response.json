@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a thinking process that leads to the suggested diagnosis and debugging plan:\n\n1.  **Analyze the Problem Statement:**\n\n    *   **Context:** Performance-sensitive Vulkan backend (LLM inference, likely GGML-style quantization).\n    *   **Specifics:**\n        *   Kernel: Q2_K decode shader.\n        *   Platform: Intel Xe1 (Arc/Alchemist).\n        *   Symptom: Correct at $N=1, 2$ (batch size or sequence length? Usually $N$ in this context refers to the batch size or the number of tokens being processed in parallel, but given \"logits\", it's likely the batch dimension or the number of parallel decoding steps. Let's assume $N$ is the batch size or the number of parallel tokens). *Correction:* In LLM inference, $N$ often refers to the batch size. If $N=1$ works and $N=3$ fails, it suggests a race condition or memory corruption that manifests with specific alignment or occupancy patterns.\n        *   Failure Mode: Occasional wrong logits (non-deterministic or data-dependent).\n        *   Architecture: Intel Xe1 (Gen12/Arc).\n        *   Shader Details:\n            *   Shared memory (L1 cache) used for weight scales.\n            *   Subgroup size = 16.\n            *   3 activation-row accumulators per output row.\n        *   Performance:\n            *   $N=2$: 18"
+      }
+    }
+  ],
+  "created": 1785454848,
+  "model": "/var/home/agent/workspace/projects/llama-cpp-vulkan-mtp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+  "system_fingerprint": "b10498-603f26c86",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 210,
+    "total_tokens": 530,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-8wsVzARDX4QBNSrOERdKvFf8I7WP9yg6",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 22473.263,
+    "prompt_per_token_ms": 107.01553809523809,
+    "prompt_per_second": 9.344437432161055,
+    "predicted_n": 320,
+    "predicted_ms": 85842.482,
+    "predicted_per_token_ms": 268.25775625,
+    "predicted_per_second": 3.7277580114703577,
+    "draft_n": 179,
+    "draft_n_accepted": 139
+  }
+}

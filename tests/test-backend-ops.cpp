@@ -35,6 +35,7 @@
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <random>
 #include <regex>
 #include <set>
@@ -51,10 +52,16 @@
 #   define N_THREADS std::thread::hardware_concurrency()
 #endif
 
-static void init_tensor_uniform(ggml_tensor * tensor, float min = -1.0f, float max = 1.0f) {
+static void init_tensor_uniform(ggml_tensor * tensor, float min = -1.0f, float max = 1.0f, uint32_t seed = 0) {
     size_t nels = ggml_nelements(tensor);
     std::vector<float> data(nels);
-    {
+    if (seed != 0) {
+        std::mt19937 gen(seed);
+        std::uniform_real_distribution<float> distribution(min, max);
+        for (size_t i = 0; i < nels; ++i) {
+            data[i] = distribution(gen);
+        }
+    } else {
         // parallel initialization
         static const size_t n_threads = N_THREADS;
 
@@ -144,7 +151,7 @@ static void init_tensor_uniform(ggml_tensor * tensor, float min = -1.0f, float m
 }
 
 // generate an F16 mask where certain blocks are randomly masked with -INF value
-static void init_tensor_kq_mask(ggml_tensor * tensor, float min = -1.0f, float max = 1.0f) {
+static void init_tensor_kq_mask(ggml_tensor * tensor, float min = -1.0f, float max = 1.0f, uint32_t seed = 0) {
     GGML_ASSERT(tensor->type == GGML_TYPE_F16);
 
     GGML_TENSOR_LOCALS( int32_t, ne, tensor, ne);
@@ -153,7 +160,7 @@ static void init_tensor_kq_mask(ggml_tensor * tensor, float min = -1.0f, float m
     std::vector<ggml_fp16_t> data_f16(ne0*ne1*ne2*ne3);
 
     std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed != 0 ? seed : rd());
     std::uniform_real_distribution<float> dis(min, max);
 
     for (size_t i = 0; i < data_f32.size(); i++) {
@@ -168,12 +175,12 @@ static void init_tensor_kq_mask(ggml_tensor * tensor, float min = -1.0f, float m
     const int n_inf_zero_blocks = 0.2*(ne0*ne1*ne2*ne3)/(blck0*blck1);
 
     for (int b = 0; b < n_inf_zero_blocks; b++) {
-        const int p3 = (rd() % ne3);
-        const int p2 = (rd() % ne2);
-        const int p1 = (rd() % ne1);
-        const int p0 = (rd() % ne0);
+        const int p3 = (gen() % ne3);
+        const int p2 = (gen() % ne2);
+        const int p1 = (gen() % ne1);
+        const int p0 = (gen() % ne0);
 
-        bool inf = rd() & 1;
+        bool inf = gen() & 1;
 
         for (int i1 = 0; i1 < blck1 && p1 + i1 < ne1; i1++) {
             const int idx = p3*ne2*ne1*ne0 + p2*ne1*ne0 + (p1 + i1)*ne0 + p0;
@@ -7405,6 +7412,75 @@ static std::string var_to_str(const std::array<int32_t, GGML_MAX_OP_PARAMS / siz
     return oss.str();
 }
 
+static void init_semantic_indices(
+        ggml_tensor * t,
+        int64_t upper_bound,
+        bool unique_per_row,
+        std::mt19937 & rng) {
+    GGML_ASSERT(t->type == GGML_TYPE_I32 || t->type == GGML_TYPE_I64);
+    GGML_ASSERT(upper_bound > 0);
+
+    std::uniform_int_distribution<int64_t> dist(0, upper_bound - 1);
+    std::vector<int64_t> row(t->ne[0]);
+    std::vector<int64_t> pool;
+    if (unique_per_row) {
+        GGML_ASSERT(t->ne[0] <= upper_bound);
+        pool.resize(upper_bound);
+        std::iota(pool.begin(), pool.end(), 0);
+    }
+
+    for (int64_t i3 = 0; i3 < t->ne[3]; ++i3) {
+        for (int64_t i2 = 0; i2 < t->ne[2]; ++i2) {
+            for (int64_t i1 = 0; i1 < t->ne[1]; ++i1) {
+                if (unique_per_row) {
+                    std::shuffle(pool.begin(), pool.end(), rng);
+                    std::copy_n(pool.begin(), row.size(), row.begin());
+                    if (upper_bound > static_cast<int64_t>(row.size()) &&
+                            *std::max_element(row.begin(), row.end()) < static_cast<int64_t>(row.size())) {
+                        row.back() = upper_bound - 1;
+                    }
+                } else {
+                    for (int64_t i0 = 0; i0 < t->ne[0]; ++i0) {
+                        row[i0] = dist(rng);
+                    }
+                }
+
+                for (int64_t i0 = 0; i0 < t->ne[0]; ++i0) {
+                    const size_t offset = i0*t->nb[0] + i1*t->nb[1] + i2*t->nb[2] + i3*t->nb[3];
+                    if (t->type == GGML_TYPE_I32) {
+                        const int32_t value = static_cast<int32_t>(row[i0]);
+                        ggml_backend_tensor_set(t, &value, offset, sizeof(value));
+                    } else {
+                        const int64_t value = row[i0];
+                        ggml_backend_tensor_set(t, &value, offset, sizeof(value));
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void init_integer_tensor(ggml_tensor * t, std::mt19937 & rng) {
+    GGML_ASSERT(t->type == GGML_TYPE_I32 || t->type == GGML_TYPE_I64);
+    std::uniform_int_distribution<int64_t> dist(-8, 8);
+    for (int64_t i3 = 0; i3 < t->ne[3]; ++i3) {
+        for (int64_t i2 = 0; i2 < t->ne[2]; ++i2) {
+            for (int64_t i1 = 0; i1 < t->ne[1]; ++i1) {
+                for (int64_t i0 = 0; i0 < t->ne[0]; ++i0) {
+                    const size_t offset = i0*t->nb[0] + i1*t->nb[1] + i2*t->nb[2] + i3*t->nb[3];
+                    if (t->type == GGML_TYPE_I32) {
+                        const int32_t value = static_cast<int32_t>(dist(rng));
+                        ggml_backend_tensor_set(t, &value, offset, sizeof(value));
+                    } else {
+                        const int64_t value = dist(rng);
+                        ggml_backend_tensor_set(t, &value, offset, sizeof(value));
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 struct test_generic_op : public test_case {
     const ggml_op op;
@@ -7520,8 +7596,28 @@ struct test_generic_op : public test_case {
     void initialize_tensors(ggml_context * ctx) override {
         ggml_tensor * out = ggml_get_tensor(ctx, "out");
 
-        std::random_device rd;
-        std::default_random_engine rng(rd());
+        uint32_t seed = 0x5eed1234u ^ static_cast<uint32_t>(op) ^ (static_cast<uint32_t>(type) << 16);
+        for (size_t i = 0; i < ne.size(); ++i) {
+            seed ^= static_cast<uint32_t>(ne[i]) * static_cast<uint32_t>(0x9e3779b9u + i);
+        }
+        for (size_t i = 0; i < sources.size(); ++i) {
+            seed ^= static_cast<uint32_t>(sources[i].type) * static_cast<uint32_t>(0x85ebca6bu + i);
+            for (size_t d = 0; d < sources[i].ne.size(); ++d) {
+                seed ^= static_cast<uint32_t>(sources[i].ne[d]) * static_cast<uint32_t>(0xc2b2ae35u + i + d);
+                seed ^= static_cast<uint32_t>(sources[i].nb[d]) * static_cast<uint32_t>(0x27d4eb2fu + i + d);
+            }
+        }
+        std::mt19937 rng(seed);
+
+        // Initialize outputs, backing tensors, and test sentinels. Semantic index
+        // views are overwritten below with operation-specific valid values.
+        uint32_t tensor_seed = seed;
+        for (ggml_tensor * t = ggml_get_first_tensor(ctx); t != nullptr; t = ggml_get_next_tensor(ctx, t)) {
+            if (!ggml_is_view_op(t->op)) {
+                tensor_seed = tensor_seed * 1664525u + 1013904223u;
+                init_tensor_uniform(t, -1.0f, 1.0f, tensor_seed);
+            }
+        }
 
         for (size_t i = 0; i < sources.size() && i < GGML_MAX_SRC; i++) {
             ggml_tensor * t = out->src[i];
@@ -7531,55 +7627,48 @@ struct test_generic_op : public test_case {
 
             // FLASH_ATTN_EXT: src[3] is the KQ mask
             if (op == GGML_OP_FLASH_ATTN_EXT && i == 3) {
-                init_tensor_kq_mask(t);
+                init_tensor_kq_mask(t, -1.0f, 1.0f, seed ^ 0xa5a5a5a5u);
                 continue;
             }
 
             if (t->type == GGML_TYPE_I32 || t->type == GGML_TYPE_I64) {
-                if (op == GGML_OP_GET_ROWS || op == GGML_OP_GET_ROWS_BACK) {
-                    const int64_t num_rows = sources[0].ne[1];
-                    const int64_t nels = ggml_nelements(t);
-                    std::vector<int32_t> data(nels);
-                    std::uniform_int_distribution<int32_t> dist(0, num_rows - 1);
-                    for (int64_t i = 0; i < nels; i++) {
-                        data[i] = dist(rng);
-                    }
-                    ggml_backend_tensor_set(t, data.data(), 0, nels * sizeof(int32_t));
-                } else if (op == GGML_OP_SET_ROWS) {
-                    init_set_rows_row_ids(t, ne[1]);
-                } else if (op == GGML_OP_ROPE) {
-                    const int mode = op_params[2];
-                    const int64_t nels = (mode & GGML_ROPE_TYPE_MROPE) ? ne[2] * 4 : ne[2];
-                    std::vector<int32_t> data(nels);
-                    std::uniform_int_distribution<int32_t> dist(0, ne[2] - 1);
-                    for (int64_t i = 0; i < nels; i++) {
-                        data[i] = dist(rng);
-                    }
-                    ggml_backend_tensor_set(t, data.data(), 0, nels * sizeof(int32_t));
-                } else if (op == GGML_OP_MUL_MAT_ID || op == GGML_OP_ADD_ID) {
-                    const int64_t n_expert = (op == GGML_OP_MUL_MAT_ID) ? sources[0].ne[2] : sources[1].ne[1];
-                    for (int64_t r = 0; r < ggml_nrows(t); r++) {
-                        std::vector<int32_t> data(t->ne[0]);
-                        for (int32_t i = 0; i < t->ne[0]; i++) {
-                            data[i] = i % n_expert;
-                        }
-                        std::shuffle(data.begin(), data.end(), rng);
-                        ggml_backend_tensor_set(t, data.data(), r * t->nb[1], t->ne[0] * sizeof(int32_t));
-                    }
-                } else if (op == GGML_OP_SSM_SCAN) {
-                    for (int64_t r = 0; r < ggml_nrows(t); r++) {
-                        std::vector<int32_t> data(t->ne[0]);
-                        for (int32_t i = 0; i < t->ne[0]; i++) {
-                            data[i] = i;
-                        }
-                        std::shuffle(data.begin(), data.end(), rng);
-                        ggml_backend_tensor_set(t, data.data(), r * t->nb[1], t->ne[0] * sizeof(int32_t));
-                    }
-                } else {
-                    init_tensor_uniform(t);
+                bool initialized = false;
+                if (op == GGML_OP_GET_ROWS && i == 1) {
+                    init_semantic_indices(t, sources[0].ne[1], false, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_GET_ROWS_BACK && i == 1) {
+                    init_semantic_indices(t, sources.size() > 2 ? sources[2].ne[1] : sources[0].ne[1], false, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_SET_ROWS && i == 1) {
+                    init_semantic_indices(t, ne[1], true, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_ROPE && i == 1) {
+                    init_semantic_indices(t, std::max<int64_t>(1, ne[2]), false, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_MUL_MAT_ID && i == 2) {
+                    init_semantic_indices(t, sources[0].ne[2], true, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_ADD_ID && i == 2) {
+                    init_semantic_indices(t, sources[1].ne[1], true, rng);
+                    initialized = true;
+                } else if (op == GGML_OP_SSM_SCAN && i == 6) {
+                    init_semantic_indices(t, sources[0].ne[3], true, rng);
+                    initialized = true;
                 }
+
+                if (!initialized) {
+                    init_integer_tensor(t, rng);
+                }
+            } else if (op == GGML_OP_GATED_DELTA_NET && i == 2) {
+                init_tensor_uniform(t, -0.3f, 5.0f, seed ^ static_cast<uint32_t>(i + 1));
+            } else if (op == GGML_OP_GATED_DELTA_NET && i == 3) {
+                init_tensor_uniform(t, -20.0f, -1e-4f, seed ^ static_cast<uint32_t>(i + 1));
+            } else if (op == GGML_OP_GATED_DELTA_NET && i == 4) {
+                init_tensor_uniform(t, 0.0f, 1.0f, seed ^ static_cast<uint32_t>(i + 1));
+            } else if (op == GGML_OP_SSM_SCAN && i == 3) {
+                init_tensor_uniform(t, -1.0f, -0.5f, seed ^ static_cast<uint32_t>(i + 1));
             } else {
-                init_tensor_uniform(t);
+                init_tensor_uniform(t, -1.0f, 1.0f, seed ^ static_cast<uint32_t>(i + 1));
             }
         }
     }

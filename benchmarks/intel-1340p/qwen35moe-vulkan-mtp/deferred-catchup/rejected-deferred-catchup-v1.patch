@@ -1,0 +1,400 @@
+diff --git a/common/speculative.cpp b/common/speculative.cpp
+index 5653a90b8..303fe055c 100644
+--- a/common/speculative.cpp
++++ b/common/speculative.cpp
+@@ -164,6 +164,14 @@ struct common_speculative_impl {
+ 
+     virtual bool process(const llama_batch & batch) = 0;
+ 
++    virtual bool process_deferred(const llama_batch & batch) {
++        return process(batch);
++    }
++
++    virtual bool commit(llama_seq_id /*seq_id*/, uint16_t /*n_accepted*/) {
++        return true;
++    }
++
+     virtual void draft(common_speculative_draft_params_vec & dparams) = 0;
+ 
+     virtual void accept(llama_seq_id seq_id, uint16_t n_accepted, bool is_other) = 0;
+@@ -1279,6 +1287,10 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
+     std::vector<std::vector<float>> verify_h;
+     std::vector<int32_t> verify_h_rows;
+ 
++    // Target verification rows waiting for the accepted prefix to be known.
++    std::vector<llama_tokens> deferred_tokens;
++    std::vector<std::vector<llama_pos>> deferred_pos;
++
+     std::vector<int>                i_last;
+     std::vector<std::vector<float>> chain_h;
+ 
+@@ -1359,6 +1371,8 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
+ 
+         verify_h.assign(n_seq, {});
+         verify_h_rows.assign(n_seq, 0);
++        deferred_tokens.assign(n_seq, {});
++        deferred_pos.assign(n_seq, {});
+     }
+ 
+     ~common_speculative_impl_draft_mtp() override {
+@@ -1432,6 +1446,8 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
+         auto * ctx_dft = this->params.ctx_dft;
+ 
+         const size_t row_bytes = (size_t) n_embd * sizeof(float);
++        const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++        const int64_t catchup_start_us = profile ? ggml_time_us() : 0;
+ 
+         // if kv is shared with target (e.g Gemma4), then we can skip this catch-up decode
+         if (!is_mem_shared) {
+@@ -1495,7 +1511,12 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
+                 return false;
+             }
+         }
++        if (profile) {
++            SPC_INF("QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=%d us=%lld\n",
++                    n_tokens, (long long) (ggml_time_us() - catchup_start_us));
++        }
+ 
++        const int64_t extract_start_us = profile ? ggml_time_us() : 0;
+         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+             if (i_batch_end[seq_id] < 0) {
+                 continue;
+@@ -1513,10 +1534,125 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
+             std::memcpy(pending_h[seq_id].data(),
+                     verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
+         }
++        if (profile) {
++            SPC_INF("QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=%d us=%lld\n",
++                    n_tokens, (long long) (ggml_time_us() - extract_start_us));
++        }
+ 
+         return true;
+     }
+ 
++    bool process_deferred(const llama_batch & batch_in) override {
++        if (batch_in.n_tokens <= 0) {
++            return true;
++        }
++
++        if (batch_in.token == nullptr || batch_in.embd != nullptr || is_mem_shared) {
++            return process(batch_in);
++        }
++
++        std::fill(i_batch_beg.begin(), i_batch_beg.end(), -1);
++        std::fill(i_batch_end.begin(), i_batch_end.end(), -1);
++        for (auto & tokens : deferred_tokens) {
++            tokens.clear();
++        }
++        for (auto & pos : deferred_pos) {
++            pos.clear();
++        }
++
++        for (int k = 0; k < batch_in.n_tokens; ++k) {
++            GGML_ASSERT(batch_in.n_seq_id[k] == 1);
++            const llama_seq_id seq_id = batch_in.seq_id[k][0];
++            GGML_ASSERT(seq_id >= 0 && seq_id < (llama_seq_id) n_seq);
++
++            if (i_batch_beg[seq_id] < 0) {
++                i_batch_beg[seq_id] = k;
++            }
++            i_batch_end[seq_id] = k;
++            deferred_tokens[seq_id].push_back(batch_in.token[k]);
++            deferred_pos[seq_id].push_back(batch_in.pos[k]);
++        }
++
++        auto * ctx_tgt = this->params.ctx_tgt;
++        const size_t row_bytes = (size_t) n_embd * sizeof(float);
++        const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++        const int64_t extract_start_us = profile ? ggml_time_us() : 0;
++
++        for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
++            if (i_batch_beg[seq_id] < 0) {
++                continue;
++            }
++
++            const int32_t n_rows = (int32_t) deferred_tokens[seq_id].size();
++            verify_h_rows[seq_id] = n_rows;
++            verify_h[seq_id].resize((size_t) n_rows * n_embd);
++
++            for (int32_t i = 0; i < n_rows; ++i) {
++                const float * h = llama_get_embeddings_nextn_ith(ctx_tgt, i_batch_beg[seq_id] + i);
++                std::memcpy(verify_h[seq_id].data() + (size_t) i * n_embd, h, row_bytes);
++            }
++        }
++
++        if (profile) {
++            SPC_INF("QWEN35MOE_MTP_PROFILE phase=hidden_extract_deferred rows=%d us=%lld\n",
++                    batch_in.n_tokens, (long long) (ggml_time_us() - extract_start_us));
++        }
++
++        return true;
++    }
++
++    bool commit(llama_seq_id seq_id, uint16_t n_accepted) override {
++        if (seq_id < 0 || seq_id >= (llama_seq_id) n_seq || deferred_tokens[seq_id].empty()) {
++            return true;
++        }
++
++        const int32_t n_rows = std::min<int32_t>((int32_t) n_accepted + 1, verify_h_rows[seq_id]);
++        GGML_ASSERT(n_rows > 0 && n_rows <= (int32_t) deferred_tokens[seq_id].size());
++
++        common_batch_clear(batch);
++        const size_t row_bytes = (size_t) n_embd * sizeof(float);
++        for (int32_t i = 0; i < n_rows; ++i) {
++            common_batch_add(batch, deferred_tokens[seq_id][i], deferred_pos[seq_id][i], { seq_id }, 0);
++            const float * h = i == 0
++                    ? pending_h[seq_id].data()
++                    : verify_h[seq_id].data() + (size_t) (i - 1) * n_embd;
++            std::memcpy(batch.embd + (size_t) i * n_embd, h, row_bytes);
++        }
++
++        auto * ctx_dft = this->params.ctx_dft;
++        auto * mem_dft = llama_get_memory(ctx_dft);
++        const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++        const int64_t catchup_start_us = profile ? ggml_time_us() : 0;
++
++        bool ok = true;
++        for (int head = 0; head < n_mtp_layers; ++head) {
++            if (chain_heads) {
++                llama_memory_seq_rm(mem_dft, seq_id, deferred_pos[seq_id][0], -1);
++                llama_set_nextn_layer_offset(ctx_dft, head);
++            }
++
++            const int32_t rc = llama_decode(ctx_dft, batch);
++            if (rc != 0) {
++                SPC_ERR("llama_decode(ctx_dft) deferred head=%d failed rc=%d (pos=%d)\n",
++                        head, (int) rc, (int) deferred_pos[seq_id][0]);
++                ok = false;
++                break;
++            }
++        }
++
++        if (chain_heads) {
++            llama_set_nextn_layer_offset(ctx_dft, 0);
++        }
++        if (profile) {
++            SPC_INF("QWEN35MOE_MTP_PROFILE phase=draft_catchup_deferred rows=%d us=%lld ok=%d\n",
++                    n_rows, (long long) (ggml_time_us() - catchup_start_us), ok ? 1 : 0);
++        }
++
++        deferred_tokens[seq_id].clear();
++        deferred_pos[seq_id].clear();
++        return ok;
++    }
++
+     void draft(common_speculative_draft_params_vec & dparams) override {
+         auto & ctx_dft = params.ctx_dft;
+ 
+@@ -2563,9 +2699,35 @@ bool common_speculative_process(common_speculative * spec, const llama_batch & b
+         return result;
+     }
+ 
++    const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++    const int64_t t_start_us = profile ? ggml_time_us() : 0;
+     for (auto & impl : spec->impls) {
+         result = result && impl->process(batch);
+     }
++    if (profile) {
++        SPC_INF("QWEN35MOE_MTP_PROFILE phase=process rows=%d us=%lld ok=%d\n",
++                batch.n_tokens, (long long) (ggml_time_us() - t_start_us), result ? 1 : 0);
++    }
++
++    return result;
++}
++
++bool common_speculative_process_deferred(common_speculative * spec, const llama_batch & batch) {
++    bool result = true;
++
++    if (spec == nullptr) {
++        return result;
++    }
++
++    const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++    const int64_t t_start_us = profile ? ggml_time_us() : 0;
++    for (auto & impl : spec->impls) {
++        result = result && impl->process_deferred(batch);
++    }
++    if (profile) {
++        SPC_INF("QWEN35MOE_MTP_PROFILE phase=process_deferred rows=%d us=%lld ok=%d\n",
++                batch.n_tokens, (long long) (ggml_time_us() - t_start_us), result ? 1 : 0);
++    }
+ 
+     return result;
+ }
+@@ -2623,9 +2785,19 @@ void common_speculative_draft(common_speculative * spec) {
+ 
+     for (auto & impl : spec->impls) {
+         {
++            const bool profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++            const int64_t draft_start_us = profile ? ggml_time_us() : 0;
+             common_time_meas tm(impl->t_draft_us, !impl->gen_perf);
+             impl->draft(dparams);
+             impl->n_call_draft++;
++            if (profile) {
++                size_t n_tokens = 0;
++                for (const auto & dp : dparams) {
++                    n_tokens += dp.result ? dp.result->size() : 0;
++                }
++                SPC_INF("QWEN35MOE_MTP_PROFILE phase=draft tokens=%zu us=%lld\n",
++                        n_tokens, (long long) (ggml_time_us() - draft_start_us));
++            }
+         }
+ 
+         int n_drafting = 0;
+@@ -2679,6 +2851,18 @@ void common_speculative_draft(common_speculative * spec) {
+     }
+ }
+ 
++bool common_speculative_commit(common_speculative * spec, llama_seq_id seq_id, uint16_t n_accepted) {
++    if (spec == nullptr) {
++        return true;
++    }
++
++    bool result = true;
++    for (auto & impl : spec->impls) {
++        result = result && impl->commit(seq_id, n_accepted);
++    }
++    return result;
++}
++
+ void common_speculative_accept(common_speculative * spec, llama_seq_id seq_id, uint16_t n_accepted) {
+     common_speculative_impl * impl = spec->impl_last[seq_id];
+ 
+diff --git a/common/speculative.h b/common/speculative.h
+index 062bf2093..7c00a15e0 100644
+--- a/common/speculative.h
++++ b/common/speculative.h
+@@ -58,6 +58,11 @@ void common_speculative_begin(common_speculative * spec, llama_seq_id seq_id, co
+ // process the batch and update the internal state of the speculative context
+ bool common_speculative_process(common_speculative * spec, const llama_batch & batch);
+ 
++// process target outputs while allowing implementations to defer work until the
++// accepted draft prefix is known. Implementations without a deferred path fall
++// back to common_speculative_process() semantics.
++bool common_speculative_process_deferred(common_speculative * spec, const llama_batch & batch);
++
+ // true if any implementation requires target post-norm embeddings to be extracted
+ bool common_speculative_need_embd(common_speculative * spec);
+ 
+@@ -67,6 +72,9 @@ bool common_speculative_need_embd_nextn(common_speculative * spec);
+ // generate drafts for the sequences specified with `common_speculative_get_draft_params`
+ void common_speculative_draft(common_speculative * spec);
+ 
++// commit implementation work that was deferred until the accepted prefix was known
++bool common_speculative_commit(common_speculative * spec, llama_seq_id, uint16_t n_accepted);
++
+ // informs the speculative context that n_accepted tokens were accepted by the target model
+ void common_speculative_accept(common_speculative * spec, llama_seq_id, uint16_t n_accepted);
+ 
+diff --git a/tools/server/server-context.cpp b/tools/server/server-context.cpp
+index 4055f2f30..b66a9a029 100644
+--- a/tools/server/server-context.cpp
++++ b/tools/server/server-context.cpp
+@@ -2854,7 +2854,16 @@ private:
+                 // TODO @ngxson : maybe handle n_batch == 1 here instead of inside decode()
+ 
+                 batch_view = batch.get_view(off, n_tokens);
++                const bool mtp_profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr &&
++                        std::any_of(slots.begin(), slots.end(), [](const server_slot & slot) {
++                            return !slot.spec_i_batch.empty();
++                        });
++                const int64_t mtp_decode_start_us = mtp_profile ? ggml_time_us() : 0;
+                 bool ok = decode(n_batch, off, batch_view);
++                if (mtp_profile) {
++                    SRV_INF("QWEN35MOE_MTP_PROFILE phase=target_decode rows=%d us=%lld ok=%d\n",
++                            batch_view.n_tokens, (long long) (ggml_time_us() - mtp_decode_start_us), ok ? 1 : 0);
++                }
+ #ifdef DEBUG_TIMINGS
+                 llama_synchronize(ctx_tgt);
+ #endif
+@@ -3688,10 +3697,40 @@ private:
+             return false; // retry with the updated n_batch
+         }
+ 
+-        // TODO: avoid restoring the draft context and re-evaluating the drafted tokens when not needed [TAG_SPEC_AVOID_DRAFT_REEVAL]
+-        //       for now, always re-evaluate for simplicity
+-        //       ref: https://github.com/ggml-org/llama.cpp/pull/22728#issuecomment-4400925384
+-        if (!common_speculative_process(spec.get(), batch_view)) {
++        // MTP can defer draft-context catch-up until sampling reveals the accepted prefix.
++        // Only use the deferred path when this entire sub-batch is speculative verification;
++        // prompt and mixed batches retain the generic immediate semantics.
++        bool all_speculative_rows = batch_view.n_tokens > 0;
++        for (int32_t i = 0; all_speculative_rows && i < batch_view.n_tokens; ++i) {
++            all_speculative_rows = batch_view.n_seq_id[i] == 1;
++            if (!all_speculative_rows) {
++                break;
++            }
++            const llama_seq_id seq_id = batch_view.seq_id[i][0];
++            all_speculative_rows = seq_id >= 0 && seq_id < (llama_seq_id) slots.size();
++            if (!all_speculative_rows) {
++                break;
++            }
++            const auto & indices = slots[seq_id].spec_i_batch;
++            all_speculative_rows = std::find(indices.begin(), indices.end(), off + i) != indices.end();
++        }
++
++        const bool mtp_enabled = std::find(params_base.speculative.types.begin(),
++                                            params_base.speculative.types.end(),
++                                            COMMON_SPECULATIVE_TYPE_DRAFT_MTP) != params_base.speculative.types.end();
++        const bool defer_mtp_requested = getenv("GGML_QWEN35MOE_MTP_DEFER_CATCHUP") != nullptr;
++        const bool defer_mtp_catchup = defer_mtp_requested &&
++                params_base.n_parallel == 1 && mtp_enabled && all_speculative_rows;
++        if (defer_mtp_requested && getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr) {
++            SRV_INF("QWEN35MOE_MTP_PROFILE phase=defer_decision rows=%d mtp=%d all_spec=%d np=%d enabled=%d\n",
++                    batch_view.n_tokens, mtp_enabled ? 1 : 0, all_speculative_rows ? 1 : 0,
++                    params_base.n_parallel, defer_mtp_catchup ? 1 : 0);
++        }
++
++        const bool process_ok = defer_mtp_catchup
++                ? common_speculative_process_deferred(spec.get(), batch_view)
++                : common_speculative_process(spec.get(), batch_view);
++        if (!process_ok) {
+             SRV_ERR("%s", "failed to process speculative batch\n");
+ 
+             // TODO: handle error
+@@ -3856,9 +3895,16 @@ private:
+                 // save the sampler sampler state in case we need to restore it
+                 common_sampler_ptr smpl_save(common_sampler_clone(slot.smpl.get()));
+ 
++                const bool mtp_profile = getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
++                const int64_t mtp_accept_start_us = mtp_profile ? ggml_time_us() : 0;
+                 GGML_ASSERT(slot.spec_i_batch.size() == n_draft + 1);
+                 auto accepted = common_sampler_sample_and_accept_n(slot.smpl.get(), slot.ctx_tgt, slot.spec_i_batch, slot.spec_draft);
+                 slot.spec_i_batch.clear();
++                if (mtp_profile) {
++                    SRV_INF("QWEN35MOE_MTP_PROFILE phase=sample_accept rows=%zu accepted=%zu us=%lld\n",
++                            n_draft + 1, accepted.size() - 1,
++                            (long long) (ggml_time_us() - mtp_accept_start_us));
++                }
+ 
+                 GGML_ASSERT(accepted.size() >= 1);
+ 
+@@ -3882,6 +3928,7 @@ private:
+ 
+                         SLT_DBG(slot, "restoring speculative checkpoint (pos_min = %d, pos_max = %d, size = %zu)\n", ckpt.pos_min, ckpt.pos_max, ckpt.size());
+ 
++                        const int64_t mtp_restore_start_us = mtp_profile ? ggml_time_us() : 0;
+                         ckpt.load_tgt(slot.ctx_tgt, slot.id, LLAMA_STATE_SEQ_FLAGS_PARTIAL_ONLY);
+ 
+                         if (slot.ctx_dft) {
+@@ -3892,6 +3939,10 @@ private:
+ 
+                         slot.prompt.tokens.keep_first(ckpt.n_tokens);
+                         slot.smpl = std::move(smpl_save);
++                        if (mtp_profile) {
++                            SRV_INF("QWEN35MOE_MTP_PROFILE phase=checkpoint_restore rollback=%u us=%lld\n",
++                                    n_rollback, (long long) (ggml_time_us() - mtp_restore_start_us));
++                        }
+ 
+                         return;
+                     }
+@@ -3901,6 +3952,9 @@ private:
+                     SLT_INF(slot, "accepted %2zu/%2zu draft tokens\n", accepted.size() - 1, n_draft);
+                 }
+ 
++                if (!common_speculative_commit(spec.get(), slot.id, accepted.size() - 1)) {
++                    throw std::runtime_error("failed to commit speculative context");
++                }
+                 common_speculative_accept(spec.get(), slot.id, accepted.size() - 1);
+ 
+                 slot.spec_draft = std::move(accepted);

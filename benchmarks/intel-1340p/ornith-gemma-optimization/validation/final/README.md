@@ -10,6 +10,7 @@ Verified against source commit `603f26c869b6700eaa5c6d52068ed583419eeacf` with t
 - Native graphs:
   - `ornith-target-mtp-support.csv`: 150/150 CPU-supported
   - `gemma-target-assistant-mtp-support.csv`: 141/141 CPU-supported
+  - `../semantic-replay/`: two numerical CPU-reference repetitions, 150/150 Ornith and 141/141 Gemma passed each time
 - Backend thread control:
   - `backend-threads-t1.txt`: one-thread benchmark passed
   - `backend-threads-invalid.txt`: `-t 0` rejected with exit 1
@@ -19,11 +20,11 @@ Verified against source commit `603f26c869b6700eaa5c6d52068ed583419eeacf` with t
 - Speculative profiling:
   - `profile-alias.txt`: generic and legacy environment names produced identical normalised output
   - `expert-io-metrics.txt`: CPU expert-I/O metrics were resolved dynamically and exported
-- Launch artefacts:
-  - `ornith-candidate-dry-run.txt`
-  - `gemma4-candidate-dry-run.txt`
-  - `candidate-systemd-verify.txt`
-  - `candidate-service-state.txt`
+- Launch artefacts (static validation only; the campaign did not start a candidate service):
+  - `../ornith-candidate-dry-run.txt`
+  - `../gemma4-candidate-dry-run.txt`
+  - `../candidate-systemd-verify.txt`
+  - `../candidate-service-state.txt`
 - Harness safety:
   - `../invalid-preserves-output.log`: invalid options fail before output deletion
 

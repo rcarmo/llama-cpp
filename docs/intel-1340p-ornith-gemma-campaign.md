@@ -1,6 +1,6 @@
 # Ornith 1.0 35B and Gemma 4 E4B on Intel Core i5-1340P
 
-The campaign promotes CPU runtime profiles for both models. Gemma 4 E4B is the 32K throughput finalist. The existing Qwen3.6 35B-A3B Q2_K_XL profile remains the 128K service default.
+The campaign validates 128K CPU runtime profiles for both models. Gemma 4 E4B is the throughput finalist. The existing Qwen3.6 35B-A3B Q2_K_XL service remains the deployed rollback baseline.
 
 Measurements use source commit `603f26c869b6700eaa5c6d52068ed583419eeacf`, the `build-intel-clang` Clang 22.1.8 build, model workers on logical CPUs 0–7 and a 2% repeated end-to-end promotion gate. Raw results and machine-readable decisions are under [`benchmarks/intel-1340p/ornith-gemma-optimization/`](../benchmarks/intel-1340p/ornith-gemma-optimization/).
 
@@ -63,12 +63,13 @@ The CPU backend passed the focused model shapes and native graph support checks:
 
 The native graph exporter now accepts the existing `--spec-type draft-mtp` and `--model-draft` options. It initialises MTP contexts through `common_speculative_init_from_params()`, the same target/assistant pairing used by the server.
 
-Whole-file numerical replay of the exported graph is not valid for semantic index operations: random `GET_ROWS` inputs can exceed model-specific row bounds. The campaign uses support replay for complete native graphs, focused numerical operation fixtures, and real end-to-end tool-call responses.
+Whole-file numerical replay now generates source-slot-aware, stride-aware semantic inputs for operations such as `GET_ROWS`. Two CPU-reference repetitions passed all 150 Ornith target/MTP operations and all 141 Gemma target/assistant operations. The metadata-only export format remains backward-compatible.
 
 Evidence:
 
 - [`native-graph-fixtures/ornith-target-mtp-support.csv`](../benchmarks/intel-1340p/ornith-gemma-optimization/native-graph-fixtures/ornith-target-mtp-support.csv)
 - [`native-graph-fixtures/gemma-target-assistant-mtp-support.csv`](../benchmarks/intel-1340p/ornith-gemma-optimization/native-graph-fixtures/gemma-target-assistant-mtp-support.csv)
+- [`validation/semantic-replay/`](../benchmarks/intel-1340p/ornith-gemma-optimization/validation/semantic-replay/)
 - [`validation/test-batch-alloc.txt`](../benchmarks/intel-1340p/ornith-gemma-optimization/validation/test-batch-alloc.txt)
 - [`validation/test-recurrent-state-rollback.txt`](../benchmarks/intel-1340p/ornith-gemma-optimization/validation/test-recurrent-state-rollback.txt)
 
@@ -112,6 +113,25 @@ For an explicit user-service trial, copy one profile to `~/.config/llama-candida
 
 The candidate unit is separate from `llama-qwen-longctx.service`. Stopping and disabling `llama-candidate.service` removes the trial without changing Qwen files or state.
 
-The Qwen profile remains the long-context default because it is validated at 131,072 tokens. Ornith and Gemma were validated through 32,768 tokens in this campaign. The Qwen launcher and rollback instructions remain in [`intel-1340p-qwen-longctx-runbook.md`](intel-1340p-qwen-longctx-runbook.md).
+<!-- INTEL_128K_STATUS_BEGIN -->
+Near-capacity 128K validation passed for Ornith and Gemma with the selected 1024/256 geometry. Qwen remains the deployed rollback baseline; candidate activation remains an explicit operator decision.
 
-Gemma is the 32K throughput finalist. No service was installed, enabled or started by this campaign.
+## Verified 128K profile
+
+Near-capacity validation completed with one 131,072-token slot, batch 1024, ubatch 256, F16 KV, Flash Attention off and the model-specific MTP depth.
+
+| Model | Prompt tokens | Prompt | Generation | Elapsed | Draft acceptance | Peak PSS | Peak temperature |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ornith | 124,341 | 13.14 tok/s | 2.63 tok/s | 9490 s | 37/44 | 23857 MiB | 91 °C |
+| Gemma 4 | 124,112 | 22.49 tok/s | 4.49 tok/s | 5537 s | 29/42 | 11141 MiB | 90 °C |
+
+Both frozen requests retained output headroom, ended with exactly one schema-valid `search_repository` tool call, used speculative decoding and completed without a thermal-abort marker.
+<!-- INTEL_128K_STATUS_END -->
+
+Operational procedures:
+
+- [`intel-1340p-ornith-runbook.md`](intel-1340p-ornith-runbook.md)
+- [`intel-1340p-gemma4-runbook.md`](intel-1340p-gemma4-runbook.md)
+- [`intel-1340p-qwen-longctx-runbook.md`](intel-1340p-qwen-longctx-runbook.md)
+
+Gemma is the throughput finalist across the repeated short-workload and near-capacity 128K measurements. No candidate service was installed, enabled or started by this campaign.

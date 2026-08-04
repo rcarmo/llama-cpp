@@ -40,6 +40,12 @@ using json = nlohmann::ordered_json;
 
 constexpr int HTTP_POLLING_SECONDS = 1;
 
+static bool env_truthy(const char * name) {
+    const char * value = getenv(name);
+    return value != nullptr &&
+        (strcmp(value, "1") == 0 || strcmp(value, "true") == 0 || strcmp(value, "yes") == 0);
+}
+
 static uint32_t server_n_outputs_max(const common_params & params) {
     const uint32_t n_batch  = params.n_batch;
 
@@ -938,6 +944,7 @@ private:
 
     common_context_seq_rm_type ctx_tgt_seq_rm_type = COMMON_CONTEXT_SEQ_RM_TYPE_NO;
     common_context_seq_rm_type ctx_dft_seq_rm_type = COMMON_CONTEXT_SEQ_RM_TYPE_NO;
+    bool force_spec_ckpt_for_test = false;
 
     common_speculative_ptr spec;
 
@@ -1046,6 +1053,10 @@ private:
 
         params_base = params;
         params_base.n_outputs_max = server_n_outputs_max(params_base);
+        force_spec_ckpt_for_test = env_truthy("GGML_SPECULATIVE_TEST_FORCE_CHECKPOINT");
+        if (force_spec_ckpt_for_test) {
+            SRV_WRN("%s", "GGML_SPECULATIVE_TEST_FORCE_CHECKPOINT enabled: forcing speculative checkpoints for validation only\n");
+        }
 
         const bool has_mmproj = !params.mmproj.path.empty();
         const bool has_draft = params.speculative.has_dft();
@@ -1326,6 +1337,9 @@ private:
 
         if (ctx_dft) {
             ctx_dft_seq_rm_type = common_context_can_seq_rm(ctx_dft);
+            // common_speculative_init_result constructs draft contexts with n_rs_seq=0.
+            // If this changes, draft rollback needs an independent bounded-RS restore policy.
+            GGML_ASSERT(ctx_dft_seq_rm_type != COMMON_CONTEXT_SEQ_RM_TYPE_RS);
         }
 
         if (spec) {
@@ -2988,8 +3002,8 @@ private:
             if (spec) {
                 common_speculative_get_draft_params(spec.get(), slot.id).drafting = false;
 
-                const bool use_ckpt_tgt = ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
-                const bool use_ckpt_dft = ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test || ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+                const bool use_ckpt_dft = force_spec_ckpt_for_test || ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
 
                 const int n_draft_max = slot.get_n_draft_max();
 
@@ -3043,7 +3057,7 @@ private:
             slot.n_draft_total += draft.size();
 
             // TODO: avoid restoring the draft context and re-evaluating the drafted tokens when not needed [TAG_SPEC_AVOID_DRAFT_REEVAL]
-            const bool use_ckpt_dft = ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+            const bool use_ckpt_dft = force_spec_ckpt_for_test || ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
 
             if (ctx_dft) {
                 if (use_ckpt_dft) {
@@ -3056,11 +3070,11 @@ private:
             }
 
             if (!draft.empty()) {
-                const bool use_ckpt_tgt =
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
                    (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_tgt));
 
-                const bool use_ckpt_dft =
+                const bool use_ckpt_dft = force_spec_ckpt_for_test ||
                    (ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_dft));
 
                 if (use_ckpt_tgt) {
@@ -3882,7 +3896,7 @@ private:
 
                 const uint32_t n_rollback = slot.spec_draft.size() + 1 - accepted.size();
 
-                const bool use_ckpt_tgt =
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
                     (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && n_rollback > llama_n_rs_seq(ctx_tgt));
 
