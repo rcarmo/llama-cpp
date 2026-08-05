@@ -1,0 +1,33 @@
+[1/8] Provisioning UI assets
+-- UI: npm not found, skipping npm build
+-- UI: downloading from b10573: https://huggingface.co/buckets/ggml-org/llama-ui/resolve/b10573/dist.tar.gz
+-- UI: download dist.tar.gz from b10573 failed: "HTTP response code said error"
+-- UI: downloading from latest: https://huggingface.co/buckets/ggml-org/llama-ui/resolve/latest/dist.tar.gz
+-- UI: archive verified and extracted
+-- UI: HF download succeeded, stamp updated (latest)
+-- UI: gzip compression applied (/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/tools/ui/dist/_gzip)
+embed: write output file /var/home/agent/workspace/projects/llama-cpp/build-intel-clang/tools/ui/ui.cpp
+[2/7] Building CXX object tools/ui/CMakeFiles/llama-ui.dir/ui.cpp.o
+[3/7] Linking CXX static library tools/ui/libllama-ui.a
+[4/7] Linking CXX shared library bin/libllama-server-impl.so
+[5/7] Linking CXX shared library bin/libllama-cli-impl.so
+[6/7] Linking CXX executable bin/llama-server
+[7/7] Linking CXX executable bin/llama-cli
+Test project /var/home/agent/workspace/projects/llama-cpp/build-intel-clang
+    Start 22: test-batch-alloc
+1/5 Test #22: test-batch-alloc .................   Passed    0.01 sec
+    Start 26: test-llama-archs
+2/5 Test #26: test-llama-archs .................   Passed    8.87 sec
+    Start 27: test-generate-models
+3/5 Test #27: test-generate-models .............   Passed    1.90 sec
+    Start 28: test-recurrent-state-rollback
+4/5 Test #28: test-recurrent-state-rollback ....   Passed    0.04 sec
+    Start 50: test-x86-quant-dot
+5/5 Test #50: test-x86-quant-dot ...............   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+main    =  10.82 sec*proc (5 tests)
+
+Total Test time (real) =  10.83 sec

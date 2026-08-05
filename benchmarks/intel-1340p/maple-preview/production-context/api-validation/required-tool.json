@@ -1,0 +1,47 @@
+{
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "The user is asking me to search for \"MADV_WILLNEED\" in the repository, specifically under the path \"ggml/src/ggml-cpu\". They want the first three results. This is a straightforward search query.\n\nLet me use the search_repository function with:\n- query: \"MADV_WILLNEED\"\n- path: \"ggml/src/ggml-cpu\"\n- max_results: 3\n",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "search_repository",
+              "arguments": "{\"query\": \"MADV_WILLNEED\", \"path\": \"ggml/src/ggml-cpu\", \"max_results\": 3}"
+            },
+            "id": "deoud2GhkOUJMczPncVE2rnnwZwAejnG"
+          }
+        ]
+      }
+    }
+  ],
+  "created": 1785964576,
+  "model": "maple-preview-tq2-exact-head",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 135,
+    "prompt_tokens": 247,
+    "total_tokens": 382,
+    "prompt_tokens_details": {
+      "cached_tokens": 241
+    }
+  },
+  "id": "chatcmpl-X37Pnbx0LRk7wicf0cSEQmOnk8UbkGB4",
+  "timings": {
+    "cache_n": 241,
+    "prompt_n": 6,
+    "prompt_ms": 130.704,
+    "prompt_per_token_ms": 21.784000000000002,
+    "prompt_per_second": 45.90525156077855,
+    "predicted_n": 135,
+    "predicted_ms": 7363.368,
+    "predicted_per_token_ms": 54.54346666666667,
+    "predicted_per_second": 18.334001505832656
+  }
+}

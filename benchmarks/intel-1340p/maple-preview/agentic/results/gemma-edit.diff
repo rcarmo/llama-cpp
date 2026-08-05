@@ -1,0 +1,8 @@
+diff -ru /tmp/maple-agentic-edit-base/src/clamp.ts /tmp/maple-agentic-edit-gemma/src/clamp.ts
+--- /tmp/maple-agentic-edit-base/src/clamp.ts	2026-08-05 22:40:41.776964580 +0100
++++ /tmp/maple-agentic-edit-gemma/src/clamp.ts	2026-08-05 22:44:47.813233199 +0100
+@@ -1,3 +1,3 @@
+ export function clamp(value: number, min: number, max: number): number {
+-  return Math.max(min, value);
++  return Math.min(max, Math.max(min, value));
+ }

@@ -55,9 +55,9 @@ Strict-affinity tests use eight P-core threads, CPU mask `0xff`, batch 2048 and 
 | --- | ---: | ---: | --- |
 | Q8 baseline | 128.89 tok/s at 4K | 33.21 tok/s | 21.52 GB artifact |
 | Generic TQ2_0 | 201.91 tok/s at 4K | 63.87 tok/s | Rejected for quality |
-| Exact TQ2_0/F32 AVX2 | 75.61 tok/s at 512 | 20.96 tok/s | Accepted correctness path; longer prompt sweep pending |
+| Exact TQ2_0/F32 AVX2 | 69.57 tok/s at 4K; 54.69 tok/s at 32K | 20.96 tok/s | Accepted compact path |
 
-The 2x2 dense kernel improved the exact compact 512-token prompt result from 59.32 to 74.04 tok/s. The 2x1 expert kernel then reached 75.61 tok/s and improved repeated decode from 18.86 to 20.96 tok/s.
+The 2x2 dense kernel improved the exact compact 512-token prompt result from 59.32 to 74.04 tok/s. The 2x1 expert kernel then reached 75.61 tok/s at 512 tokens and improved repeated decode from 18.86 to 20.96 tok/s. On canonical `main`, the final compact artifact reaches 69.57 tok/s at 4K and 54.69 tok/s at 32K. The 4K/32K runs use 7.28/7.64 GiB maximum RSS, incur zero process swaps and zero major faults, and end at 95/96 C from 55 C starts.
 
 Evidence:
 
@@ -66,6 +66,29 @@ Evidence:
 - `baseline/README.md`
 - `ternary/pp4096.jsonl`
 - `ternary/tg16.jsonl`
+
+## Production context and serving
+
+The accepted local-provider profile uses two independent 131,072-token slots, F16 KV, batch 2048, ubatch 512 and a 12,288 MiB prompt-state cache.
+
+| Workload | Cached | Processed | Prompt rate |
+|---|---:|---:|---:|
+| 65,536-token frozen prompt | 0 | 65,536 | 45.66 tok/s |
+| 124,000-token extension | 65,536 | 58,464 | 25.10 tok/s |
+
+The campaign peaked at 14.70 GiB PSS, retained at least 22.12 GiB available host memory, incurred zero process swap and process major faults, and reached 94 C. Two concurrent short requests used both slots and generated at 18.74 tok/s each.
+
+Maple supports whole-prefix prompt-state restore and context checkpoints. Its per-layer RoPE geometry does not support safe KV shifting, partial chunk reuse or context shifting in this build.
+
+OpenAI-compatible health, model discovery, reasoning separation, required tools, tool responses, incremental SSE, terminal usage, cancellation, stop strings and a real Pi request passed. The installed loopback provider is `local-maple/maple-preview-tq2-exact-head` on `127.0.0.1:8093`.
+
+## Agentic decision
+
+Maple remains an explicit alternative. It does not replace Gemma as the primary local Pi model.
+
+Both models passed missing-evidence refusal, cached follow-up, strict JSON, required tools and a real Pi code-edit/test task under bounded reasoning. Both broad engineering prompts reached the 1,024-token cap. Gemma generated faster in five of six API cases, selected the requested `max_results: 3`, and made the exact minimal edit. Maple ingested prompts faster; its timestamp-derived edit-time upper bound is about 11% below Gemma's measured wall time, but it requested 20 search results and added an unnecessary semicolon.
+
+See `agentic/report.md` and `production-context/`.
 
 ## Reproduction order
 

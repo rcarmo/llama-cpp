@@ -1,0 +1,23 @@
+{
+  "id": "bounded-reasoning",
+  "description": "Terminate an impossible task within a fixed reasoning budget.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Do not invent missing evidence. If a request cannot be answered from the supplied facts, state the limitation in one sentence and stop."
+      },
+      {
+        "role": "user",
+        "content": "Using only the fact that the repository contains a file named README.md, give the exact SHA-256 of that file."
+      }
+    ],
+    "max_tokens": 96,
+    "temperature": 0,
+    "seed": 606
+  },
+  "expect": {
+    "must_match": "(?i)(cannot|insufficient|need|not provided|unavailable|not supply|not enough|does not provide|determine)",
+    "max_completion_tokens": 192
+  }
+}

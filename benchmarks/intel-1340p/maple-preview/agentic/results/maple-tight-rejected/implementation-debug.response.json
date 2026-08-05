@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "We need to diagnose a Vulkan decode shader issue: Q2_K (likely a shader variant for quantized 2x4 or similar) works at N=1,2 but fails at N=3 occasionally on Intel Xe1. The shader uses subgroup size 16, three activation-row accumulators per output row. Validation reports no out-of-bounds. N=2 is 18% faster than generic MMVQ, N=3 only 3% faster and increases register pressure. Generic fallback correct.\n\nMost likely causes: \n1. Register pressure: Three activation-row accumulators per output row. For N=3, output rows = 3, so 9 accumulators. Plus other registers. On Intel Xe1, limited registers, might spill. But N=2 had 6 accumulators, still fast. So maybe N=3 triggers a different register layout or additional registers needed.\n2. Shared memory indexing: Possibly out-of-bounds in shared memory indexing for N=3 due to different number of rows? But validation says no out-of-bounds. Could be alignment or stride issues.\n3. Subgroup control: N=3 might cause different subgroup behavior? But subgroup size fixed at 16. Could be that N=3 triggers a different number of workgroups per row? Or maybe the shader uses a different number of threads per workgroup? Not specified.\n4. Activation-row accumulators: \"three activation-row accumulators per output row\" - maybe for N=3, the number of output rows is 3, so total"
+      }
+    }
+  ],
+  "created": 1785965296,
+  "model": "maple-preview-tq2-exact-head",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 211,
+    "total_tokens": 531,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-xofPr1Ua2QoxrECfvGN8l3pT7Nta4nV9",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 211,
+    "prompt_ms": 2784.059,
+    "prompt_per_token_ms": 13.194592417061612,
+    "prompt_per_second": 75.78862373247118,
+    "predicted_n": 320,
+    "predicted_ms": 16816.831,
+    "predicted_per_token_ms": 52.55259687499999,
+    "predicted_per_second": 19.028555380023743
+  }
+}

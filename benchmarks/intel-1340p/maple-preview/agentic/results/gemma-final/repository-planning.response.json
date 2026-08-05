@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "This plan outlines the implementation of an **Exact-Row Q2\\_K Kernel** specifically optimized for the Intel Xe architecture, replacing the inefficient column-looping MMVQ shader. The goal is to leverage the hardware's capabilities (FP16/Integer Dot Product) while respecting the 48 KiB shared memory constraint and the lack of cooperative matrix support.\n\n---\n\n### Phase 0: Pre-Requisites & Assumptions\n*   **Target:** Qwen3.6 35B-A3B Q2\\_K\\_XL.\n*   **Architecture:** Intel Xe (Iris Xe).\n*   **Constraint:** 48 KiB shared memory limit.\n*   **Optimization Goal:** Replace column-major accumulation with row-major processing to maximize data locality and minimize redundant weight fetches.\n\n---\n\n### Phase 1: Kernel Implementation & Unit Verification (Target Verification)\n\n**Objective:** Implement the exact-row Q2\\_K kernel and verify its mathematical correctness against the existing CPU reference implementation.\n\n#### 1. Kernel Design (Exact-Row Q2\\_K)\n*   **Logic:** Instead of accumulating across columns (which requires re-fetching weights for every row in the column), the kernel will process one full row of the quantized weight matrix at a time.\n*   **Data Flow:**\n    1.  Load a block of quantized weights (Q2\\_K) into shared memory.\n    2.  De-quantize the block using the FP16/Integer Dot Product capabilities.\n    3.  Perform the dot product with the input activation vector.\n    4.  Accumulate the result into the output tensor.\n    5.  Write back the result.\n*   **Shared Memory Strategy:** Given the 48 KiB limit, the kernel must tile aggressively. The tile size must be calculated such that `(Tile_Height * Tile_Width * sizeof(Q2_K)) + (Input_Vector_Size * sizeof(FP16)) <= 48 KiB`.\n\n#### 2. Graph Shapes & Dispatch Gates\n*   **Input Shape:** `[Batch_Size, Seq_Len, Head_Dim, Q2_K_Data]`\n*   **Output Shape:** `[Batch_Size, Seq_Len, Head_Dim, FP16_Accumulator]`\n*   **Dispatch Gate:** `Kernel_Type == \"Q2_K_ExactRow\"`\n*   **Dispatch Logic:** The dispatcher will check the quantization type and, if it matches `Q2_K_XL`, it will route the workload to the new kernel.\n\n#### 3. Correctness Tests (Unit Verification)\n*   **Test Case 1 (Small Batch):** Run a single forward pass with a tiny batch size (N=1) and a small sequence length. Compare the output tensor element-wise against the CPU reference.\n*   **Test Case 2 (Edge Quantization):** Test with weights at the extreme ends of the quantization range (min/max) to ensure no overflow or underflow occurs during de-quantization.\n*   **Test Case 3 (Zero Input):** Verify that a zero input vector results in a zero output vector.\n\n#### 4. Telemetry & Metrics\n*   **Metric:** `Kernel_Execution_Time_ms`\n*   **Metric:** `Shared_Memory_Usage_KiB`\n*   **Metric:** `Instruction_Count` (to verify efficiency gains over the generic MMVQ shader).\n\n#### 5. Files Likely to Change\n*   `kernels/q2k/exact_row_kernel",
+        "reasoning_content": "Here's a plan to structure the response:\n1.  **Analyze the Request & Constraints:**\n    *   **Goal:** Design a focused two-phase implementation plan for an Intel Xe exact-row Q2\\_K kernel.\n    *   **Target:** Qwen3.6 35B-A3B Q2\\_K\\_XL.\n    *   **Hardware:** Intel Core i5-1340P (Iris Xe).\n    *   **Current State:** CPU target-only is faster than full Vulkan. Native MTP improves CPU generation. Vulkan has FP16/integer dot product, no cooperative matrix support, 48 KiB shared memory.\n    *   **Problem:** Generic MMVQ shader uses `temp[NUM_COLS][NUM_ROWS]` accumulators and loops over columns while decoding the same quantized weights (inefficient).\n    *   **Deliverables:** Two-phase plan, graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, files likely to change.\n    *   **Crucial Distinction:** Target verification vs. draft-head generation.\n\n2.  **Deconstruct the Technical Challenge (The Kernel):**"
+      }
+    }
+  ],
+  "created": 1785965801,
+  "model": "gemma-4-e4b-qat-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 249,
+    "total_tokens": 1273,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-x3127YX3nZZmGW5Ux6ykxU193PZKC8nZ",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 249,
+    "prompt_ms": 3819.559,
+    "prompt_per_token_ms": 15.339594377510041,
+    "prompt_per_second": 65.19077202368126,
+    "predicted_n": 1024,
+    "predicted_ms": 48637.1,
+    "predicted_per_token_ms": 47.49716796875,
+    "predicted_per_second": 21.053886847694457,
+    "draft_n": 1170,
+    "draft_n_accepted": 633
+  }
+}

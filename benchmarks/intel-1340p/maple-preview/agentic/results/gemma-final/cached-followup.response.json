@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "**Release Gate: Inference Optimization V1.0**\n\n| Dimension | Metric | Threshold |\n| :--- | :--- | :--- |\n| **Correctness** | Logit/Token Acceptance Delta | $\\text{Max } \\Delta \\text{ (Logits)} < 10^{-6}$ vs. Golden Reference. |\n| **Stability** | State Integrity (KV/Rollback) | $100\\%$ successful state consistency across partial MTP acceptance. |\n| **Performance** | Latency/Throughput | $\\text{Target Latency} \\le 1.2 \\times \\text{Baseline (CPU/Vulkan)}$ on target hardware. |\n| **Fallback Coverage** | Generic Vulkan Path Execution | $100\\%$ successful execution on defined edge cases (e.g., unsupported shapes, non-optimized devices). |",
+        "reasoning_content": "Here's a thinking process to arrive at the suggested release gate:\n\n1.  **Analyze the Request:** The user wants the three previously stated invariants (Deterministic Logits/Acceptance, Correct State Management, Generic Fallback) converted into a *compact release gate* with *measurable thresholds* covering four dimensions: Correctness, Performance, Stability, and Fallback Coverage.\n\n2.  **Deconstruct the Invariants & Map to Metrics:**\n\n    *   *Invariant 1: Deterministic target logits and token acceptance.*\n        *   *Metric:* Correctness.\n        *   *Threshold:* Bitwise equality check (or near-zero delta) against a golden reference model.\n    *   *Invariant 2: Correct KV and recurrent rollback state across partial MTP acceptance.*\n        *   *Metric:* Correctness/Stability.\n        *   *Threshold:* State integrity check (e.g., KV cache consistency, rollback success rate).\n    *   *Invariant 3: Retain the generic Vulkan path as a safe fallback.*\n        *   *Metric:* Fallback Coverage.\n        *   *Threshold:* Successful execution on a defined set of unsupported/edge cases.\n\n3.  **Address"
+      }
+    }
+  ],
+  "created": 1785965680,
+  "model": "gemma-4-e4b-qat-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 441,
+    "prompt_tokens": 287,
+    "total_tokens": 728,
+    "prompt_tokens_details": {
+      "cached_tokens": 282
+    }
+  },
+  "id": "chatcmpl-bku3zQdrMI92GgRMy4BxiROOQhvpYvMM",
+  "timings": {
+    "cache_n": 282,
+    "prompt_n": 5,
+    "prompt_ms": 158.589,
+    "prompt_per_token_ms": 31.7178,
+    "prompt_per_second": 31.528037884090324,
+    "predicted_n": 441,
+    "predicted_ms": 20364.826,
+    "predicted_per_token_ms": 46.17874376417234,
+    "predicted_per_second": 21.65498492351469,
+    "draft_n": 501,
+    "draft_n_accepted": 274
+  }
+}
