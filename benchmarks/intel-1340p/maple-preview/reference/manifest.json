@@ -1,0 +1,50 @@
+{
+  "created": "2026-08-05",
+  "source": {
+    "model": {
+      "repo": "deepgrove/maple-preview",
+      "revision": "ac1ddd79d2b5cb4406f5d2bebdf95406ce505a07"
+    },
+    "compact_model": {
+      "repo": "deepgrove/maple-preview-2bit-mlx",
+      "revision": "361db5da5e74ff6fcdd852d478e1f266ce11013a"
+    },
+    "runtime": {
+      "repo": "deepgrove-ai/mlx-lm-deepgrove",
+      "revision": "eba96c16158f032821b0bf374ea1421cfddef0a9"
+    }
+  },
+  "compact_shards": {
+    "model-00001-of-00003.safetensors": "1444bbc92e2842e9a612c32b6d6f30f0f026a107c8094a4ac273819a22eb84e1",
+    "model-00002-of-00003.safetensors": "d051e252c46570f989b65c5e037b94402d22f892e96dc91f5fb83dbb06b50d30",
+    "model-00003-of-00003.safetensors": "85c97321214c864597562d5b7286b9e8a0dac36e5abd622f11f9b8425ee88705",
+    "model-flashhead.safetensors": "67d1af06cd8ec6f434ea57b9e066dedf1f7572a95d1af14c56a525cb8b7b03cd"
+  },
+  "metadata": {
+    "config.json": "57eb521da63629196ebda2c103be929c81c1027ddf2766e7b19e2d2427f77443",
+    "chat_template.jinja": "83e4c58ca602ade89b126cc75a036eb8bd06d373d4fd94b09d2277d609131089",
+    "tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer_config.json": "bcab9fe0f4f56a0cffba7c916f943c376810d32c08f2cebf01f8b15849039d35",
+    "maple.py": "4685745e9cba8802e578b833504213efce21bec9b45d0550d6040340f367f007"
+  },
+  "reference_environment": {
+    "image": "localhost/maple-reference:fedora44",
+    "image_id": "5e7cd7cf1085a7c266805d0d3d9e2f1d3ba8e48b1829f3788c0028b31e746aa2",
+    "torch": "2.9.1",
+    "transformers": "4.57.1",
+    "safetensors": "0.7.0",
+    "tokenizers": "0.22.2",
+    "numpy": "2.4.6"
+  },
+  "fixtures": {
+    "tokenizer-and-position.json": "1aaf70298258c8bed7fee5fe68a970235ad6440b9867a1909d5babf8758f0ec2",
+    "full-short.json": "dadbfc18edb8cc20f47d2eba4282e6dcfd833a19e3f9167a4d30447b523907be",
+    "full-short.npz": "011565ef9b6381ffc3caef1aec7214fa1ed3637d531f3848dd12c59f9d4f6f30"
+  },
+  "fixture_contract": {
+    "full_short_prompt": "Return only: MAPLE",
+    "token_count": 15,
+    "captures": "embedding, every layer output, Q/K/V, attention probabilities, FP32 router logits, top-8 route IDs and weights, final hidden state, exact-head logits",
+    "position_fixture": [0, 1, 511, 512, 4095, 65535, 131071]
+  }
+}

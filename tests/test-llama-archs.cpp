@@ -190,13 +190,18 @@ static gguf_context_ptr get_gguf_ctx(const llm_arch arch, const bool moe) {
         ms.add_kv(LLM_KV_ROPE_FREQ_BASE_SWA,              10000.0f);
         // SWA pattern: every 5th layer is full attention (matches E2B layer_types)
         ms.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN, uint32_t(5));
-    } else if (arch == LLM_ARCH_COHERE2MOE || arch == LLM_ARCH_MIMO2 || arch == LLM_ARCH_STEP35) {
+    } else if (arch == LLM_ARCH_COHERE2MOE || arch == LLM_ARCH_MIMO2 || arch == LLM_ARCH_STEP35 || arch == LLM_ARCH_MAPLE) {
         std::vector<uint32_t> pattern;
         pattern.reserve(n_layer);
         for (uint32_t il = 0; il < n_layer; il++) {
-            pattern.push_back(il % 2);
+            pattern.push_back(arch == LLM_ARCH_MAPLE ? il % 4 != 3 : il % 2);
         }
         ms.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN, pattern);
+        if (arch == LLM_ARCH_MAPLE) {
+            ms.add_kv(LLM_KV_ROPE_DIMENSION_COUNT, uint32_t(0));
+            ms.add_kv(LLM_KV_ROPE_DIMENSION_COUNT_SWA, uint32_t(64));
+            ms.add_kv(LLM_KV_SWIGLU_CLAMP_EXP, 7.0f);
+        }
     } else {
         ms.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN, uint32_t(2));
     }
@@ -216,8 +221,8 @@ static gguf_context_ptr get_gguf_ctx(const llm_arch arch, const bool moe) {
     if (moe) {
         ms.add_kv(LLM_KV_EXPERT_FEED_FORWARD_LENGTH, n_ff);
         ms.add_kv(LLM_KV_INTERLEAVE_MOE_LAYER_STEP,  uint32_t(2));
-        ms.add_kv(LLM_KV_EXPERT_COUNT,               uint32_t(2));
-        ms.add_kv(LLM_KV_EXPERT_USED_COUNT,          uint32_t(1));
+        ms.add_kv(LLM_KV_EXPERT_COUNT,               arch == LLM_ARCH_MAPLE ? uint32_t(256) : uint32_t(2));
+        ms.add_kv(LLM_KV_EXPERT_USED_COUNT,          arch == LLM_ARCH_MAPLE ? uint32_t(8) : uint32_t(1));
         ms.add_kv(LLM_KV_EXPERT_SHARED_COUNT,        uint32_t(1));
         ms.add_kv(LLM_KV_EXPERT_GATING_FUNC,         uint32_t(2)); // sigmoid
         ms.add_kv(LLM_KV_EXPERT_GROUP_SCALE,         1.0f);
@@ -368,6 +373,7 @@ static bool moe_mandatory(const llm_arch arch) {
         case LLM_ARCH_MIMO2:
         case LLM_ARCH_KIMI_LINEAR:
         case LLM_ARCH_STEP35:
+        case LLM_ARCH_MAPLE:
         case LLM_ARCH_MISTRAL4:
         case LLM_ARCH_MELLUM:
         case LLM_ARCH_LAGUNA:

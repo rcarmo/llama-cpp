@@ -1435,7 +1435,7 @@ extern "C" {
             struct ggml_tensor  * a,
             struct ggml_tensor  * b);
 
-    // change the precision of a matrix multiplication
+    // change the precision of a matrix multiplication or expert matrix multiplication
     // set to GGML_PREC_F32 for higher precision (useful for phi-2)
     GGML_API void ggml_mul_mat_set_prec(
             struct ggml_tensor * a,

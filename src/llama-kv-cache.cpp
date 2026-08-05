@@ -1170,7 +1170,7 @@ void llama_kv_cache::apply_ubatch(const slot_info & sinfo, const llama_ubatch & 
 
 bool llama_kv_cache::get_can_shift() const {
     // Step35 uses per-layer RoPE dims; K-shift assumes a single global n_rot.
-    if (model.arch == LLM_ARCH_STEP35) {
+    if (model.arch == LLM_ARCH_STEP35 || model.arch == LLM_ARCH_MAPLE) {
         return false;
     }
     if (hparams.n_pos_per_embd() > 1) {

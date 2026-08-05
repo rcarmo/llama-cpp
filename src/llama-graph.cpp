@@ -1489,6 +1489,10 @@ ggml_tensor * llm_graph_context::build_lora_mm(
           ggml_tensor * w_s) const {
     ggml_tensor * res = ggml_mul_mat(ctx0, w, cur);
 
+    if (arch == LLM_ARCH_MAPLE && w->type == GGML_TYPE_TQ2_0) {
+        ggml_mul_mat_set_prec(res, GGML_PREC_F32);
+    }
+
     if (w_s) {
         res = ggml_mul(ctx0, res, w_s);
     }
@@ -1520,6 +1524,10 @@ ggml_tensor * llm_graph_context::build_lora_mm_id(
           ggml_tensor * ids,
           ggml_tensor * w_s) const {
     ggml_tensor * res = ggml_mul_mat_id(ctx0, w, cur, ids);
+
+    if (arch == LLM_ARCH_MAPLE && w->type == GGML_TYPE_TQ2_0) {
+        ggml_mul_mat_set_prec(res, GGML_PREC_F32);
+    }
 
     if (w_s) {
         const int64_t n_expert = w_s->ne[0];
@@ -1754,7 +1762,7 @@ ggml_tensor * llm_graph_context::build_ffn(
                         tmp = ggml_clamp(ctx0, tmp, -limit, limit);
                         cb(tmp, "ffn_up_clamped", il);
 
-                        if (arch == LLM_ARCH_DEEPSEEK4 || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0)) {
+                        if (arch == LLM_ARCH_DEEPSEEK4 || arch == LLM_ARCH_MAPLE || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0)) {
                             cur = ggml_clamp(ctx0, cur, -INFINITY, limit);
                             cb(cur, "ffn_gate_clamped", il);
                             cur = ggml_swiglu_split(ctx0, cur, tmp);
@@ -2149,7 +2157,7 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
                         up = ggml_clamp(ctx0, up, -limit, limit);
                         cb(up, "ffn_moe_up_clamped", il);
 
-                        if (arch == LLM_ARCH_DEEPSEEK4 || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0)) {
+                        if (arch == LLM_ARCH_DEEPSEEK4 || arch == LLM_ARCH_MAPLE || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0)) {
                             cur = ggml_clamp(ctx0, cur, -INFINITY, limit);
                             cb(cur, "ffn_moe_gate_clamped", il);
                             cur = ggml_swiglu_split(ctx0, cur, up);
