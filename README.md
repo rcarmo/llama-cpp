@@ -14,9 +14,10 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Rollback profile | Uninterrupted 99,104-token request |
+| LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Long-context and repository fallback | 99,104-token request; only matched repository-retrieval pass |
 | LattePanda Sigma | Ornith 1.0 35B, 128K | Validated | 124,341-token prompt completed |
-| LattePanda Sigma | Gemma 4 E4B, 128K | Deployed local provider | 124,112-token validation; two 128K service slots |
+| LattePanda Sigma | Gemma 4 E4B, 128K | Primary local provider | Best overall matched quality; 25.77 generation tok/s |
+| LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Prompt-heavy alternative | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
 | LattePanda Sigma | Iris Xe SYCL/Vulkan | Rejected | Correctness or local wins did not survive end-to-end gates |
 | SpaceMIT K3 | RVV/IME CPU backend | Selected | Qwen and Gemma live-verified |
 | SpaceMIT K3 | Direct recurrent-state writes | Selected service option | 5.05% mean Qwen generation gain |
@@ -148,6 +149,25 @@ Installation, Pi registration, diagnostics and rollback:
 
 - [`docs/gemma-local-provider-runbook.md`](docs/gemma-local-provider-runbook.md)
 - [`docs/gemma-local-provider-benchmark-2026-08-02.md`](docs/gemma-local-provider-benchmark-2026-08-02.md)
+
+### Maple, Gemma and Qwen role comparison
+
+The matched campaign on 5-6 August 2026 used exact per-tokenizer 512, 4,096 and 32,768-token prompts, a 512-token prompt with 64 generated tokens, identical bounded API cases and identical real Pi tasks. Each model ran alone on eight P-core threads with its accepted service profile.
+
+| Model | Prompt 512 | Prompt 4K | Prompt 32K | Generation | Bounded API | Real Pi | Role |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Maple exact TQ2/F32 | **76.03** | **71.79** | **56.91** | 18.77 | 4/6 | 3/4 | Fast prompt ingestion |
+| Gemma 4 E4B | 65.24 | 60.96 | 44.32 | **25.77** | 4/6 | 3/4 | Primary local model |
+| Qwen3.6 35B-A3B Q2 | 31.89 | 26.87 | 10.95 | 11.40 | 3/6 | **4/4** | Repository-grounded fallback |
+
+The blind substantive review ranked Gemma first, Qwen second and Maple third. Qwen alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
+
+Maple remains useful for large prompt ingestion, but it does not replace Gemma for general interactive work. Qwen remains useful when repository grounding matters more than latency. The hosted default remains `github-copilot/gpt-5.6-terra`.
+
+Full report, raw responses, telemetry, identities and validators:
+
+- [`benchmarks/intel-1340p/maple-qwen-campaign/report.md`](benchmarks/intel-1340p/maple-qwen-campaign/report.md)
+- [`benchmarks/intel-1340p/maple-qwen-campaign/README.md`](benchmarks/intel-1340p/maple-qwen-campaign/README.md)
 
 ### Iris Xe: measured and rejected
 

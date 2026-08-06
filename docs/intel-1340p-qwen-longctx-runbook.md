@@ -145,6 +145,16 @@ For first installation, use the ordered steps under [Install and boot startup](#
 
 Concurrent requests queue behind the single active slot.
 
+## Selected role
+
+Qwen is the repository-grounded local alternative when latency is acceptable. In the matched 5-6 August 2026 campaign it was the only model to find `src/llama-kv-cache.cpp` and `llama_kv_cache::get_can_shift()` for the requested repository fact. It passed all four real Pi tasks, while Maple timed out on retrieval and Gemma returned the wrong path and function.
+
+This strength has a large performance cost. Qwen processed exact 512, 4,096 and 32,768-token prompts at 31.89, 26.87 and 10.95 tok/s and generated at 11.40 tok/s. It was slower than Maple and Gemma at every matched size and retains one slot. The blind substantive review ranked Qwen second, behind Gemma.
+
+Use Qwen for source-grounded repository work that tolerates long first-token latency. Gemma remains the primary local model, and Maple remains the prompt-heavy alternative.
+
+Campaign report: [`../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
+
 ## KV and recurrent memory
 
 The following allocation is derived from the deployed GGUF metadata, `src/models/qwen35moe.cpp` and the Q4_0 layout in `ggml/src/ggml-cpu/ggml-common.h`. It is not a direct allocator log.

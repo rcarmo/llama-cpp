@@ -22,6 +22,8 @@ the repository root README.
 - [Maple local-provider operations](maple-local-provider-runbook.md)
 - [Maple implementation and validation evidence](../benchmarks/intel-1340p/maple-preview/README.md)
 - [Maple agentic comparison](../benchmarks/intel-1340p/maple-preview/agentic/report.md)
+- [Matched Maple, Gemma and Qwen campaign](../benchmarks/intel-1340p/maple-qwen-campaign/report.md)
+- [Campaign evidence and reproduction index](../benchmarks/intel-1340p/maple-qwen-campaign/README.md)
 - [Expert-I/O baseline and controls](expert-io-adoption-baseline.md)
 - [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md)
 - [Intel CPU/Vulkan campaign report](../benchmarks/intel-1340p/final-report-20260731.md)

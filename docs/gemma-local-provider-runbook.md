@@ -39,6 +39,14 @@ Validated artefacts:
 
 The model directory also contains an `mmproj` file, but this provider is registered for text input only and does not load it.
 
+## Selected role
+
+Gemma remains the primary local Pi provider. In the matched 5-6 August 2026 campaign it generated at 25.77 tok/s, faster than Maple at 18.77 tok/s and Qwen at 11.40 tok/s. Prompt throughput was 65.24, 60.96 and 44.32 tok/s at exact 512, 4,096 and 32,768-token inputs.
+
+Gemma scored 4/6 on bounded API cases and 3/4 on real Pi tasks. It alone obeyed the requested `max_results: 3` tool limit. Its repository-retrieval answer cited the wrong source path and function, so Qwen remains an explicit alternative when repository grounding matters more than latency. The blind substantive review ranked Gemma first.
+
+Campaign report: [`../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
+
 Repository files:
 
 - `tools/run-intel-candidate.sh`
@@ -167,7 +175,7 @@ jq '{defaultProvider, defaultModel}' \
 pi --list-models local-gemma
 ```
 
-On the validated host, the authoritative default must remain `github-copilot/gpt-5.6-sol`. The workspace settings file remains `openai-codex/gpt-5.4`; it is not authoritative while `PI_CODING_AGENT_DIR=/var/home/agent/.pi/agent`.
+On the validated host, the authoritative default must remain `github-copilot/gpt-5.6-terra`. The workspace settings file remains `openai-codex/gpt-5.4`; it is not authoritative while `PI_CODING_AGENT_DIR=/var/home/agent/.pi/agent`.
 
 ## Operate and diagnose
 

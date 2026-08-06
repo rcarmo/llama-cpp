@@ -19,6 +19,16 @@ The user service `llama-maple-local-provider.service` exposes Maple Preview on `
 
 The server restores whole prompt prefixes from the RAM prompt-state cache. Maple uses different RoPE dimensions across SWA and global layers. llama.cpp disables KV shifting and partial chunk reuse for this model. Context shifting is also disabled. Requests must fit in one 131,072-token slot.
 
+## Selected role
+
+Maple is the prompt-heavy local alternative. In the matched 5-6 August 2026 campaign it processed exact 512, 4,096 and 32,768-token prompts at 76.03, 71.79 and 56.91 tok/s, faster than Gemma and Qwen at all three sizes. It generated at 18.77 tok/s.
+
+Maple scored 4/6 on bounded API cases and 3/4 on real Pi tasks. Its repository retrieval timed out after 600 seconds and kept the server busy until restart. The blind substantive review ranked Maple third. Use Maple when prompt-ingestion speed matters; keep Gemma as the primary local model for general interactive work.
+
+The accepted exact TQ2/F32 representation retains 2880/2880 routes, hidden/logit NRMSE below 1e-6, 15/15 top-1 agreement and 32/32 mean top-32 overlap. Faster generic Q8 and TQ2/Q8-head variants failed the exact-quality tier. No additional weight conversion was promoted.
+
+Campaign report: [`../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
+
 Validated source files:
 
 - `tools/run-intel-maple-provider.sh`
