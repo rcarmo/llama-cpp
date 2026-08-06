@@ -1,0 +1,26 @@
+{
+  "finish_reason": "length",
+  "reasoning": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Context:** Inference optimization campaign for Qwen3.6 35B-A3B on Intel i5-1340P (AVX2, AVX-VNNI, Iris Xe).\n   - **Key Facts:** Hybrid attention, MoE, CPU faster than full Vulkan, Native MTP draft-1 high acceptance/improves CPU gen, Vulkan multi-column Q2_K decode gains at N=2 plateaus at N=4, disabling MMVQ/int dot product removes gain, CPU/Vulkan branch-overlap prototype correct but regressed due to shared LPDDR bandwidth, next work: model-specific exact-row Vulkan kernel, reduced MTP orchestration overhead.\n   - **Previous Output:** I stated three invariants: deterministic target logits/token acceptance, correct KV/recurrent rollback state across partial MTP acceptance, generic Vulkan path as safe fallback.\n   - **Current Request:** Turn those invariants into a compact release gate with measurable thresholds for correctness, performance, stability, and fallback coverage.\n\n2.  **Deconstruct Requirements:**\n   - Need a \"compact release gate\" (likely a checklist/matrix format)",
+  "content": "- Must cover four dimensions: correctness, performance, stability, fallback coverage.\n   - Must be measurable with thresholds.\n   - Must align with the three invariants I stated.\n   - Keep it concise, technical, reproducible.\n\n3.  **Map Invariants to Dimensions:**\n   - *Invariant 1:* Deterministic target logits & token acceptance → Correctness\n   - *Invariant 2:* Correct KV/recurrent rollback state across partial MTP acceptance → Stability/Correctness\n   - *Invariant 3:* Generic Vulkan path as safe fallback → Fallback Coverage\n   - *Performance* needs a threshold tied to the campaign facts (MTP draft-1 gains, Q2_K decode N=2 plateau, CPU vs Vulkan baseline).\n\n4.  **Define Measurable Thresholds (Mental Draft):**\n   - **Correctness:** Logit divergence < 1e-4 (FP32 reference), token acceptance rate matches CPU baseline ±0.5%, deterministic across 100 runs.\n   - **Performance:** MTP draft-1 generation throughput ≥ CPU baseline + 15% at N=2, Q2_K decode latency ≤ 1.2x CPU at N=2, no regression at N=4.\n   - **Stability:** KV/recurrent rollback state corruption rate = 0%, MTP partial acceptance rollback overhead ≤ 5% of total decode time, memory bandwidth contention (shared LPDDR) ≤ 2% throughput drop.\n   - **Fallback Coverage:** Generic Vulkan path activates on <0.1% of unsupported shapes/devices, fallback latency ≤ 1.5x CPU baseline, zero kernel launch failures in 10k token test.\n\n5.  **Refine & Format (Compact Release Gate):**\n   Need to make it tight, technical, and reproducible. Use a table or structured list. Ensure thresholds are explicit and measurable.\n\n   Structure:\n   - **Correctness Gate**\n   - **Performance Gate**\n   - **Stability Gate**\n   - **Fallback Coverage Gate**\n   Each with specific metrics, thresholds, and validation method.\n\n   Let's draft it carefully:\n\n   **Release Gate: Qwen3.6 35B-A3B MTP/Vulkan Hybrid**\n   - **Correctness:** Logit L2 norm vs FP32 CPU reference < 1e-4; token acceptance rate within ±0.5% of CPU baseline; deterministic across 50 identical seeds.\n   - **Performance:** MTP draft-1 gen throughput ≥ CPU baseline + 15% at N=2; Q2_K decode latency ≤ 1.2× CPU at N=2; no throughput regression at N=4; MMVQ/int-dot product enabled by default.\n   - **Stability:** KV/recurrent rollback state corruption = 0%; partial MTP rollback overhead ≤ 5% of decode cycle; shared LPDDR bandwidth contention ≤ 2% throughput drop; zero OOM or invalid memory accesses in 10k-token stress test.\n   - **Fallback Coverage:** Generic Vulkan path triggers on <0.1% of unsupported shapes/devices; fallback latency ≤ 1.5× CPU baseline; kernel launch failure rate = 0 across 500 diverse prompts.\n\n   Check against constraints:\n   - Compact? Yes.\n   - Release gate format? Yes.\n   - Measurable thresholds? Yes, all have explicit numbers/methods.\n   - Covers correctness, performance, stability, fallback? Yes.\n   - Aligns with campaign facts? Yes (mentions MTP draft-1, Q2_K N=2",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 278,
+    "total_tokens": 1302,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 278,
+    "prompt_ms": 8697.088,
+    "prompt_per_token_ms": 31.284489208633094,
+    "prompt_per_second": 31.964721985105818,
+    "predicted_n": 1024,
+    "predicted_ms": 78802.495,
+    "predicted_per_token_ms": 76.9555615234375,
+    "predicted_per_second": 12.99451241994305,
+    "draft_n": 1054,
+    "draft_n_accepted": 671
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "protocol": "../protocol.md",
+  "models": {
+    "maple": {
+      "source": "../../maple-preview/agentic/results/maple-final/summary.json",
+      "passed": 4,
+      "failed": 2,
+      "passed_cases": ["bounded-reasoning", "cached-followup", "instruction-following", "tool-planning"],
+      "failed_cases": ["implementation-debug", "repository-planning"],
+      "tool_arguments": {"query": "Q2_K multi-column matrix-vector decode", "path": ".", "max_results": 20}
+    },
+    "gemma": {
+      "source": "../../maple-preview/agentic/results/gemma-final/summary.json",
+      "passed": 4,
+      "failed": 2,
+      "passed_cases": ["bounded-reasoning", "cached-followup", "instruction-following", "tool-planning"],
+      "failed_cases": ["implementation-debug", "repository-planning"],
+      "tool_arguments": {"query": "Q2_K multi-column matrix-vector decode", "path": ".", "max_results": 3}
+    },
+    "qwen": {
+      "source": "qwen/summary.json",
+      "passed": 3,
+      "failed": 3,
+      "passed_cases": ["bounded-reasoning", "instruction-following", "tool-planning"],
+      "failed_cases": ["cached-followup", "implementation-debug", "repository-planning"],
+      "tool_arguments": {"query": "Q2_K multi-column matrix-vector decode", "path": ".", "max_results": 20}
+    }
+  },
+  "shared_failures": ["implementation-debug", "repository-planning"],
+  "notes": [
+    "A prose case fails convergence when it reaches the 1024-token limit.",
+    "All models produced the exact strict JSON object.",
+    "All models refused to invent a SHA-256 from a filename alone.",
+    "All models emitted one valid search_repository call. Gemma alone obeyed max_results=3 exactly."
+  ]
+}

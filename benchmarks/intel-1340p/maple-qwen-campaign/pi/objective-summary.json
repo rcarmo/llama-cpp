@@ -1,0 +1,92 @@
+{
+  "tasks": [
+    "repository retrieval",
+    "constrained code edit",
+    "exact instruction",
+    "cancellation recovery"
+  ],
+  "models": {
+    "maple": {
+      "passed": 3,
+      "failed": 1,
+      "retrieval": {
+        "exit_code": 124,
+        "wall_ms": 600016,
+        "passed": false,
+        "failure": "client timeout; server slot remained busy until service restart"
+      },
+      "edit": {
+        "passed": true,
+        "wall_ms": 73168,
+        "independent_test": true,
+        "diff_minimal": true
+      },
+      "instruction": {
+        "exit_code": 0,
+        "wall_ms": 65105,
+        "passed": true
+      },
+      "cancellation": {
+        "passed": true,
+        "client_exit_code": 124,
+        "server_recovered": true
+      }
+    },
+    "gemma": {
+      "passed": 3,
+      "failed": 1,
+      "retrieval": {
+        "exit_code": 0,
+        "wall_ms": 354563,
+        "passed": false,
+        "failure": "reported src/models/maple.cpp and llama_model_maple::graph::graph instead of explicit disable site"
+      },
+      "edit": {
+        "passed": true,
+        "wall_ms": 80417,
+        "independent_test": true,
+        "diff_minimal": true
+      },
+      "instruction": {
+        "exit_code": 0,
+        "wall_ms": 75081,
+        "passed": true
+      },
+      "cancellation": {
+        "passed": true,
+        "client_exit_code": 124,
+        "server_recovered": true
+      }
+    },
+    "qwen": {
+      "passed": 4,
+      "failed": 0,
+      "retrieval": {
+        "exit_code": 0,
+        "wall_ms": 262227,
+        "passed": true
+      },
+      "edit": {
+        "passed": true,
+        "wall_ms": 132250,
+        "independent_test": true,
+        "diff_minimal": true
+      },
+      "instruction": {
+        "exit_code": 0,
+        "wall_ms": 164736,
+        "passed": true
+      },
+      "cancellation": {
+        "passed": true,
+        "client_exit_code": 124,
+        "server_recovered": true
+      }
+    }
+  },
+  "notes": [
+    "Qwen was the only model to retrieve the explicit disable site correctly.",
+    "All code edits changed only src/clamp.ts and passed an independent bun test.",
+    "Maple was fastest on the isolated edit and exact-reply tasks."
+  ]
+}

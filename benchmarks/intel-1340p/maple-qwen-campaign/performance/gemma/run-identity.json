@@ -1,0 +1,72 @@
+{
+  "model": "gemma",
+  "source_commit": "78616cbadf8f6aa488f4913e98f1073c22f81017",
+  "build_commit": "7f3f259a1",
+  "build_number": 10573,
+  "server_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+  "model_id": "gemma-4-e4b-qat-mtp",
+  "model_sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
+  "draft_sha256": "49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc",
+  "profile": {
+    "context_per_slot": 131072,
+    "slots": 2,
+    "kv": "f16",
+    "batch": 1024,
+    "ubatch": 256,
+    "mtp_depth": 3,
+    "cache_ram_mib": 12288
+  },
+  "fixture": {
+    "label": "gemma",
+    "tokenizer_endpoint": "http://127.0.0.1:8091",
+    "source": "ornith-content.txt",
+    "source_sha256": "6ddf8c449ba6294d0ea4e6dffe9891bf8bdea658c39a2778635002872b0a351f",
+    "source_chars": 297363,
+    "add_special": true,
+    "prompts": [
+      {
+        "target_tokens": 512,
+        "prompt_tokens": 512,
+        "prompt_chars": 1309,
+        "prompt_sha256": "8553ca8562fbc2ced6af4580cedb400df75e137035f14cce41769cd58c86148f",
+        "payload_sha256": "a8a5b18ecc948e9c2208e49fef7811b246164ecdab7771affc53915146fd4028",
+        "prompt_file": "prompt-512.txt",
+        "payload_file": "completion-512.json"
+      },
+      {
+        "target_tokens": 4096,
+        "prompt_tokens": 4096,
+        "prompt_chars": 9189,
+        "prompt_sha256": "410b403cc96ea474a3a8b67f362149f2fab85b58f76b9e180d4ad545a309fd3a",
+        "payload_sha256": "3dbdf9d70d22a08f2b82a1c1daa0c47f9e7389e39c967f9a729d9842150486a4",
+        "prompt_file": "prompt-4096.txt",
+        "payload_file": "completion-4096.json"
+      },
+      {
+        "target_tokens": 32768,
+        "prompt_tokens": 32768,
+        "prompt_chars": 72218,
+        "prompt_sha256": "acb0fcc3f3bc15d7b16ceefe54d535f445152200c99acba8ed2219ff9c40bca6",
+        "payload_sha256": "672db6c4700bbbab3f7dd3fa9d01ce273d31dccd82bbd3869615dcde58453022",
+        "prompt_file": "prompt-32768.txt",
+        "payload_file": "completion-32768.json"
+      }
+    ],
+    "generation": {
+      "prompt_tokens": 512,
+      "generated_tokens": 64,
+      "payload_sha256": "62bbb1aad57b5d2241badd1ce2bf6bffa718f5865c21d28d052c1f8fa9853c2f",
+      "payload_file": "completion-generation.json"
+    }
+  },
+  "observed": {
+    "model_api_sha256": "5cb4c6bc1ee53bcaafce0a3f6d352addc3e3e16a460e493eda50d254957bed78",
+    "model_api_id": "gemma-4-e4b-qat-mtp",
+    "configured_slots": 2,
+    "context_per_slot": 131072,
+    "installed_profile_sha256": "11182665dfd97dbb250216a90ac715e3a8f0c1476ab787749affc4b82fdd42e5",
+    "server_executable_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+    "server_command_sha256": "922b7594cd146e5c6a784c30ead08ab7ab70fe0847d1ff51286b7b1eb88c868e"
+  },
+  "identity_sha256": "2e931ce2c16cb088dded4059aa457ad650974486c2c49de67f98903c2a2b3c37"
+}

@@ -1,0 +1,24 @@
+{
+  "reviewer": "independent delegated judge",
+  "mapping": {"A": "qwen", "B": "maple", "C": "gemma"},
+  "overall_ranking_blind": ["C", "A", "B"],
+  "overall_ranking_models": ["gemma", "qwen", "maple"],
+  "case_findings": {
+    "cached-followup": {
+      "A": {"scores": {"grounding": 3, "coverage": 4, "detail": 4, "concision": 1, "unsupported": 2}, "finish_reason": "length", "finding": "Detailed but invented thresholds and did not finish compactly."},
+      "B": {"scores": {"grounding": 2, "coverage": 2, "detail": 2, "concision": 5, "unsupported": 2}, "finish_reason": "stop", "finding": "Missed rollback-state invariant and misframed fallback."},
+      "C": {"scores": {"grounding": 3, "coverage": 3, "detail": 3, "concision": 4, "unsupported": 2}, "finish_reason": "stop", "finding": "Usable but used unsupported thresholds and did not define a reproducible test procedure."}
+    },
+    "implementation-debug": {
+      "A": {"scores": {"grounding": 3, "coverage": 3, "detail": 4, "concision": 2, "unsupported": 1}, "finish_reason": "length", "finding": "Detailed but falsely described Q8_1 and made unsupported Xe1 claims."},
+      "B": {"scores": {"grounding": 1, "coverage": 2, "detail": 2, "concision": 2, "unsupported": 1}, "finish_reason": "length", "finding": "Dismissed required checks without evidence and cited likely invalid APIs."},
+      "C": {"scores": {"grounding": 3, "coverage": 3, "detail": 3, "concision": 2, "unsupported": 2}, "finish_reason": "length", "finding": "Contained a shared-memory factual error and did not reach the bounded matrix or criteria."}
+    },
+    "repository-planning": {
+      "A": {"scores": {"grounding": 2, "coverage": 2, "detail": 2, "concision": 1, "unsupported": 1}, "finish_reason": "length", "finding": "Speculative, invented shapes, and truncated before a concrete two-phase plan."},
+      "B": {"scores": {"grounding": 1, "coverage": 1, "detail": 1, "concision": 1, "unsupported": 4}, "finish_reason": "length", "finding": "Repeated the prompt and omitted nearly all requested plan elements."},
+      "C": {"scores": {"grounding": 2, "coverage": 3, "detail": 3, "concision": 2, "unsupported": 2}, "finish_reason": "length", "finding": "Best of the three but invented shapes, dispatch names and a file path; phase two was incomplete."}
+    }
+  },
+  "conclusion": "Gemma had the best blind balance. Qwen was second. Maple was last because its substantive planning and debugging outputs were less grounded and less complete. All three failed at least one convergence or factual-quality gate."
+}

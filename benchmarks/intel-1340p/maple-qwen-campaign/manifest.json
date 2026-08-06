@@ -1,0 +1,92 @@
+{
+  "created": "2026-08-05",
+  "host": {
+    "name": "sigma",
+    "cpu": "Intel Core i5-1340P",
+    "logical_cpus": 16,
+    "model_cpus": "0-7",
+    "process_cpus": "0-15",
+    "threads": 8,
+    "ram_bytes": 33359691776,
+    "swap_bytes": 8589930496,
+    "cool_start_max_mC": 60000,
+    "cool_start_load1_max": 1.5,
+    "thermal_abort_mC": 97000,
+    "thermal_abort_samples": 3
+  },
+  "source": {
+    "repository": "/var/home/agent/workspace/projects/llama-cpp",
+    "commit": "78616cbadf8f6aa488f4913e98f1073c22f81017",
+    "origin_main": "78616cbadf8f6aa488f4913e98f1073c22f81017",
+    "build_number": 10573,
+    "build_commit": "7f3f259a1",
+    "compiler": "Clang 22.1.8",
+    "server_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab"
+  },
+  "models": {
+    "maple": {
+      "id": "maple-preview-tq2-exact-head",
+      "path": "/var/home/agent/workspace/projects/models/maple-preview-tq2-exact-head.gguf",
+      "size": 7593741952,
+      "sha256": "fd68a5f315189367dfae84d44fc066386e2d37ba6544f529304f21d482f24db4",
+      "endpoint": "http://127.0.0.1:8093",
+      "service": "llama-maple-local-provider.service",
+      "context_per_slot": 131072,
+      "slots": 2,
+      "kv": "f16",
+      "batch": 2048,
+      "ubatch": 512,
+      "mtp_depth": 0,
+      "cache_ram_mib": 12288
+    },
+    "gemma": {
+      "id": "gemma-4-e4b-qat-mtp",
+      "path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "size": 5154941280,
+      "sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
+      "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_size": 98671040,
+      "draft_sha256": "49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc",
+      "endpoint": "http://127.0.0.1:8091",
+      "service": "llama-gemma-local-provider.service",
+      "context_per_slot": 131072,
+      "slots": 2,
+      "kv": "f16",
+      "batch": 1024,
+      "ubatch": 256,
+      "mtp_depth": 3,
+      "cache_ram_mib": 12288
+    },
+    "qwen": {
+      "id": "qwen3.6-35b-a3b-128k-mtp",
+      "path": "/var/home/agent/workspace/projects/models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+      "size": 12574128416,
+      "sha256": "ed7cda7e38985b4fcff76475865135039641d2bfbac3c169df15ca770f37fb0c",
+      "endpoint": "http://127.0.0.1:8090",
+      "service": "llama-qwen-longctx.service",
+      "context_per_slot": 131072,
+      "slots": 1,
+      "kv": "q4_0",
+      "batch": 1024,
+      "ubatch": 256,
+      "mtp_depth": 3,
+      "cache_ram_mib": 0
+    }
+  },
+  "reasoning_budgets": {
+    "missing_evidence": {"reasoning": 96, "total": 192},
+    "tool_or_json": {"reasoning": 128, "total": 256},
+    "engineering_prose": {"reasoning": 256, "total": 1024}
+  },
+  "corpus_sha256": {
+    "cached-followup.json": "6b6e18dea6715b1cc6187b7cae33e0c8079975b8477b47edd80c44a88ced0322",
+    "implementation-debug.json": "c21f1c6a30dc33a5f77e2aa4d6f25da3f898c650ad0a693fb80c7aef7e92900d",
+    "repository-planning.json": "f8c38c3e44cec7ced18f2fd3c2d8b148ef96ee07a58a304c83b0bb2595465ed0",
+    "tool-planning.json": "fcdec187d7a49b2ad9c89ac03ddf0542c80d7a9610509171d3e77ed47ff78394",
+    "instruction-following.json": "9697658b6447b87d445452db2fbad3666ad33b6d0f9128dce017ba47fa482bc7",
+    "bounded-reasoning.json": "3b16a505b346a91e2deebaa9ec024b69acd17f6a42f744bf8a73e9b0b4606867",
+    "run-matched-corpus.ts": "8ea2f3528e819ed249e10932f78d50e17b7ba6f92ea29ed5b65962fa5026ee80"
+  },
+  "promotion_gate_percent": 2.0,
+  "hosted_default": "github-copilot/gpt-5.6-terra"
+}

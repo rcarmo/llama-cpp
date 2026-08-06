@@ -1,0 +1,5 @@
+Based on the codebase and accompanying documentation, the mechanism is architectural rather than controlled by a single disabling function, but the implementation of per-layer RoPE in the following function is the root cause:
+
+*   **Source Path:** `src/models/maple.cpp`
+*   **Function Name:** `llama_model_maple::graph::graph`
+*   **Reason:** This function applies layer-specific RoPE frequencies, which prevents the use of standard KV cache shifting due to varying positional rotations across layers.

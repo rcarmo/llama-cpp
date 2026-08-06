@@ -1,0 +1,3 @@
+**Source path:** `src/llama-kv-cache.cpp`
+**Function:** `llama_kv_cache::get_can_shift()`
+**Reason:** Maple uses per-layer RoPE dimensions, while KV (K-shift) assumes a single global `n_rot`, so shifting is unsafe for this architecture.

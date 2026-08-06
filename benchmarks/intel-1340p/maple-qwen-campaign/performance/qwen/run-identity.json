@@ -1,0 +1,72 @@
+{
+  "model": "qwen",
+  "source_commit": "78616cbadf8f6aa488f4913e98f1073c22f81017",
+  "build_commit": "7f3f259a1",
+  "build_number": 10573,
+  "server_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+  "model_id": "qwen3.6-35b-a3b-128k-mtp",
+  "model_sha256": "ed7cda7e38985b4fcff76475865135039641d2bfbac3c169df15ca770f37fb0c",
+  "draft_sha256": null,
+  "profile": {
+    "context_per_slot": 131072,
+    "slots": 1,
+    "kv": "q4_0",
+    "batch": 1024,
+    "ubatch": 256,
+    "mtp_depth": 3,
+    "cache_ram_mib": 0
+  },
+  "fixture": {
+    "label": "qwen",
+    "tokenizer_endpoint": "http://127.0.0.1:8090",
+    "source": "ornith-content.txt",
+    "source_sha256": "6ddf8c449ba6294d0ea4e6dffe9891bf8bdea658c39a2778635002872b0a351f",
+    "source_chars": 297363,
+    "add_special": true,
+    "prompts": [
+      {
+        "target_tokens": 512,
+        "prompt_tokens": 512,
+        "prompt_chars": 1397,
+        "prompt_sha256": "640b8dded0c3bc4c7c1c4a72b3dc6d67aa226a142c3d151ca43d10499a567968",
+        "payload_sha256": "aba0a71d32bd491d11b3dba554a2a4d4d926e5b893361450840f39f1b789c43c",
+        "prompt_file": "prompt-512.txt",
+        "payload_file": "completion-512.json"
+      },
+      {
+        "target_tokens": 4096,
+        "prompt_tokens": 4096,
+        "prompt_chars": 9985,
+        "prompt_sha256": "d88132c78220d7697a6359cafbc29fa33fc07d5af8803cafdfd9977e3213a5e2",
+        "payload_sha256": "094b2ba34ee573c070ca7163cb02dd40ddf166ea54a17a75592dcf599d0b663a",
+        "prompt_file": "prompt-4096.txt",
+        "payload_file": "completion-4096.json"
+      },
+      {
+        "target_tokens": 32768,
+        "prompt_tokens": 32768,
+        "prompt_chars": 78628,
+        "prompt_sha256": "e0a21ca8bc01b89ba8db256e1a3d329902da388bddc8e2302cd4cfa20116ed34",
+        "payload_sha256": "0f4cececcab662d2fbd0e17bcbf51880addfc7eb857e4f066e64e473ee08b030",
+        "prompt_file": "prompt-32768.txt",
+        "payload_file": "completion-32768.json"
+      }
+    ],
+    "generation": {
+      "prompt_tokens": 512,
+      "generated_tokens": 64,
+      "payload_sha256": "ac33d4deb36da2e9f3e10f10f51686a0c2c5f9952530b60c171e5dad14467f8d",
+      "payload_file": "completion-generation.json"
+    }
+  },
+  "observed": {
+    "model_api_sha256": "4ce4c989f7e5f760817f540857b004df52045836e0e03ae0fd63357431ad5dd5",
+    "model_api_id": "qwen3.6-35b-a3b-128k-mtp",
+    "configured_slots": 1,
+    "context_per_slot": 131072,
+    "installed_profile_sha256": "185e475a1ef5d624b2bb356e864ffdbdfdd9d7d876e47000d50efdeced90817b",
+    "server_executable_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+    "server_command_sha256": "a0628d1385b5128776a11e8332108bf85ba2a8633dcb0f5e19dfd18b9d1742da"
+  },
+  "identity_sha256": "3b89e534180e3b633e1bb113e4e91acb9a2738af23ef86f9e0bcb235551f104e"
+}
