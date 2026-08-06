@@ -435,7 +435,9 @@ extern "C" {
         GGML_TYPE_TURBO4_0 = 45, // TurboQuant 4-bit KV cache: WHT + 4-bit PolarQuant
         GGML_TYPE_TQ3_1S  = 46, // TurboQuant 3-bit weight: WHT-rotated 8-level Lloyd-Max, block_size=32
         GGML_TYPE_TQ4_1S  = 47, // TurboQuant 4-bit weight: WHT-rotated 16-level Lloyd-Max, block_size=32
-        GGML_TYPE_COUNT   = 48,
+        // Prism-private Q2_0 at group size 128 (upstream Q2_0 is group 64).
+        GGML_TYPE_Q2_0_G128 = 142,
+        GGML_TYPE_COUNT   = 143,
     };
 
     // [TAG_GGML_PREC]
@@ -491,6 +493,7 @@ extern "C" {
         GGML_FTYPE_MOSTLY_NVFP4   = 26, // except 1d tensors
         GGML_FTYPE_MOSTLY_Q1_0    = 27, // except 1d tensors
         GGML_FTYPE_MOSTLY_Q2_0    = 28, // except 1d tensors
+        GGML_FTYPE_MOSTLY_Q2_0_G128 = 128, // except 1d tensors (Prism-private group-128 Q2_0)
     };
 
     // available tensor operations:
