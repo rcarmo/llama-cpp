@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Below is a focused, implementation-ready plan for an Intel Xe exact-row Q2_K kernel and its use in Qwen MTP verification. The plan is deliberately narrow: it targets the decode path where the current generic MMVQ shader wastes work by keeping `temp[NUM_COLS][NUM_ROWS]` accumulators and re-decoding the same quantized weights for multiple columns. It does not attempt to redesign the full Vulkan backend.\n\n---\n\n# 1. Problem framing\n\n## 1.1 Observed behavior\n\n- CPU target-only generation is faster than full Vulkan on this machine.\n- Native MTP improves CPU generation.\n- Vulkan has:\n  - FP16 support.\n  - Integer dot product support.\n  - No cooperative matrix support.\n  - 48 KiB shared memory.\n- Multi-column Vulkan decode improves aggregate throughput at `N=2`, but plateaus at `N=4`.\n- The generic MMVQ shader keeps `temp[NUM_COLS][NUM_ROWS]` accumulators and loops over columns while decoding the same quantized weights.\n\n## 1.2 Likely bottleneck\n\nFor Q2_K decode, the dominant cost is not the final dot product. It is:\n\n1. Repeated decoding of quantized weight blocks.\n2. Repeated loading of scales/mins.\n3. Repeated expansion of quantized values into FP16 or integer vectors.\n4. Keeping multiple column accumulators live in registers/shared memory.\n5. Poor occupancy or register pressure when `NUM_COLS` grows.\n\nThe current generic MMVQ approach is reasonable for a general-purpose kernel, but it is not optimal for the exact-row decode case where:\n\n- One row of the weight matrix is needed.\n- The activation vector is short.\n- The same quantized weight row is being decoded multiple times for multiple output columns.\n- The target is a single scalar or small vector result per row.\n\nThe opportunity is a specialized exact-row Q2_K kernel that decodes each quantized weight block once and reuses it across the required output columns.\n\n---\n\n# 2. Scope\n\n## 2.1 In scope\n\n- A specialized Vulkan compute shader for Q2_K exact-row decode.\n- Integration into Qwen MTP verification.\n- Dispatch gating based on:\n  - GPU model.\n  - Shared memory size.\n  - FP16 support.\n  - Integer dot product support.\n  - Batch size.\n  - Sequence length.\n  - Weight shape.\n  - Activation shape.\n  - MTP verification mode.\n- Correctness tests against CPU reference.\n- Telemetry for decode cost, occupancy, fallback rate, and MTP acceptance.\n- Performance gates to prevent regressions.\n- Fallback to existing MMVQ or CPU path.\n\n## 2.2 Out of scope\n\n- Full cooperative matrix implementation.\n- General-purpose Q2_K GEMM redesign.\n- Prefill optimization.\n- New quantization formats.\n- Cross-GPU portability beyond Intel Xe.\n- Speculative decoding algorithm changes.\n- Model architecture changes.\n\n---\n\n# 3. Two-phase implementation plan\n\n## Phase 1: Exact-row Q2_K decode kernel\n\nGoal: replace the generic MMVQ path for the narrow decode case with a kernel that decodes each Q2_K weight block once and reuses it across output columns.\n\n### 3.1 Kernel design\n\n#### 3.1.1 Q2_K layout assumptions\n\nQ2_K is a block quantization format. The exact layout should be confirmed against the repository implementation, but the kernel should be written",
+        "reasoning_content": "We need answer user's request. Need design focused two-phase implementation plan for Intel Xe exact-row Q2_K kernel and integration into Qwen MTP verification. Need include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, files likely to change. Distinguish target verification from draft-head generation.\n\nWe need think deeply. User context: Qwen3.6 35B-A3B Q2_K_XL on Intel Core i5-1340P with Iris Xe unified memory. CPU target-only generation faster than full Vulkan, but native MTP improves CPU generation. Vulkan has FP16 and integer dot product, no cooperative matrix support, and 48 KiB shared memory. Profiling shows multi-column Vulkan decode improves aggregate throughput at N=2 but plateaus at N=4. Generic MMVQ shader keeps temp[NUM_COLS][NUM_ROWS] accumulators and loops over columns while decoding same quantized weights. Design focused two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation"
+      }
+    }
+  ],
+  "created": 1787057596,
+  "model": "qwen3.8-27b-q4km-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 272,
+    "total_tokens": 1296,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-hP4qyOlVxTKtepXTtBJbcdyMzlDtd0S7",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 272,
+    "prompt_ms": 40483.303,
+    "prompt_per_token_ms": 148.83567279411764,
+    "prompt_per_second": 6.718819361157364,
+    "predicted_n": 1024,
+    "predicted_ms": 303132.151,
+    "predicted_per_token_ms": 296.0274912109375,
+    "predicted_per_second": 3.3780646382178046,
+    "draft_n": 1023,
+    "draft_n_accepted": 681
+  }
+}

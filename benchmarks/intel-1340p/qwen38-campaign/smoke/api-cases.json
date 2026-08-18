@@ -1,0 +1,5 @@
+{
+  "none": {"model":"qwen3.8-27b-q4km-mtp","messages":[{"role":"user","content":"Reply with exactly API_OK and nothing else."}],"reasoning_effort":"none","temperature":0,"seed":731,"max_tokens":16,"stream":false},
+  "json": {"model":"qwen3.8-27b-q4km-mtp","messages":[{"role":"user","content":"Return a JSON object with integer field answer set to 42. No prose."}],"reasoning_effort":"none","temperature":0,"seed":731,"max_tokens":32,"response_format":{"type":"json_object"},"stream":false},
+  "tool": {"model":"qwen3.8-27b-q4km-mtp","messages":[{"role":"user","content":"Use the add tool to add 17 and 25."}],"reasoning_effort":"none","temperature":0,"seed":731,"max_tokens":64,"tool_choice":"required","tools":[{"type":"function","function":{"name":"add","description":"Add two integers","parameters":{"type":"object","properties":{"a":{"type":"integer"},"b":{"type":"integer"}},"required":["a","b"],"additionalProperties":false}}}],"stream":false}
+}

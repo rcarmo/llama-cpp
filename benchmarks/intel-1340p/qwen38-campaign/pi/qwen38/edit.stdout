@@ -1,0 +1,7 @@
+Fixed. The test now passes.
+
+**Root cause:** `src/clamp.ts` only applied the lower bound (`Math.max(min, value)`) and never clamped to `max`, so `clamp(12, 0, 10)` returned `12` instead of `10`.
+
+**Fix:** Changed the return to `Math.min(max, Math.max(min, value))` — the standard clamp idiom.
+
+Test result: `1 pass, 0 fail` (3 expect calls). No changes to `clamp.test.ts` or `package.json`.
