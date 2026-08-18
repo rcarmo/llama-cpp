@@ -15,6 +15,7 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Long-context and repository fallback | 99,104-token request; only matched repository-retrieval pass |
+| LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi; service disabled |
 | LattePanda Sigma | Ornith 1.0 35B, 128K | Validated | 124,341-token prompt completed |
 | LattePanda Sigma | Gemma 4 E4B, 128K | Primary local provider | Best overall matched quality; 25.77 generation tok/s |
 | LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Prompt-heavy alternative | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
@@ -48,6 +49,7 @@ Key entrypoints:
 
 - `tools/build-intel-1340p.sh` - selected CPU build;
 - `tools/run-intel-qwen-longctx.sh` - Qwen 128K service;
+- `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
 - `tools/run-intel-candidate.sh` - Ornith and Gemma profiles;
 - `tools/validate-intel-candidate.sh` - no-install candidate validation;
 - `tools/systemd/user/` - tracked user services.
@@ -152,22 +154,28 @@ Installation, Pi registration, diagnostics and rollback:
 
 ### Maple, Gemma and Qwen role comparison
 
-The matched campaign on 5-6 August 2026 used exact per-tokenizer 512, 4,096 and 32,768-token prompts, a 512-token prompt with 64 generated tokens, identical bounded API cases and identical real Pi tasks. Each model ran alone on eight P-core threads with its accepted service profile.
+The 5-6 August 2026 campaign used exact per-tokenizer 512, 4,096 and 32,768-token prompts, a 512-token prompt with 64 generated tokens, identical bounded API cases and identical real Pi tasks. The 18 August Qwen 3.8 follow-up retained those prompt sizes and test corpora. Each model ran alone on eight P-core threads with its accepted profile.
 
 | Model | Prompt 512 | Prompt 4K | Prompt 32K | Generation | Bounded API | Real Pi | Role |
 |---|---:|---:|---:|---:|---:|---:|---|
 | Maple exact TQ2/F32 | **76.03** | **71.79** | **56.91** | 18.77 | 4/6 | 3/4 | Fast prompt ingestion |
 | Gemma 4 E4B | 65.24 | 60.96 | 44.32 | **25.77** | 4/6 | 3/4 | Primary local model |
 | Qwen3.6 35B-A3B Q2 | 31.89 | 26.87 | 10.95 | 11.40 | 3/6 | **4/4** | Repository-grounded fallback |
+| Qwen 3.8 target | 6.88 | 6.34 | 3.21 | 2.33 | not run | not run | Target-only measurement |
+| Qwen 3.8 MTP-3 | 6.76 | 6.18 | not run | 3.47 | 4/6 | 2/4 | Manual compatibility and vision only |
 
-The blind substantive review ranked Gemma first, Qwen second and Maple third. Qwen alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
+The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwen3.6 second and Maple third. Qwen3.6 alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
 
-Maple remains useful for large prompt ingestion, but it does not replace Gemma for general interactive work. Qwen remains useful when repository grounding matters more than latency. The hosted default remains `github-copilot/gpt-5.6-terra`.
+Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. The disabled service on `127.0.0.1:8094` is suitable only for manual compatibility or vision checks.
 
-Full report, raw responses, telemetry, identities and validators:
+Maple remains useful for large prompt ingestion. Qwen3.6 remains useful when repository grounding matters more than latency. Neither model replaces Gemma for general interactive work, and Qwen 3.8 does not change those roles. The hosted default remains `github-copilot/gpt-5.6-terra`.
+
+Full reports, raw responses, telemetry, identities and validators:
 
 - [`benchmarks/intel-1340p/maple-qwen-campaign/report.md`](benchmarks/intel-1340p/maple-qwen-campaign/report.md)
 - [`benchmarks/intel-1340p/maple-qwen-campaign/README.md`](benchmarks/intel-1340p/maple-qwen-campaign/README.md)
+- [`benchmarks/intel-1340p/qwen38-campaign/report.md`](benchmarks/intel-1340p/qwen38-campaign/report.md)
+- [`benchmarks/intel-1340p/qwen38-campaign/README.md`](benchmarks/intel-1340p/qwen38-campaign/README.md)
 
 ### Iris Xe: measured and rejected
 

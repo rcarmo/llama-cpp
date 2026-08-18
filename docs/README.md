@@ -24,6 +24,8 @@ the repository root README.
 - [Maple agentic comparison](../benchmarks/intel-1340p/maple-preview/agentic/report.md)
 - [Matched Maple, Gemma and Qwen campaign](../benchmarks/intel-1340p/maple-qwen-campaign/report.md)
 - [Campaign evidence and reproduction index](../benchmarks/intel-1340p/maple-qwen-campaign/README.md)
+- [Qwen 3.8 27B Sigma campaign](../benchmarks/intel-1340p/qwen38-campaign/report.md)
+- [Qwen 3.8 evidence and reproduction index](../benchmarks/intel-1340p/qwen38-campaign/README.md)
 - [Expert-I/O baseline and controls](expert-io-adoption-baseline.md)
 - [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md)
 - [Intel CPU/Vulkan campaign report](../benchmarks/intel-1340p/final-report-20260731.md)
