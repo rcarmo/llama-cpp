@@ -3498,6 +3498,23 @@ static void test_template_output_peg_parsers(bool detailed_debug) {
 
         tst.test("Hello, world!\nWhat's up?").expect(message_assist).expect_reconstruction().run();
 
+        // Function-like content must not trigger the lazy tool grammar unless it is a complete,
+        // configured function opener.
+        tst.test("#include <functional>\nstd::function<void()> callback;")
+            .tools({ special_function_tool })
+            .expect_content("#include <functional>\nstd::function<void()> callback;")
+            .run();
+
+        tst.test("An incomplete <function marker is ordinary content.")
+            .tools({ special_function_tool })
+            .expect_content("An incomplete <function marker is ordinary content.")
+            .run();
+
+        tst.test("<function=unknown_function>\nnot a configured tool\n</function>")
+            .tools({ special_function_tool })
+            .expect_content("<function=unknown_function>\nnot a configured tool\n</function>")
+            .run();
+
         tst.test(
                "<tool_call>\n"
                "<function=special_function>\n"
