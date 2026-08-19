@@ -177,13 +177,33 @@ Full reports, raw responses, telemetry, identities and validators:
 - [`benchmarks/intel-1340p/qwen38-campaign/report.md`](benchmarks/intel-1340p/qwen38-campaign/report.md)
 - [`benchmarks/intel-1340p/qwen38-campaign/README.md`](benchmarks/intel-1340p/qwen38-campaign/README.md)
 
+### 18-19 August 2026 upstream adoption gates
+
+The latest adoption campaign tested selected upstream changes in isolated worktrees before commit `abdbeadf`. Correctness took precedence over local throughput. The retained small patch produced byte-identical fixed-prompt token IDs and first-token logits for Gemma, Qwen3.6, Qwen 3.8 and Maple.
+
+| Gate | Profile | Measured result | Decision |
+|---|---|---|---|
+| mmap quantisation eviction | Qwen3.6 22.85 GB input to 13.25 GB Q2_K | mmap wall time fell from 496.584 to 390.551 seconds and peak PSS from 24,875,134 to 4,562,491 KiB, an 81.66% PSS reduction; output remained byte-identical | Selected |
+| Non-mmap control | Same source and output | Wall time changed by +0.15% and peak PSS by +52 KiB; no swap | No regression |
+| CPU F16 V-cache conversion | 4,096-token prompt, 64 generated tokens, eight P-core threads | Mean end-to-end time improved by 0.40%, median by 0.48%, and generation throughput fell by 1.54%; output remained byte-identical | Rejected below the 2% gate |
+| Full-integration CPU | Release CPU suite | 64/64 tests passed in 44.70 seconds | Passed, but insufficient to promote the full integration |
+| Full-integration Vulkan | Normal runtime and result checker | Normal runtime passed 64/64 in 1,167.46 seconds; the checker failed 7/9 focused tests | Rejected for correctness |
+| Maple TQ2_0 Vulkan | Exact-head model, F32 K/V, Flash Attention off | Routed `MUL_MAT_ID` lost the device at `n=16` and `n=32`; sequential aggregate NRMSE was `5.334015e-6` and maximum KL was `1.152624e-10` | Rejected for correctness |
+| Full-integration long-context deployment | Integration-branch Gemma 128K and shorter Qwen3.6 MTP fixtures | The 95 C gate stopped Gemma at 24,681 processed prompt tokens and the Qwen3.6 MTP fixture at 1,353 | Incomplete; full integration not promoted and deployed roles unchanged |
+
+Maple's sequential Vulkan run retained top-1 agreement for 15/15 tokens and mean top-32 overlap of 32/32, but only 3/15 tokens met the NRMSE limit. Ranking agreement did not override the `< 1e-6` NRMSE and `< 2e-11` KL requirements.
+
+SYCL Q1_0 `MUL_MAT` errors reached `0.417105617` and `1.365789949` against a `0.000500000` limit. Graph mode repeated the corruption, and the graph-mode Q2_0 run did not complete. SpaceMIT Q5_0 dispatch was not adopted because no Q5_0 K3 fixture was available.
+
+After the later small-patch merge, the selected CPU build reported `b10579-abdbeadfb`, rebuilt all 330 targets and passed 59/59 main-branch tests. The deployed model roles and ports did not change.
+
 ### Iris Xe: measured and rejected
 
 Iris Xe remains a validation target, not the deployed inference backend.
 
-Vulkan passed 1,544/1,544 focused `MUL_MAT_ID`, `RMS_NORM`, `ROPE` and `SOFT_MAX` cases. Full Q2 offload generated 9.90 tok/s versus 14.90 tok/s on CPU; a Q4 10-layer split generated 7.62 tok/s versus 13.17 tok/s on CPU.
+The July Vulkan campaign passed 1,544/1,544 focused `MUL_MAT_ID`, `RMS_NORM`, `ROPE` and `SOFT_MAX` cases. Full Q2 offload generated 9.90 tok/s versus 14.90 tok/s on CPU; a Q4 10-layer split generated 7.62 tok/s versus 13.17 tok/s on CPU. The August result-checker failures and Maple device loss above prevent promotion of the newer upstream Vulkan paths.
 
-SYCL discovered the Level Zero device and passed focused model-shaped operations, but broad quant support, decode throughput and graph stability were insufficient. Full and partial offload regressed generation, and the tested Gemma graph split failed.
+The earlier SYCL campaign discovered the Level Zero device and passed its focused model-shaped operations, but broad quant support, decode throughput and graph stability were insufficient. Full and partial offload regressed generation, and the tested Gemma graph split failed. The August Q1_0 failures above keep SYCL blocked.
 
 Further Vulkan prototypes were also rejected:
 
