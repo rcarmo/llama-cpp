@@ -1,0 +1,19 @@
+[Unit]
+Description=Ornith 1.5 35B-A3B Q4_K_M 128K llama.cpp local provider
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/ornith-1.5-local-provider-runbook.md
+After=network-online.target
+Wants=network-online.target
+Conflicts=llama-gemma-local-provider.service llama-maple-local-provider.service llama-qwen-longctx.service llama-qwen38-local-provider.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/agent/workspace/projects/llama-cpp
+ExecStart=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-intel-candidate.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=120
+KillSignal=SIGTERM
+EnvironmentFile=%h/.config/llama-ornith-local-provider/service.env
+
+[Install]
+WantedBy=default.target

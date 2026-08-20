@@ -18,7 +18,8 @@ threads=${LLAMA_THREADS:-8}
 batch=${LLAMA_BATCH:-512}
 ubatch=${LLAMA_UBATCH:-128}
 kv=${LLAMA_KV:-f16}
-draft=${LLAMA_MTP_DEPTH:?set LLAMA_MTP_DEPTH}
+use_mtp=${LLAMA_USE_MTP:-1}
+draft=${LLAMA_MTP_DEPTH:-1}
 load_mode=${LLAMA_LOAD_MODE:-mmap}
 flash_attn=${LLAMA_FLASH_ATTN:-off}
 cache_ram=${LLAMA_CACHE_RAM_MIB:-0}
@@ -34,14 +35,15 @@ runtime=$build/runtime
 
 [[ -x $server ]] || { echo "missing llama-server: $server" >&2; exit 1; }
 [[ -s $model ]] || { echo "missing model: $model" >&2; exit 1; }
-[[ -z $draft_model || -s $draft_model ]] || { echo "missing draft model: $draft_model" >&2; exit 1; }
+[[ $use_mtp == 0 || -z $draft_model || -s $draft_model ]] || { echo "missing draft model: $draft_model" >&2; exit 1; }
 [[ $ctx =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_CTX must be positive" >&2; exit 2; }
 [[ $parallel =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_PARALLEL must be positive" >&2; exit 2; }
 (( parallel <= 32 )) || { echo "LLAMA_PARALLEL must not exceed 32" >&2; exit 2; }
 [[ $kv_unified == on || $kv_unified == off ]] || { echo "LLAMA_KV_UNIFIED must be on or off" >&2; exit 2; }
 [[ $cont_batching == on || $cont_batching == off ]] || { echo "LLAMA_CONT_BATCHING must be on or off" >&2; exit 2; }
 [[ $threads =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_THREADS must be positive" >&2; exit 2; }
-[[ $draft =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_MTP_DEPTH must be positive" >&2; exit 2; }
+[[ $use_mtp == 0 || $use_mtp == 1 ]] || { echo "LLAMA_USE_MTP must be 0 or 1" >&2; exit 2; }
+[[ $use_mtp == 0 || $draft =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_MTP_DEPTH must be positive when MTP is enabled" >&2; exit 2; }
 [[ $flash_attn == on || $flash_attn == off || $flash_attn == auto ]] || { echo "LLAMA_FLASH_ATTN must be on, off or auto" >&2; exit 2; }
 [[ $cache_ram =~ ^-1$|^[0-9]+$ ]] || { echo "LLAMA_CACHE_RAM_MIB must be -1 or a non-negative integer" >&2; exit 2; }
 [[ $cache_idle_slots == on || $cache_idle_slots == off ]] || { echo "LLAMA_CACHE_IDLE_SLOTS must be on or off" >&2; exit 2; }
@@ -58,12 +60,15 @@ export LD_LIBRARY_PATH="$build/bin:$runtime${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 export GGML_CPU_EXPERT_IO_PROFILE=${GGML_CPU_EXPERT_IO_PROFILE:-1}
 export GGML_CPU_EXPERT_IO_ADVISE_MODE=${GGML_CPU_EXPERT_IO_ADVISE_MODE:-off}
 
-spec=(
-  --spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max "$draft"
-  --spec-draft-threads "$threads" --spec-draft-threads-batch "$threads"
-  --spec-draft-type-k "$kv" --spec-draft-type-v "$kv"
-)
-[[ -z $draft_model ]] || spec+=(--model-draft "$draft_model")
+spec=()
+if [[ $use_mtp == 1 ]]; then
+  spec=(
+    --spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max "$draft"
+    --spec-draft-threads "$threads" --spec-draft-threads-batch "$threads"
+    --spec-draft-type-k "$kv" --spec-draft-type-v "$kv"
+  )
+  [[ -z $draft_model ]] || spec+=(--model-draft "$draft_model")
+fi
 
 cache=(
   --cache-prompt --cache-ram "$cache_ram" --cache-reuse "$cache_reuse"

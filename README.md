@@ -14,11 +14,12 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Long-context and repository fallback | 99,104-token request; only matched repository-retrieval pass |
-| LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi; service disabled |
-| LattePanda Sigma | Ornith 1.0 35B, 128K | Validated | 124,341-token prompt completed |
-| LattePanda Sigma | Gemma 4 E4B, 128K | Primary local provider | Best overall matched quality; 25.77 generation tok/s |
-| LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Prompt-heavy alternative | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
+| LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Sole enabled local provider | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
+| LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
+| LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
+| LattePanda Sigma | Ornith 1.0 35B, 128K | Historical validation | 124,341-token prompt completed |
+| LattePanda Sigma | Gemma 4 E4B, 128K | Validated; service disabled | Best overall matched quality; 25.77 generation tok/s |
+| LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Validated; service disabled | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
 | LattePanda Sigma | Iris Xe SYCL/Vulkan | Rejected | Correctness or local wins did not survive end-to-end gates |
 | SpaceMIT K3 | RVV/IME CPU backend | Selected | Qwen and Gemma live-verified |
 | SpaceMIT K3 | Direct recurrent-state writes | Selected service option | 5.05% mean Qwen generation gain |
@@ -125,30 +126,34 @@ Campaign records:
 - [`docs/intel-1340p-ornith-runbook.md`](docs/intel-1340p-ornith-runbook.md)
 - [`docs/intel-1340p-gemma4-runbook.md`](docs/intel-1340p-gemma4-runbook.md)
 
-### Gemma local Pi provider
+### Ornith 1.5 local Pi provider
 
-The deployed Sigma profile exposes `local-gemma/gemma-4-e4b-qat-mtp` on loopback at `127.0.0.1:8091`.
+The deployed Sigma profile exposes `local-ornith/ornith-1.5-35b-a3b-q4-k-m` on loopback at `127.0.0.1:8095`.
 
 | Setting | Value |
 |---|---|
 | Context per request | 131,072 tokens |
-| Aggregate context | 262,144 tokens |
-| Slots | 2 independent KV streams |
-| MTP depth | 3, separate assistant GGUF |
-| KV | F16 |
-| Prompt-state cache limit | 12,288 MiB, allocated on demand |
-| Reuse/checkpoints | 256-token reuse, 32 checkpoints, 8,192-token minimum spacing |
+| Slots | 1 |
+| Threads | 12 on CPU range `0-15` |
+| Batch / ubatch | 1,024 / 256 |
+| MTP | Disabled after measured regressions |
+| KV | Q8_0 with Flash Attention enabled |
+| Prompt cache | Enabled; no idle-slot RAM cache |
+| Reuse/checkpoints | No cross-request reuse; 32 checkpoints, 8,192-token minimum spacing |
 
-Two isolated 128K streams beat the queued single-slot profile on the fixed concurrency workload. Group wall time changed from 55.45 to 54.69 seconds for two requests and from 108.30 to 105.37 seconds for four requests. Two- and four-slot unified-KV profiles were slower. Extra callers run in two-request waves.
+The exact 32K profile processed prompts at 18.07 tok/s and generated at 6.80 tok/s. It peaked at 91 C under the 95 C tuning gate. Built-in Q8 MTP depth 1 reduced the matched 32K rates to 12.62 and 3.95 tok/s and used 7.54 GiB of process swap, so the service runs target-only.
 
 ```bash
-systemctl --user status llama-gemma-local-provider.service
-curl -fsS http://127.0.0.1:8091/health
-pi --provider local-gemma --model gemma-4-e4b-qat-mtp
+systemctl --user status llama-ornith-local-provider.service
+curl -fsS http://127.0.0.1:8095/health
+pi --provider local-ornith --model ornith-1.5-35b-a3b-q4-k-m
 ```
 
-Installation, Pi registration, diagnostics and rollback:
+The Gemma, Maple, Qwen3.6 and Qwen 3.8 services are disabled. Their weight files remain available for rollback.
 
+Installation, Pi registration, diagnostics, measurements and rollback:
+
+- [`docs/ornith-1.5-local-provider-runbook.md`](docs/ornith-1.5-local-provider-runbook.md)
 - [`docs/gemma-local-provider-runbook.md`](docs/gemma-local-provider-runbook.md)
 - [`docs/gemma-local-provider-benchmark-2026-08-02.md`](docs/gemma-local-provider-benchmark-2026-08-02.md)
 
@@ -168,7 +173,7 @@ The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwe
 
 Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. The disabled service on `127.0.0.1:8094` is suitable only for manual compatibility or vision checks.
 
-Maple remains useful for large prompt ingestion. Qwen3.6 remains useful when repository grounding matters more than latency. Neither model replaces Gemma for general interactive work, and Qwen 3.8 does not change those roles. The hosted default remains `github-copilot/gpt-5.6-terra`.
+These role assignments record the 5-6 August comparison. The 20 August Ornith 1.5 deployment superseded them: Ornith is the sole enabled local provider, while the Maple, Gemma and Qwen services are disabled with their weights preserved.
 
 Full reports, raw responses, telemetry, identities and validators:
 
@@ -195,7 +200,7 @@ Maple's sequential Vulkan run retained top-1 agreement for 15/15 tokens and mean
 
 SYCL Q1_0 `MUL_MAT` errors reached `0.417105617` and `1.365789949` against a `0.000500000` limit. Graph mode repeated the corruption, and the graph-mode Q2_0 run did not complete. SpaceMIT Q5_0 dispatch was not adopted because no Q5_0 K3 fixture was available.
 
-After the later small-patch merge, the selected CPU build reported `b10579-abdbeadfb`, rebuilt all 330 targets and passed 59/59 main-branch tests. The deployed model roles and ports did not change.
+After the later small-patch merge, the selected CPU build reported `b10579-abdbeadfb`, rebuilt all 330 targets and passed 59/59 main-branch tests. Model roles and ports did not change during that campaign. The separate 20 August Ornith 1.5 deployment replaced the enabled local provider.
 
 ### Iris Xe: measured and rejected
 
