@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #ifdef __APPLE__
@@ -776,6 +779,82 @@ struct ggml_backend_sched_split {
     struct ggml_cgraph graph;
 };
 
+// async execution of CPU splits (GGML_SCHED_ASYNC_CPU): a persistent worker
+// computes a CPU split while the main thread keeps launching later splits that
+// do not depend on it, so an independent GPU split overlaps the CPU compute
+struct ggml_sched_cpu_async {
+    std::thread             worker;
+    std::mutex              mtx;
+    std::condition_variable cv;
+    ggml_backend_t          job_backend = nullptr;
+    struct ggml_cgraph *    job_graph   = nullptr;
+    enum ggml_status        job_status  = GGML_STATUS_SUCCESS;
+    bool                    job_ready   = false;
+    bool                    job_done    = false;
+    bool                    stop        = false;
+    bool                    pending     = false; // main-thread view: a job is queued or running
+
+    ggml_sched_cpu_async() {
+        worker = std::thread([this]() {
+            for (;;) {
+                std::unique_lock<std::mutex> lock(mtx);
+                cv.wait(lock, [this]() { return job_ready || stop; });
+                if (stop) {
+                    return;
+                }
+                job_ready = false;
+                ggml_backend_t   backend = job_backend;
+                ggml_cgraph *    graph   = job_graph;
+                lock.unlock();
+
+                enum ggml_status status = ggml_backend_graph_compute_async(backend, graph);
+
+                lock.lock();
+                job_status = status;
+                job_done   = true;
+                cv.notify_all();
+            }
+        });
+    }
+
+    ~ggml_sched_cpu_async() {
+        // The graph view belongs to the scheduler. Drain queued/running work
+        // before the scheduler storage can be destroyed.
+        (void) join();
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            stop = true;
+        }
+        cv.notify_all();
+        worker.join();
+    }
+
+    void launch(ggml_backend_t backend, struct ggml_cgraph * graph) {
+        GGML_ASSERT(!pending);
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            job_backend = backend;
+            job_graph   = graph;
+            job_status  = GGML_STATUS_SUCCESS;
+            job_done    = false;
+            job_ready   = true;
+        }
+        cv.notify_all();
+        pending = true;
+    }
+
+    // wait for the in-flight job (if any); returns its status
+    enum ggml_status join() {
+        if (!pending) {
+            return GGML_STATUS_SUCCESS;
+        }
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this]() { return job_done; });
+        pending = false;
+        return job_status;
+    }
+};
+
 struct ggml_backend_sched {
     bool is_reset; // true if the scheduler has been reset since the last graph split
     bool is_alloc;
@@ -836,6 +915,11 @@ struct ggml_backend_sched {
     ggml_backend_event_t prefetch_free[GGML_SCHED_MAX_PREFETCH_SLOTS];
     bool prefetch_used[GGML_SCHED_MAX_PREFETCH_SLOTS];
     int prefetch_cur;
+
+    // One bounded scheduler-owned CPU worker. It remains dormant unless the
+    // owning context explicitly enables asynchronous CPU split execution.
+    struct ggml_sched_cpu_async * cpu_async;
+    bool async_cpu_enabled;
 
     int debug;
 
@@ -1700,6 +1784,14 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
     GGML_ASSERT(sched);
     struct ggml_backend_sched_split * splits = sched->splits;
 
+    if (sched->cpu_async->pending) {
+        // A job left over from an aborted eval references stale split memory.
+        enum ggml_status ec = sched->cpu_async->join();
+        if (ec != GGML_STATUS_SUCCESS) {
+            return ec;
+        }
+    }
+
     ggml_tensor * prev_ids_tensor = nullptr;
     std::vector<int32_t> ids;
     std::vector<ggml_bitset_t> used_ids;
@@ -1712,6 +1804,22 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         ggml_tensor * prefetch_input_cpy = NULL;
         ggml_backend_buffer_t prefetch_saved_buffer = NULL;
         void * prefetch_saved_data = NULL;
+
+        // an async CPU split may still be computing; join before anything that
+        // depends on it: another CPU split, or a split reading a CPU tensor
+        if (sched->async_cpu_enabled && sched->cpu_async->pending) {
+            bool must_join = split_backend_id == sched->n_backends - 1;
+            for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
+                ggml_backend_t input_backend = ggml_backend_sched_get_tensor_backend(sched, split->inputs[input_id]);
+                must_join = input_backend == sched->backends[sched->n_backends - 1];
+            }
+            if (must_join) {
+                enum ggml_status ec = sched->cpu_async->join();
+                if (ec != GGML_STATUS_SUCCESS) {
+                    return ec;
+                }
+            }
+        }
 
         // copy the input tensors to the split backend
         for (int input_id = 0; input_id < split->n_inputs; input_id++) {
@@ -1872,6 +1980,12 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         }
 
         if (!sched->callback_eval) {
+            if (sched->async_cpu_enabled && split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1) {
+                // run the CPU split on the worker; the loop continues launching
+                // later splits until one depends on this split's outputs
+                sched->cpu_async->launch(split_backend, &split->graph);
+                continue;
+            }
             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
             if (split_prefetch_slot != -1) {
                 // the kernels have captured the slot address at launch, safe to restore
@@ -1922,6 +2036,13 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
             if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
                 ggml_backend_event_record(sched->events[split_backend_id][sched->cur_copy], split_backend);
             }
+        }
+    }
+
+    if (sched->cpu_async->pending) {
+        enum ggml_status ec = sched->cpu_async->join();
+        if (ec != GGML_STATUS_SUCCESS) {
+            return ec;
         }
     }
 
@@ -2004,6 +2125,9 @@ ggml_backend_sched_t ggml_backend_sched_new(
     // default of 3 covers the gate/up/down expert tensors of one MoE layer
     sched->prefetch_n_slots = prefetch_n_slots <= 1 ? 3 : std::min(prefetch_n_slots, GGML_SCHED_MAX_PREFETCH_SLOTS);
 
+    sched->cpu_async = new ggml_sched_cpu_async();
+    sched->async_cpu_enabled = false;
+
     ggml_backend_sched_reset(sched);
 
     return sched;
@@ -2028,6 +2152,7 @@ void ggml_backend_sched_free(ggml_backend_sched_t sched) {
         }
         ggml_backend_free(sched->prefetch_backend);
     }
+    delete sched->cpu_async;
     ggml_gallocr_free(sched->galloc);
     ggml_free(sched->ctx);
     ggml_hash_set_free(&sched->hash_set);
@@ -2133,6 +2258,9 @@ enum ggml_status ggml_backend_sched_graph_compute_async(ggml_backend_sched_t sch
 
 void ggml_backend_sched_synchronize(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
+    if (sched->cpu_async->pending) {
+        (void) sched->cpu_async->join();
+    }
     for (int i = 0; i < sched->n_backends; i++) {
         ggml_backend_synchronize(sched->backends[i]);
     }
@@ -2145,6 +2273,15 @@ void ggml_backend_sched_synchronize(ggml_backend_sched_t sched) {
         // which avoids changes in the graph that could cause CUDA or other graphs to be disabled
         sched->next_copy = 0;
     }
+}
+
+void ggml_backend_sched_set_async_cpu(ggml_backend_sched_t sched, bool enabled) {
+    GGML_ASSERT(sched);
+    if (sched->async_cpu_enabled == enabled) {
+        return;
+    }
+    ggml_backend_sched_synchronize(sched);
+    sched->async_cpu_enabled = enabled;
 }
 
 void ggml_backend_sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback callback, void * user_data) {
