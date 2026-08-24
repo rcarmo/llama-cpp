@@ -1,0 +1,27 @@
+{
+  "id": "cached-followup",
+  "description": "Dependent follow-up that reuses a long technical prefix.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are maintaining an inference optimization campaign. Keep answers concise, technical, and reproducible."
+      },
+      {
+        "role": "user",
+        "content": "Campaign facts: Qwen3.6 35B-A3B uses hybrid attention and MoE layers. The Intel i5-1340P exposes AVX2 and AVX-VNNI; Iris Xe exposes FP16 and integer dot product but no cooperative matrices. CPU generation is currently faster than full Vulkan. Native MTP draft-1 has high acceptance and improves CPU generation. Vulkan multi-column Q2_K decode gains at N=2 but plateaus at N=4. Disabling MMVQ or integer dot product removes the gain. A same-session CPU/Vulkan branch-overlap prototype was correct but regressed because both devices streamed weights through shared LPDDR. The next work targets a model-specific exact-row Vulkan kernel and reduced MTP orchestration overhead. State the three invariants that all promoted changes must preserve."
+      },
+      {
+        "role": "assistant",
+        "content": "The change must preserve deterministic target logits and token acceptance, maintain correct KV and recurrent rollback state across partial MTP acceptance, and retain the generic Vulkan path as a safe fallback for unsupported shapes or devices."
+      },
+      {
+        "role": "user",
+        "content": "Now turn those invariants into a compact release gate with measurable thresholds for correctness, performance, stability, and fallback coverage."
+      }
+    ],
+    "max_tokens": 256,
+    "temperature": 0,
+    "seed": 404
+  }
+}

@@ -1,0 +1,219 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.189 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.425 I srv          init: The UI is disabled
+0.00.004.428 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.004.611 W srv  llama_server: -----------------
+0.00.004.612 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.613 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.613 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.613 W srv  llama_server: -----------------
+0.00.006.202 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.01.768.828 I common_speculative_init_result: creating MTP draft context against the target model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.01.923.790 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.01.968.345 I srv          init: chat template supports preserving reasoning, consider enabling it via --reasoning-preserve
+0.01.968.420 I srv  llama_server: model loaded
+0.01.968.428 I srv  llama_server: listening on http://127.0.0.1:8292
+0.02.324.579 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.324.965 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.10.703.020 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=329 us=246468
+0.10.703.932 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=329 us=901
+0.10.703.936 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=329 us=247395 ok=1
+0.10.703.969 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    329, progress = 0.11, t =   8.38 s / 39.26 tokens per second
+0.24.100.232 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=512 us=409622
+0.24.102.171 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=512 us=1930
+0.24.102.173 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=512 us=411573 ok=1
+0.24.102.197 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    841, progress = 0.27, t =  21.78 s / 38.62 tokens per second
+0.38.098.515 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=512 us=463888
+0.38.098.959 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=512 us=435
+0.38.098.963 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=512 us=464345 ok=1
+0.38.098.990 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1353, progress = 0.44, t =  35.77 s / 37.82 tokens per second
+0.52.757.659 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=512 us=521741
+0.52.758.333 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=512 us=662
+0.52.758.336 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=512 us=522431 ok=1
+0.52.758.362 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1865, progress = 0.61, t =  50.43 s / 36.98 tokens per second
+1.08.112.127 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=512 us=589936
+1.08.112.575 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=512 us=442
+1.08.112.578 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=512 us=590396 ok=1
+1.08.112.603 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2377, progress = 0.77, t =  65.79 s / 36.13 tokens per second
+1.24.189.592 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=512 us=651653
+1.24.190.263 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=512 us=663
+1.24.190.267 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=512 us=652340 ok=1
+1.24.190.307 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2889, progress = 0.94, t =  81.87 s / 35.29 tokens per second
+1.25.749.728 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=47 us=71533
+1.25.749.776 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=47 us=40
+1.25.749.777 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=47 us=71587 ok=1
+1.25.749.798 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2936, progress = 0.96, t =  83.42 s / 35.19 tokens per second
+1.29.988.628 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=128 us=174796
+1.29.988.778 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=128 us=144
+1.29.988.781 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=128 us=174957 ok=1
+1.29.988.804 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   3064, progress = 1.00, t =  87.66 s / 34.95 tokens per second
+1.30.194.860 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=4 us=7484
+1.30.194.869 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=4 us=5
+1.30.194.870 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=4 us=7497 ok=1
+1.30.220.640 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25070
+1.30.378.949 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6241
+1.30.378.958 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=5
+1.30.378.958 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6254 ok=1
+1.30.378.960 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=158286 ok=1
+1.30.380.353 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1082
+1.30.406.957 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=26538
+1.30.564.967 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5502
+1.30.564.976 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.30.564.976 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5515 ok=1
+1.30.564.978 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=157995 ok=1
+1.30.566.267 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=992
+1.30.591.344 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25020
+1.30.742.552 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5753
+1.30.742.559 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=3
+1.30.742.560 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5764 ok=1
+1.30.742.561 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=151194 ok=1
+1.30.743.884 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1026
+1.30.769.175 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25238
+1.30.921.686 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5864
+1.30.921.695 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=5
+1.30.921.695 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5878 ok=1
+1.30.921.697 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=152498 ok=1
+1.30.923.051 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1054
+1.30.948.075 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24973
+1.31.099.685 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6101
+1.31.099.692 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.31.099.693 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6112 ok=1
+1.31.099.694 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=151595 ok=1
+1.31.101.065 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1072
+1.31.126.118 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24999
+1.31.278.212 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6090
+1.31.278.219 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.31.278.220 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6101 ok=1
+1.31.278.221 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=152079 ok=1
+1.31.278.931 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=0 us=405
+1.31.303.893 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24904
+1.31.458.337 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5960
+1.31.458.345 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.31.458.345 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5972 ok=1
+1.31.458.347 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=154431 ok=1
+1.31.459.052 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=0 us=398
+1.31.484.016 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24911
+1.31.646.181 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6358
+1.31.646.189 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.31.646.190 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6371 ok=1
+1.31.646.191 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=162153 ok=1
+1.31.647.602 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1097
+1.31.673.902 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=26248
+1.31.830.164 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5906
+1.31.830.172 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.31.830.172 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5918 ok=1
+1.31.830.174 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=156248 ok=1
+1.31.831.524 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1041
+1.31.856.522 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24945
+1.32.018.655 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5818
+1.32.018.667 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=5
+1.32.018.667 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5837 ok=1
+1.32.018.670 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=162124 ok=1
+1.32.020.061 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1089
+1.32.045.090 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24971
+1.32.195.818 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6039
+1.32.195.828 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.32.195.828 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6053 ok=1
+1.32.195.830 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=150713 ok=1
+1.32.197.169 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1042
+1.32.222.355 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25135
+1.32.373.072 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5729
+1.32.373.081 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.32.373.081 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5742 ok=1
+1.32.373.082 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=150703 ok=1
+1.32.374.125 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=1 us=742
+1.32.399.135 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24953
+1.32.551.050 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5667
+1.32.551.059 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.32.551.059 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5679 ok=1
+1.32.551.061 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=151902 ok=1
+1.32.552.373 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1014
+1.32.577.413 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24979
+1.32.732.306 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6326
+1.32.732.316 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.32.732.316 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6339 ok=1
+1.32.732.318 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=154884 ok=1
+1.32.733.711 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1073
+1.32.761.230 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=27466
+1.32.928.953 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6042
+1.32.928.963 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.32.928.964 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6055 ok=1
+1.32.928.965 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=167710 ok=1
+1.32.930.356 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1088
+1.32.955.663 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25261
+1.33.109.902 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5906
+1.33.109.910 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=3
+1.33.109.911 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5917 ok=1
+1.33.109.912 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=154227 ok=1
+1.33.111.246 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1031
+1.33.136.304 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=25013
+1.33.286.234 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5806
+1.33.286.243 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.33.286.244 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5818 ok=1
+1.33.286.245 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=149919 ok=1
+1.33.287.586 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1036
+1.33.312.624 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24994
+1.33.466.368 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5840
+1.33.466.377 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.33.466.378 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5852 ok=1
+1.33.466.379 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=153732 ok=1
+1.33.467.694 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1005
+1.33.492.736 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24990
+1.33.651.764 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5975
+1.33.651.771 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.33.651.771 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5985 ok=1
+1.33.651.773 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=159015 ok=1
+1.33.653.138 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1069
+1.33.678.170 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=24989
+1.33.835.130 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=6183
+1.33.835.143 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.33.835.143 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=6199 ok=1
+1.33.835.145 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=156954 ok=1
+1.33.836.487 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=1036
+1.33.862.975 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=26431
+1.34.023.415 I spec      process: GGML_SPECULATIVE_PROFILE phase=draft_catchup rows=3 us=5887
+1.34.023.423 I spec      process: GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=3 us=4
+1.34.023.423 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=5903 ok=1
+1.34.023.424 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=160426 ok=1
+1.34.024.732 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept rows=3 accepted=2 us=995
+1.34.024.774 I slot print_timing: id  0 | task 1 | prompt eval time =   87870.55 ms /  3068 tokens (   28.64 ms per token,    34.91 tokens per second)
+1.34.024.780 I slot print_timing: id  0 | task 1 |        eval time =    3829.21 ms /    59 tokens (   64.90 ms per token,    15.41 tokens per second)
+1.34.024.781 I slot print_timing: id  0 | task 1 |       total time =   91699.76 ms /  3127 tokens
+1.34.024.783 I slot print_timing: id  0 | task 1 |    graphs reused =         28
+1.34.024.786 I slot print_timing: id  0 | task 1 | draft acceptance = 0.88095 (   37 accepted /    42 generated), mean len =  2.76
+1.34.024.896 I slot      release: id  0 | task 1 | stop processing: n_tokens = 3126, truncated = 0
+1.35.171.789 I srv    operator(): operator(): cleaning up before exit...
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=ADD family=other calls=21540 wall_us=266271 active_thread_us=1448024 capacity_us=2130168 logical_read_bytes=79090082560 logical_write_bytes=10538341120
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=MUL family=other calls=7470 wall_us=1031842 active_thread_us=6338368 capacity_us=8254736 logical_read_bytes=13701044380 logical_write_bytes=11590972160
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=DIV family=other calls=2010 wall_us=4455 active_thread_us=11740 capacity_us=35640 logical_read_bytes=4625820 logical_write_bytes=4111840
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SUM_ROWS family=other calls=2010 wall_us=4132 active_thread_us=5518 capacity_us=33056 logical_read_bytes=4111840 logical_write_bytes=513980
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=CONCAT family=other calls=1530 wall_us=1628014 active_thread_us=1632858 capacity_us=13024112 logical_read_bytes=3273441280 logical_write_bytes=3273441280
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=RMS_NORM family=other calls=6918 wall_us=278872 active_thread_us=1806715 capacity_us=2230976 logical_read_bytes=4949630976 logical_write_bytes=4384884736
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=L2_NORM family=other calls=2880 wall_us=112646 active_thread_us=697157 capacity_us=901168 logical_read_bytes=6088949760 logical_write_bytes=1539932160
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=MUL_MAT family=matrix calls=22038 wall_us=31605229 active_thread_us=245577495 capacity_us=252841832 logical_read_bytes=108727396352 logical_write_bytes=10084796860
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=MUL_MAT_ID family=matrix calls=6030 wall_us=37757601 active_thread_us=300934648 capacity_us=302060808 logical_read_bytes=657199427008 logical_write_bytes=12631572480
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SCALE family=other calls=2880 wall_us=17908 active_thread_us=14336 capacity_us=143264 logical_read_bytes=131727360 logical_write_bytes=131727360
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=CPY family=copy calls=8640 wall_us=286085 active_thread_us=1602743 capacity_us=2288680 logical_read_bytes=28081375800 logical_write_bytes=9421455360
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=CONT family=copy calls=570 wall_us=24388 active_thread_us=152756 capacity_us=195104 logical_read_bytes=1130076160 logical_write_bytes=565329920
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=GET_ROWS family=other calls=8089 wall_us=310056 active_thread_us=330851 capacity_us=2480448 logical_read_bytes=58801249080 logical_write_bytes=3218130072
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SET_ROWS family=copy calls=1140 wall_us=5983 active_thread_us=25269 capacity_us=47864 logical_read_bytes=5222235280 logical_write_bytes=5080350720
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SOFT_MAX family=attention calls=2010 wall_us=23011 active_thread_us=116476 capacity_us=184088 logical_read_bytes=131578880 logical_write_bytes=131578880
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=ROPE family=attention calls=1140 wall_us=37055 active_thread_us=218462 capacity_us=296440 logical_read_bytes=637100320 logical_write_bytes=635996160
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=CLAMP family=other calls=2010 wall_us=4532 active_thread_us=10269 capacity_us=36256 logical_read_bytes=513980 logical_write_bytes=513980
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=PAD family=other calls=43 wall_us=42575 active_thread_us=69542 capacity_us=340600 logical_read_bytes=42711040 logical_write_bytes=85422080
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=ARGSORT family=other calls=2010 wall_us=238308 active_thread_us=1593522 capacity_us=1906464 logical_read_bytes=131578880 logical_write_bytes=131578880
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=TOP_K family=other calls=43 wall_us=8787 active_thread_us=8796 capacity_us=70296 logical_read_bytes=42711040 logical_write_bytes=1720
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=FLASH_ATTN_EXT family=attention calls=570 wall_us=12536720 active_thread_us=94618185 capacity_us=100293760 logical_read_bytes=2224647680 logical_write_bytes=565329920
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SSM_CONV family=recurrent calls=1440 wall_us=576405 active_thread_us=3200198 capacity_us=4611240 logical_read_bytes=3410165760 logical_write_bytes=3079864320
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=GATED_DELTA_NET family=recurrent calls=1440 wall_us=4319332 active_thread_us=26333367 capacity_us=34554656 logical_read_bytes=7640163840 logical_write_bytes=10599628800
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=UNARY family=other calls=8340 wall_us=298938 active_thread_us=1558813 capacity_us=2391504 logical_read_bytes=5209701820 logical_write_bytes=5209701820
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=GLU family=other calls=4020 wall_us=127151 active_thread_us=748910 capacity_us=1017208 logical_read_bytes=4736839680 logical_write_bytes=2368419840
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=matrix calls=28068 wall_us=69362830 active_thread_us=546512143 capacity_us=554902640 idle_or_sync_us=8390497 logical_read_bytes=765926823360 logical_write_bytes=22716369340
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=attention calls=3720 wall_us=12596786 active_thread_us=94953123 capacity_us=100774288 idle_or_sync_us=5821165 logical_read_bytes=2993326880 logical_write_bytes=1332904960
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=recurrent calls=2880 wall_us=4895737 active_thread_us=29533565 capacity_us=39165896 idle_or_sync_us=9632331 logical_read_bytes=11050329600 logical_write_bytes=13679493120
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=copy calls=10350 wall_us=316456 active_thread_us=1780768 capacity_us=2531648 idle_or_sync_us=750880 logical_read_bytes=34433687240 logical_write_bytes=15067136000
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=other calls=71793 wall_us=4374487 active_thread_us=16275419 capacity_us=34995896 idle_or_sync_us=18720477 logical_read_bytes=176208919496 logical_write_bytes=42477693028
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=total graphs=138 graph_us=91568524 node_wall_us=91546296 active_thread_us=689055018 capacity_us=732370368 idle_or_sync_us=43315350 logical_read_bytes=990613086576 logical_write_bytes=95273596448
+GGML_CPU_EXPERT_IO_PROFILE nodes=126 selections=1008 unique=1008 duplicates=0 repeated=741 invalid_ids=0 ranges=1008 range_bytes=1123024896 resident_pages=1008 sampled_pages=1008 advice_calls=0 advice_bytes=0 advice_failures=0 advice_skips=0 advice_us=0 advice_slow=0 advice_disabled=0 resident_skips=0

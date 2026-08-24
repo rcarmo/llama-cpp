@@ -1,0 +1,86 @@
+[state]
+llama-qwen38-local-provider.service	active=inactive	enabled=disabled
+llama-gemma-local-provider.service	active=active	enabled=enabled
+llama-maple-local-provider.service	active=active	enabled=enabled
+llama-qwen-longctx.service	active=active	enabled=enabled
+pi-active-model=opencode-zen/minimax-m2.5-free
+[health]
+8091	{"status":"ok"}
+8093	{"status":"ok"}
+8090	{"status":"ok"}
+[unit]
+# /var/home/agent/.config/systemd/user/llama-qwen38-local-provider.service
+[Unit]
+Description=Qwen 3.8 27B local llama.cpp provider (manual, memory-exclusive)
+After=network-online.target
+Wants=network-online.target
+Conflicts=llama-gemma-local-provider.service llama-maple-local-provider.service llama-qwen-longctx.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/agent/workspace/projects/llama-cpp
+Environment=LLAMA_HOST=127.0.0.1
+Environment=LLAMA_PORT=8094
+Environment=LLAMA_CTX=8192
+Environment=LLAMA_KV=q4_0
+Environment=LLAMA_MTP_DEPTH=3
+ExecStart=/var/home/agent/workspace/projects/llama-cpp/tools/run-intel-qwen38.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=45
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=default.target
+
+# /usr/lib/systemd/user/service.d/10-timeout-abort.conf
+# This file is part of the systemd package.
+# See https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer.
+#
+# To facilitate debugging when a service fails to stop cleanly,
+# TimeoutStopFailureMode=abort is set to "crash" services that fail to stop in
+# the time allotted. This will cause the service to be terminated with SIGABRT
+# and a coredump to be generated.
+#
+# To undo this configuration change, create a mask file:
+#   sudo mkdir -p /etc/systemd/user/service.d
+#   sudo ln -sv /dev/null /etc/systemd/user/service.d/10-timeout-abort.conf
+
+[Service]
+TimeoutStopFailureMode=abort
+[pi-model]
+{
+  "activeModel": "opencode-zen/minimax-m2.5-free",
+  "qwen38": {
+    "baseUrl": "http://127.0.0.1:8094/v1",
+    "api": "openai-completions",
+    "apiKey": "local",
+    "compat": {
+      "supportsDeveloperRole": false,
+      "supportsReasoningEffort": true,
+      "supportsStore": false,
+      "supportsStrictMode": true,
+      "supportsOpenAIGrammarTools": false,
+      "maxTokensField": "max_tokens",
+      "thinkingFormat": "qwen-chat-template"
+    },
+    "models": [
+      {
+        "id": "qwen3.8-27b-q4km-mtp",
+        "name": "Qwen 3.8 27B Q4_K_M MTP (Local 8K)",
+        "reasoning": true,
+        "input": [
+          "text"
+        ],
+        "contextWindow": 8192,
+        "maxTokens": 4096,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0
+        }
+      }
+    ]
+  }
+}

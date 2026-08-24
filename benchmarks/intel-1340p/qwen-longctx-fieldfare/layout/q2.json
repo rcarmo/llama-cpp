@@ -1,0 +1,4194 @@
+{
+  "model": "/var/home/agent/workspace/projects/models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+  "file_size": 12574128416,
+  "gguf_alignment": 32,
+  "gguf_data_offset": 10991392,
+  "mmap_backed": true,
+  "expert_layers": 41,
+  "ranges_per_expert": 3,
+  "layers": [
+    {
+      "layer": 0,
+      "projections": {
+        "down": {
+          "name": "blk.0.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 664008480,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.0.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 767629088,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.0.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 848049952,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 767629088,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 848049952,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 664008480,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "projections": {
+        "down": {
+          "name": "blk.1.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 951220768,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.1.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1054841376,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.1.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1135262240,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 1054841376,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 1135262240,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 951220768,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "projections": {
+        "down": {
+          "name": "blk.2.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 1238433056,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.2.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1342053664,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.2.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1422474528,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 1342053664,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 1422474528,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 1238433056,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "projections": {
+        "down": {
+          "name": "blk.3.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 1527367712,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.3.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1630988320,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.3.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1711409184,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 1630988320,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 1711409184,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 1527367712,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "projections": {
+        "down": {
+          "name": "blk.4.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 1807042592,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.4.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1910663200,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.4.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 1991084064,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 1910663200,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 1991084064,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 1807042592,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 5,
+      "projections": {
+        "down": {
+          "name": "blk.5.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 2094254880,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.5.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2197875488,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.5.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2278296352,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 2197875488,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 2278296352,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 2094254880,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 6,
+      "projections": {
+        "down": {
+          "name": "blk.6.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 2381467168,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.6.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2485087776,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.6.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2565508640,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 2485087776,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 2565508640,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 2381467168,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 7,
+      "projections": {
+        "down": {
+          "name": "blk.7.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 2670401824,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.7.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2774022432,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.7.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 2854443296,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 2774022432,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 2854443296,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 2670401824,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 8,
+      "projections": {
+        "down": {
+          "name": "blk.8.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 2950076704,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.8.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3053697312,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.8.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3134118176,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 3053697312,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 3134118176,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 2950076704,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 9,
+      "projections": {
+        "down": {
+          "name": "blk.9.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 3237288992,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.9.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3340909600,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.9.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3421330464,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 3340909600,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 3421330464,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 3237288992,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 10,
+      "projections": {
+        "down": {
+          "name": "blk.10.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 3524501280,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.10.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3628121888,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.10.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3708542752,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 3628121888,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 3708542752,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 3524501280,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 11,
+      "projections": {
+        "down": {
+          "name": "blk.11.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 3813435936,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.11.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3917056544,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.11.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 3997477408,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 3917056544,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 3997477408,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 3813435936,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 12,
+      "projections": {
+        "down": {
+          "name": "blk.12.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 4093110816,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.12.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4196731424,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.12.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4277152288,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 4196731424,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 4277152288,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 4093110816,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 13,
+      "projections": {
+        "down": {
+          "name": "blk.13.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 4380323104,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.13.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4483943712,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.13.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4564364576,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 4483943712,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 4564364576,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 4380323104,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 14,
+      "projections": {
+        "down": {
+          "name": "blk.14.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 4667535392,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.14.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4771156000,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.14.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 4851576864,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 4771156000,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 4851576864,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 4667535392,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 15,
+      "projections": {
+        "down": {
+          "name": "blk.15.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 4956470048,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.15.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5060090656,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.15.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5140511520,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 5060090656,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 5140511520,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 4956470048,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 16,
+      "projections": {
+        "down": {
+          "name": "blk.16.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 5236144928,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.16.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5339765536,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.16.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5420186400,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 5339765536,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 5420186400,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 5236144928,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 17,
+      "projections": {
+        "down": {
+          "name": "blk.17.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 5523357216,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.17.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5626977824,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.17.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5707398688,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 5626977824,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 5707398688,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 5523357216,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 18,
+      "projections": {
+        "down": {
+          "name": "blk.18.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 5810569504,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.18.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5914190112,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.18.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 5994610976,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 5914190112,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 5994610976,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 5810569504,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 19,
+      "projections": {
+        "down": {
+          "name": "blk.19.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 6099504160,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.19.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6203124768,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.19.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6283545632,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 6203124768,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 6283545632,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 6099504160,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 20,
+      "projections": {
+        "down": {
+          "name": "blk.20.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 6379179040,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.20.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6482799648,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.20.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6563220512,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 6482799648,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 6563220512,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 6379179040,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 21,
+      "projections": {
+        "down": {
+          "name": "blk.21.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 6666391328,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.21.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6770011936,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.21.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 6850432800,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 6770011936,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 6850432800,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 6666391328,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 22,
+      "projections": {
+        "down": {
+          "name": "blk.22.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 6953603616,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.22.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7057224224,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.22.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7137645088,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 7057224224,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 7137645088,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 6953603616,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 23,
+      "projections": {
+        "down": {
+          "name": "blk.23.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 7242538272,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.23.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7346158880,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.23.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7426579744,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 7346158880,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 7426579744,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 7242538272,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 24,
+      "projections": {
+        "down": {
+          "name": "blk.24.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 7522213152,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.24.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7625833760,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.24.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7706254624,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 7625833760,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 7706254624,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 7522213152,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 25,
+      "projections": {
+        "down": {
+          "name": "blk.25.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 7809425440,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.25.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7913046048,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.25.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 7993466912,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 7913046048,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 7993466912,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 7809425440,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 26,
+      "projections": {
+        "down": {
+          "name": "blk.26.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 8096637728,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.26.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8200258336,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.26.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8280679200,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 8200258336,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 8280679200,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 8096637728,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 27,
+      "projections": {
+        "down": {
+          "name": "blk.27.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 8385572384,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.27.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8489192992,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.27.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8569613856,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 8489192992,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 8569613856,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 8385572384,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 28,
+      "projections": {
+        "down": {
+          "name": "blk.28.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 8665247264,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.28.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8768867872,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.28.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 8849288736,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 8768867872,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 8849288736,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 8665247264,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 29,
+      "projections": {
+        "down": {
+          "name": "blk.29.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 8952459552,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.29.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9056080160,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.29.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9136501024,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 9056080160,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 9136501024,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 8952459552,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 30,
+      "projections": {
+        "down": {
+          "name": "blk.30.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 9239671840,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.30.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9343292448,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.30.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9423713312,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 9343292448,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 9423713312,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 9239671840,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 31,
+      "projections": {
+        "down": {
+          "name": "blk.31.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 9528606496,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.31.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9632227104,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.31.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9712647968,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 9632227104,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 9712647968,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 9528606496,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 32,
+      "projections": {
+        "down": {
+          "name": "blk.32.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 9808281376,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.32.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9911901984,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.32.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 9992322848,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 9911901984,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 9992322848,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 9808281376,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 33,
+      "projections": {
+        "down": {
+          "name": "blk.33.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 10095493664,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.33.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10199114272,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.33.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10279535136,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 10199114272,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 10279535136,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 10095493664,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 34,
+      "projections": {
+        "down": {
+          "name": "blk.34.ffn_down_exps.weight",
+          "type": "23",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            272
+          ],
+          "storage_strides": [
+            557056,
+            272,
+            1
+          ],
+          "tensor_offset": 10382705952,
+          "tensor_bytes": 142606336,
+          "expert_count": 256,
+          "expert_bytes": 557056,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.34.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10526172448,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.34.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10606593312,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 10526172448,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 10606593312,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 10382705952,
+              "length": 557056
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 35,
+      "projections": {
+        "down": {
+          "name": "blk.35.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 10711486496,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.35.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10815107104,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.35.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 10895527968,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 10815107104,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 10895527968,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 10711486496,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 36,
+      "projections": {
+        "down": {
+          "name": "blk.36.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 10991161376,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.36.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11094781984,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.36.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11175202848,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 11094781984,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 11175202848,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 10991161376,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 37,
+      "projections": {
+        "down": {
+          "name": "blk.37.ffn_down_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            196
+          ],
+          "storage_strides": [
+            401408,
+            196,
+            1
+          ],
+          "tensor_offset": 11278373664,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.37.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11381994272,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.37.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11462415136,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 11381994272,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 11462415136,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 11278373664,
+              "length": 401408
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 38,
+      "projections": {
+        "down": {
+          "name": "blk.38.ffn_down_exps.weight",
+          "type": "23",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            272
+          ],
+          "storage_strides": [
+            557056,
+            272,
+            1
+          ],
+          "tensor_offset": 11565585952,
+          "tensor_bytes": 142606336,
+          "expert_count": 256,
+          "expert_bytes": 557056,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.38.ffn_gate_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11709052448,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.38.ffn_up_exps.weight",
+          "type": "17",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            592
+          ],
+          "storage_strides": [
+            303104,
+            592,
+            1
+          ],
+          "tensor_offset": 11789473312,
+          "tensor_bytes": 77594624,
+          "expert_count": 256,
+          "expert_bytes": 303104,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 11709052448,
+              "length": 303104
+            },
+            {
+              "projection": "up",
+              "offset": 11789473312,
+              "length": 303104
+            },
+            {
+              "projection": "down",
+              "offset": 11565585952,
+              "length": 557056
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 39,
+      "projections": {
+        "down": {
+          "name": "blk.39.ffn_down_exps.weight",
+          "type": "23",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            272
+          ],
+          "storage_strides": [
+            557056,
+            272,
+            1
+          ],
+          "tensor_offset": 11898216736,
+          "tensor_bytes": 142606336,
+          "expert_count": 256,
+          "expert_bytes": 557056,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.39.ffn_gate_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            784
+          ],
+          "storage_strides": [
+            401408,
+            784,
+            1
+          ],
+          "tensor_offset": 12041937184,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.39.ffn_up_exps.weight",
+          "type": "18",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            784
+          ],
+          "storage_strides": [
+            401408,
+            784,
+            1
+          ],
+          "tensor_offset": 12147663136,
+          "tensor_bytes": 102760448,
+          "expert_count": 256,
+          "expert_bytes": 401408,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 12041937184,
+              "length": 401408
+            },
+            {
+              "projection": "up",
+              "offset": 12147663136,
+              "length": 401408
+            },
+            {
+              "projection": "down",
+              "offset": 11898216736,
+              "length": 557056
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "layer": 40,
+      "projections": {
+        "down": {
+          "name": "blk.40.ffn_down_exps.weight",
+          "type": "11",
+          "logical_shape": [
+            512,
+            2048,
+            256
+          ],
+          "storage_shape": [
+            256,
+            2048,
+            220
+          ],
+          "storage_strides": [
+            450560,
+            220,
+            1
+          ],
+          "tensor_offset": 12270324000,
+          "tensor_bytes": 115343360,
+          "expert_count": 256,
+          "expert_bytes": 450560,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "gate": {
+          "name": "blk.40.ffn_gate_exps.weight",
+          "type": "10",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            672
+          ],
+          "storage_strides": [
+            344064,
+            672,
+            1
+          ],
+          "tensor_offset": 12386527520,
+          "tensor_bytes": 88080384,
+          "expert_count": 256,
+          "expert_bytes": 344064,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        },
+        "up": {
+          "name": "blk.40.ffn_up_exps.weight",
+          "type": "10",
+          "logical_shape": [
+            2048,
+            512,
+            256
+          ],
+          "storage_shape": [
+            256,
+            512,
+            672
+          ],
+          "storage_strides": [
+            344064,
+            672,
+            1
+          ],
+          "tensor_offset": 12476381472,
+          "tensor_bytes": 88080384,
+          "expert_count": 256,
+          "expert_bytes": 344064,
+          "contiguous_outer_experts": true,
+          "aligned": true
+        }
+      },
+      "sample_experts": [
+        {
+          "expert": 0,
+          "ranges": [
+            {
+              "projection": "gate",
+              "offset": 12386527520,
+              "length": 344064
+            },
+            {
+              "projection": "up",
+              "offset": 12476381472,
+              "length": 344064
+            },
+            {
+              "projection": "down",
+              "offset": 12270324000,
+              "length": 450560
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,285 @@
+main: using seed 97500953
+|     Model arch.|                             Device|Config|   NMSE vs. CPU|Roundtrip|
+|----------------|-----------------------------------|------|---------------|---------|
+|            clip|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            clip|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           llama|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           llama|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           llama|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           llama|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          llama4|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          llama4|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            deci|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            deci|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          falcon|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          falcon|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        baichuan|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        baichuan|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            grok|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            grok|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            gpt2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            gpt2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            gptj|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            gptj|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         gptneox|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         gptneox|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|             mpt|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|             mpt|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       starcoder|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       starcoder|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          refact|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          refact|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          refact|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          refact|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            bert|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            bert|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     modern-bert|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     modern-bert|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      nomic-bert|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      nomic-bert|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|  nomic-bert-moe|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|  nomic-bert-moe|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        neo-bert|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        neo-bert|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    jina-bert-v2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    jina-bert-v2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    jina-bert-v3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    jina-bert-v3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        eurobert|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        eurobert|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           bloom|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           bloom|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        stablelm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        stablelm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            qwen|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            qwen|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           qwen2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           qwen2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        qwen2moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        qwen2moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         qwen2vl|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         qwen2vl|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           qwen3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           qwen3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        qwen3moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        qwen3moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       qwen3next|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       qwen3next|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         qwen3vl|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         qwen3vl|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      qwen3vlmoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      qwen3vlmoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          qwen35|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          qwen35|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       qwen35moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       qwen35moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            phi2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            phi2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            phi3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            phi3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          phimoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          phimoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           plamo|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           plamo|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          plamo2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          plamo2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          plamo3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          plamo3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       codeshell|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       codeshell|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           orion|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           orion|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       internlm2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       internlm2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         minicpm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         minicpm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         minicpm|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         minicpm|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        minicpm3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        minicpm3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           gemma|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           gemma|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          gemma2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          gemma2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          gemma3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          gemma3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         gemma3n|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|         gemma3n|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+| gemma-embedding|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+| gemma-embedding|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      starcoder2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      starcoder2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           mamba|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           mamba|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          mamba2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          mamba2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           jamba|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           jamba|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       falcon-h1|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       falcon-h1|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          xverse|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          xverse|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       command-r|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       command-r|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         cohere2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|         cohere2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      cohere2moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|      cohere2moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            dbrx|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            dbrx|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            olmo|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            olmo|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           olmo2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|           olmo2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           olmoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           olmoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         openelm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         openelm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          arctic|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          arctic|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        deepseek|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        deepseek|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       deepseek2|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       deepseek2|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|   deepseek2-ocr|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|   deepseek2-ocr|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      deepseek32|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      deepseek32|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       deepseek4|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       deepseek4|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         chatglm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         chatglm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            glm4|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            glm4|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         glm4moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         glm4moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         glm-dsa|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         glm-dsa|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          bitnet|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          bitnet|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|              t5|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|              t5|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       t5encoder|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       t5encoder|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            jais|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            jais|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           jais2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           jais2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        nemotron|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        nemotron|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      nemotron_h|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      nemotron_h|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|  nemotron_h_moe|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|  nemotron_h_moe|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          exaone|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          exaone|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         exaone4|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         exaone4|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      exaone-moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|      exaone-moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           rwkv6|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           rwkv6|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      rwkv6qwen2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      rwkv6qwen2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           rwkv7|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           rwkv7|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          arwkv7|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          arwkv7|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         granite|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         granite|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         granite|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         granite|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      granitemoe|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      granitemoe|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      granitemoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      granitemoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|   granitehybrid|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|   granitehybrid|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       chameleon|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       chameleon|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|wavtokenizer-dec|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|wavtokenizer-dec|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|             plm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|             plm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      bailingmoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      bailingmoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     bailingmoe2|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|     bailingmoe2|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           dots1|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           dots1|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           arcee|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           arcee|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           afmoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|           afmoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          laguna|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          laguna|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        ernie4_5|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        ernie4_5|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    ernie4_5-moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|    ernie4_5-moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     hunyuan-moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|     hunyuan-moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|   hunyuan-dense|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|   hunyuan-dense|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      hunyuan_vl|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      hunyuan_vl|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           hy_v3|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           hy_v3|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         smollm3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         smollm3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         gpt-oss|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         gpt-oss|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            lfm2|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            lfm2|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         lfm2moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|         lfm2moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           dream|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           dream|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|    smallthinker|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|    smallthinker|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           llada|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|           llada|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       llada-moe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       llada-moe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        seed_oss|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        seed_oss|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        grovemoe|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        grovemoe|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|         apertus|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|         apertus|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      minimax-m2|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      minimax-m2|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          cogvlm|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          cogvlm|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|            rnd1|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|            rnd1|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|  pangu-embedded|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|  pangu-embedded|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        mistral3|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        mistral3|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        mistral3|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        mistral3|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        mistral4|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        mistral4|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       paddleocr|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       paddleocr|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|           mimo2|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|           mimo2|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          step35|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          step35|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     llama-embed|13th Gen Intel(R) Core(TM) i5-1340P| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     llama-embed|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     llama-embed|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     llama-embed|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|       maincoder|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|       maincoder|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|     kimi-linear|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|     kimi-linear|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          talkie|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|          talkie|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|          mellum|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|     [1;33mSKIP[0m|
+|          mellum|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|      minimax-m3|13th Gen Intel(R) Core(TM) i5-1340P|   MoE|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|      minimax-m3|                               Meta|   MoE|[1;33mSKIP[0m           |     [1;33mSKIP[0m|
+|        nanbeige|13th Gen Intel(R) Core(TM) i5-1340P| Dense|  [1;32mOK[0m (0.00e+00)|       [1;32mOK[0m|
+|        nanbeige|                               Meta| Dense|[1;33mSKIP[0m           |     [1;33mSKIP[0m|

@@ -1,0 +1,24 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.613 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.005.548 W srv  llama_server: -----------------
+0.00.005.553 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.005.553 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.005.553 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.005.554 W srv  llama_server: -----------------
+0.00.006.887 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/qwen3.8-27b/Qwen3.8-27B-Q4_K_M.gguf'
+0.14.522.219 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/qwen3.8-27b/mtp-Qwen3.8-27B-Q4_0.gguf'
+0.17.612.332 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.17.732.781 I srv  llama_server: model loaded
+0.17.732.796 I srv  llama_server: listening on http://127.0.0.1:8094
+0.18.529.455 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.18.529.568 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.22.033.018 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =     21, progress = 0.84, t =   3.50 s / 5.99 tokens per second
+0.24.655.702 I slot print_timing: id  0 | task 1 | prompt eval time =    4378.50 ms /    25 tokens (  175.14 ms per token,     5.71 tokens per second)
+0.24.655.711 I slot print_timing: id  0 | task 1 |        eval time =    1747.50 ms /     7 tokens (  249.64 ms per token,     4.01 tokens per second)
+0.24.655.712 I slot print_timing: id  0 | task 1 |       total time =    6126.00 ms /    32 tokens
+0.24.655.715 I slot print_timing: id  0 | task 1 |    graphs reused =          1
+0.24.661.955 I slot print_timing: id  0 | task 1 | draft acceptance = 1.00000 (    6 accepted /     6 generated), mean len =  4.00
+0.24.662.149 I slot      release: id  0 | task 1 | stop processing: n_tokens = 33, truncated = 0
+0.24.884.438 I srv    operator(): operator(): cleaning up before exit...

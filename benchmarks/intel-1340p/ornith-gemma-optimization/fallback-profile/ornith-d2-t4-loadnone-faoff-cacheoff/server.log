@@ -1,0 +1,22 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.760 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.992 I srv          init: The UI is disabled
+0.00.004.996 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.005.203 W srv  llama_server: -----------------
+0.00.005.212 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.005.213 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.005.213 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.005.213 W srv  llama_server: -----------------
+0.00.006.741 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.00.381.923 E llama_init_from_model: V cache quantization requires flash_attn
+0.00.421.649 W srv    load_model: [spec] failed to measure MTP context memory: failed to create llama_context from model
+0.00.768.271 E llama_init_from_model: V cache quantization requires flash_attn
+0.00.806.507 E common_fit_params: encountered an error while trying to fit params to free device memory: failed to create llama_context from model
+0.07.064.133 E llama_init_from_model: V cache quantization requires flash_attn
+0.07.064.139 E cmn  common_init_: failed to create context with model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.07.064.139 E cmn  common_init_: failed to create context with model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.07.064.143 E srv    load_model: failed to create_context with model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.07.064.146 I srv    operator(): operator(): cleaning up before exit...
+0.07.065.124 E srv  llama_server: exiting due to model loading error

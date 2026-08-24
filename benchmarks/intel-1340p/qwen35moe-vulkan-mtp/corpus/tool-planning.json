@@ -1,0 +1,43 @@
+{
+  "id": "tool-planning",
+  "description": "Select a repository inspection tool with structured arguments.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a coding agent. Use the supplied tools when repository evidence is required."
+      },
+      {
+        "role": "user",
+        "content": "Find the Vulkan shader and dispatch code responsible for Q2_K multi-column matrix-vector decode, then report the first three files to inspect. Do not modify anything."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "search_repository",
+          "description": "Search repository source files for a symbol or phrase.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "query": { "type": "string" },
+              "path": { "type": "string" },
+              "max_results": { "type": "integer", "minimum": 1, "maximum": 20 }
+            },
+            "required": ["query", "path", "max_results"],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "tool_choice": "required",
+    "parallel_tool_calls": false,
+    "max_tokens": 128,
+    "temperature": 0,
+    "seed": 303
+  },
+  "expect": {
+    "tool_name": "search_repository"
+  }
+}

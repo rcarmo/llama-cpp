@@ -1,0 +1,15 @@
+diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
+index d3a721aaa..42944a1dd 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -1787,6 +1787,10 @@ static void ggml_compute_forward_mul_mat_id(
+         const int64_t nr1 = cne1;
+
+         int chunk_size = 16;
++        const char * chunk_size_env = getenv("GGML_CPU_MUL_MAT_ID_CHUNK_SIZE");
++        if (chunk_size_env != NULL && strcmp(chunk_size_env, "32") == 0) {
++            chunk_size = 32;
++        }
+         if (nr0 == 1 || nr1 == 1) {
+             chunk_size = 64;
+         }

@@ -1,0 +1,73 @@
+{
+  "created": "2026-08-18",
+  "reference": {
+    "url": "https://simonwillison.net/2026/Aug/16/qwen-38-27b/",
+    "reported_hardware": ["Apple M3 Ultra", "NVIDIA DGX Spark"],
+    "reported_generation_tokens_per_second_range": [15, 30],
+    "reported_mtp_uplift_percent_approx": 72
+  },
+  "host": {
+    "name": "sigma",
+    "cpu": "Intel Core i5-1340P",
+    "logical_cpus": 16,
+    "ram_bytes": 33359691776,
+    "swap_bytes": 8589930496,
+    "model_cpus": "0-7",
+    "process_cpus": "0-15",
+    "threads": 8,
+    "cool_start_max_mC": 60000,
+    "cool_start_load1_max": 1.5,
+    "thermal_abort_mC": 97000,
+    "thermal_abort_samples": 3
+  },
+  "source": {
+    "repository_commit": "def3f1649e22833a7b66bd4814804a21f6616396",
+    "runtime_build": 10573,
+    "runtime_commit": "7f3f259a1",
+    "runtime_compiler": "Clang 22.1.8",
+    "server_sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab"
+  },
+  "model": {
+    "repository": "ggml-org/Qwen3.8-27B-GGUF",
+    "revision": "0669b98607d47046c7c2b3f801011d54a08cfccf",
+    "base_repository": "Qwen/Qwen3.8-27B",
+    "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "license": "Apache-2.0",
+    "target": {
+      "file": "Qwen3.8-27B-Q4_K_M.gguf",
+      "size": 18973870432,
+      "sha256": "31629f53165ab6a7dad8c9847dcfd1fdf55829dac1e6e748f4a68581b0033d34"
+    },
+    "mtp": {
+      "file": "mtp-Qwen3.8-27B-Q4_0.gguf",
+      "size": 1680271648,
+      "sha256": "051a1764cff8c4f3ee6ae8b00593a0364c7539c67fa50ffc58f3f96509fca38e"
+    },
+    "vision_projector": {
+      "file": "mmproj-Qwen3.8-27B-Q8_0.gguf",
+      "size": 629247008,
+      "sha256": "2e968a6af97ce35d8971890b257b9b7edabf20ad91450501fa53162a19ee33eb"
+    }
+  },
+  "installed_profile": {
+    "service": "llama-qwen38-local-provider.service",
+    "enabled": false,
+    "endpoint": "http://127.0.0.1:8094",
+    "pi_provider": "local-qwen38",
+    "pi_model": "qwen3.8-27b-q4km-mtp",
+    "context": 8192,
+    "slots": 1,
+    "kv": "q4_0",
+    "batch": 1024,
+    "ubatch": 256,
+    "mtp_depth": 3
+  },
+  "rollback": {
+    "maple_runtime_commit": "7f3f259a17",
+    "maple_repository_commit": "78616cbad",
+    "maple_endpoint": "http://127.0.0.1:8093",
+    "maple_sha256": "fd68a5f315189367dfae84d44fc066386e2d37ba6544f529304f21d482f24db4",
+    "primary_local_model": "local-gemma/gemma-4-e4b-qat-mtp",
+    "hosted_default_unchanged": true
+  }
+}

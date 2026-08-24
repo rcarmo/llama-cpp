@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Release gate: promote only if all checks pass.\n\n| Area | Gate | Threshold |\n|---|---|---|\n| Correctness: target logits | Same prompt, seed, sampler, and MTP draft-1 settings vs CPU golden | Top-1 token match ≥ 99.9%; top-10 overlap ≥ 99.5%; max logit diff ≤ 1e-3 for FP16/integer path, or bit-exact if integer-only path is claimed |\n| Correctness: MTP acceptance | Draft-1 acceptance and rollback behavior | Acceptance rate within ±1.0 pp of baseline; zero incorrect continuations after partial acceptance; rollback restores exact KV/recurrent state |\n| Correctness: KV/recurrent state | Abort, partial accept, and re-prompt tests | 100% pass on 100 randomized prompts; no stale KV, recurrent, or draft-state leakage |\n| Performance: CPU baseline | CPU generation with MTP draft-1 | No regression > 2% tokens/s vs current CPU baseline |\n| Performance: Vulkan N=2 | Q2_K multi-column decode at N=2 | ≥ 5% tokens/s gain vs CPU baseline; no regression > 2% vs previous Vulkan N=2 |\n| Performance: Vulkan N=4 | Q2_K multi-column decode at N=4 | No regression > 2% vs N=2 Vulkan; no regression > 2% vs CPU baseline |\n| Performance: MTP overhead | Orchestration overhead for draft-1 | ≤ 5% of total decode time; no increase > 1% vs baseline |\n| Stability: soak | 1-hour continuous decode with MTP, aborts, and device switches | 0 crashes, 0 hangs, 0 OOMs; RSS growth ≤ 1% over soak |\n| Stability: rollback stress | 1,000 forced partial accepts/aborts | 100% correct state recovery; 0 corrupted KV/recurrent states |\n| Fallback coverage: unsupported shapes | Non-Q2_K, non-N=2/N=4, missing MMVQ/int-dot, no cooperative matrices | 100% fall back to generic Vulkan or CPU; no crash, no silent wrong path |\n| Fallback coverage: feature detection | MMVQ, integer dot product, FP16, AVX2/AVX-VNNI | 100% correct path selection; disabled features produce baseline behavior, not degraded correctness |\n| Fallback coverage: shared-memory regression | CPU/Vulkan branch-overlap path | If shared LPDDR streaming is detected, disable overlap; no regression > 2% vs non-overlap baseline |\n\nHard blockers: any correctness mismatch, incorrect rollback, crash, OOM, hang, or fallback failure.",
+        "reasoning_content": "We need answer user's request: \"Now turn those invariants into a compact release gate with measurable thresholds for correctness, performance, stability, and fallback coverage.\" Need produce concise technical reproducible. Need likely define release gate with measurable thresholds. Need ensure based on invariants: deterministic target logits/token acceptance, correct KV/recurrent rollback state across partial MTP acceptance, generic Vulkan fallback. Need include correctness, performance, stability, fallback coverage. Need maybe thresholds: bit-exact or tolerance? Since model-specific exact-row Vulkan kernel and MTP orchestration. Need measurable. Need compact. Could be table. Need maybe define pass criteria. Need be careful: CPU generation currently faster than full Vulkan; MTP draft-1 high acceptance; Vulkan multi-column Q2_K decode gains at N=2 plateaus N=4; disabling MMVQ/int dot removes gain; branch-overlap regressed due shared LPDDR. Release gate should preserve invariants. Need measurable thresholds: correctness: golden logits/token sequence match, acceptance rate, KV rollback tests. Performance: CPU baseline, Vulkan N=2 gain, no regression > x%, MTP overhead reduction, memory bandwidth? Stability: soak, no crashes, memory growth, rollback under aborts. Fallback coverage: unsupported shapes"
+      }
+    }
+  ],
+  "created": 1787056817,
+  "model": "qwen3.8-27b-q4km-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 853,
+    "prompt_tokens": 320,
+    "total_tokens": 1173,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-9Jjd1IJCNGWCMyN9nsxtS5OebKFPSVQf",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 320,
+    "prompt_ms": 47845.152,
+    "prompt_per_token_ms": 149.5161,
+    "prompt_per_second": 6.688242938385899,
+    "predicted_n": 853,
+    "predicted_ms": 291466.876,
+    "predicted_per_token_ms": 341.6962203985932,
+    "predicted_per_second": 2.926576123181833,
+    "draft_n": 990,
+    "draft_n_accepted": 524
+  }
+}

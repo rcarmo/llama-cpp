@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "## Ranked Diagnosis\n\nThe failure at $N=3$ specifically on Intel Xe1, coupled with performance degradation and increased register pressure, strongly suggests a **resource contention or synchronization issue** that only manifests when the workload exceeds a certain complexity threshold (i.e., $N=3$). The fact that $N=2$",
+        "reasoning_content": "Here's a plan to structure the response:\n1.  **Analyze the Symptoms:** Identify the core problem (N=3 failure, specific hardware dependency, performance degradation, register pressure increase).\n2.  **Rank Potential Causes (Diagnosis):** Prioritize the most likely culprits based on the provided constraints (Vulkan, Vulkan shader, N=3, Intel Xe1, shared memory, subgroup usage).\n3.  **Identify Violated Invariants/Assumptions:** Determine what needs verification in the shader and dispatch logic.\n4.  **Design the Experiment Matrix:** Create a minimal, bounded sequence of tests covering all specified areas (subgroup control, barriers, tail rows, shared memory, register spills, activation layout, determinism).\n5.  **Define Acceptance/Rejection Criteria:** Set clear pass/fail conditions for the debugging process.\n\nConstraint Checklist:\n*   Ranked diagnosis: Yes.\n*   Minimal experiment matrix: Yes.\n*   Do not propose code until invariant is identified: Yes.\n*   Cover specific areas (subgroup control, barriers, tail rows, shared memory, register spills, Q8_1 activation layout, deterministic logits): Yes.\n\nExecution."
+      }
+    }
+  ],
+  "created": 1785965408,
+  "model": "gemma-4-e4b-qat-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 217,
+    "total_tokens": 537,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-oiDVi47KOaeb1v7WXczkzWSkFZfo8oUN",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 217,
+    "prompt_ms": 3336.964,
+    "prompt_per_token_ms": 15.377714285714285,
+    "prompt_per_second": 65.02917022778789,
+    "predicted_n": 320,
+    "predicted_ms": 15776.914,
+    "predicted_per_token_ms": 49.302856250000005,
+    "predicted_per_second": 20.282800552757024,
+    "draft_n": 393,
+    "draft_n_accepted": 188
+  }
+}

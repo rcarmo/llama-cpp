@@ -1,0 +1,8 @@
+diff -ru /tmp/maple-qwen-pi-fixture-base-qwen/src/clamp.ts /tmp/maple-qwen-pi-fixture-qwen/src/clamp.ts
+--- /tmp/maple-qwen-pi-fixture-base-qwen/src/clamp.ts	2026-08-06 00:16:29.817488149 +0100
++++ /tmp/maple-qwen-pi-fixture-qwen/src/clamp.ts	2026-08-06 00:22:46.030324639 +0100
+@@ -1,3 +1,3 @@
+ export function clamp(value: number, min: number, max: number): number {
+-  return Math.max(min, value);
++  return Math.max(min, Math.min(value, max));
+ }

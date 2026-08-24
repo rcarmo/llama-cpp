@@ -222,6 +222,9 @@ static void ggml_vec_dot_turbo2_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
 static void ggml_vec_dot_turbo4_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
                                        const void * GGML_RESTRICT vx, size_t bx,
                                        const void * GGML_RESTRICT vy, size_t by, int nrc);
+static void ggml_vec_dot_tq2_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
+                                   const void * GGML_RESTRICT vx, size_t bx,
+                                   const void * GGML_RESTRICT vy, size_t by, int nrc);
 
 static const struct ggml_type_traits_cpu type_traits_cpu[GGML_TYPE_COUNT] = {
     [GGML_TYPE_F32] = {
@@ -420,6 +423,8 @@ static const struct ggml_type_traits_cpu type_traits_cpu[GGML_TYPE_COUNT] = {
         .vec_dot                  = ggml_vec_dot_tq2_0_q8_K,
         .vec_dot_type             = GGML_TYPE_Q8_K,
         .nrows                    = 1,
+        .vec_dot_f32              = ggml_vec_dot_tq2_0_f32,
+        .nrows_f32                = 2,
     },
     [GGML_TYPE_TURBO3_0] = {
         .from_float               = (ggml_from_float_t) quantize_row_turbo3_0_ref,
@@ -1211,6 +1216,113 @@ static void ggml_vec_dot_turbo3_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
     *s = sum;
 }
 
+static void ggml_vec_dot_tq2_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
+                                    const void * GGML_RESTRICT vx, size_t bx,
+                                    const void * GGML_RESTRICT vy, size_t by, int nrc) {
+    GGML_ASSERT(nrc == 1 || nrc == 2);
+
+    const block_tq2_0 * x = (const block_tq2_0 *) vx;
+    const float * y = (const float *) vy;
+    const int nb = n / QK_K;
+
+#if defined(__AVX2__)
+    if (nrc == 2) {
+        const block_tq2_0 * x1 = (const block_tq2_0 *) ((const char *) vx + bx);
+        const bool paired_y = by != 0;
+        const float * y1 = paired_y ? (const float *) ((const char *) vy + by) : y;
+        __m256 sum00 = _mm256_setzero_ps();
+        __m256 sum01 = _mm256_setzero_ps();
+        __m256 sum10 = _mm256_setzero_ps();
+        __m256 sum11 = _mm256_setzero_ps();
+        const __m256i mask = _mm256_set1_epi32(3);
+        const __m256i one = _mm256_set1_epi32(1);
+
+        for (int ib = 0; ib < nb; ++ib) {
+            const __m256 d0 = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib].d));
+            const __m256 d1 = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x1[ib].d));
+            for (size_t j = 0; j < sizeof(x[ib].qs); j += 8) {
+                const __m256i p0 = _mm256_cvtepu8_epi32(_mm_loadl_epi64((const __m128i *) (x[ib].qs + j)));
+                const __m256i p1 = _mm256_cvtepu8_epi32(_mm_loadl_epi64((const __m128i *) (x1[ib].qs + j)));
+                for (size_t l = 0; l < 4; ++l) {
+                    const __m256 q0 = _mm256_cvtepi32_ps(_mm256_sub_epi32(_mm256_and_si256(_mm256_srli_epi32(p0, 2*l), mask), one));
+                    const __m256 q1 = _mm256_cvtepi32_ps(_mm256_sub_epi32(_mm256_and_si256(_mm256_srli_epi32(p1, 2*l), mask), one));
+                    const size_t group = j & ~(size_t) 31;
+                    const size_t lane = j & 31;
+                    const size_t offset = ib*QK_K + group*4 + l*32 + lane;
+                    const __m256 a0 = _mm256_loadu_ps(y + offset);
+                    const __m256 w0 = _mm256_mul_ps(d0, q0);
+                    const __m256 w1 = _mm256_mul_ps(d1, q1);
+                    sum00 = _mm256_fmadd_ps(w0, a0, sum00);
+                    sum10 = _mm256_fmadd_ps(w1, a0, sum10);
+                    if (paired_y) {
+                        const __m256 a1 = _mm256_loadu_ps(y1 + offset);
+                        sum01 = _mm256_fmadd_ps(w0, a1, sum01);
+                        sum11 = _mm256_fmadd_ps(w1, a1, sum11);
+                    }
+                }
+            }
+        }
+
+        __m128 r00 = _mm_add_ps(_mm256_castps256_ps128(sum00), _mm256_extractf128_ps(sum00, 1));
+        __m128 r01 = _mm_add_ps(_mm256_castps256_ps128(sum01), _mm256_extractf128_ps(sum01, 1));
+        __m128 r10 = _mm_add_ps(_mm256_castps256_ps128(sum10), _mm256_extractf128_ps(sum10, 1));
+        __m128 r11 = _mm_add_ps(_mm256_castps256_ps128(sum11), _mm256_extractf128_ps(sum11, 1));
+        r00 = _mm_add_ps(r00, _mm_movehl_ps(r00, r00)); r00 = _mm_add_ss(r00, _mm_movehdup_ps(r00));
+        r01 = _mm_add_ps(r01, _mm_movehl_ps(r01, r01)); r01 = _mm_add_ss(r01, _mm_movehdup_ps(r01));
+        r10 = _mm_add_ps(r10, _mm_movehl_ps(r10, r10)); r10 = _mm_add_ss(r10, _mm_movehdup_ps(r10));
+        r11 = _mm_add_ps(r11, _mm_movehl_ps(r11, r11)); r11 = _mm_add_ss(r11, _mm_movehdup_ps(r11));
+        s[0] = _mm_cvtss_f32(r00);
+        s[1] = _mm_cvtss_f32(r10);
+        if (paired_y) {
+            s[bs + 0] = _mm_cvtss_f32(r01);
+            s[bs + 1] = _mm_cvtss_f32(r11);
+        }
+        return;
+    }
+
+    __m256 sum = _mm256_setzero_ps();
+    const __m256i mask = _mm256_set1_epi32(3);
+    const __m256i one = _mm256_set1_epi32(1);
+
+    for (int ib = 0; ib < nb; ++ib) {
+        const __m256 d = _mm256_set1_ps(GGML_CPU_FP16_TO_FP32(x[ib].d));
+        for (size_t j = 0; j < sizeof(x[ib].qs); j += 8) {
+            const __m128i packed8 = _mm_loadl_epi64((const __m128i *) (x[ib].qs + j));
+            const __m256i packed = _mm256_cvtepu8_epi32(packed8);
+            for (size_t l = 0; l < 4; ++l) {
+                const __m256i qi = _mm256_sub_epi32(_mm256_and_si256(_mm256_srli_epi32(packed, 2*l), mask), one);
+                const __m256 q = _mm256_cvtepi32_ps(qi);
+                const size_t group = j & ~(size_t) 31;
+                const size_t lane = j & 31;
+                const float * yf = y + ib*QK_K + group*4 + l*32 + lane;
+                sum = _mm256_fmadd_ps(_mm256_mul_ps(d, q), _mm256_loadu_ps(yf), sum);
+            }
+        }
+    }
+
+    __m128 sum128 = _mm_add_ps(_mm256_castps256_ps128(sum), _mm256_extractf128_ps(sum, 1));
+    sum128 = _mm_add_ps(sum128, _mm_movehl_ps(sum128, sum128));
+    sum128 = _mm_add_ss(sum128, _mm_movehdup_ps(sum128));
+    *s = _mm_cvtss_f32(sum128);
+#else
+    GGML_ASSERT(nrc == 1);
+    GGML_UNUSED(bs); GGML_UNUSED(bx); GGML_UNUSED(by);
+    float sum = 0.0f;
+    for (int ib = 0; ib < nb; ++ib) {
+        const float d = GGML_CPU_FP16_TO_FP32(x[ib].d);
+        for (size_t j = 0; j < sizeof(x[ib].qs); j += 32) {
+            for (size_t l = 0; l < 4; ++l) {
+                for (size_t k = 0; k < 32; ++k) {
+                    const int q = ((x[ib].qs[j + k] >> (2*l)) & 3) - 1;
+                    sum += d * q * y[ib*QK_K + j*4 + l*32 + k];
+                }
+            }
+        }
+    }
+    *s = sum;
+#endif
+}
+
 // TurboQuant2 vec_dot: dequantize turbo2 block to f32, then dot with f32 operand.
 static void ggml_vec_dot_turbo2_0_f32(int n, float * GGML_RESTRICT s, size_t bs,
                                        const void * GGML_RESTRICT vx, size_t bx,
@@ -1268,8 +1380,9 @@ static void ggml_compute_forward_mul_mat_one_chunk(
 
     const bool src1_cont = ggml_is_contiguous(src1);
 
-    ggml_vec_dot_t const vec_dot      = type_traits_cpu[type].vec_dot;
-    enum ggml_type const vec_dot_type = type_traits_cpu[type].vec_dot_type;
+    const bool use_f32 = ggml_get_op_params_i32(dst, 0) == GGML_PREC_F32 && type_traits_cpu[type].vec_dot_f32;
+    ggml_vec_dot_t const vec_dot      = use_f32 ? type_traits_cpu[type].vec_dot_f32 : type_traits_cpu[type].vec_dot;
+    enum ggml_type const vec_dot_type = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[type].vec_dot_type;
 
     // broadcast factors
     const int64_t r2 = ne12 / ne02;
@@ -1381,9 +1494,10 @@ void ggml_compute_forward_mul_mat(
     const int ith = params->ith;
     const int nth = params->nth;
 
-    enum ggml_type           const vec_dot_type         = type_traits_cpu[src0->type].vec_dot_type;
+    const bool use_f32 = ggml_get_op_params_i32(dst, 0) == GGML_PREC_F32 && type_traits_cpu[src0->type].vec_dot_f32;
+    enum ggml_type           const vec_dot_type         = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[src0->type].vec_dot_type;
     ggml_from_float_t        const from_float           = type_traits_cpu[vec_dot_type].from_float;
-    int64_t                  const vec_dot_num_rows     = type_traits_cpu[src0->type].nrows;
+    int64_t                  const vec_dot_num_rows     = use_f32 ? type_traits_cpu[src0->type].nrows_f32 : type_traits_cpu[src0->type].nrows;
 
 #if defined(__riscv) || defined(__riscv__)
     if (ith == 0 && getenv("SPACEMIT_PROFILE_FALLBACK")) {
@@ -1608,8 +1722,9 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
 
     const enum ggml_type type = src0->type;
 
-    ggml_vec_dot_t    const vec_dot      = type_traits_cpu[type].vec_dot;
-    enum ggml_type    const vec_dot_type = type_traits_cpu[type].vec_dot_type;
+    const bool use_f32 = ggml_get_op_params_i32(dst, 0) == GGML_PREC_F32 && type_traits_cpu[type].vec_dot_f32;
+    ggml_vec_dot_t const vec_dot      = use_f32 ? type_traits_cpu[type].vec_dot_f32 : type_traits_cpu[type].vec_dot;
+    enum ggml_type const vec_dot_type = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[type].vec_dot_type;
 
     const int64_t blck_0 = 16;
     const int64_t blck_1 = 16;
@@ -1641,7 +1756,13 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
 
                 float * dst_col = (float *) ((char *) dst->data + (i1*nb1 + i2*nb2));
 
-                for (int64_t ir0 = iir0; ir0 < iir0 + blck_0 && ir0 < ir0_end; ++ir0) {
+                int64_t ir0 = iir0;
+                if (use_f32 && type == GGML_TYPE_TQ2_0) {
+                    for (; ir0 + 1 < iir0 + blck_0 && ir0 + 1 < ir0_end; ir0 += 2) {
+                        vec_dot(ne00, &tmp[ir0 - iir0], 2, src0_cur + ir0*nb01, nb01, src1_col, 0, 2);
+                    }
+                }
+                for (; ir0 < iir0 + blck_0 && ir0 < ir0_end; ++ir0) {
                     vec_dot(ne00, &tmp[ir0 - iir0], 0, src0_cur + ir0*nb01, 0, src1_col, 0, 1);
                 }
 
@@ -1676,8 +1797,9 @@ static void ggml_compute_forward_mul_mat_id(
 
     const bool src1_cont = ggml_is_contiguous(src1);
 
-    enum ggml_type    const vec_dot_type    = type_traits_cpu[type].vec_dot_type;
-    ggml_from_float_t const from_float      = type_traits_cpu[vec_dot_type].from_float;
+    const bool use_f32 = ggml_get_op_params_i32(dst, 0) == GGML_PREC_F32 && type_traits_cpu[type].vec_dot_f32;
+    enum ggml_type const vec_dot_type = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[type].vec_dot_type;
+    ggml_from_float_t const from_float = type_traits_cpu[vec_dot_type].from_float;
 
     // we don't support permuted src0 or src1
     GGML_ASSERT(nb00 == ggml_type_size(type));
@@ -2975,7 +3097,8 @@ struct ggml_cplan ggml_graph_plan(
                     } break;
                 case GGML_OP_MUL_MAT:
                     {
-                        const enum ggml_type vec_dot_type = type_traits_cpu[node->src[0]->type].vec_dot_type;
+                        const bool use_f32 = ggml_get_op_params_i32(node, 0) == GGML_PREC_F32 && type_traits_cpu[node->src[0]->type].vec_dot_f32;
+                        const enum ggml_type vec_dot_type = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[node->src[0]->type].vec_dot_type;
 
                         if (node->src[1]->type != vec_dot_type) {
                             cur = ggml_row_size(vec_dot_type, ggml_nelements(node->src[1]));
@@ -2987,7 +3110,8 @@ struct ggml_cplan ggml_graph_plan(
                         const struct ggml_tensor * src0 = node->src[0];
                         const struct ggml_tensor * src1 = node->src[1];
                         const struct ggml_tensor * ids = node->src[2];
-                        const enum ggml_type vec_dot_type = type_traits_cpu[src0->type].vec_dot_type;
+                        const bool use_f32 = ggml_get_op_params_i32(node, 0) == GGML_PREC_F32 && type_traits_cpu[src0->type].vec_dot_f32;
+                        const enum ggml_type vec_dot_type = use_f32 ? GGML_TYPE_F32 : type_traits_cpu[src0->type].vec_dot_type;
                         const int n_as = src0->ne[2];
                         // src1
                         if (src1->type != vec_dot_type) {

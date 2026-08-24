@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "We need to design a two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification. The user mentions Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, etc. They want a focused two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce implementation-ready plans grounded in supplied repository facts. The facts provided: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, etc. They want a two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce a plan that is grounded in the facts. The facts mention: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, CPU target-only generation faster than full Vulkan, native MTP improves CPU generation, Vulkan has FP16 and integer dot product, no cooperative matrix support, 48 KiB shared memory, profiling shows multi-column Vulkan decode improves aggregate throughput at N=2 but plateaus at N=4. The generic MMVQ shader keeps temp[NUM_COLS][NUM_ROWS] accumulators and loops over columns while decoding the same quantized weights. Design a focused two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce a plan that is grounded in the facts. The facts mention: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, etc. They want a two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce a plan that is grounded in the facts. The facts mention: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, etc. They want a two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce a plan that is grounded in the facts. The facts mention: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe, etc. They want a two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce a plan that is grounded in the facts. The facts mention: Qwen3.6",
+        "reasoning_content": "We need to design a two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification. The user mentions Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P with Iris Xe, CPU target-only generation, Vulkan, MTP, etc. They want a focused two-phase plan: exact-row Q2_K kernel and integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation.\n\nWe need to produce implementation-ready plans grounded in supplied repository facts. The facts provided: Qwen3.6 35B-A3B Q2_K_XL, Intel i5-1340P, Iris Xe unified memory, CPU target-only generation faster than full Vulkan, native MTP improves CPU generation, Vulkan has FP16 and integer dot product, no cooperative matrix support, 48 KiB shared memory, profiling shows multi-column Vulkan decode improves aggregate throughput at N=2 but plateaus at N=4. Generic MMVQ shader keeps temp[NUM_COLS][NUM"
+      }
+    }
+  ],
+  "created": 1785965977,
+  "model": "maple-preview-tq2-exact-head",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 236,
+    "total_tokens": 1260,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-AylqWj4JAyihGahxwsv2LqQ467QQ1tfR",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 236,
+    "prompt_ms": 3768.524,
+    "prompt_per_token_ms": 15.968322033898305,
+    "prompt_per_second": 62.62398753464221,
+    "predicted_n": 1024,
+    "predicted_ms": 58447.552,
+    "predicted_per_token_ms": 57.0776875,
+    "predicted_per_second": 17.519980990820624
+  }
+}

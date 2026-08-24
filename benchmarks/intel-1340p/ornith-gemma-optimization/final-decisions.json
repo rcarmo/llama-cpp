@@ -1,0 +1,359 @@
+{
+  "generated_at": "2026-08-01T23:00:40Z",
+  "source_head": "603f26c869b6700eaa5c6d52068ed583419eeacf",
+  "promotion_gate_pct": 2,
+  "selected_profiles": {
+    "ornith": {
+      "mtp_depth": 2,
+      "kv": "f16",
+      "flash_attn": "off",
+      "load_mode": "mmap",
+      "threads": 8,
+      "batch": 1024,
+      "ubatch": 256,
+      "advice_mode": "off",
+      "validated_context": 131072,
+      "gate": {
+        "wall_speedup_pct": 6.915819758466624,
+        "prompt_speedup_pct": 6.733371578113134,
+        "generation_speedup_pct": 11.317056861165643
+      },
+      "long_context_pressure_result": {
+        "model": "ornith",
+        "run_name": "ornith-d2-f16-faoff-ctx32k-p8",
+        "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+        "draft_path": "",
+        "draft_depth": 2,
+        "context": 32768,
+        "batch": 512,
+        "ubatch": 128,
+        "kv": "f16",
+        "advice_mode": "off",
+        "load_mode": "mmap",
+        "flash_attn": "off",
+        "prompt_cache": "on",
+        "pressure_gib": 8,
+        "wall_seconds": 341.07128,
+        "prompt_tokens": 11288,
+        "generated_tokens": 60,
+        "prompt_tps": 33.504972906147856,
+        "generation_tps": 14.770557847043488,
+        "draft_tokens": 40,
+        "accepted_draft_tokens": 39,
+        "tool_name": "search_repository",
+        "tool_args": {
+          "max_results": 3,
+          "path": "ggml/src/ggml-cpu",
+          "query": "MADV_WILLNEED"
+        }
+      },
+      "near_capacity_128k_result": {
+        "status": "passed",
+        "accepted": {
+          "context_exact": true,
+          "geometry_exact": true,
+          "profile_exact": true,
+          "prompt_tokens_at_least_min": true,
+          "output_headroom": true,
+          "generated_output": true,
+          "exactly_one_tool_call": true,
+          "required_tool_call": true,
+          "valid_tool_arguments": true,
+          "no_stray_content": true,
+          "finished_by_tool_call": true,
+          "speculative_activity": true,
+          "no_thermal_abort": true
+        },
+        "context": 131072,
+        "batch": 1024,
+        "ubatch": 256,
+        "kv": "f16",
+        "flash_attn": "off",
+        "prompt_tokens": 124341,
+        "generated_tokens": 60,
+        "prompt_tps": 13.140446538313764,
+        "generation_tps": 2.6312308863003038,
+        "draft_tokens": 44,
+        "accepted_draft_tokens": 37,
+        "finish_reason": "tool_calls",
+        "tool_name": "search_repository",
+        "tool_arguments": {
+          "query": "MADV_WILLNEED",
+          "path": "ggml/src/ggml-cpu",
+          "max_results": 5
+        },
+        "wall_samples": 4117,
+        "elapsed_s": 9490,
+        "max_rss_kib": 24433632,
+        "max_pss_kib": 24429124,
+        "max_proc_majflt": 1,
+        "min_mem_available_kib": 19994580,
+        "min_swap_free_kib": 8084288,
+        "max_pswpin_delta": 118,
+        "max_pswpout_delta": 470,
+        "max_global_pgmaj_delta": 131,
+        "max_temp_mC": 91000,
+        "final_snapshot": {
+          "profile": "ornith",
+          "model": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+          "draft_model": "",
+          "alias": "ornith-1.0-35b-mtp-apex",
+          "port": 8480,
+          "pid": 2342289,
+          "context": 131072,
+          "batch": 1024,
+          "ubatch": 256,
+          "kv": "f16",
+          "flash_attn": "off",
+          "load_mode": "mmap",
+          "threads": 8,
+          "cpus": "0-7",
+          "process_cpus": "0-15",
+          "rss_kib": 24433632,
+          "pss_kib": 24429119,
+          "swap_kib": 0,
+          "read_bytes": 90112,
+          "minflt": 135392693,
+          "majflt": 1,
+          "pswpin_delta": 118,
+          "pswpout_delta": 470,
+          "pgmaj_delta": 131,
+          "pkg_temp_mC": 66000,
+          "slot": {
+            "id": 0,
+            "n_ctx": 131072,
+            "speculative": true,
+            "is_processing": false
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 15,
+            "prompt_ms": 518.466,
+            "prompt_per_token_ms": 34.5644,
+            "prompt_per_second": 28.93150177639421,
+            "predicted_n": 2,
+            "predicted_ms": 162.153,
+            "predicted_per_token_ms": 81.0765,
+            "predicted_per_second": 12.334030206039975,
+            "draft_n": 2,
+            "draft_n_accepted": 2
+          },
+          "content": "OK"
+        }
+      }
+    },
+    "gemma4": {
+      "mtp_depth": 3,
+      "kv": "f16",
+      "flash_attn": "off",
+      "load_mode": "mmap",
+      "threads": 8,
+      "batch": 1024,
+      "ubatch": 256,
+      "advice_mode": "off",
+      "validated_context": 131072,
+      "gate": {
+        "wall_speedup_pct": 12.969927262247683,
+        "prompt_speedup_pct": 13.158481429834179,
+        "generation_speedup_pct": 7.237076022548639
+      },
+      "long_context_pressure_result": {
+        "model": "gemma4",
+        "run_name": "gemma4-d3-f16-faoff-ctx32k-p8",
+        "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+        "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+        "draft_depth": 3,
+        "context": 32768,
+        "batch": 512,
+        "ubatch": 128,
+        "kv": "f16",
+        "advice_mode": "off",
+        "load_mode": "mmap",
+        "flash_attn": "off",
+        "prompt_cache": "on",
+        "pressure_gib": 8,
+        "wall_seconds": 231.459523,
+        "prompt_tokens": 12481,
+        "generated_tokens": 45,
+        "prompt_tps": 54.53432317375482,
+        "generation_tps": 17.92486613112478,
+        "draft_tokens": 42,
+        "accepted_draft_tokens": 32,
+        "tool_name": "search_repository",
+        "tool_args": {
+          "max_results": 3,
+          "path": "src/ggml-cpu/",
+          "query": "Qwen routed-expert page residency AND bounded asynchronous mmap advice"
+        }
+      },
+      "near_capacity_128k_result": {
+        "status": "passed",
+        "accepted": {
+          "context_exact": true,
+          "geometry_exact": true,
+          "profile_exact": true,
+          "prompt_tokens_at_least_min": true,
+          "output_headroom": true,
+          "generated_output": true,
+          "exactly_one_tool_call": true,
+          "required_tool_call": true,
+          "valid_tool_arguments": true,
+          "no_stray_content": true,
+          "finished_by_tool_call": true,
+          "speculative_activity": true,
+          "no_thermal_abort": true
+        },
+        "context": 131072,
+        "batch": 1024,
+        "ubatch": 256,
+        "kv": "f16",
+        "flash_attn": "off",
+        "prompt_tokens": 124112,
+        "generated_tokens": 44,
+        "prompt_tps": 22.48712192285156,
+        "generation_tps": 4.4903077218087,
+        "draft_tokens": 42,
+        "accepted_draft_tokens": 29,
+        "finish_reason": "tool_calls",
+        "tool_name": "search_repository",
+        "tool_arguments": {
+          "max_results": 1,
+          "path": "src/ggml-cpu/",
+          "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+        },
+        "wall_samples": 2583,
+        "elapsed_s": 5537,
+        "max_rss_kib": 11412932,
+        "max_pss_kib": 11408433,
+        "max_proc_majflt": 0,
+        "min_mem_available_kib": 24175196,
+        "min_swap_free_kib": 8084292,
+        "max_pswpin_delta": 36,
+        "max_pswpout_delta": 0,
+        "max_global_pgmaj_delta": 54,
+        "max_temp_mC": 90000,
+        "final_snapshot": {
+          "profile": "gemma4",
+          "model": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+          "draft_model": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+          "alias": "gemma-4-e4b-qat-mtp",
+          "port": 8481,
+          "pid": 2396741,
+          "context": 131072,
+          "batch": 1024,
+          "ubatch": 256,
+          "kv": "f16",
+          "flash_attn": "off",
+          "load_mode": "mmap",
+          "threads": 8,
+          "cpus": "0-7",
+          "process_cpus": "0-15",
+          "rss_kib": 11412932,
+          "pss_kib": 11408430,
+          "swap_kib": 0,
+          "read_bytes": 2394046464,
+          "minflt": 35266489,
+          "majflt": 0,
+          "pswpin_delta": 36,
+          "pswpout_delta": 0,
+          "pgmaj_delta": 54,
+          "pkg_temp_mC": 66000,
+          "slot": {
+            "id": 0,
+            "n_ctx": 131072,
+            "speculative": true,
+            "is_processing": false
+          },
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 12,
+            "prompt_ms": 340.241,
+            "prompt_per_token_ms": 28.353416666666664,
+            "prompt_per_second": 35.26911806631182,
+            "predicted_n": 2,
+            "predicted_ms": 131.265,
+            "predicted_per_token_ms": 65.6325,
+            "predicted_per_second": 15.23635394050204,
+            "draft_n": 3,
+            "draft_n_accepted": 3
+          },
+          "content": "OK"
+        }
+      }
+    }
+  },
+  "model_role_decision": {
+    "throughput_finalist": "gemma4",
+    "rationale": "Highest repeated short-workload and near-capacity 128K prompt/generation throughput; strict 128K validation passed.",
+    "long_context_default": "qwen3.6-35b-a3b-q2_k_xl",
+    "rationale_long_context": "Qwen remains the deployed rollback baseline. Ornith and Gemma are now validated 128K candidates; activation remains an explicit operator decision."
+  },
+  "baseline_mtp": {
+    "ornith_d2_vs_d0": {
+      "generation_pct": 20.335265606383945,
+      "wall_speedup_pct": -2.440105370933976,
+      "prompt_pct": -3.448377445719464,
+      "draft": [
+        37,
+        42
+      ]
+    },
+    "gemma_d3_vs_d0": {
+      "generation_pct": 73.39592832393309,
+      "wall_speedup_pct": 3.152470298653509,
+      "prompt_pct": 0.7520392699086775,
+      "draft": [
+        31,
+        39
+      ]
+    }
+  },
+  "rejected": {
+    "routed_chunk32": {
+      "reason": "focused microbenchmark below 2% gate",
+      "geomean_speedup_pct": 1.1945343786315732,
+      "artifact": "chunk-size-diagnostic/rejected-chunk32.patch"
+    },
+    "gemma_mtp4": {
+      "reason": "2.31% generation regression versus depth 3",
+      "artifact": "baseline/gemma4-d4/result.json"
+    },
+    "expert_advice": {
+      "reason": "bounded -2.19% and adaptive -0.86% generation versus off; all sampled expert ranges already resident",
+      "selected": "off",
+      "artifacts": [
+        "expert-advice/ornith-d2-bounded/result.json",
+        "expert-advice/ornith-d2-adaptive/result.json"
+      ]
+    },
+    "q8_to_f16_with_flash_on": {
+      "reason": "prompt and wall improved but repeated generation regressed 3.38%",
+      "artifact": "kv-f16-gate/summary.json"
+    },
+    "sycl": {
+      "reason": "full and partial offload regressed decode; broader q1_0/q2_0 correctness failures and graph-mode crash",
+      "artifacts": [
+        "sycl/correctness/full-MUL_MAT.csv",
+        "sycl/correctness/full-MUL_MAT_ID.csv",
+        "sycl/model-sweep/gemma4-ngl4-graph1/server.log"
+      ]
+    },
+    "source_optimizations": {
+      "reason": "no exact-row, scheduler, graph, expert-cache, or quant-kernel source candidate cleared the 2% end-to-end gate"
+    }
+  },
+  "hardening": {
+    "semantic_replay": {
+      "ornith": "150/150 twice",
+      "gemma4": "141/141 twice"
+    },
+    "mtp_checkpoint_restore": {
+      "ornith_forced_restores": 2,
+      "gemma4_forced_restores": 5,
+      "semantic_output_identical": true
+    },
+    "no_install_candidate_validation": true,
+    "near_capacity_128k": true,
+    "final_hardening_validation": "passed"
+  }
+}

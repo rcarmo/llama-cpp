@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a thinking process:\n\n1.  **Deconstruct the User Prompt:**\n   - **Context:** Performance-sensitive Vulkan backend, debugging a new Q2_K decode shader.\n   - **Symptoms:**\n     - Correct at N=1 and N=2.\n     - N=3 produces *occasional* wrong logits *only* on Intel Xe1.\n     - Shader stages decoded weight scales in shared memory.\n     - Subgroup size = 16.\n     - Three activation-row accumulators per output row.\n     - Validation reports no out-of-bounds accesses.\n     - N=2 is 18% faster than generic MMVQ.\n     - N=3 is only 3% faster and increases register pressure.\n     - Generic fallback remains correct.\n   - **Requirements:**\n     - Give a ranked diagnosis.\n     - Provide a minimal experiment matrix.\n     - Do NOT propose code until identifying the violated invariant.\n     - Explain most likely causes.\n     - Identify assumptions to check in shader and dispatch code.\n     - Define a bounded debugging sequence covering: subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, deterministic logits.\n     - End with explicit accept/reject criteria.\n\n2.  **Analyze Key Technical Details & Constraints:**\n   - **Q2_K:** A quantization format (likely from llama.cpp or similar). Q2_K typically uses 2-bit weights with per-group scales/zero-points"
+      }
+    }
+  ],
+  "created": 1785455154,
+  "model": "/var/home/agent/workspace/projects/llama-cpp-vulkan-mtp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf",
+  "system_fingerprint": "b10498-603f26c86",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 210,
+    "total_tokens": 530,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-0Nzyh9GSspPwk0sPvtNbZGriptxdpumm",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 19218.153,
+    "prompt_per_token_ms": 91.51501428571427,
+    "prompt_per_second": 10.927168703464897,
+    "predicted_n": 320,
+    "predicted_ms": 50202.056,
+    "predicted_per_token_ms": 156.88142499999998,
+    "predicted_per_second": 6.37424092750305,
+    "draft_n": 167,
+    "draft_n_accepted": 152
+  }
+}

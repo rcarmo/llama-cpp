@@ -1,0 +1,47 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content_chars": 129
+    },
+    {
+      "role": "user",
+      "content_chars": 32262
+    }
+  ],
+  "max_tokens": 384,
+  "seed": 731,
+  "temperature": 0,
+  "tool_choice": "required",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "search_repository",
+        "description": "Search repository source files for a symbol or phrase.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "query",
+            "path",
+            "max_results"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

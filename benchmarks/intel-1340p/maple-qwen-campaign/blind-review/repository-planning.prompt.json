@@ -1,0 +1,19 @@
+{
+  "id": "repository-planning",
+  "description": "Plan a constrained llama.cpp optimization from repository evidence.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a senior inference engineer. Produce implementation-ready plans grounded in the supplied repository facts. Preserve correctness, identify rollback points, and avoid speculative claims."
+      },
+      {
+        "role": "user",
+        "content": "We run Qwen3.6 35B-A3B Q2_K_XL on an Intel Core i5-1340P with Iris Xe unified memory. CPU target-only generation is faster than full Vulkan, but native MTP improves CPU generation. Vulkan has FP16 and integer dot product, no cooperative matrix support, and 48 KiB shared memory. Profiling shows multi-column Vulkan decode improves aggregate throughput at N=2 but plateaus at N=4. The generic MMVQ shader keeps temp[NUM_COLS][NUM_ROWS] accumulators and loops over columns while decoding the same quantized weights. Design a focused two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification. Include graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, and files likely to change. Distinguish target verification from draft-head generation."
+      }
+    ],
+    "max_tokens": 384,
+    "temperature": 0,
+    "seed": 101
+  }
+}

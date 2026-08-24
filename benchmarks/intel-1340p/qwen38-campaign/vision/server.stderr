@@ -1,0 +1,33 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.003.272 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.003.715 W srv  llama_server: -----------------
+0.00.003.717 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.003.717 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.003.718 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.003.718 W srv  llama_server: -----------------
+0.00.004.998 I srv    load_model: loading model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.8-27b/Qwen3.8-27B-Q4_K_M.gguf'
+0.10.925.092 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.8-27b/mtp-Qwen3.8-27B-Q4_0.gguf'
+0.13.366.924 W load_hparams: Qwen-VL models require at minimum 1024 image tokens to function correctly on grounding tasks
+0.13.366.931 W load_hparams: if you encounter problems with accuracy, try adding --image-min-tokens 1024
+0.13.366.931 W load_hparams: more info: https://github.com/ggml-org/llama.cpp/issues/16842
+
+0.14.570.037 I srv    load_model: loaded multimodal model, '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.8-27b/mmproj-Qwen3.8-27B-Q8_0.gguf'
+0.16.865.010 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 4096, kv_unified = 'false'
+0.16.911.907 I srv  llama_server: model loaded
+0.16.911.928 I srv  llama_server: listening on http://127.0.0.1:8094
+0.17.283.476 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.17.283.658 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.19.597.649 W find_slot: non-consecutive token position 4 after 3 for sequence 0 with 64 new tokens
+0.19.597.714 W find_slot: non-consecutive token position 4 after 3 for sequence 0 with 64 new tokens
+0.28.697.615 W find_slot: non-consecutive token position 32 after 4 for sequence 0 with 21 new tokens
+0.28.697.661 W find_slot: non-consecutive token position 32 after 4 for sequence 0 with 21 new tokens
+0.31.920.535 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =     89, progress = 0.96, t =  14.64 s / 6.08 tokens per second
+0.35.455.402 I slot print_timing: id  0 | task 0 | prompt eval time =   15527.55 ms /    93 tokens (  166.96 ms per token,     5.99 tokens per second)
+0.35.455.413 I slot print_timing: id  0 | task 0 |        eval time =    2644.12 ms /     9 tokens (  293.79 ms per token,     3.40 tokens per second)
+0.35.455.414 I slot print_timing: id  0 | task 0 |       total time =   18171.67 ms /   102 tokens
+0.35.455.417 I slot print_timing: id  0 | task 0 |    graphs reused =          2
+0.35.455.422 I slot print_timing: id  0 | task 0 | draft acceptance = 0.77778 (    7 accepted /     9 generated), mean len =  3.33
+0.35.455.744 I slot      release: id  0 | task 0 | stop processing: n_tokens = 103, truncated = 0
+0.35.764.747 I srv    operator(): operator(): cleaning up before exit...

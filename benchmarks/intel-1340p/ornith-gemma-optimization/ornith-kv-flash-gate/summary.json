@@ -1,0 +1,243 @@
+{
+  "order": [
+    "q8-faon",
+    "f16-faoff",
+    "f16-faoff",
+    "q8-faon"
+  ],
+  "rows": [
+    {
+      "model": "ornith",
+      "run_name": "run-01-q8-faon",
+      "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+      "draft_path": "",
+      "draft_depth": 2,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "q8_0",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "on",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 91.363255,
+      "prompt_tokens": 3068,
+      "generated_tokens": 59,
+      "prompt_tps": 35.140197705991085,
+      "generation_tps": 14.969858570358205,
+      "draft_tokens": 42,
+      "accepted_draft_tokens": 37,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "ggml/src/ggml-cpu",
+        "query": "routed expert residency mmap"
+      }
+    },
+    {
+      "model": "ornith",
+      "run_name": "run-02-f16-faoff",
+      "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+      "draft_path": "",
+      "draft_depth": 2,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "f16",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "off",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 84.684104,
+      "prompt_tokens": 3068,
+      "generated_tokens": 59,
+      "prompt_tps": 37.85391731596479,
+      "generation_tps": 16.71405620965432,
+      "draft_tokens": 42,
+      "accepted_draft_tokens": 37,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "ggml/src/ggml-cpu",
+        "query": "routed expert residency mmap"
+      }
+    },
+    {
+      "model": "ornith",
+      "run_name": "run-03-f16-faoff",
+      "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+      "draft_path": "",
+      "draft_depth": 2,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "f16",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "off",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 86.143049,
+      "prompt_tokens": 3068,
+      "generated_tokens": 59,
+      "prompt_tps": 37.2002793319019,
+      "generation_tps": 16.579875235033782,
+      "draft_tokens": 42,
+      "accepted_draft_tokens": 37,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "ggml/src/ggml-cpu",
+        "query": "routed expert residency mmap"
+      }
+    },
+    {
+      "model": "ornith",
+      "run_name": "run-04-q8-faon",
+      "model_path": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+      "draft_path": "",
+      "draft_depth": 2,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "q8_0",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "on",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 91.277996,
+      "prompt_tokens": 3068,
+      "generated_tokens": 59,
+      "prompt_tps": 35.179136854651034,
+      "generation_tps": 14.939242858915309,
+      "draft_tokens": 42,
+      "accepted_draft_tokens": 37,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "ggml/src/ggml-cpu",
+        "query": "routed expert residency mmap"
+      }
+    }
+  ],
+  "groups": {
+    "q8-faon": {
+      "wall": {
+        "n": 2,
+        "mean": 91.3206255,
+        "sd": 0.06028721705717928,
+        "min": 91.277996,
+        "max": 91.363255
+      },
+      "prompt_tps": {
+        "n": 2,
+        "mean": 35.15966728032106,
+        "sd": 0.02753413607108121,
+        "min": 35.140197705991085,
+        "max": 35.179136854651034
+      },
+      "generation_tps": {
+        "n": 2,
+        "mean": 14.954550714636756,
+        "sd": 0.021648577172122804,
+        "min": 14.939242858915309,
+        "max": 14.969858570358205
+      },
+      "max_pss_kib": [
+        14855064,
+        14855091
+      ],
+      "draft": [
+        [
+          42,
+          37
+        ],
+        [
+          42,
+          37
+        ]
+      ],
+      "tools": [
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "ggml/src/ggml-cpu",
+            "query": "routed expert residency mmap"
+          }
+        ],
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "ggml/src/ggml-cpu",
+            "query": "routed expert residency mmap"
+          }
+        ]
+      ]
+    },
+    "f16-faoff": {
+      "wall": {
+        "n": 2,
+        "mean": 85.4135765,
+        "sd": 1.0316299028782074,
+        "min": 84.684104,
+        "max": 86.143049
+      },
+      "prompt_tps": {
+        "n": 2,
+        "mean": 37.527098323933345,
+        "sd": 0.46219185097197374,
+        "min": 37.2002793319019,
+        "max": 37.85391731596479
+      },
+      "generation_tps": {
+        "n": 2,
+        "mean": 16.64696572234405,
+        "sd": 0.09488027706040231,
+        "min": 16.579875235033782,
+        "max": 16.71405620965432
+      },
+      "max_pss_kib": [
+        15006423,
+        15006475
+      ],
+      "draft": [
+        [
+          42,
+          37
+        ],
+        [
+          42,
+          37
+        ]
+      ],
+      "tools": [
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "ggml/src/ggml-cpu",
+            "query": "routed expert residency mmap"
+          }
+        ],
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "ggml/src/ggml-cpu",
+            "query": "routed expert residency mmap"
+          }
+        ]
+      ]
+    }
+  },
+  "comparisons": {
+    "wall_speedup_pct": 6.915819758466624,
+    "prompt_speedup_pct": 6.733371578113134,
+    "generation_speedup_pct": 11.317056861165643
+  }
+}

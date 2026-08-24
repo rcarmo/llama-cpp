@@ -1,0 +1,55 @@
+{
+  "created": "2026-07-31",
+  "host": "sigma",
+  "source": {
+    "repository": "/var/home/agent/workspace/projects/llama-cpp",
+    "head": "603f26c869b6700eaa5c6d52068ed583419eeacf",
+    "working_diff_sha256": "c807d00610b197704f21870aac9ed50a93eb415809eb08545f917ae6d683aecb",
+    "build": "build-intel-clang",
+    "compiler": "Clang 22.1.8",
+    "cpu_backend": true,
+    "vulkan_backend": false
+  },
+  "hardware": {
+    "cpu": "Intel Core i5-1340P",
+    "model_cpus": "0-7",
+    "process_cpus": "0-15",
+    "threads": 8,
+    "ram_bytes": 33359691776,
+    "swap_bytes": 8589930496
+  },
+  "models": {
+    "ornith": {
+      "target": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf",
+      "target_sha256": "91358f1059f029330de497e8c5637869347374468e98ca13fa4357cd8a811a4d",
+      "mmproj": "/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/mmproj-F16.gguf",
+      "mmproj_sha256": "a516ab92e8240da4734d68352bdfba84c16e830ee40010b8fac80d69c77272ff",
+      "architecture": "qwen35moe",
+      "embedded_mtp_layers": 1,
+      "context_train": 262144
+    },
+    "gemma4": {
+      "target": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "target_sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee",
+      "draft": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_sha256": "49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc",
+      "mmproj": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-mmproj.gguf",
+      "mmproj_sha256": "7498a37cb619e55f2fcf87eb931f56e99389ed6d432e4c5c66110694c0d65578",
+      "architecture": "gemma4",
+      "assistant_architecture": "gemma4-assistant",
+      "assistant_mtp_layers": 4,
+      "context_train": 131072
+    }
+  },
+  "baseline": {
+    "context": 8192,
+    "batch": 512,
+    "ubatch": 128,
+    "kv": "q8_0",
+    "agentic_workload": "../qwen-longctx-fieldfare/workloads/agentic-tool-planning-3k.json",
+    "repetitions": 1,
+    "cooldown_load_max": 1.5,
+    "cooldown_temperature_max_mC": 55000,
+    "promotion_gate_percent": 2.0
+  }
+}

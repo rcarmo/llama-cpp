@@ -1,681 +1,340 @@
-# llama.cpp
+# rcarmo/llama-cpp
 
-![llama](https://raw.githubusercontent.com/ggml-org/llama.brand/refs/heads/master/cover/llama-cpp/cover-llama-cpp-dark.svg)
+This fork turns llama.cpp into a measured inference stack for two constrained machines:
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Release](https://img.shields.io/github/v/release/ggml-org/llama.cpp)](https://github.com/ggml-org/llama.cpp/releases)
-[![Server](https://github.com/ggml-org/llama.cpp/actions/workflows/server.yml/badge.svg)](https://github.com/ggml-org/llama.cpp/actions/workflows/server.yml)
-[![Docker](https://github.com/ggml-org/llama.cpp/actions/workflows/docker.yml/badge.svg)](https://github.com/ggml-org/llama.cpp/actions/workflows/docker.yml)
-[![Winget](https://github.com/ggml-org/llama.cpp/actions/workflows/winget.yml/badge.svg)](https://github.com/ggml-org/llama.cpp/actions/workflows/winget.yml)
+1. **LattePanda Sigma**, using its Intel Core i5-1340P CPU and 31 GiB of shared memory;
+2. **SpaceMIT K3 / Milk-V K3**, using RVV, IME1/IME2 and tightly managed memory.
 
-[Manifesto](https://github.com/ggml-org/llama.cpp/discussions/205) / [ggml](https://github.com/ggml-org/ggml) / [ops](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md) / [maintainer PRs](https://github.com/ggml-org/llama.cpp/issues?q=is%3Apr%20is%3Aopen%20draft%3AFalse%20(author%3Argerganov%20OR%20author%3AKitaitiMakoto%20OR%20author%3Adanbev%20OR%20author%3Aaldehir%20OR%20author%3Amax-krasnyansky%20OR%20author%3ACISC%20OR%20author%3Aggerganov%20OR%20author%3Aam17an%20OR%20author%3Abartowski1182%20OR%20author%3Ahipudding%20OR%20author%3AServeurpersoCom%20OR%20author%3Apwilkin%20OR%20author%3Areeselevine%20OR%20author%3Angxson%20OR%20author%3Ajeffbolznv%20OR%20author%3A0cc4m%20OR%20author%3Aangt%20OR%20author%3AIMbackK%20OR%20author%3Aarthw%20OR%20author%3AJohannesGaessler%20OR%20author%3AORippler%20OR%20author%3Aruixiang63%20OR%20author%3Axctan%20OR%20author%3Aallozaur%20OR%20author%3Ayomaytk%20OR%20author%3Aaendk%20OR%20author%3Agaugarg-nv%20OR%20author%3Ataronaeo%20OR%20author%3Aforforever73%20OR%20author%3Alhez%20OR%20author%3Anetrunnereve%20OR%20author%3Afairydreaming)%20sort%3Aupdated-desc)
+The Sigma work is the current priority and appears first throughout this README. The K3 work follows as the specialised RISC-V backend. Both campaigns use end-to-end promotion gates: a faster kernel is not enabled when the complete model or service regresses.
 
-LLM inference in C/C++
+This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.cpp). Use the upstream project for general model, API and platform documentation. This page covers the fork-specific implementation, measurements and deployment profiles.
 
-## Recent API changes
+## Current status
 
-- [Changelog for `libllama` API](https://github.com/ggml-org/llama.cpp/issues/9289)
-- [Changelog for `llama-server` REST API](https://github.com/ggml-org/llama.cpp/issues/9291)
+| Machine | Area | Status | Measured result |
+|---|---|---|---|
+| LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
+| LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Sole enabled local provider | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
+| LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
+| LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
+| LattePanda Sigma | Ornith 1.0 35B, 128K | Historical validation | 124,341-token prompt completed |
+| LattePanda Sigma | Gemma 4 E4B, 128K | Validated; service disabled | Best overall matched quality; 25.77 generation tok/s |
+| LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Validated; service disabled | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
+| LattePanda Sigma | Iris Xe SYCL/Vulkan | Rejected | Correctness or local wins did not survive end-to-end gates |
+| SpaceMIT K3 | RVV/IME CPU backend | Selected | Qwen and Gemma live-verified |
+| SpaceMIT K3 | Direct recurrent-state writes | Selected service option | 5.05% mean Qwen generation gain |
+| SpaceMIT K3 | Compact-IQ IME2 tile cache | Opt-in | Valid under a bounded shared cache, not the service default |
 
-## Hot topics
+## LattePanda Sigma: Intel Core i5-1340P
 
-- **Hugging Face cache migration: models downloaded with `-hf` are now stored in the standard Hugging Face cache directory, enabling sharing with other HF tools.**
-- **[guide : using the new WebUI of llama.cpp](https://github.com/ggml-org/llama.cpp/discussions/16938)**
-- [guide : running gpt-oss with llama.cpp](https://github.com/ggml-org/llama.cpp/discussions/15396)
-- [[FEEDBACK] Better packaging for llama.cpp to support downstream consumers 🤗](https://github.com/ggml-org/llama.cpp/discussions/15313)
-- Support for the `gpt-oss` model with native MXFP4 format has been added | [PR](https://github.com/ggml-org/llama.cpp/pull/15091) | [Collaboration with NVIDIA](https://blogs.nvidia.com/blog/rtx-ai-garage-openai-oss) | [Comment](https://github.com/ggml-org/llama.cpp/discussions/15095)
-- Multimodal support arrived in `llama-server`: [#12898](https://github.com/ggml-org/llama.cpp/pull/12898) | [documentation](./docs/multimodal.md)
-- VS Code extension for FIM completions: https://github.com/ggml-org/llama.vscode
-- Vim/Neovim plugin for FIM completions: https://github.com/ggml-org/llama.vim
-- Hugging Face Inference Endpoints now support GGUF out of the box! https://github.com/ggml-org/llama.cpp/discussions/9669
-- Hugging Face GGUF editor: [discussion](https://github.com/ggml-org/llama.cpp/discussions/9268) | [tool](https://huggingface.co/spaces/CISCai/gguf-editor)
-- WebGPU support is now available in the browser, see a blog/demo introducing it [here](https://reeselevine.github.io/llamas-on-the-web/).
+### Hardware and placement
 
-----
+The validated Sigma has:
 
-## Quick start
+- four P-cores with SMT and eight E-cores, for 12 cores and 16 logical CPUs;
+- AVX2, FMA, F16C and AVX-VNNI, with no AVX-512 or AMX;
+- 31 GiB usable shared memory and 8 GiB zram;
+- Intel Iris Xe integrated graphics.
 
-Getting started with llama.cpp is straightforward. Here are several ways to install it on your machine:
+Eight inference threads pinned to logical CPUs `0-7` perform best for the 35B-A3B models. Adding the E-cores reduces generation throughput. The server process may use CPUs `0-15` for HTTP and supporting work while model compute remains on the P-core SMT pairs.
 
-- Install `llama.cpp` using [brew, nix, winget, or conda-forge](docs/install.md)
-- Run with Docker - see our [Docker documentation](docs/docker.md)
-- Download pre-built binaries from the [releases page](https://github.com/ggml-org/llama.cpp/releases)
-- Build from source by cloning this repository - check out [our build guide](docs/build.md)
+### Build the selected CPU backend
 
-Once installed, you'll need a model to work with. Head to the [Obtaining and quantizing models](#obtaining-and-quantizing-models) section to learn more.
-
-Example command:
-
-```sh
-# Use a local model file
-llama-cli -m my_model.gguf
-
-# Or download and run a model directly from Hugging Face
-llama-cli -hf ggml-org/gemma-3-1b-it-GGUF
-
-# Launch OpenAI-compatible API server
-llama-server -hf ggml-org/gemma-3-1b-it-GGUF
+```bash
+BUILD_JOBS=2 tools/build-intel-1340p.sh
 ```
 
-## Description
+The build helper uses an isolated Fedora container and produces a Clang 22 native x86 build with AVX-VNNI, OpenMP, the CPU backend and the embedded Web UI. Vulkan is disabled in this build.
 
-The main goal of `llama.cpp` is to enable LLM inference with minimal setup and state-of-the-art performance on a wide
-range of hardware - locally and in the cloud.
+Key entrypoints:
 
-- Plain C/C++ implementation without any dependencies
-- Apple silicon is a first-class citizen - optimized via ARM NEON, Accelerate and Metal frameworks
-- AVX, AVX2, AVX512 and AMX support for x86 architectures
-- RVV, ZVFH, ZFH, ZICBOP and ZIHINTPAUSE support for RISC-V architectures
-- 1.5-bit, 2-bit, 3-bit, 4-bit, 5-bit, 6-bit, and 8-bit integer quantization for faster inference and reduced memory use
-- Custom CUDA kernels for running LLMs on NVIDIA GPUs (support for AMD GPUs via HIP and Moore Threads GPUs via MUSA)
-- Vulkan and SYCL backend support
-- CPU+GPU hybrid inference to partially accelerate models larger than the total VRAM capacity
+- `tools/build-intel-1340p.sh` - selected CPU build;
+- `tools/run-intel-qwen-longctx.sh` - Qwen 128K service;
+- `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
+- `tools/run-intel-candidate.sh` - Ornith and Gemma profiles;
+- `tools/validate-intel-candidate.sh` - no-install candidate validation;
+- `tools/systemd/user/` - tracked user services.
 
-The `llama.cpp` project is the main playground for developing new features for the [ggml](https://github.com/ggml-org/ggml) library.
+### CPU baseline and model selection
 
-## rcarmo fork: SpaceMIT K3
+The initial Qwen campaign established the CPU baseline and rejected Iris Xe generation offload.
 
-This fork adds a RISC-V CPU backend for the Milk-V K3 and compatible SpaceMIT SoCs. The backend uses RVV for activation processing, IME1/IME2 matrix kernels, TCM staging, quantized-weight repacking and GGML's worker pool. The protected `main` and compatibility/default `master` branches are kept synchronized; development and integration use `main`.
+| Model | Prompt pp128 | Generation tg32 | Peak profile memory | Decision |
+|---|---:|---:|---:|---|
+| Qwen3.6 35B-A3B Q4_K_XL | 53.608 tok/s | 13.166 tok/s | About 31 GiB | Quality profile at short context |
+| Qwen3.6 35B-A3B Q2_K_XL | 28.807 tok/s | 14.895 tok/s | About 12.4 GiB RSS | Selected 128K weight format |
+| Qwen3.6 27B Q2_K_XL | 4.335 tok/s | 2.909 tok/s | About 13.1 GiB RSS | Dense model, memory-bandwidth limited |
 
-Fork-specific implementation reports and validation guides are indexed in [docs/README.md](docs/README.md).
+Against the published K3 Q4 baseline, the Sigma Q4 result is 58.7% faster at pp64, 65.5% faster at pp128 and 99.8% faster at tg32. These are hardware-specific measurements, not universal model claims.
 
-Configure a native release build with:
+Evidence: [`benchmarks/intel-1340p/final-report-20260731.md`](benchmarks/intel-1340p/final-report-20260731.md).
+
+### Qwen 128K service and expert I/O
+
+The selected long-context rollback profile uses:
+
+| Setting | Value |
+|---|---|
+| Model | Qwen3.6 35B-A3B Q2_K_XL |
+| Context | 131,072 tokens |
+| Proven uninterrupted input | 99,104 tokens |
+| MTP depth | 3 |
+| KV | Q4_0 |
+| Batch / ubatch | 1024 / 256 |
+| Compute workers | 8 threads on CPUs `0-7` |
+| Loading | mmap |
+| Expert I/O | bounded, adaptive and miss-only |
+
+The router-aware expert-I/O path records selected experts, maps their GGUF ranges, checks page residency and issues bounded asynchronous `MADV_WILLNEED` only for nonresident data. Prometheus counters expose selection, residency and advice behaviour.
+
+A controlled cold-inode gate rejected a separate raw expert cache. The bounded cold request was only 0.64% slower than a warm bounded control, below the 10% residual-I/O gate. The extra ownership, eviction and slot-lifetime complexity was not justified.
+
+The uninterrupted 99,104-token acceptance run took 21,663 seconds at 4.580 prompt tok/s and 2.104 generation tok/s, accepted 42/45 MTP drafts and recorded no process major faults or swap-in/out.
+
+Operations and evidence:
+
+- [`docs/intel-1340p-qwen-longctx-runbook.md`](docs/intel-1340p-qwen-longctx-runbook.md)
+- [`benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md`](benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md)
+- [`docs/expert-io-adoption-baseline.md`](docs/expert-io-adoption-baseline.md)
+
+### Ornith and Gemma 128K validation
+
+The final candidate profiles use F16 KV, Flash Attention off, mmap loading, batch 1024, ubatch 256 and eight model threads.
+
+| Model | MTP | Repeated prompt | Repeated generation | Near-capacity prompt | Near-capacity generation |
+|---|---:|---:|---:|---:|---:|
+| Ornith 1.0 35B | 2 | 37.53 tok/s | 16.65 tok/s | 124,341 tokens at 13.14 tok/s | 2.63 tok/s |
+| Gemma 4 E4B | 3 | 61.19 tok/s | 25.30 tok/s | 124,112 tokens at 22.49 tok/s | 4.49 tok/s |
+
+Both near-capacity requests retained output headroom, used speculative decoding and ended with exactly one schema-valid `search_repository` call. Ornith accepted 37/44 draft tokens and peaked at 23,857 MiB PSS. Gemma accepted 29/42 and peaked at 11,141 MiB PSS.
+
+The hardening campaign also added:
+
+- architecture-neutral speculative phase timings through `GGML_SPECULATIVE_PROFILE`;
+- forced target/draft checkpoint restoration for deterministic state-machine tests;
+- model-shaped backend fixtures for Ornith and Gemma target/assistant graphs;
+- source-slot-aware and stride-aware semantic replay;
+- numerical replay of Ornith 150/150 operations twice and Gemma 141/141 twice;
+- isolated SYCL build and correctness gates;
+- explicit promotion and revert records for rejected source, backend and cache candidates.
+
+Campaign records:
+
+- [`docs/intel-1340p-ornith-gemma-campaign.md`](docs/intel-1340p-ornith-gemma-campaign.md)
+- [`benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md`](benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md)
+- [`benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json`](benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json)
+- [`docs/intel-1340p-ornith-runbook.md`](docs/intel-1340p-ornith-runbook.md)
+- [`docs/intel-1340p-gemma4-runbook.md`](docs/intel-1340p-gemma4-runbook.md)
+
+### Ornith 1.5 local Pi provider
+
+The deployed Sigma profile exposes `local-ornith/ornith-1.5-35b-a3b-q4-k-m` on loopback at `127.0.0.1:8095`.
+
+| Setting | Value |
+|---|---|
+| Context per request | 131,072 tokens |
+| Slots | 1 |
+| Threads | 12 on CPU range `0-15` |
+| Batch / ubatch | 1,024 / 256 |
+| MTP | Disabled after measured regressions |
+| KV | Q8_0 with Flash Attention enabled |
+| Prompt cache | Enabled; no idle-slot RAM cache |
+| Reuse/checkpoints | No cross-request reuse; 32 checkpoints, 8,192-token minimum spacing |
+
+The exact 32K profile processed prompts at 18.07 tok/s and generated at 6.80 tok/s. It peaked at 91 C under the 95 C tuning gate. Built-in Q8 MTP depth 1 reduced the matched 32K rates to 12.62 and 3.95 tok/s and used 7.54 GiB of process swap, so the service runs target-only.
+
+```bash
+systemctl --user status llama-ornith-local-provider.service
+curl -fsS http://127.0.0.1:8095/health
+pi --provider local-ornith --model ornith-1.5-35b-a3b-q4-k-m
+```
+
+The Gemma, Maple, Qwen3.6 and Qwen 3.8 services are disabled. Their weight files remain available for rollback.
+
+Installation, Pi registration, diagnostics, measurements and rollback:
+
+- [`docs/ornith-1.5-local-provider-runbook.md`](docs/ornith-1.5-local-provider-runbook.md)
+- [`docs/gemma-local-provider-runbook.md`](docs/gemma-local-provider-runbook.md)
+- [`docs/gemma-local-provider-benchmark-2026-08-02.md`](docs/gemma-local-provider-benchmark-2026-08-02.md)
+
+### Maple, Gemma and Qwen role comparison
+
+The 5-6 August 2026 campaign used exact per-tokenizer 512, 4,096 and 32,768-token prompts, a 512-token prompt with 64 generated tokens, identical bounded API cases and identical real Pi tasks. The 18 August Qwen 3.8 follow-up retained those prompt sizes and test corpora. Each model ran alone on eight P-core threads with its accepted profile.
+
+| Model | Prompt 512 | Prompt 4K | Prompt 32K | Generation | Bounded API | Real Pi | Role |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Maple exact TQ2/F32 | **76.03** | **71.79** | **56.91** | 18.77 | 4/6 | 3/4 | Fast prompt ingestion |
+| Gemma 4 E4B | 65.24 | 60.96 | 44.32 | **25.77** | 4/6 | 3/4 | Primary local model |
+| Qwen3.6 35B-A3B Q2 | 31.89 | 26.87 | 10.95 | 11.40 | 3/6 | **4/4** | Repository-grounded fallback |
+| Qwen 3.8 target | 6.88 | 6.34 | 3.21 | 2.33 | not run | not run | Target-only measurement |
+| Qwen 3.8 MTP-3 | 6.76 | 6.18 | not run | 3.47 | 4/6 | 2/4 | Manual compatibility and vision only |
+
+The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwen3.6 second and Maple third. Qwen3.6 alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
+
+Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. The disabled service on `127.0.0.1:8094` is suitable only for manual compatibility or vision checks.
+
+These role assignments record the 5-6 August comparison. The 20 August Ornith 1.5 deployment superseded them: Ornith is the sole enabled local provider, while the Maple, Gemma and Qwen services are disabled with their weights preserved.
+
+Full reports, raw responses, telemetry, identities and validators:
+
+- [`benchmarks/intel-1340p/maple-qwen-campaign/report.md`](benchmarks/intel-1340p/maple-qwen-campaign/report.md)
+- [`benchmarks/intel-1340p/maple-qwen-campaign/README.md`](benchmarks/intel-1340p/maple-qwen-campaign/README.md)
+- [`benchmarks/intel-1340p/qwen38-campaign/report.md`](benchmarks/intel-1340p/qwen38-campaign/report.md)
+- [`benchmarks/intel-1340p/qwen38-campaign/README.md`](benchmarks/intel-1340p/qwen38-campaign/README.md)
+
+### 18-19 August 2026 upstream adoption gates
+
+The latest adoption campaign tested selected upstream changes in isolated worktrees before commit `abdbeadf`. Correctness took precedence over local throughput. The retained small patch produced byte-identical fixed-prompt token IDs and first-token logits for Gemma, Qwen3.6, Qwen 3.8 and Maple.
+
+| Gate | Profile | Measured result | Decision |
+|---|---|---|---|
+| mmap quantisation eviction | Qwen3.6 22.85 GB input to 13.25 GB Q2_K | mmap wall time fell from 496.584 to 390.551 seconds and peak PSS from 24,875,134 to 4,562,491 KiB, an 81.66% PSS reduction; output remained byte-identical | Selected |
+| Non-mmap control | Same source and output | Wall time changed by +0.15% and peak PSS by +52 KiB; no swap | No regression |
+| CPU F16 V-cache conversion | 4,096-token prompt, 64 generated tokens, eight P-core threads | Mean end-to-end time improved by 0.40%, median by 0.48%, and generation throughput fell by 1.54%; output remained byte-identical | Rejected below the 2% gate |
+| Full-integration CPU | Release CPU suite | 64/64 tests passed in 44.70 seconds | Passed, but insufficient to promote the full integration |
+| Full-integration Vulkan | Normal runtime and result checker | Normal runtime passed 64/64 in 1,167.46 seconds; the checker failed 7/9 focused tests | Rejected for correctness |
+| Maple TQ2_0 Vulkan | Exact-head model, F32 K/V, Flash Attention off | Routed `MUL_MAT_ID` lost the device at `n=16` and `n=32`; sequential aggregate NRMSE was `5.334015e-6` and maximum KL was `1.152624e-10` | Rejected for correctness |
+| Full-integration long-context deployment | Integration-branch Gemma 128K and shorter Qwen3.6 MTP fixtures | The 95 C gate stopped Gemma at 24,681 processed prompt tokens and the Qwen3.6 MTP fixture at 1,353 | Incomplete; full integration not promoted and deployed roles unchanged |
+
+Maple's sequential Vulkan run retained top-1 agreement for 15/15 tokens and mean top-32 overlap of 32/32, but only 3/15 tokens met the NRMSE limit. Ranking agreement did not override the `< 1e-6` NRMSE and `< 2e-11` KL requirements.
+
+SYCL Q1_0 `MUL_MAT` errors reached `0.417105617` and `1.365789949` against a `0.000500000` limit. Graph mode repeated the corruption, and the graph-mode Q2_0 run did not complete. SpaceMIT Q5_0 dispatch was not adopted because no Q5_0 K3 fixture was available.
+
+After the later small-patch merge, the selected CPU build reported `b10579-abdbeadfb`, rebuilt all 330 targets and passed 59/59 main-branch tests. Model roles and ports did not change during that campaign. The separate 20 August Ornith 1.5 deployment replaced the enabled local provider.
+
+### Iris Xe: measured and rejected
+
+Iris Xe remains a validation target, not the deployed inference backend.
+
+The July Vulkan campaign passed 1,544/1,544 focused `MUL_MAT_ID`, `RMS_NORM`, `ROPE` and `SOFT_MAX` cases. Full Q2 offload generated 9.90 tok/s versus 14.90 tok/s on CPU; a Q4 10-layer split generated 7.62 tok/s versus 13.17 tok/s on CPU. The August result-checker failures and Maple device loss above prevent promotion of the newer upstream Vulkan paths.
+
+The earlier SYCL campaign discovered the Level Zero device and passed its focused model-shaped operations, but broad quant support, decode throughput and graph stability were insufficient. Full and partial offload regressed generation, and the tested Gemma graph split failed. The August Q1_0 failures above keep SYCL blocked.
+
+Further Vulkan prototypes were also rejected:
+
+- Q2 exact-row end-to-end results ranged from -2.8% to +0.7%;
+- Q4 exact-row geometric mean was -0.14%;
+- deferred MTP catch-up regressed generation by 3.04% and wall time by 3.59%;
+- CPU/Vulkan routed-expert overlap did not clear the promotion gate.
+
+Evidence:
+
+- [`benchmarks/intel-1340p/cpu-vulkan-interleaving-report-20260731.md`](benchmarks/intel-1340p/cpu-vulkan-interleaving-report-20260731.md)
+- [`benchmarks/intel-1340p/qwen35moe-vulkan-mtp/report.md`](benchmarks/intel-1340p/qwen35moe-vulkan-mtp/report.md)
+- [`benchmarks/intel-1340p/ornith-gemma-optimization/sycl/`](benchmarks/intel-1340p/ornith-gemma-optimization/sycl/)
+
+## SpaceMIT K3 / Milk-V K3
+
+### Backend
+
+The K3 backend adds hardware-specific CPU paths for:
+
+- RVV activation, reduction and compact-quant kernels;
+- IME1/IME2 matrix dispatch;
+- TCM allocation and staging;
+- K3 AI-core affinity;
+- load-time Q4_K, Q5_K, Q6_K and Q8_0 weight repacking;
+- routed-MoE row handling;
+- bounded compact-IQ IME2 tile packing and caching;
+- matmul, recurrent, copy and cache profiling.
+
+Build a native release:
 
 ```bash
 cmake -B build \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGGML_CPU_RISCV64_SPACEMIT=ON \
-    -DGGML_NATIVE=ON
+  -DCMAKE_BUILD_TYPE=Release \
+  -DGGML_CPU_RISCV64_SPACEMIT=ON \
+  -DGGML_NATIVE=ON
 cmake --build build -j"$(nproc)"
 ```
 
-### K3 optimisation progress
+Build and backend notes:
 
-The table records the state verified on a Milk-V K3 through 24 July 2026. `Default` means the path is active without an experimental environment variable.
+- [`docs/build-riscv64-spacemit.md`](docs/build-riscv64-spacemit.md)
+- [`docs/spacemit-default-fastpaths-deployment.md`](docs/spacemit-default-fastpaths-deployment.md)
+- [`scripts/README-k3-matmul.md`](scripts/README-k3-matmul.md)
 
-| Area | Implementation and evidence | Measured result | State |
-|---|---|---:|---|
-| SpaceMIT backend | RVV activation kernels, IME1/IME2 dispatch, TCM allocation and K3 AI-core affinity | Qwen and Gemma services live-verified | Default |
-| Quantized weights | Load-time repacking for Q4_K, Q5_K, Q6_K and Q8_0 IME layouts | Avoids per-call weight conversion | Default |
-| Q4_K edges | Register-tiled m4/m1 family tested at activation rows 1–9 and 32 | All one- and eight-thread cases passed | Default |
-| Matmul scheduling | Profiled `auto`, `tcm-a`, `tcm-b` and `direct` across prompt and generation shapes | `direct` reduced Qwen generation by 8.2%; `auto` retained | Default: `auto` |
-| Compact-IQ MoE | Direct IQ2/IQ3/IQ4 packing into IME2 tiles plus one shared cross-format byte ceiling and global tile LRU | Q2_K_XL reached 3.58 tok/s warm at 16K with a 14 GiB shared cache; expert protection regressed and defaults off | Opt-in |
-| Q4_K/Q5_K MoE edges | m4→m2→m1 contract and routed-row fixture for rows 1, 2, 4, 5 and 8 | 120 gate/type/row/thread combinations passed; m4 was 4.48% of Qwen MoE tiles | Opt-in |
-| Dense MTP tails | Spill-free i8×i8 m2 kernel shares one B tile across two A rows | 3.1–4.0% focused gain; 0.09% Qwen end-to-end gain | Opt-in |
-| Qwen matrix campaign, 20 July | Q4_K_M, draft maximum 3, eight threads, batch 512, microbatch 128, one 8K slot | 10.18 generation tok/s; 93.88% draft acceptance on the campaign corpus | Historical benchmark |
-| Qwen live service, 22 July | Q4_K_M, draft maximum 1, eight threads, batch 2,048, microbatch 512, one 4K slot | 7.86 generation tok/s across five varied prompts; 77.4% draft acceptance | Live default |
-| Qwen Q4 16K test, 23 July | Same Q4_K_M profile with one 16K slot | 7.05 tok/s at short context; new 4,122-token prefill ran at 6.42 tok/s and took 642 s; generation with that active context was 2.67 tok/s; 8.33 GiB available after load | Tested, not live default |
-| Qwen context/cache | 3,042-token README prompt and cached follow-up | 3,038 cached tokens reused; 54 new tokens processed | Live-verified |
-| Qwen recurrent state | GDN writes rollback snapshots directly into the strided recurrent-cache view, removing the second 8 MiB state copy | +8.33–8.99% in three paired runs; +5.05% across five prompts | Live default |
-| F32 dot reduction | LMUL=8 split and four-accumulator LMUL=4 variants tested at the dominant 128-element shape | 23–43% slower than the current RVV reduction | Rejected |
-| Gated delta net | Fused state-row update and output dot | 15–17% faster fixture; 0.6–1.1% slower across five prompts | Rejected |
-| SSM Conv4 | Channel-vectorised strided RVV kernel for the `8192 × 4` decode shape | 21–29% faster fixture; 0.98% slower without speculation | Rejected |
+### Selected paths
 
-No experimental matrix or arithmetic kernel met the 2% end-to-end promotion threshold. The service keeps the automatic scheduler, existing TCM staging and existing F32/GDN/SSM kernels. Direct recurrent-state writes met the threshold and are enabled in the live Qwen launcher.
+The default SpaceMIT paths include:
 
-### K3 controls
+- automatic TCM/matmul scheduling;
+- Q4_K 32x256 IME2 routing;
+- BF16 `per_layer_model_proj.weight` to Q8 conversion;
+- Gemma F32 projection to Q8 conversion;
+- shape- and name-restricted Gemma attention-cache `matvec8`;
+- load-time quantised-weight repacking.
 
-| Variable | Effect | Default |
+The Qwen service may also enable direct GDN recurrent-state writes with `GGML_CPU_GDN_DIRECT_STATE=1`. This removes the second recurrent-state copy and improved mean generation from 6.887 to 7.235 tok/s across five prompts, a 5.05% gain with matching outputs and draft acceptance.
+
+Gemma's promoted default fast paths measured 6.84 tg128 and 50.90 pp16, about 12% faster in decode and 68% faster in short prompt processing than the original baseline.
+
+### Opt-in and diagnostic controls
+
+| Variable | Purpose | Default |
 |---|---|---|
-| `GGML_RISCV64_SPACEMIT_MATMUL_TRACE=1` | Emit exact matmul operations, types and shapes | Off |
-| `GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto\|tcm-a\|tcm-b\|direct` | Select the diagnostic matmul schedule | `auto` |
-| `GGML_RISCV64_SPACEMIT_COPY_PROFILE=1` | Count dense and MoE TCM copy calls and bytes | Off |
-| `GGML_RISCV64_SPACEMIT_MOE_TILE_PROFILE=1` | Count m4, m2 and m1 MoE dispatches | Off |
-| `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable the Q4_K/Q5_K m4 edge contract | Off |
-| `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense register-tiled i8×i8 m2 kernel | Off |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1` | Pack compact-IQ routed-MoE tiles for IME2 and enable the bounded cross-request cache | Off |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_BYTES=<bytes>` | Set the exact aggregate compact-IQ IME2 cache ceiling | Unset |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` | Set one aggregate compact-IQ IME2 cache ceiling; `0` uses per-thread scratch packing | 64 MiB when the tile gate is on |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_ROUTES=<n>` | Require repeated expert routes before cache admission; diagnostic because tested thresholds regressed Qwen | `1` |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_LAYER_RESERVE_PCT=<0-100>` | Soft per-layer reserve inside the shared ceiling; used only with protected experts | `50` |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT=<0-100>` | Reserve an optional protected expert pool inside the shared ceiling | `0` |
-| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` | Emit aggregate cache telemetry plus tile-pack calls, direct/fallback rows, pack time and staging bytes | Off |
-| `GGML_CPU_WHOLE_TOKEN_PROFILE=1` | Emit cumulative exit-time CPU operation/family totals with active-thread time and logical bytes; profiling adds per-node barriers | Off |
-| `GGML_CPU_EXPERT_IO_PROFILE=1` | Emit opt-in routed-expert selection/reuse/range/residency metrics | Off |
-| `GGML_CPU_EXPERT_IO_ADVISE_MODE=off\|bounded\|adaptive` | Enable bounded miss-only expert page advice; see the expert-I/O guide for safety limits | `off` |
-| `GGML_CPU_RECURRENT_PROFILE=1` | Count CPU `DUP`/`CPY` buckets and time GDN/SSM shapes | Off |
-| `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly into the recurrent-cache view | Off in library; on in the Qwen service |
-
-Detailed measurements and reproduction instructions:
-
-- [Qwen3.6-35B-A3B matrix campaign](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
-- [Qwen recurrent-path campaign](benchmarks/qwen-recurrent-20260721/final-report.md)
-- [Qwen service parameter sweep](benchmarks/qwen-parameter-sweep-20260722/final-report.md)
-- [Compact-IQ IME2 tile and cache campaign](benchmarks/qwen-compact-ime2-20260722/report.md)
-- [Layer-segmented compact-IQ cache experiment](benchmarks/qwen-compact-ime2-segmented-20260722/report.md)
-- [Shared compact-IQ cache architecture](benchmarks/qwen-compact-ime2-soft-cache-20260723/report.md)
-- [Qwen quant comparison](benchmarks/qwen-quant-comparison-20260722/report.md)
-- [Qwen Q3_K_M service test](benchmarks/qwen-q3km-20260722/report.md)
-- [Qwen Q4_K_M at 16K context](benchmarks/qwen-q4km-16k-20260723/report.md)
-- [K3 RVV/IME2 matmul campaign](benchmarks/k3-matmul-final-report-20260720.md)
-- [K3 benchmark harness](scripts/README-k3-matmul.md)
-
-<details>
-<summary>Models</summary>
-
-Typically finetunes of the base models below are supported as well.
-
-Instructions for adding support for new models: [HOWTO-add-model.md](docs/development/HOWTO-add-model.md)
-
-#### Text-only
-
-- [X] LLaMA 🦙
-- [x] LLaMA 2 🦙🦙
-- [x] LLaMA 3 🦙🦙🦙
-- [X] [Mistral 7B](https://huggingface.co/mistralai/Mistral-7B-v0.1)
-- [x] [Mixtral MoE](https://huggingface.co/models?search=mistral-ai/Mixtral)
-- [x] [DBRX](https://huggingface.co/databricks/dbrx-instruct)
-- [x] [Jamba](https://huggingface.co/ai21labs)
-- [X] [Falcon](https://huggingface.co/models?search=tiiuae/falcon)
-- [X] [Chinese LLaMA / Alpaca](https://github.com/ymcui/Chinese-LLaMA-Alpaca) and [Chinese LLaMA-2 / Alpaca-2](https://github.com/ymcui/Chinese-LLaMA-Alpaca-2)
-- [X] [Vigogne (French)](https://github.com/bofenghuang/vigogne)
-- [X] [BERT](https://github.com/ggml-org/llama.cpp/pull/5423)
-- [X] [Koala](https://bair.berkeley.edu/blog/2023/04/03/koala/)
-- [X] [Baichuan 1 & 2](https://huggingface.co/models?search=baichuan-inc/Baichuan) + [derivations](https://huggingface.co/hiyouga/baichuan-7b-sft)
-- [X] [Aquila 1 & 2](https://huggingface.co/models?search=BAAI/Aquila)
-- [X] [Starcoder models](https://github.com/ggml-org/llama.cpp/pull/3187)
-- [X] [Refact](https://huggingface.co/smallcloudai/Refact-1_6B-fim)
-- [X] [MPT](https://github.com/ggml-org/llama.cpp/pull/3417)
-- [X] [Bloom](https://github.com/ggml-org/llama.cpp/pull/3553)
-- [x] [Yi models](https://huggingface.co/models?search=01-ai/Yi)
-- [X] [StableLM models](https://huggingface.co/stabilityai)
-- [x] [Deepseek models](https://huggingface.co/models?search=deepseek-ai/deepseek)
-- [x] [Qwen models](https://huggingface.co/models?search=Qwen/Qwen)
-- [x] [PLaMo-13B](https://github.com/ggml-org/llama.cpp/pull/3557)
-- [x] [Phi models](https://huggingface.co/models?search=microsoft/phi)
-- [x] [PhiMoE](https://github.com/ggml-org/llama.cpp/pull/11003)
-- [x] [GPT-2](https://huggingface.co/gpt2)
-- [x] [Orion 14B](https://github.com/ggml-org/llama.cpp/pull/5118)
-- [x] [InternLM2](https://huggingface.co/models?search=internlm2)
-- [x] [CodeShell](https://github.com/WisdomShell/codeshell)
-- [x] [Gemma](https://ai.google.dev/gemma)
-- [x] [Mamba](https://github.com/state-spaces/mamba)
-- [x] [Grok-1](https://huggingface.co/keyfan/grok-1-hf)
-- [x] [Xverse](https://huggingface.co/models?search=xverse)
-- [x] [Command-R models](https://huggingface.co/models?search=CohereForAI/c4ai-command-r)
-- [x] [SEA-LION](https://huggingface.co/models?search=sea-lion)
-- [x] [GritLM-7B](https://huggingface.co/GritLM/GritLM-7B) + [GritLM-8x7B](https://huggingface.co/GritLM/GritLM-8x7B)
-- [x] [OLMo](https://allenai.org/olmo)
-- [x] [OLMo 2](https://allenai.org/olmo)
-- [x] [OLMoE](https://huggingface.co/allenai/OLMoE-1B-7B-0924)
-- [x] [Granite models](https://huggingface.co/collections/ibm-granite/granite-code-models-6624c5cec322e4c148c8b330)
-- [x] [GPT-NeoX](https://github.com/EleutherAI/gpt-neox) + [Pythia](https://github.com/EleutherAI/pythia)
-- [x] [Snowflake-Arctic MoE](https://huggingface.co/collections/Snowflake/arctic-66290090abe542894a5ac520)
-- [x] [Smaug](https://huggingface.co/models?search=Smaug)
-- [x] [Poro 34B](https://huggingface.co/LumiOpen/Poro-34B)
-- [x] [Bitnet b1.58 models](https://huggingface.co/1bitLLM)
-- [x] [Flan T5](https://huggingface.co/models?search=flan-t5)
-- [x] [Open Elm models](https://huggingface.co/collections/apple/openelm-instruct-models-6619ad295d7ae9f868b759ca)
-- [x] [ChatGLM3-6b](https://huggingface.co/THUDM/chatglm3-6b) + [ChatGLM4-9b](https://huggingface.co/THUDM/glm-4-9b) + [GLMEdge-1.5b](https://huggingface.co/THUDM/glm-edge-1.5b-chat) + [GLMEdge-4b](https://huggingface.co/THUDM/glm-edge-4b-chat)
-- [x] [GLM-4-0414](https://huggingface.co/collections/THUDM/glm-4-0414-67f3cbcb34dd9d252707cb2e)
-- [x] [SmolLM](https://huggingface.co/collections/HuggingFaceTB/smollm-6695016cad7167254ce15966)
-- [x] [EXAONE-3.0-7.8B-Instruct](https://huggingface.co/LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct)
-- [x] [FalconMamba Models](https://huggingface.co/collections/tiiuae/falconmamba-7b-66b9a580324dd1598b0f6d4a)
-- [x] [Jais](https://huggingface.co/inceptionai/jais-13b-chat)
-- [x] [Bielik-11B-v2.3](https://huggingface.co/collections/speakleash/bielik-11b-v23-66ee813238d9b526a072408a)
-- [x] [RWKV-7](https://huggingface.co/collections/shoumenchougou/rwkv7-gxx-gguf)
-- [x] [RWKV-6](https://github.com/BlinkDL/RWKV-LM)
-- [x] [QRWKV-6](https://huggingface.co/recursal/QRWKV6-32B-Instruct-Preview-v0.1)
-- [x] [GigaChat-20B-A3B](https://huggingface.co/ai-sage/GigaChat-20B-A3B-instruct)
-- [X] [Trillion-7B-preview](https://huggingface.co/trillionlabs/Trillion-7B-preview)
-- [x] [Ling models](https://huggingface.co/collections/inclusionAI/ling-67c51c85b34a7ea0aba94c32)
-- [x] [Liquid LFM2 models](https://huggingface.co/collections/LiquidAI/lfm2)
-- [x] [Liquid LFM2.5 models](https://huggingface.co/collections/LiquidAI/lfm25)
-- [x] [Liquid Nanos](https://huggingface.co/collections/LiquidAI/liquid-nanos)
-- [x] [Hunyuan models](https://huggingface.co/collections/tencent/hunyuan-dense-model-6890632cda26b19119c9c5e7)
-- [x] [BailingMoeV2 (Ring/Ling 2.0) models](https://huggingface.co/collections/inclusionAI/ling-v2-68bf1dd2fc34c306c1fa6f86)
-- [x] [Mellum models](https://huggingface.co/JetBrains/models?search=mellum)
-
-#### Multimodal
-
-- [x] [LLaVA 1.5 models](https://huggingface.co/collections/liuhaotian/llava-15-653aac15d994e992e2677a7e), [LLaVA 1.6 models](https://huggingface.co/collections/liuhaotian/llava-16-65b9e40155f60fd046a5ccf2)
-- [x] [BakLLaVA](https://huggingface.co/models?search=SkunkworksAI/Bakllava)
-- [x] [Obsidian](https://huggingface.co/NousResearch/Obsidian-3B-V0.5)
-- [x] [ShareGPT4V](https://huggingface.co/models?search=Lin-Chen/ShareGPT4V)
-- [x] [MobileVLM 1.7B/3B models](https://huggingface.co/models?search=mobileVLM)
-- [x] [Yi-VL](https://huggingface.co/models?search=Yi-VL)
-- [x] [Mini CPM](https://huggingface.co/models?search=MiniCPM)
-- [x] [Moondream](https://huggingface.co/vikhyatk/moondream2)
-- [x] [Bunny](https://github.com/BAAI-DCAI/Bunny)
-- [x] [GLM-EDGE](https://huggingface.co/models?search=glm-edge)
-- [x] [Qwen2-VL](https://huggingface.co/collections/Qwen/qwen2-vl-66cee7455501d7126940800d)
-- [x] [LFM2-VL](https://huggingface.co/collections/LiquidAI/lfm2-vl-68963bbc84a610f7638d5ffa)
-
-</details>
-
-<details>
-<summary>Bindings</summary>
-
-- Python: [ddh0/easy-llama](https://github.com/ddh0/easy-llama)
-- Python: [abetlen/llama-cpp-python](https://github.com/abetlen/llama-cpp-python)
-- Go: [go-skynet/go-llama.cpp](https://github.com/go-skynet/go-llama.cpp)
-- Node.js: [withcatai/node-llama-cpp](https://github.com/withcatai/node-llama-cpp)
-- JS/TS (llama.cpp server client): [lgrammel/modelfusion](https://modelfusion.dev/integration/model-provider/llamacpp)
-- JS/TS (Programmable Prompt Engine CLI): [offline-ai/cli](https://github.com/offline-ai/cli)
-- JavaScript/Wasm (works in browser): [tangledgroup/llama-cpp-wasm](https://github.com/tangledgroup/llama-cpp-wasm)
-- Typescript/Wasm (nicer API, available on npm): [ngxson/wllama](https://github.com/ngxson/wllama)
-- Ruby: [yoshoku/llama_cpp.rb](https://github.com/yoshoku/llama_cpp.rb)
-- Ruby: [docusealco/rllama](https://github.com/docusealco/rllama)
-- Rust (more features): [edgenai/llama_cpp-rs](https://github.com/edgenai/llama_cpp-rs)
-- Rust (nicer API): [mdrokz/rust-llama.cpp](https://github.com/mdrokz/rust-llama.cpp)
-- Rust (more direct bindings): [utilityai/llama-cpp-rs](https://github.com/utilityai/llama-cpp-rs)
-- Rust (automated build from crates.io): [ShelbyJenkins/llm_client](https://github.com/ShelbyJenkins/llm_client)
-- C#/.NET: [SciSharp/LLamaSharp](https://github.com/SciSharp/LLamaSharp)
-- C#/VB.NET (more features - community license): [LM-Kit.NET](https://docs.lm-kit.com/lm-kit-net/index.html)
-- Scala 3: [donderom/llm4s](https://github.com/donderom/llm4s)
-- Clojure: [phronmophobic/llama.clj](https://github.com/phronmophobic/llama.clj)
-- React Native: [mybigday/llama.rn](https://github.com/mybigday/llama.rn)
-- Java: [kherud/java-llama.cpp](https://github.com/kherud/java-llama.cpp)
-- Java: [QuasarByte/llama-cpp-jna](https://github.com/QuasarByte/llama-cpp-jna)
-- Zig: [deins/llama.cpp.zig](https://github.com/Deins/llama.cpp.zig)
-- Flutter/Dart: [netdur/llama_cpp_dart](https://github.com/netdur/llama_cpp_dart)
-- Flutter: [xuegao-tzx/Fllama](https://github.com/xuegao-tzx/Fllama)
-- PHP (API bindings and features built on top of llama.cpp): [distantmagic/resonance](https://github.com/distantmagic/resonance) [(more info)](https://github.com/ggml-org/llama.cpp/pull/6326)
-- Guile Scheme: [guile_llama_cpp](https://savannah.nongnu.org/projects/guile-llama-cpp)
-- Swift [srgtuszy/llama-cpp-swift](https://github.com/srgtuszy/llama-cpp-swift)
-- Swift [ShenghaiWang/SwiftLlama](https://github.com/ShenghaiWang/SwiftLlama)
-- Delphi [Embarcadero/llama-cpp-delphi](https://github.com/Embarcadero/llama-cpp-delphi)
-- Go (no CGo needed): [hybridgroup/yzma](https://github.com/hybridgroup/yzma)
-- Android: [llama.android](/examples/llama.android)
-
-</details>
-
-<details>
-<summary>UIs</summary>
-
-*(to have a project listed here, it should clearly state that it depends on `llama.cpp`)*
-
-- [AI Sublime Text plugin](https://github.com/yaroslavyaroslav/OpenAI-sublime-text) (MIT)
-- [BonzAI App](https://apps.apple.com/us/app/bonzai-your-local-ai-agent/id6752847988) (proprietary)
-- [cztomsik/ava](https://github.com/cztomsik/ava) (MIT)
-- [Dot](https://github.com/alexpinel/Dot) (GPL)
-- [eva](https://github.com/ylsdamxssjxxdd/eva) (MIT)
-- [iohub/collama](https://github.com/iohub/coLLaMA) (Apache-2.0)
-- [janhq/jan](https://github.com/janhq/jan) (AGPL)
-- [johnbean393/Sidekick](https://github.com/johnbean393/Sidekick) (MIT)
-- [KanTV](https://github.com/zhouwg/kantv?tab=readme-ov-file) (Apache-2.0)
-- [KodiBot](https://github.com/firatkiral/kodibot) (GPL)
-- [llama.vim](https://github.com/ggml-org/llama.vim) (MIT)
-- [LARS](https://github.com/abgulati/LARS) (AGPL)
-- [Llama Assistant](https://github.com/vietanhdev/llama-assistant) (GPL)
-- [LlamaLib](https://github.com/undreamai/LlamaLib) (Apache-2.0)
-- [LLMFarm](https://github.com/guinmoon/LLMFarm?tab=readme-ov-file) (MIT)
-- [LLMUnity](https://github.com/undreamai/LLMUnity) (MIT)
-- [LMStudio](https://lmstudio.ai/) (proprietary)
-- [LocalAI](https://github.com/mudler/LocalAI) (MIT)
-- [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp) (AGPL)
-- [MindMac](https://mindmac.app) (proprietary)
-- [MindWorkAI/AI-Studio](https://github.com/MindWorkAI/AI-Studio) (FSL-1.1-MIT)
-- [Mobile-Artificial-Intelligence/maid](https://github.com/Mobile-Artificial-Intelligence/maid) (MIT)
-- [Mozilla-Ocho/llamafile](https://github.com/Mozilla-Ocho/llamafile) (Apache-2.0)
-- [nat/openplayground](https://github.com/nat/openplayground) (MIT)
-- [nomic-ai/gpt4all](https://github.com/nomic-ai/gpt4all) (MIT)
-- [ollama/ollama](https://github.com/ollama/ollama) (MIT)
-- [oobabooga/text-generation-webui](https://github.com/oobabooga/text-generation-webui) (AGPL)
-- [PocketPal AI](https://github.com/a-ghorbani/pocketpal-ai) (MIT)
-- [psugihara/FreeChat](https://github.com/psugihara/FreeChat) (MIT)
-- [ptsochantaris/emeltal](https://github.com/ptsochantaris/emeltal) (MIT)
-- [pythops/tenere](https://github.com/pythops/tenere) (AGPL)
-- [ramalama](https://github.com/containers/ramalama) (MIT)
-- [semperai/amica](https://github.com/semperai/amica) (MIT)
-- [withcatai/catai](https://github.com/withcatai/catai) (MIT)
-- [Autopen](https://github.com/blackhole89/autopen) (GPL)
-
-</details>
-
-<details>
-<summary>Tools</summary>
-
-- [akx/ggify](https://github.com/akx/ggify) – download PyTorch models from Hugging Face Hub and convert them to GGML
-- [akx/ollama-dl](https://github.com/akx/ollama-dl) – download models from the Ollama library to be used directly with llama.cpp
-- [crashr/gppm](https://github.com/crashr/gppm) – launch llama.cpp instances utilizing NVIDIA Tesla P40 or P100 GPUs with reduced idle power consumption
-- [gpustack/gguf-parser](https://github.com/gpustack/gguf-parser-go/tree/main/cmd/gguf-parser) - review/check the GGUF file and estimate the memory usage
-- [Styled Lines](https://marketplace.unity.com/packages/tools/generative-ai/styled-lines-llama-cpp-model-292902) (proprietary licensed, async wrapper of inference part for game development in Unity3d with pre-built Mobile and Web platform wrappers and a model example)
-- [unslothai/unsloth](https://github.com/unslothai/unsloth) – 🦥 exports/saves fine-tuned and trained models to GGUF (Apache-2.0)
-
-</details>
-
-<details>
-<summary>Infrastructure</summary>
-
-- [Paddler](https://github.com/intentee/paddler) - Open-source LLMOps platform for hosting and scaling AI in your own infrastructure
-- [GPUStack](https://github.com/gpustack/gpustack) - Manage GPU clusters for running LLMs
-- [llama_cpp_canister](https://github.com/onicai/llama_cpp_canister) - llama.cpp as a smart contract on the Internet Computer, using WebAssembly
-- [llama-swap](https://github.com/mostlygeek/llama-swap) - transparent proxy that adds automatic model switching with llama-server
-- [Kalavai](https://github.com/kalavai-net/kalavai-client) - Crowdsource end to end LLM deployment at any scale
-- [llmaz](https://github.com/InftyAI/llmaz) - ☸️ Easy, advanced inference platform for large language models on Kubernetes.
-- [LLMKube](https://github.com/defilantech/llmkube) - Kubernetes operator for llama.cpp with multi-GPU and Apple Silicon Metal
-  support"
-</details>
-
-<details>
-<summary>Games</summary>
-
-- [Lucy's Labyrinth](https://github.com/MorganRO8/Lucys_Labyrinth) - A simple maze game where agents controlled by an AI model will try to trick you.
-
-</details>
-
-
-## Supported backends
-
-| Backend | Target devices |
-| --- | --- |
-| [Metal](docs/build.md#metal-build) | Apple Silicon |
-| [BLAS](docs/build.md#blas-build) | All |
-| [BLIS](docs/backend/BLIS.md) | All |
-| [SYCL](docs/backend/SYCL.md) | Intel GPU |
-| [OpenVINO [In Progress]](docs/backend/OPENVINO.md) | Intel CPUs, GPUs, and NPUs |
-| [MUSA](docs/build.md#musa) | Moore Threads GPU |
-| [CUDA](docs/build.md#cuda) | Nvidia GPU |
-| [HIP](docs/build.md#hip) | AMD GPU |
-| [ZenDNN](docs/build.md#zendnn) | AMD CPU |
-| [Vulkan](docs/build.md#vulkan) | GPU |
-| [CANN](docs/build.md#cann) | Ascend NPU |
-| [OpenCL](docs/backend/OPENCL.md) | Adreno GPU |
-| [IBM zDNN](docs/backend/zDNN.md) | IBM Z & LinuxONE |
-| [WebGPU](docs/build.md#webgpu) | All |
-| [RPC](https://github.com/ggml-org/llama.cpp/tree/master/tools/rpc) | All |
-| [Hexagon [In Progress]](docs/backend/snapdragon/README.md) | Snapdragon |
-| [VirtGPU](docs/backend/VirtGPU.md) | VirtGPU APIR |
-
-## Obtaining and quantizing models
-
-The [Hugging Face](https://huggingface.co) platform hosts a [number of LLMs](https://huggingface.co/models?library=gguf&sort=trending) compatible with `llama.cpp`:
-
-- [Trending](https://huggingface.co/models?library=gguf&sort=trending)
-- [LLaMA](https://huggingface.co/models?sort=trending&search=llama+gguf)
-
-You can either manually download the GGUF file or directly use any `llama.cpp`-compatible models from [Hugging Face](https://huggingface.co/) or other model hosting sites, by using this CLI argument: `-hf <user>/<model>[:quant]`. For example:
-
-```sh
-llama-cli -hf ggml-org/gemma-3-1b-it-GGUF
-```
-
-By default, the CLI would download from Hugging Face, you can switch to other options with the environment variable `MODEL_ENDPOINT`. The `MODEL_ENDPOINT` must point to a Hugging Face compatible API endpoint.
-
-After downloading a model, use the CLI tools to run it locally - see below.
-
-`llama.cpp` requires the model to be stored in the [GGUF](https://github.com/ggml-org/ggml/blob/master/docs/gguf.md) file format. Models in other data formats can be converted to GGUF using the `convert_*.py` Python scripts in this repo.
-
-The Hugging Face platform provides a variety of online tools for converting, quantizing and hosting models with `llama.cpp`:
-
-- Use the [GGUF-my-repo space](https://huggingface.co/spaces/ggml-org/gguf-my-repo) to convert to GGUF format and quantize model weights to smaller sizes
-- Use the [GGUF-my-LoRA space](https://huggingface.co/spaces/ggml-org/gguf-my-lora) to convert LoRA adapters to GGUF format (more info: https://github.com/ggml-org/llama.cpp/discussions/10123)
-- Use the [GGUF-editor space](https://huggingface.co/spaces/CISCai/gguf-editor) to edit GGUF meta data in the browser (more info: https://github.com/ggml-org/llama.cpp/discussions/9268)
-- Use the [Inference Endpoints](https://ui.endpoints.huggingface.co/) to directly host `llama.cpp` in the cloud (more info: https://github.com/ggml-org/llama.cpp/discussions/9669)
-
-To learn more about model quantization, [read this documentation](tools/quantize/README.md)
-
-## [`llama-cli`](tools/cli)
-
-#### A CLI tool for accessing and experimenting with most of `llama.cpp`'s functionality.
-
-- <details open>
-    <summary>Run in conversation mode</summary>
-
-    Models with a built-in chat template will automatically activate conversation mode. If this doesn't occur, you can manually enable it by adding `-cnv` and specifying a suitable chat template with `--chat-template NAME`
-
-    ```bash
-    llama-cli -m model.gguf
-
-    # > hi, who are you?
-    # Hi there! I'm your helpful assistant! I'm an AI-powered chatbot designed to assist and provide information to users like you. I'm here to help answer your questions, provide guidance, and offer support on a wide range of topics. I'm a friendly and knowledgeable AI, and I'm always happy to help with anything you need. What's on your mind, and how can I assist you today?
-    #
-    # > what is 1+1?
-    # Easy peasy! The answer to 1+1 is... 2!
-    ```
-
-    </details>
-
-- <details>
-    <summary>Run in conversation mode with custom chat template</summary>
-
-    ```bash
-    # use the "chatml" template (use -h to see the list of supported templates)
-    llama-cli -m model.gguf -cnv --chat-template chatml
-
-    # use a custom template
-    llama-cli -m model.gguf -cnv --in-prefix 'User: ' --reverse-prompt 'User:'
-    ```
-
-    </details>
-
-- <details>
-    <summary>Constrain the output with a custom grammar</summary>
-
-    ```bash
-    llama-cli -m model.gguf -n 256 --grammar-file grammars/json.gbnf -p 'Request: schedule a call at 8pm; Command:'
-
-    # {"appointmentTime": "8pm", "appointmentDetails": "schedule a a call"}
-    ```
-
-    The [grammars/](grammars/) folder contains a handful of sample grammars. To write your own, check out the [GBNF Guide](grammars/README.md).
-
-    For authoring more complex JSON grammars, check out https://grammar.intrinsiclabs.ai/
-
-    </details>
-
-
-## [`llama-server`](tools/server)
-
-#### A lightweight, [OpenAI API](https://github.com/openai/openai-openapi) compatible, HTTP server for serving LLMs.
-
-- <details open>
-    <summary>Start a local HTTP server with default configuration on port 8080</summary>
-
-    ```bash
-    llama-server -m model.gguf --port 8080
-
-    # Basic web UI can be accessed via browser: http://localhost:8080
-    # Chat completion endpoint: http://localhost:8080/v1/chat/completions
-    ```
-
-    </details>
-
-- <details>
-    <summary>Support multiple-users and parallel decoding</summary>
-
-    ```bash
-    # up to 4 concurrent requests, each with 4096 max context
-    llama-server -m model.gguf -c 16384 -np 4
-    ```
-
-    </details>
-
-- <details>
-    <summary>Enable speculative decoding</summary>
-
-    ```bash
-    # the draft.gguf model should be a small variant of the target model.gguf
-    llama-server -m model.gguf -md draft.gguf
-    ```
-
-    </details>
-
-- <details>
-    <summary>Serve an embedding model</summary>
-
-    ```bash
-    # use the /embedding endpoint
-    llama-server -m model.gguf --embedding --pooling cls -ub 8192
-    ```
-
-    </details>
-
-- <details>
-    <summary>Serve a reranking model</summary>
-
-    ```bash
-    # use the /reranking endpoint
-    llama-server -m model.gguf --reranking
-    ```
-
-    </details>
-
-- <details>
-    <summary>Constrain all outputs with a grammar</summary>
-
-    ```bash
-    # custom grammar
-    llama-server -m model.gguf --grammar-file grammar.gbnf
-
-    # JSON
-    llama-server -m model.gguf --grammar-file grammars/json.gbnf
-    ```
-
-    </details>
-
-
-## [`llama-perplexity`](tools/perplexity)
-
-#### A tool for measuring the [perplexity](tools/perplexity/README.md) [^1] (and other quality metrics) of a model over a given text.
-
-- <details open>
-    <summary>Measure the perplexity over a text file</summary>
-
-    ```bash
-    llama-perplexity -m model.gguf -f file.txt
-
-    # [1]15.2701,[2]5.4007,[3]5.3073,[4]6.2965,[5]5.8940,[6]5.6096,[7]5.7942,[8]4.9297, ...
-    # Final estimate: PPL = 5.4007 +/- 0.67339
-    ```
-
-    </details>
-
-- <details>
-    <summary>Measure KL divergence</summary>
-
-    ```bash
-    # TODO
-    ```
-
-    </details>
-
-[^1]: [https://huggingface.co/docs/transformers/perplexity](https://huggingface.co/docs/transformers/perplexity)
-
-## [`llama-bench`](tools/llama-bench)
-
-#### Benchmark the performance of the inference for various parameters.
-
-- <details open>
-    <summary>Run default benchmark</summary>
-
-    ```bash
-    llama-bench -m model.gguf
-
-    # Output:
-    # | model               |       size |     params | backend    | threads |          test |                  t/s |
-    # | ------------------- | ---------: | ---------: | ---------- | ------: | ------------: | -------------------: |
-    # | qwen2 1.5B Q4_0     | 885.97 MiB |     1.54 B | Metal,BLAS |      16 |         pp512 |      5765.41 ± 20.55 |
-    # | qwen2 1.5B Q4_0     | 885.97 MiB |     1.54 B | Metal,BLAS |      16 |         tg128 |        197.71 ± 0.81 |
-    #
-    # build: 3e0ba0e60 (4229)
-    ```
-
-    </details>
-
-## [`llama-simple`](examples/simple)
-
-#### A minimal example for implementing apps with `llama.cpp`. Useful for developers.
-
-- <details>
-    <summary>Basic text completion</summary>
-
-    ```bash
-    llama-simple -m model.gguf
-
-    # Hello my name is Kaitlyn and I am a 16 year old girl. I am a junior in high school and I am currently taking a class called "The Art of
-    ```
-
-    </details>
-
-
-## Contributing
-
-- Contributors can open PRs
-- Collaborators will be invited based on contributions
-- Maintainers can push to branches in the `llama.cpp` repo and merge PRs into the `master` branch
-- Any help with managing issues, PRs and projects is very appreciated!
-- See [good first issues](https://github.com/ggml-org/llama.cpp/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) for tasks suitable for first contributions
-- Read the [CONTRIBUTING.md](CONTRIBUTING.md) for more information
-- Make sure to read this: [Inference at the edge](https://github.com/ggml-org/llama.cpp/discussions/205)
-- A bit of backstory for those who are interested: [Changelog podcast](https://changelog.com/podcast/532)
-
-## Other documentation
-
-- [cli](tools/cli/README.md)
-- [completion](tools/completion/README.md)
-- [server](tools/server/README.md)
-- [GBNF grammars](grammars/README.md)
-
-#### Development documentation
-
-- [How to build](docs/build.md)
-- [Running on Docker](docs/docker.md)
-- [Build on Android](docs/android.md)
-- [Multi-GPU usage](docs/multi-gpu.md)
-- [Performance troubleshooting](docs/development/token_generation_performance_tips.md)
-- [GGML tips & tricks](https://github.com/ggml-org/llama.cpp/wiki/GGML-Tips-&-Tricks)
-
-#### Seminal papers and background on the models
-
-If your issue is with model generation quality, then please at least scan the following links and papers to understand the limitations of LLaMA models. This is especially important when choosing an appropriate model size and appreciating both the significant and subtle differences between LLaMA models and ChatGPT:
-- LLaMA:
-    - [Introducing LLaMA: A foundational, 65-billion-parameter large language model](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/)
-    - [LLaMA: Open and Efficient Foundation Language Models](https://arxiv.org/abs/2302.13971)
-- GPT-3
-    - [Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)
-- GPT-3.5 / InstructGPT / ChatGPT:
-    - [Aligning language models to follow instructions](https://openai.com/research/instruction-following)
-    - [Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155)
-
-## XCFramework
-The XCFramework is a precompiled version of the library for iOS, visionOS, tvOS,
-and macOS. It can be used in Swift projects without the need to compile the
-library from source. For example:
-```swift
-// swift-tools-version: 5.10
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
-import PackageDescription
-
-let package = Package(
-    name: "MyLlamaPackage",
-    targets: [
-        .executableTarget(
-            name: "MyLlamaPackage",
-            dependencies: [
-                "LlamaFramework"
-            ]),
-        .binaryTarget(
-            name: "LlamaFramework",
-            url: "https://github.com/ggml-org/llama.cpp/releases/download/b5046/llama-b5046-xcframework.zip",
-            checksum: "c19be78b5f00d8d29a25da41042cb7afa094cbf6280a225abe614b03b20029ab"
-        )
-    ]
-)
-```
-The above example is using an intermediate build `b5046` of the library. This can be modified
-to use a different version by changing the URL and checksum.
-
-## Completions
-Command-line completion is available for some environments.
-
-#### Bash Completion
-```bash
-$ build/bin/llama-cli --completion-bash > ~/.llama-completion.bash
-$ source ~/.llama-completion.bash
-```
-Optionally this can be added to your `.bashrc` or `.bash_profile` to load it
-automatically. For example:
-```console
-$ echo "source ~/.llama-completion.bash" >> ~/.bashrc
-```
-
-## Dependencies
-
-- [yhirose/cpp-httplib](https://github.com/yhirose/cpp-httplib) - Single-header HTTP server, used by `llama-server` - MIT license
-- [stb-image](https://github.com/nothings/stb) - Single-header image format decoder, used by multimodal subsystem - Public domain
-- [nlohmann/json](https://github.com/nlohmann/json) - Single-header JSON library, used by various tools/examples - MIT License
-- [miniaudio.h](https://github.com/mackron/miniaudio) - Single-header audio format decoder, used by multimodal subsystem - Public domain
-- [subprocess.h](https://github.com/sheredom/subprocess.h) - Single-header process launching solution for C and C++ - Public domain
+| `GGML_RISCV64_SPACEMIT_MATMUL_TRACE=1` | Trace exact matmul operations and shapes | Off |
+| `GGML_RISCV64_SPACEMIT_MATMUL_SCHEDULE=auto\|tcm-a\|tcm-b\|direct` | Select diagnostic scheduling | `auto` |
+| `GGML_RISCV64_SPACEMIT_MOE_M4=1` | Enable Q4_K/Q5_K four-row MoE edge path | Off |
+| `GGML_RISCV64_SPACEMIT_I8I8_M2=1` | Enable the dense two-row i8 x i8 kernel | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1` | Enable compact-IQ IME2 tile packing/cache | Off |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=<MiB>` | Bound the shared tile cache | 64 MiB when enabled |
+| `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_PROFILE=1` | Emit cache and packing telemetry | Off |
+| `GGML_CPU_GDN_DIRECT_STATE=1` | Write GDN rollback snapshots directly | Off in the library |
+| `GGML_CPU_RECURRENT_PROFILE=1` | Profile recurrent operations | Off |
+
+The compact-IQ path remains opt-in. Its best retained 16K result used a 14 GiB shared cache and reached 3.585 warm generation tok/s, but the memory cost is unsuitable for the default 31 GiB service profile.
+
+### Rejected K3 experiments
+
+The K3 campaign retained only complete-model wins:
+
+- direct matmul scheduling reduced generation from 10.168 to 9.334 tok/s, so automatic scheduling remains selected;
+- a dense MTP two-row kernel improved focused cases by 3.1-4.0% but only 0.09% end-to-end;
+- fused gated-delta update/dot improved its fixture by 15-17% but regressed end-to-end by 0.6-1.1%;
+- SSM Conv4 RVV improved its fixture by 21-29% but regressed service generation by 0.98%;
+- persistent compact-IQ repacking expanded weights by 1.89x-3.68x and was rejected as a default;
+- protected-expert cache policies caused excessive eviction and regressed the shared global LRU.
+
+Evidence:
+
+- [`benchmarks/k3-matmul-final-report-20260720.md`](benchmarks/k3-matmul-final-report-20260720.md)
+- [`benchmarks/qwen-a3b-tunney/final-report-20260720.md`](benchmarks/qwen-a3b-tunney/final-report-20260720.md)
+- [`benchmarks/qwen-recurrent-20260721/final-report.md`](benchmarks/qwen-recurrent-20260721/final-report.md)
+- [`benchmarks/qwen-parameter-sweep-20260722/final-report.md`](benchmarks/qwen-parameter-sweep-20260722/final-report.md)
+- [`benchmarks/qwen-compact-ime2-20260722/report.md`](benchmarks/qwen-compact-ime2-20260722/report.md)
+- [`benchmarks/qwen-compact-ime2-soft-cache-20260723/report.md`](benchmarks/qwen-compact-ime2-soft-cache-20260723/report.md)
+
+## Promotion policy
+
+Fork changes are promoted only after the applicable end-to-end gate passes:
+
+- at least 2% for K3 live-kernel and Sigma profile changes;
+- deterministic output, tool-call and draft-acceptance checks for MTP changes;
+- numerical semantic replay for model-shaped backend graphs;
+- a 10% residual token-wall penalty before implementing a separate raw expert cache;
+- memory, page-fault, swap, temperature and restart checks before service use.
+
+A faster microbenchmark is recorded but left disabled or reverted when the complete workload regresses.
+
+## Repository map
+
+| Path | Contents |
+|---|---|
+| [`docs/README.md`](docs/README.md) | Fork documentation index |
+| [`benchmarks/intel-1340p/`](benchmarks/intel-1340p/) | Sigma CPU, long-context, MTP, SYCL and Vulkan evidence |
+| [`benchmarks/qwen-*`](benchmarks/) | K3 model and kernel campaigns |
+| [`tools/config/`](tools/config/) | Tracked service profiles |
+| [`tools/systemd/user/`](tools/systemd/user/) | User service units |
+| [`scripts/README-k3-matmul.md`](scripts/README-k3-matmul.md) | K3 benchmark harness and interpretation |
+
+General llama.cpp references remain available in this tree:
+
+- [`docs/build.md`](docs/build.md)
+- [`tools/server/README.md`](tools/server/README.md)
+- [`docs/models.md`](docs/models.md)
+- [`docs/function-calling.md`](docs/function-calling.md)
+
+## Upstream and licence
+
+This is a downstream hardware-optimisation fork of [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.cpp). Fork changes retain the project's [MIT licence](LICENSE).

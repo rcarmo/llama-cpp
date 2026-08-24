@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a plan to structure the response:\n1.  **Analyze the Request & Constraints:**\n    *   **Goal:** Design a focused two-phase implementation plan for an Intel Xe exact-row Q2\\_K kernel.\n    *   **Target:** Qwen3.6 35B-A3B Q2\\_K\\_XL.\n    *   **Hardware:** Intel Core i5-1340P (Iris Xe).\n    *   **Current State:** CPU target-only is faster than full Vulkan. Native MTP improves CPU generation. Vulkan has FP16/integer dot product, no cooperative matrix support, 48 KiB shared memory.\n    *   **Problem:** Generic MMVQ shader uses `temp[NUM_COLS][NUM_ROWS]` accumulators and loops over columns while decoding the same quantized weights (inefficient).\n    *   **Deliverables:** Two-phase plan, graph shapes, dispatch gates, correctness tests, telemetry, performance gates, fallback behavior, files likely to change.\n    *   **Crucial Distinction:** Target verification vs. draft-head generation.\n\n2.  **Deconstruct the Technical Challenge (The Kernel):**\n    *   The current bottleneck is the MMVQ shader's memory access pattern and accumulation strategy (column-major accumulation while decoding weights).\n    *   The goal is an \"exact-row Q2\\_K kernel\" for Intel Xe. This implies optimizing the memory access and computation to align with row-major processing or efficient row-wise accumulation, leveraging the available integer/FP16 capabilities without relying on complex cooperative matrix support.\n    *   The constraint is the 48 KiB shared memory limit.\n\n3.  **Structure the Plan (Two Phases):**\n    *   Phase "
+      }
+    }
+  ],
+  "created": 1785965435,
+  "model": "gemma-4-e4b-qat-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 384,
+    "prompt_tokens": 249,
+    "total_tokens": 633,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-OxzuD3Rl3NXf1M19YFupkVK0hq1NAjPA",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 249,
+    "prompt_ms": 3810.155,
+    "prompt_per_token_ms": 15.301827309236948,
+    "prompt_per_second": 65.35167204483807,
+    "predicted_n": 384,
+    "predicted_ms": 16825.928,
+    "predicted_per_token_ms": 43.81752083333333,
+    "predicted_per_second": 22.821921025693204,
+    "draft_n": 414,
+    "draft_n_accepted": 244
+  }
+}

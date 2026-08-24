@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Context:** Performance-sensitive Vulkan backend, debugging a Q2_K decode shader.\n   - **Symptoms:** \n     - Correct at N=1 and N=2\n     - N=3 produces *occasional* wrong logits *only* on Intel Xe1\n     - Shader stages decoded weight scales in shared memory\n     - Subgroup size = 16\n     - Three activation-row accumulators per output row\n     - Validation reports no out-of-bounds accesses\n     - N=2 is 18% faster than generic MMVQ\n     - N=3 is only 3% faster and increases register pressure\n     - Generic fallback remains correct\n   - **Requirements:**\n     - Give a ranked diagnosis\n     - Provide a minimal experiment matrix\n     - Do NOT propose code until identifying the violated invariant\n     - Explain most likely causes\n     - Identify which assumptions must be checked in shader and dispatch code\n     - Define a bounded debugging sequence covering: subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, deterministic logits\n     - End with explicit accept/reject criteria\n\n2.  **Deconstruct Technical Context:**\n   - **Q2_K:** A quantization format (likely from llama.cpp or similar). Q2_K typically uses 2-bit quantization with per-group scales and possibly per-tensor or per-channel scales. It often involves dequantization on the fly.\n"
+      }
+    }
+  ],
+  "created": 1785456665,
+  "model": "/var/home/agent/workspace/projects/llama-cpp-vulkan-mtp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+  "system_fingerprint": "b10498-603f26c86",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 320,
+    "prompt_tokens": 210,
+    "total_tokens": 530,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-eEWxOaSdEavYWLJRFtmLPwf9RdJmGh3D",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 22981.518,
+    "prompt_per_token_ms": 109.4358,
+    "prompt_per_second": 9.137777582838522,
+    "predicted_n": 320,
+    "predicted_ms": 52733.961,
+    "predicted_per_token_ms": 164.793628125,
+    "predicted_per_second": 6.068195787530543,
+    "draft_n": 279,
+    "draft_n_accepted": 225
+  }
+}

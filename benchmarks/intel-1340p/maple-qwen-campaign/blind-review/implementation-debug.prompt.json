@@ -1,0 +1,19 @@
+{
+  "id": "implementation-debug",
+  "description": "Debug a Vulkan kernel regression with explicit evidence requirements.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are debugging a performance-sensitive Vulkan backend. Give a ranked diagnosis and a minimal experiment matrix. Do not propose code until you identify the violated invariant."
+      },
+      {
+        "role": "user",
+        "content": "A new Q2_K Vulkan decode shader is correct at N=1 and N=2, but N=3 produces occasional wrong logits only on Intel Xe1. The shader stages decoded weight scales in shared memory, uses subgroup size 16, and has three activation-row accumulators per output row. Validation reports no out-of-bounds accesses. N=2 is 18% faster than generic MMVQ; N=3 is only 3% faster and increases register pressure. The generic fallback remains correct. Explain the most likely causes, identify which assumptions must be checked in the shader and dispatch code, and define a bounded debugging sequence covering subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, and deterministic logits. End with explicit accept/reject criteria."
+      }
+    ],
+    "max_tokens": 320,
+    "temperature": 0,
+    "seed": 202
+  }
+}

@@ -1,0 +1,956 @@
+load_backend: loaded SYCL backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-sycl.so
+load_backend: loaded CPU backend from /var/home/agent/workspace/projects/llama-cpp/build-intel-sycl/bin/libggml-cpu-alderlake.so
+[SYCL] call ggml_check_sycl
+Build with Macros:
+  GGML_SYCL_DNNL: yes
+  GGML_SYCL_F16: yes
+  GGML_SYCL_FORCE_MMQ: no
+  GGML_SYCL_GRAPH: yes
+  GGML_SYCL_SUPPORT_LEVEL_ZERO_API: yes
+  GGML_SYCL_SUPPORT_VMM: yes
+Running with Environment Variables:
+  GGML_SYCL_DEBUG: 1
+  GGML_SYCL_DEV2DEV_MEMCPY: 0 (SYCL API)
+  GGML_SYCL_ENABLE_DNN: 1
+  GGML_SYCL_FA_ONEDNN: 1
+  GGML_SYCL_FA_ONEDNN_MAX_KV: 0
+  GGML_SYCL_ENABLE_FLASH_ATTN: 1
+  GGML_SYCL_ENABLE_GRAPH: 0
+  GGML_SYCL_ENABLE_OPT: 1
+  GGML_SYCL_ENABLE_VMM: 1
+  GGML_SYCL_ENABLE_FUSION: 1
+  GGML_SYCL_PRIORITIZE_DMMV: 0
+  GGML_SYCL_USE_ASYNC_MEM_OP: 1
+  GGML_SYCL_USE_LEVEL_ZERO_API: 1
+  GGML_SYCL_USM_SYSTEM: 0
+[SYCL] call ggml_backend_sycl_print_sycl_devices
+Found 1 SYCL devices:
+|  |                   |                                       |       |Max    |        |Max  |Global |                     |
+|  |                   |                                       |       |compute|Max work|sub  |mem    |                     |
+|ID|        Device Type|                                   Name|Version|units  |group   |group|size   |       Driver version|
+|--|-------------------|---------------------------------------|-------|-------|--------|-----|-------|---------------------|
+| 0| [level_zero:gpu:0]|                 Intel Iris Xe Graphics|   12.3|     96|     512|   32| 30886M|         1.14.37020+3|
+SYCL Optimization Feature:
+|ID|        Device Type|Reorder|
+|--|-------------------|-------|
+| 0| [level_zero:gpu:0]|      Y|
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 1, 1, 1];nb=[4, 40960, 40960, 40960] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048] size=2048 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048] size=2048 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 1, 1, 1];nb=[4, 2048, 2048, 2048] size=2048 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 1, 1, 1];nb=[4, 8192, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] size=10240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 1, 1, 1];nb=[4, 10240, 10240, 10240] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 1, 1, 1];nb=[4, 16384, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] size=81920 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] size=81920 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] size=81920 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] size=81920 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] size=81920 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 2, 1, 1];nb=[4, 40960, 81920, 81920] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 2, 1, 1];nb=[4, 2048, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 2, 1, 1];nb=[4, 8192, 16384, 16384] size=16384 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] size=20480 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 2, 1, 1];nb=[4, 10240, 20480, 20480] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=2
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 2, 1, 1];nb=[4, 16384, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] size=122880 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] size=122880 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] size=122880 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] size=122880 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] size=122880 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 3, 1, 1];nb=[4, 40960, 122880, 122880] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144] size=6144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144] size=6144 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 3, 1, 1];nb=[4, 2048, 6144, 6144] size=6144 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576] size=24576 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576] size=24576 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 3, 1, 1];nb=[4, 8192, 24576, 24576] size=24576 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] size=30720 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 3, 1, 1];nb=[4, 10240, 30720, 30720] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=3
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 3, 1, 1];nb=[4, 16384, 49152, 49152] size=49152 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] size=163840 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] size=163840 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840]	src0='a':type=q4_0;ne=[2560, 10240, 1, 1];nb=[18, 1440, 14745600, 14745600]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] size=163840 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] size=163840 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600] size=14745600 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] size=163840 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]	src0='a':type=q4_0;ne=[10240, 2560, 1, 1];nb=[18, 5760, 14745600, 14745600]	src1='b':type=f32;ne=[10240, 4, 1, 1];nb=[4, 40960, 163840, 163840] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280] size=737280 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192]	src0='a':type=q4_0;ne=[2560, 512, 1, 1];nb=[18, 1440, 737280, 737280]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[512, 4, 1, 1];nb=[4, 2048, 8192, 8192] size=8192 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120] size=2949120 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768]	src0='a':type=q4_0;ne=[2560, 2048, 1, 1];nb=[18, 1440, 2949120, 2949120]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[2048, 4, 1, 1];nb=[4, 8192, 32768, 32768] size=32768 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=q4_0 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=NONE op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_device_supports_op op->op=MUL_MAT op->type=f32 -> true
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536]
+[SYCL] call ggml_backend_sycl_buffer_init_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096]
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_set_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240] size=5898240 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] size=40960 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL][OP] call ggml_sycl_mul_mat: dst='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960]
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl: dst='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536]	src0='a':type=q4_0;ne=[2560, 4096, 1, 1];nb=[18, 1440, 5898240, 5898240]	src1='b':type=f32;ne=[2560, 4, 1, 1];nb=[4, 10240, 40960, 40960] : converting src1 to Q8_1
+[SYCL][OP] call ggml_sycl_op_mul_mat/quantize_row_q8_1_sycl done
+Calling reorder_mul_mat_vec_q4_0_q8_1_sycl_switch_ncols ncols=4
+[SYCL][OP] call ggml_sycl_mul_mat done
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='out':type=f32;ne=[4096, 4, 1, 1];nb=[4, 16384, 65536, 65536] size=65536 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_0':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_1':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_2':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_synchronize
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0
+[SYCL] call ggml_backend_sycl_buffer_get_tensor: tensor='sent_3':type=f32;ne=[1024, 1, 1, 1];nb=[4, 4096, 4096, 4096] size=4096 offset=0

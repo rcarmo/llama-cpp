@@ -1,0 +1,34 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.005.915 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.006.091 I srv          init: The UI is disabled
+0.00.006.093 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.006.227 W srv  llama_server: -----------------
+0.00.006.229 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.006.229 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.006.229 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.006.229 W srv  llama_server: -----------------
+0.00.007.785 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.03.407.478 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.03.429.182 I srv          init: chat template supports preserving reasoning, consider enabling it via --reasoning-preserve
+0.03.429.261 I srv  llama_server: model loaded
+0.03.429.268 I srv  llama_server: listening on http://127.0.0.1:8270
+0.04.485.307 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.04.485.613 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.12.476.283 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    329, progress = 0.11, t =   7.99 s / 41.17 tokens per second
+0.25.310.610 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    841, progress = 0.27, t =  20.82 s / 40.38 tokens per second
+0.38.656.086 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1353, progress = 0.44, t =  34.17 s / 39.60 tokens per second
+0.52.633.184 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1865, progress = 0.61, t =  48.15 s / 38.74 tokens per second
+1.07.260.288 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2377, progress = 0.77, t =  62.77 s / 37.87 tokens per second
+1.22.557.852 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2889, progress = 0.94, t =  78.07 s / 37.00 tokens per second
+1.24.038.652 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2936, progress = 0.96, t =  79.55 s / 36.91 tokens per second
+1.28.021.542 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   3064, progress = 1.00, t =  83.54 s / 36.68 tokens per second
+1.32.833.495 I slot print_timing: id  0 | task 1 | prompt eval time =   83739.17 ms /  3068 tokens (   27.29 ms per token,    36.64 tokens per second)
+1.32.833.508 I slot print_timing: id  0 | task 1 |        eval time =    4608.67 ms /    59 tokens (   78.11 ms per token,    12.80 tokens per second)
+1.32.833.509 I slot print_timing: id  0 | task 1 |       total time =   88347.84 ms /  3127 tokens
+1.32.833.513 I slot print_timing: id  0 | task 1 |    graphs reused =         65
+1.32.833.669 I slot      release: id  0 | task 1 | stop processing: n_tokens = 3126, truncated = 0
+1.33.753.451 I srv    operator(): operator(): cleaning up before exit...
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=total graphs=0 graph_us=0 node_wall_us=0 active_thread_us=0 capacity_us=0 idle_or_sync_us=0 logical_read_bytes=0 logical_write_bytes=0
+GGML_CPU_EXPERT_IO_PROFILE nodes=6960 selections=55680 unique=55680 duplicates=0 repeated=42570 invalid_ids=0 ranges=55680 range_bytes=21734621184 resident_pages=55680 sampled_pages=55680 advice_calls=0 advice_bytes=0 advice_failures=0 advice_skips=0 advice_us=0 advice_slow=0 advice_disabled=0 resident_skips=0

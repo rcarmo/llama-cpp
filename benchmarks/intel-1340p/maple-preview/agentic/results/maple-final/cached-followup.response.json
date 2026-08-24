@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "**Release Gate Conditions**  \n1. **Correctness** – Target logits and token acceptance must match baseline within ±0.1% (absolute difference) across all test cases.  \n2. **Stability** – No crashes, hangs, or undefined behavior during inference; deterministic output across runs.  \n3. **Performance** – Latency improvement ≥10% vs. CPU baseline (excluding warmup).  \n4. **Fallback Coverage** – Generic Vulkan path must succeed for shapes/devices where CPU is unsupported (e.g., >16K seq, unsupported ops).  \n\n**Gate Pass** requires all four thresholds met simultaneously.",
+        "reasoning_content": "We need to produce a compact release gate with measurable thresholds for correctness, performance, stability, and fallback coverage. The invariants are: deterministic target logits and token acceptance, correct KV and recurrent rollback state across partial MTP acceptance, and generic Vulkan path as safe fallback for unsupported shapes/devices. So release gate conditions: correctness (logits and acceptance), stability (no regressions), performance (speedup, no slowdown), fallback coverage (Vulkan works for unsupported shapes/devices). Provide thresholds: e.g., accuracy drop < 0.1%, latency improvement > 10%, stability (no crashes) 100%, fallback coverage 100% for unsupported shapes/devices. Keep concise, technical, reproducible.\n"
+      }
+    }
+  ],
+  "created": 1785965850,
+  "model": "maple-preview-tq2-exact-head",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 277,
+    "prompt_tokens": 279,
+    "total_tokens": 556,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-pi0HJPUoohQsBF6brQxP5mUfkTUzO2y9",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 279,
+    "prompt_ms": 3738.514,
+    "prompt_per_token_ms": 13.399691756272402,
+    "prompt_per_second": 74.62858237256835,
+    "predicted_n": 277,
+    "predicted_ms": 14985.694,
+    "predicted_per_token_ms": 54.09997833935018,
+    "predicted_per_second": 18.484295755672044
+  }
+}

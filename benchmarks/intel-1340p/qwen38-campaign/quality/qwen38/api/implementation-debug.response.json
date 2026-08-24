@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "## 1. Ranked diagnosis\n\nThe strongest hypothesis is that the N=3 path violates a **subgroup/barrier/shared-memory lifetime invariant** that is not exercised, or is only weakly exercised, by N=1/N=2. The fact that the failure is:\n\n- only on Intel Xe1,\n- only for N=3,\n- occasional,\n- not caught by validation,\n- accompanied by higher register pressure and a small performance regression,\n\npoints to a **hardware/compiler-sensitive synchronization or memory-lifetime bug**, not a mathematical error in the Q2_K dequantization itself.\n\n### Rank 1: Shared-memory lifetime / barrier mismatch in the N=3 scale staging path\n\nMost likely: the shader stages weight scales into shared memory, then performs subgroup work, then reads those scales. For N=3, the compiler may reorder, split, or keep live longer the scale staging region because there are three activation-row accumulators per output row. If the shared-memory region is reused before all subgroup lanes have consumed it, or if a barrier is missing/incorrectly scoped, some lanes may read stale or overwritten scales.\n\nWhy this fits:\n\n- N=1/N=2 may have enough register pressure or simpler liveness that the compiler keeps the shared-memory region live in a safe order.\n- N=3 increases register pressure, causing the compiler to spill/reuse shared memory or change barrier placement.\n- Intel Xe1 may have different subgroup scheduling, shared-memory bank behavior, or compiler codegen than other vendors.\n- Validation cannot catch this because the accesses are in-bounds and the synchronization bug is semantic, not address-based.\n\nThe violated invariant would be:\n\n> Every lane that reads a staged scale must observe the same scale version written by the producer lane, and no lane may overwrite or reuse that shared-memory region until all consumers have completed the read.\n\n### Rank 2: Subgroup-size assumption mismatch between shader and dispatch\n\nThe shader assumes subgroup size 16. If the dispatch, pipeline, or driver exposes a different effective subgroup size on Intel Xe1, or if the shader uses subgroup primitives that are not uniformly valid across all lanes, the N=3 path may split work incorrectly.\n\nWhy this fits:\n\n- N=3 uses three accumulators per output row, so the mapping from lanes to activation rows is more sensitive to subgroup layout.\n- N=1/N=2 may hide the issue because fewer accumulators reduce the chance of a lane reading the wrong row or scale.\n- Intel Xe1 may have subgroup size 16, but the shader may be using subgroup primitives in a way that assumes a particular lane ordering or mask behavior.\n\nThe violated invariant would be:\n\n> The shader’s lane-to-row mapping must be valid for the actual subgroup size and lane ordering used by the driver, and all subgroup primitives must be executed by a uniform, full subgroup unless explicitly masked.\n\n### Rank 3: Tail-row / partial-subgroup handling in the N=3 accumulator layout\n\nIf the output dimension or activation dimension is not a multiple of the subgroup size, the last subgroup may contain inactive lanes. N=3 may expose this because the three accumulators per output row create a more complex tail pattern.\n\nWhy this fits:\n\n- N=1/N=2 may have simpler tail handling or may not require cross-lane reduction across all three accumulators.\n- N=3 may require a subgroup shuffle/reduce that assumes all lanes are active.\n- Intel Xe1 may handle inactive lanes differently, especially if the shader uses subgroup ballot, shuffle, or shared-memory indexing based on lane ID.\n\nThe violated invariant would be:\n\n> All subgroup reductions, shuffles,",
+        "reasoning_content": "We need answer user's request. Need produce final answer. Need think deeply. User: \"A new Q2_K Vulkan decode shader is correct at N=1 and N=2, but N=3 produces occasional wrong logits only on Intel Xe1. The shader stages weight scales in shared memory, uses subgroup size 16, and has three activation-row accumulators per output row. Validation reports no out-of-bounds accesses. N=2 is 18% faster than generic MMVQ; N=3 is only 3% faster and increases register pressure. The generic fallback remains correct. Explain the most likely causes, identify which assumptions must be checked in the shader and dispatch code, and define a bounded debugging sequence covering subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, and deterministic logits. End with explicit accept/reject criteria.\"\n\nWe need provide ranked diagnosis and minimal experiment matrix. Do not propose code until identify violated invariant. So final should be structured: ranked causes, assumptions to check, bounded debugging sequence, experiment matrix, accept/reject criteria. No code. Need be specific to Vulkan, Intel Xe1, Q2_K decode shader, N=1/2 correct, N"
+      }
+    }
+  ],
+  "created": 1787057204,
+  "model": "qwen3.8-27b-q4km-mtp",
+  "system_fingerprint": "b10573-7f3f259a1",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 248,
+    "total_tokens": 1272,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-VQz3SLextwQcy1637LRZ4HphSN3vHOZX",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 248,
+    "prompt_ms": 36569.421,
+    "prompt_per_token_ms": 147.4573427419355,
+    "prompt_per_second": 6.781622273975844,
+    "predicted_n": 1024,
+    "predicted_ms": 349648.686,
+    "predicted_per_token_ms": 341.453794921875,
+    "predicted_per_second": 2.9286539346525675,
+    "draft_n": 1180,
+    "draft_n_accepted": 629
+  }
+}

@@ -40,6 +40,12 @@ using json = nlohmann::ordered_json;
 
 constexpr int HTTP_POLLING_SECONDS = 1;
 
+static bool env_truthy(const char * name) {
+    const char * value = getenv(name);
+    return value != nullptr &&
+        (strcmp(value, "1") == 0 || strcmp(value, "true") == 0 || strcmp(value, "yes") == 0);
+}
+
 static uint32_t server_n_outputs_max(const common_params & params) {
     const uint32_t n_batch  = params.n_batch;
 
@@ -941,6 +947,7 @@ private:
 
     common_context_seq_rm_type ctx_tgt_seq_rm_type = COMMON_CONTEXT_SEQ_RM_TYPE_NO;
     common_context_seq_rm_type ctx_dft_seq_rm_type = COMMON_CONTEXT_SEQ_RM_TYPE_NO;
+    bool force_spec_ckpt_for_test = false;
 
     common_speculative_ptr spec;
 
@@ -1049,6 +1056,10 @@ private:
 
         params_base = params;
         params_base.n_outputs_max = server_n_outputs_max(params_base);
+        force_spec_ckpt_for_test = env_truthy("GGML_SPECULATIVE_TEST_FORCE_CHECKPOINT");
+        if (force_spec_ckpt_for_test) {
+            SRV_WRN("%s", "GGML_SPECULATIVE_TEST_FORCE_CHECKPOINT enabled: forcing speculative checkpoints for validation only\n");
+        }
 
         const bool has_mmproj = !params.mmproj.path.empty();
         const bool has_draft = params.speculative.has_dft();
@@ -1329,6 +1340,9 @@ private:
 
         if (ctx_dft) {
             ctx_dft_seq_rm_type = common_context_can_seq_rm(ctx_dft);
+            // common_speculative_init_result constructs draft contexts with n_rs_seq=0.
+            // If this changes, draft rollback needs an independent bounded-RS restore policy.
+            GGML_ASSERT(ctx_dft_seq_rm_type != COMMON_CONTEXT_SEQ_RM_TYPE_RS);
         }
 
         if (spec) {
@@ -1808,7 +1822,8 @@ private:
         // initialize samplers
         if (task.need_sampling()) {
             try {
-                slot.smpl.reset(common_sampler_init(model_tgt, task.params.sampling));
+                slot.smpl.reset(common_sampler_init(
+                        model_tgt, task.params.sampling, (int32_t) llama_n_ctx(ctx_tgt)));
             } catch (std::exception & e) {
                 std::string err_msg = std::string("Failed to initialize samplers: ") + e.what();
                 send_error(task, err_msg, ERROR_TYPE_INVALID_REQUEST);
@@ -2857,7 +2872,17 @@ private:
                 // TODO @ngxson : maybe handle n_batch == 1 here instead of inside decode()
 
                 batch_view = batch.get_view(off, n_tokens);
+                const bool mtp_profile = (getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                        getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr) &&
+                        std::any_of(slots.begin(), slots.end(), [](const server_slot & slot) {
+                            return !slot.spec_i_batch.empty();
+                        });
+                const int64_t mtp_decode_start_us = mtp_profile ? ggml_time_us() : 0;
                 bool ok = decode(n_batch, off, batch_view);
+                if (mtp_profile) {
+                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=target_decode rows=%d us=%lld ok=%d\n",
+                            batch_view.n_tokens, (long long) (ggml_time_us() - mtp_decode_start_us), ok ? 1 : 0);
+                }
 #ifdef DEBUG_TIMINGS
                 llama_synchronize(ctx_tgt);
 #endif
@@ -2981,8 +3006,8 @@ private:
             if (spec) {
                 common_speculative_get_draft_params(spec.get(), slot.id).drafting = false;
 
-                const bool use_ckpt_tgt = ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
-                const bool use_ckpt_dft = ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test || ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+                const bool use_ckpt_dft = force_spec_ckpt_for_test || ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
 
                 const int n_draft_max = slot.get_n_draft_max();
 
@@ -3036,7 +3061,7 @@ private:
             slot.n_draft_total += draft.size();
 
             // TODO: avoid restoring the draft context and re-evaluating the drafted tokens when not needed [TAG_SPEC_AVOID_DRAFT_REEVAL]
-            const bool use_ckpt_dft = ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
+            const bool use_ckpt_dft = force_spec_ckpt_for_test || ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
 
             if (ctx_dft) {
                 if (use_ckpt_dft) {
@@ -3049,11 +3074,11 @@ private:
             }
 
             if (!draft.empty()) {
-                const bool use_ckpt_tgt =
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
                    (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_tgt));
 
-                const bool use_ckpt_dft =
+                const bool use_ckpt_dft = force_spec_ckpt_for_test ||
                    (ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_dft));
 
                 if (use_ckpt_tgt) {
@@ -3859,15 +3884,23 @@ private:
                 // save the sampler sampler state in case we need to restore it
                 common_sampler_ptr smpl_save(common_sampler_clone(slot.smpl.get()));
 
+                const bool mtp_profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr ||
+                        getenv("GGML_QWEN35MOE_MTP_PROFILE") != nullptr;
+                const int64_t mtp_accept_start_us = mtp_profile ? ggml_time_us() : 0;
                 GGML_ASSERT(slot.spec_i_batch.size() == n_draft + 1);
                 auto accepted = common_sampler_sample_and_accept_n(slot.smpl.get(), slot.ctx_tgt, slot.spec_i_batch, slot.spec_draft);
                 slot.spec_i_batch.clear();
+                if (mtp_profile) {
+                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=sample_accept rows=%zu accepted=%zu us=%lld\n",
+                            n_draft + 1, accepted.size() - 1,
+                            (long long) (ggml_time_us() - mtp_accept_start_us));
+                }
 
                 GGML_ASSERT(accepted.size() >= 1);
 
                 const uint32_t n_rollback = slot.spec_draft.size() + 1 - accepted.size();
 
-                const bool use_ckpt_tgt =
+                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
                     (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && n_rollback > llama_n_rs_seq(ctx_tgt));
 
@@ -3886,6 +3919,7 @@ private:
 
                         SLT_DBG(slot, "restoring speculative checkpoint (pos_min = %d, pos_max = %d, size = %zu)\n", ckpt.pos_min, ckpt.pos_max, ckpt.size());
 
+                        const int64_t mtp_restore_start_us = mtp_profile ? ggml_time_us() : 0;
                         ckpt.load_tgt(slot.ctx_tgt, slot.id, LLAMA_STATE_SEQ_FLAGS_PARTIAL_ONLY);
 
                         if (slot.ctx_dft) {
@@ -3896,6 +3930,10 @@ private:
 
                         slot.prompt.tokens.keep_first(ckpt.n_tokens);
                         slot.smpl = std::move(smpl_save);
+                        if (mtp_profile) {
+                            SRV_INF("GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=%u us=%lld\n",
+                                    n_rollback, (long long) (ggml_time_us() - mtp_restore_start_us));
+                        }
 
                         return;
                     }
@@ -4467,7 +4505,15 @@ void server_routes::init_routes() {
         };
 
         ggml_cpu_expert_io_metrics expert_io {};
-        ggml_cpu_get_expert_io_metrics(&expert_io);
+        if (ggml_backend_dev_t cpu_dev = ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_CPU)) {
+            ggml_backend_reg_t cpu_reg = ggml_backend_dev_backend_reg(cpu_dev);
+            using get_expert_io_metrics_t = void (*)(ggml_cpu_expert_io_metrics *);
+            auto get_expert_io_metrics = (get_expert_io_metrics_t)
+                    ggml_backend_reg_get_proc_address(cpu_reg, "ggml_cpu_get_expert_io_metrics");
+            if (get_expert_io_metrics) {
+                get_expert_io_metrics(&expert_io);
+            }
+        }
         auto & expert_counters = all_metrics_def["counter"];
         expert_counters.push_back({{"name", "expert_io_nodes_total"}, {"help", "Observed routed expert matrix nodes."}, {"value", expert_io.nodes}});
         expert_counters.push_back({{"name", "expert_io_selections_total"}, {"help", "Routed expert IDs selected."}, {"value", expert_io.selections}});

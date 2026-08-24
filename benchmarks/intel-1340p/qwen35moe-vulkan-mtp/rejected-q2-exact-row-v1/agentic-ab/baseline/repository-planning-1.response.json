@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Model:** Qwen3.6 35B-A3B (Mistral-style MoE? Actually, Qwen3.6 35B-A3B is likely a MoE model with 35B total params, 3.6B active. Wait, \"A3B\" might mean Active 3.6B? Or it's a specific variant. I'll treat it as a large MoE/dense model with MTP (Multi-Token Prediction) support.)\n   - **Hardware:** Intel Core i5-1340P with Iris Xe unified memory (iGPU).\n   - **Current State:** \n     - CPU target-only generation is faster than full Vulkan.\n     - Native MTP improves CPU generation.\n     - Vulkan supports FP16 and integer dot product, no cooperative matrix support, 48 KiB shared memory.\n     - Profiling: multi-column Vulkan decode improves aggregate throughput at N=2 but plateaus at N=4.\n     - Generic MMVQ shader keeps `temp[NUM_COLS][NUM_ROWS]` accumulators and loops over columns while decoding the same quantized weights.\n   - **Request:** Design a focused two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification.\n   - **Required Elements:**\n     - Graph shapes\n     - Dispatch gates\n     - Correctness tests\n     - Telemetry\n     - Performance gates\n     - Fallback behavior\n     - Files likely to change\n     - Distinguish target verification from draft-head generation.\n   - **Constraints:** Implementation-ready, grounded in supplied facts, preserve correctness, identify rollback points, avoid speculation.\n\n2.  **Deconstruct Technical Context"
+      }
+    }
+  ],
+  "created": 1785456755,
+  "model": "/var/home/agent/workspace/projects/llama-cpp-vulkan-mtp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+  "system_fingerprint": "b10498-603f26c86",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 384,
+    "prompt_tokens": 234,
+    "total_tokens": 618,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-AZEZKYHX1NfifdbxDm9iqKdIVE5V4RVg",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 234,
+    "prompt_ms": 22874.995,
+    "prompt_per_token_ms": 97.75638888888888,
+    "prompt_per_second": 10.229510432679875,
+    "predicted_n": 384,
+    "predicted_ms": 66875.129,
+    "predicted_per_token_ms": 174.15398177083333,
+    "predicted_per_second": 5.742044998522545,
+    "draft_n": 355,
+    "draft_n_accepted": 264
+  }
+}

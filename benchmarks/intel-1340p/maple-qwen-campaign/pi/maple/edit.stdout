@@ -1,0 +1,1 @@
+The test now passes. The fix was straightforward - the `clamp` function was missing the `Math.min(max, ...)` part to also clamp the value to the maximum bound. The corrected implementation properly applies both bounds using: `Math.min(max, Math.max(min, value))`.

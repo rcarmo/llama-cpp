@@ -1,0 +1,17 @@
+[Unit]
+Description=Validated llama.cpp model candidate
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/intel-1340p-ornith-gemma-campaign.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-intel-candidate.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=90
+KillSignal=SIGTERM
+EnvironmentFile=%h/.config/llama-candidate/service.env
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,47 @@
+{
+  "id": "instruction-following",
+  "description": "Follow an exact structured-output contract without extra prose.",
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Follow the requested output format exactly. Do not add explanations."
+      },
+      {
+        "role": "user",
+        "content": "Return one JSON object with exactly these keys in this order: status, files, tests. Set status to ready, files to [\"src/a.cpp\",\"tests/a.cpp\"], and tests to 2."
+      }
+    ],
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "release_gate",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status": {"type": "string", "const": "ready"},
+            "files": {
+              "type": "array",
+              "prefixItems": [
+                {"type": "string", "const": "src/a.cpp"},
+                {"type": "string", "const": "tests/a.cpp"}
+              ],
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "tests": {"type": "integer", "const": 2}
+          },
+          "required": ["status", "files", "tests"]
+        }
+      }
+    },
+    "max_tokens": 128,
+    "temperature": 0,
+    "seed": 505
+  },
+  "expect": {
+    "json": {"status": "ready", "files": ["src/a.cpp", "tests/a.cpp"], "tests": 2}
+  }
+}

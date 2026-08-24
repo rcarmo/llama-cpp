@@ -1,0 +1,243 @@
+{
+  "order": [
+    "q8-faon",
+    "f16-faoff",
+    "f16-faoff",
+    "q8-faon"
+  ],
+  "rows": [
+    {
+      "model": "gemma4",
+      "run_name": "run-01-q8-faon",
+      "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_depth": 3,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "q8_0",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "on",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 61.113895,
+      "prompt_tokens": 3196,
+      "generated_tokens": 44,
+      "prompt_tps": 54.045057817896634,
+      "generation_tps": 23.300296337405236,
+      "draft_tokens": 39,
+      "accepted_draft_tokens": 31,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "src/ggml-cpu/",
+        "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+      }
+    },
+    {
+      "model": "gemma4",
+      "run_name": "run-02-f16-faoff",
+      "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_depth": 3,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "f16",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "off",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 53.964919,
+      "prompt_tokens": 3196,
+      "generated_tokens": 44,
+      "prompt_tps": 61.26248369264949,
+      "generation_tps": 25.392721522639917,
+      "draft_tokens": 39,
+      "accepted_draft_tokens": 31,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "src/ggml-cpu/",
+        "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+      }
+    },
+    {
+      "model": "gemma4",
+      "run_name": "run-03-f16-faoff",
+      "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_depth": 3,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "f16",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "off",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 54.127368,
+      "prompt_tokens": 3196,
+      "generated_tokens": 44,
+      "prompt_tps": 61.12480894193988,
+      "generation_tps": 25.21149002197983,
+      "draft_tokens": 39,
+      "accepted_draft_tokens": 31,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "src/ggml-cpu/",
+        "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+      }
+    },
+    {
+      "model": "gemma4",
+      "run_name": "run-04-q8-faon",
+      "model_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "draft_path": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "draft_depth": 3,
+      "context": 8192,
+      "batch": 512,
+      "ubatch": 128,
+      "kv": "q8_0",
+      "advice_mode": "off",
+      "load_mode": "mmap",
+      "flash_attn": "on",
+      "prompt_cache": "on",
+      "pressure_gib": 0,
+      "wall_seconds": 60.997883,
+      "prompt_tokens": 3196,
+      "generated_tokens": 44,
+      "prompt_tps": 54.11059352007019,
+      "generation_tps": 23.88880413189443,
+      "draft_tokens": 39,
+      "accepted_draft_tokens": 31,
+      "tool_name": "search_repository",
+      "tool_args": {
+        "max_results": 3,
+        "path": "src/ggml-cpu/",
+        "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+      }
+    }
+  ],
+  "groups": {
+    "q8-faon": {
+      "wall": {
+        "n": 2,
+        "mean": 61.055889,
+        "sd": 0.08203287189901218,
+        "min": 60.997883,
+        "max": 61.113895
+      },
+      "prompt_tps": {
+        "n": 2,
+        "mean": 54.07782566898341,
+        "sd": 0.046340739416743,
+        "min": 54.045057817896634,
+        "max": 54.11059352007019
+      },
+      "generation_tps": {
+        "n": 2,
+        "mean": 23.594550234649834,
+        "sd": 0.41613785226444966,
+        "min": 23.300296337405236,
+        "max": 23.88880413189443
+      },
+      "max_pss_kib": [
+        7682000,
+        7681964
+      ],
+      "draft": [
+        [
+          39,
+          31
+        ],
+        [
+          39,
+          31
+        ]
+      ],
+      "tools": [
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "src/ggml-cpu/",
+            "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+          }
+        ],
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "src/ggml-cpu/",
+            "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+          }
+        ]
+      ]
+    },
+    "f16-faoff": {
+      "wall": {
+        "n": 2,
+        "mean": 54.0461435,
+        "sd": 0.11486878949697005,
+        "min": 53.964919,
+        "max": 54.127368
+      },
+      "prompt_tps": {
+        "n": 2,
+        "mean": 61.193646317294686,
+        "sd": 0.09735074982493055,
+        "min": 61.12480894193988,
+        "max": 61.26248369264949
+      },
+      "generation_tps": {
+        "n": 2,
+        "mean": 25.302105772309872,
+        "sd": 0.12815002308136123,
+        "min": 25.21149002197983,
+        "max": 25.392721522639917
+      },
+      "max_pss_kib": [
+        7806724,
+        7806717
+      ],
+      "draft": [
+        [
+          39,
+          31
+        ],
+        [
+          39,
+          31
+        ]
+      ],
+      "tools": [
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "src/ggml-cpu/",
+            "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+          }
+        ],
+        [
+          "search_repository",
+          {
+            "max_results": 3,
+            "path": "src/ggml-cpu/",
+            "query": "Qwen routed-expert page residency bounded asynchronous mmap advice"
+          }
+        ]
+      ]
+    }
+  },
+  "comparisons": {
+    "wall_speedup_pct": 12.969927262247683,
+    "prompt_speedup_pct": 13.158481429834179,
+    "generation_speedup_pct": 7.237076022548639
+  }
+}

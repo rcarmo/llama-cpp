@@ -1,0 +1,26 @@
+{
+  "finish_reason": "length",
+  "reasoning": "Here's a thinking process:\n\n1.  **Analyze User Input:**\n   - **Context:** Performance-sensitive Vulkan backend, debugging a new Q2_K decode shader.\n   - **Symptoms:** \n     - Correct at N=1 and N=2\n     - N=3 produces occasional wrong logits *only* on Intel Xe1\n     - Shader stages decoded weight scales in shared memory\n     - Subgroup size = 16\n     - Three activation-row accumulators per output row\n     - Validation reports no out-of-bounds accesses\n     - N=2 is 18% faster than generic MMVQ\n     - N=3 is only 3% faster and increases register pressure\n     - Generic fallback remains correct\n   - **Requirements:**\n     - Give a ranked diagnosis\n     - Provide a minimal experiment matrix\n     - Do NOT propose code until identifying the violated invariant\n     - Explain most likely causes\n     - Identify assumptions to check in shader and dispatch code\n     - Define a bounded debugging sequence covering: subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, deterministic logits\n     - End with explicit accept/reject criteria\n\n2. ",
+  "content": "### Ranked Diagnosis (Likelihood → Impact)\n\n1. **Shared-Memory Race on Scale Loads (Invariant Violation)**\n   - *Why:* Intel Xe1 (Arc/Alchemist) uses a 16-wide subgroup architecture with a specific shared-memory bank conflict pattern. Loading scales into shared memory without a barrier or with mismatched `subgroupBallot`/`subgroupAll` synchronization can cause stale/wrong scale values when N=3 triggers a different warp-scheduling path or register pressure causes partial spills. N=1/2 fit in fewer registers and avoid the contention path.\n   - *Invariant:* All subgroup lanes must see identical scale values before dot-product accumulation begins.\n\n2. **Register Spill / Accumulator State Corruption**\n   - *Why:* N=3 increases register pressure. Xe1 has limited VGPR space per subgroup. Spills to LDS or stack can corrupt the three activation-row accumulators if the spill/reload sequence isn't perfectly aligned with the subgroup barrier. Occasional wrong logits match non-deterministic spill behavior.\n   - *Invariant:* Accumulator values must survive register pressure changes without cross-lane contamination.\n\n3. **Tail-Row / Boundary Condition Mismatch**\n   - *Why:* N=3 may cross a row-boundary or trigger a different dispatch tile size. If the shader assumes full-row alignment or uses `gl_LocalInvocationID.x` without masking, tail rows can read uninitialized shared memory or scales, producing sporadic wrong logits.\n   - *Invariant:* Every lane must either participate fully or be cleanly masked out before any shared read/write.\n\n4. **Subgroup Control Flow Divergence on Xe1**\n   - *Why:* Intel Xe1 handles `subgroupElect()`/`subgroupAll()` differently than NVIDIA/AMD. Conditional scale loads or accumulator initialization based on subgroup ballot can cause lanes to diverge, leaving some accumulators uninitialized.\n   - *Invariant:* All lanes must execute identical control flow for shared memory initialization and accumulation.\n\n5. **Q8_1 Activation Layout Stride Mismatch**\n   - *Why:* Q8_1 uses 1-bit activations packed into bytes. If the shader assumes contiguous 8-bit lanes but the dispatch packs activations differently for N=3, cross-lane reads will misalign. N=1/2 may accidentally align due to smaller tile sizes.\n   - *Invariant:* Activation bit-packing must match the subgroup indexing and shared memory layout exactly.\n\n---\n\n### Assumptions to Verify in Shader & Dispatch Code\n\n| Assumption | Where to Check | Risk if Violated |\n|------------|----------------|------------------|\n| Subgroup size = 16 is enforced at compile time & dispatch | `#pragma opencl_subgroup_size 16` / `vkCmdPushConstants` | Xe1 may fallback to 32 or 64, breaking shared memory indexing |\n| Shared memory scales are written by exactly one lane per scale index | `if (lane == 0) write_scales()` | Multiple lanes writing causes race conditions |\n| Barrier covers `GL_SHADER_LOCAL_MEMORY_BARRIER` + `GL_SUBGROUP_SCOPE` | `subgroupMemoryBarrier()` / `memoryBarrierShared()` | Stale scales or accumulator state |\n| Accumulator initialization is unconditional for all lanes | No `if (lane < N)` around `acc = 0` | Divergent initialization leaves some lanes with garbage |\n| Q8_1 bit extraction uses `bitwise_and` + `shift` consistent across lanes | Activation unpacking code | Misaligned reads produce wrong activation values |\n| Dispatch tile size divides evenly by subgroup size | `dispatch",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 210,
+    "total_tokens": 1234,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 6454.698,
+    "prompt_per_token_ms": 30.736657142857144,
+    "prompt_per_second": 32.534442355010256,
+    "predicted_n": 1024,
+    "predicted_ms": 93483.102,
+    "predicted_per_token_ms": 91.292091796875,
+    "predicted_per_second": 10.95385131742847,
+    "draft_n": 1302,
+    "draft_n_accepted": 588
+  }
+}

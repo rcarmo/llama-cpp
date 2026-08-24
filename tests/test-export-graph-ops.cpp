@@ -8,6 +8,7 @@
 #include "gguf.h"
 #include "ggml-backend.h"
 #include "download.h"
+#include "speculative.h"
 
 #include <array>
 #include <vector>
@@ -147,10 +148,13 @@ int main(int argc, char ** argv) {
     common_init_result_ptr init_result;
     llama_context_ptr ctx2;
     llama_model_ptr model;
+    llama_model * model_tgt = nullptr;
+    common_speculative_init_result_ptr spec_init;
 
     if (params.model.hf_repo.empty()) {
         init_result = common_init_from_params(params);
 
+        model_tgt = init_result->model();
         ctx = init_result->context();
         if (!ctx) {
             LOG_ERR("failed to initialize params\n");
@@ -180,8 +184,9 @@ int main(int argc, char ** argv) {
             return 1;
         }
 
+        model_tgt = model.get();
         llama_context_params ctx_params = llama_context_default_params();
-        ctx2.reset(llama_init_from_model(model.get(), ctx_params));
+        ctx2.reset(llama_init_from_model(model_tgt, ctx_params));
         ctx = ctx2.get();
 
         if (!ctx) {
@@ -212,6 +217,36 @@ int main(int argc, char ** argv) {
         return 1;
     }
     extract_graph_ops(gf_tg, "tg", tests);
+
+    const bool has_mtp = std::find(params.speculative.types.begin(),
+                                   params.speculative.types.end(),
+                                   COMMON_SPECULATIVE_TYPE_DRAFT_MTP) != params.speculative.types.end();
+    if (has_mtp) {
+        common_params params_dft = common_base_params_to_speculative(params);
+        spec_init = common_speculative_init_from_params(params_dft, model_tgt, ctx);
+        llama_context * ctx_dft = spec_init->context();
+        if (ctx_dft == nullptr) {
+            LOG_ERR("failed to initialize MTP context\n");
+            return 1;
+        }
+
+        const uint32_t n_seqs_dft   = llama_n_seq_max(ctx_dft);
+        const uint32_t n_tokens_dft = std::min(llama_n_ctx(ctx_dft), llama_n_ubatch(ctx_dft));
+
+        auto * gf_mtp_pp = llama_graph_reserve(ctx_dft, n_tokens_dft, n_seqs_dft, n_tokens_dft);
+        if (!gf_mtp_pp) {
+            LOG_ERR("failed to reserve MTP prompt processing graph\n");
+            return 1;
+        }
+        extract_graph_ops(gf_mtp_pp, "mtp-pp", tests);
+
+        auto * gf_mtp_tg = llama_graph_reserve(ctx_dft, n_seqs_dft, n_seqs_dft, n_seqs_dft);
+        if (!gf_mtp_tg) {
+            LOG_ERR("failed to reserve MTP token generation graph\n");
+            return 1;
+        }
+        extract_graph_ops(gf_mtp_tg, "mtp-tg", tests);
+    }
 
     LOG_INF("%d unique ops total\n", (int) tests.size());
 

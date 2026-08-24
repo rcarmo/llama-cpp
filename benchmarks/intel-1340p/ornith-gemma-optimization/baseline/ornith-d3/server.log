@@ -1,0 +1,165 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.006.016 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.006.340 I srv          init: The UI is disabled
+0.00.006.342 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.006.577 W srv  llama_server: -----------------
+0.00.006.579 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.006.580 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.006.580 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.006.581 W srv  llama_server: -----------------
+0.00.008.346 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.01.842.834 I common_speculative_init_result: creating MTP draft context against the target model '/var/home/agent/workspace/projects/models/ornith-1.0-35b-mtp-apex/Ornith-1.0-35B-MTP-APEX-I-Mini.gguf'
+0.01.993.875 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.02.038.482 I srv          init: chat template supports preserving reasoning, consider enabling it via --reasoning-preserve
+0.02.038.558 I srv  llama_server: model loaded
+0.02.038.566 I srv  llama_server: listening on http://127.0.0.1:8273
+0.02.315.852 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.316.174 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.10.655.456 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=329 us=251734
+0.10.656.993 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=329 us=1525
+0.10.656.997 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=329 us=253286 ok=1
+0.10.657.029 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    329, progress = 0.11, t =   8.34 s / 39.44 tokens per second
+0.23.927.163 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=512 us=410135
+0.23.929.074 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=512 us=1902
+0.23.929.078 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=512 us=412058 ok=1
+0.23.929.101 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    841, progress = 0.27, t =  21.61 s / 38.91 tokens per second
+0.37.803.219 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=512 us=464307
+0.37.803.660 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=512 us=431
+0.37.803.663 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=512 us=464762 ok=1
+0.37.803.692 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1353, progress = 0.44, t =  35.49 s / 38.13 tokens per second
+0.52.353.391 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=512 us=536749
+0.52.354.065 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=512 us=659
+0.52.354.069 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=512 us=537442 ok=1
+0.52.354.099 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1865, progress = 0.61, t =  50.04 s / 37.27 tokens per second
+1.07.568.597 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=512 us=596876
+1.07.569.018 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=512 us=417
+1.07.569.021 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=512 us=597308 ok=1
+1.07.569.045 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2377, progress = 0.77, t =  65.25 s / 36.43 tokens per second
+1.23.499.213 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=512 us=668658
+1.23.499.798 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=512 us=577
+1.23.499.803 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=512 us=669258 ok=1
+1.23.499.830 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2889, progress = 0.94, t =  81.18 s / 35.59 tokens per second
+1.25.070.417 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=47 us=67092
+1.25.070.462 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=47 us=38
+1.25.070.463 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=47 us=67145 ok=1
+1.25.070.490 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2936, progress = 0.96, t =  82.75 s / 35.48 tokens per second
+1.29.239.813 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=128 us=185006
+1.29.240.028 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=128 us=205
+1.29.240.030 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=128 us=185232 ok=1
+1.29.240.062 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   3064, progress = 1.00, t =  86.92 s / 35.25 tokens per second
+1.29.464.129 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7705
+1.29.464.149 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.29.464.150 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7733 ok=1
+1.29.506.797 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40626
+1.29.707.170 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7808
+1.29.707.186 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.29.707.187 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7832 ok=1
+1.29.707.189 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=200335 ok=1
+1.29.709.610 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1987
+1.29.749.955 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40244
+1.29.946.880 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7862
+1.29.946.898 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.29.946.899 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7889 ok=1
+1.29.946.902 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=196905 ok=1
+1.29.949.300 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1977
+1.29.989.387 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40000
+1.30.184.597 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7517
+1.30.184.614 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.30.184.615 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7541 ok=1
+1.30.184.618 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=195191 ok=1
+1.30.186.965 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1933
+1.30.229.717 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=42665
+1.30.434.275 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8014
+1.30.434.293 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.30.434.294 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8046 ok=1
+1.30.434.297 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=204536 ok=1
+1.30.436.242 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=2 us=1535
+1.30.476.543 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40201
+1.30.674.047 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8000
+1.30.674.066 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.30.674.067 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8027 ok=1
+1.30.674.069 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=197485 ok=1
+1.30.675.008 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=0 us=527
+1.30.715.609 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40512
+1.30.912.785 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7751
+1.30.912.802 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.30.912.803 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7776 ok=1
+1.30.912.805 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=197157 ok=1
+1.30.913.734 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=0 us=523
+1.30.954.458 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40636
+1.31.149.253 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7725
+1.31.149.270 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.31.149.271 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7750 ok=1
+1.31.149.274 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=194777 ok=1
+1.31.151.629 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1951
+1.31.192.368 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40655
+1.31.391.884 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8262
+1.31.391.903 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.31.391.904 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8288 ok=1
+1.31.391.907 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=199499 ok=1
+1.31.394.422 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=2085
+1.31.437.398 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=42883
+1.31.636.830 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7549
+1.31.636.849 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.31.636.850 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7577 ok=1
+1.31.636.854 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=199416 ok=1
+1.31.638.881 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=2 us=1485
+1.31.678.832 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=39861
+1.31.871.678 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7145
+1.31.871.695 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.31.871.696 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7170 ok=1
+1.31.871.698 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=192825 ok=1
+1.31.874.052 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1927
+1.31.914.681 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40540
+1.32.106.663 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7319
+1.32.106.681 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.32.106.682 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7344 ok=1
+1.32.106.684 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=191965 ok=1
+1.32.109.200 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1977
+1.32.149.190 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=39901
+1.32.353.819 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8024
+1.32.353.836 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.32.353.837 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8049 ok=1
+1.32.353.839 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=204604 ok=1
+1.32.356.260 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=2001
+1.32.397.461 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=41118
+1.32.606.941 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8122
+1.32.606.957 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.32.606.958 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8146 ok=1
+1.32.606.960 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=209459 ok=1
+1.32.609.419 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1984
+1.32.654.833 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=45329
+1.32.866.625 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=8433
+1.32.866.643 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=10
+1.32.866.644 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=8459 ok=1
+1.32.866.646 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=211771 ok=1
+1.32.868.779 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=2 us=1686
+1.32.910.963 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=42085
+1.33.110.159 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7960
+1.33.110.176 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.33.110.177 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7986 ok=1
+1.33.110.179 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=199177 ok=1
+1.33.112.485 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1895
+1.33.153.506 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40935
+1.33.351.294 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7733
+1.33.351.310 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.33.351.310 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7757 ok=1
+1.33.351.313 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=197768 ok=1
+1.33.353.706 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=1987
+1.33.393.957 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=draft tokens=3 us=40165
+1.33.587.338 I spec      process: QWEN35MOE_MTP_PROFILE phase=draft_catchup rows=4 us=7428
+1.33.587.355 I spec      process: QWEN35MOE_MTP_PROFILE phase=hidden_extract rows=4 us=9
+1.33.587.356 I spec common_specu: QWEN35MOE_MTP_PROFILE phase=process rows=4 us=7452 ok=1
+1.33.587.358 I srv  update_slots: QWEN35MOE_MTP_PROFILE phase=target_decode rows=4 us=193363 ok=1
+1.33.589.833 I srv    operator(): QWEN35MOE_MTP_PROFILE phase=sample_accept rows=4 accepted=3 us=2056
+1.33.589.903 I slot print_timing: id  0 | task 1 | prompt eval time =   87149.94 ms /  3068 tokens (   28.41 ms per token,    35.20 tokens per second)
+1.33.589.908 I slot print_timing: id  0 | task 1 |        eval time =    4123.73 ms /    59 tokens (   69.89 ms per token,    14.31 tokens per second)
+1.33.589.909 I slot print_timing: id  0 | task 1 |       total time =   91273.66 ms /  3127 tokens
+1.33.589.912 I slot print_timing: id  0 | task 1 |    graphs reused =         24
+1.33.589.917 I slot print_timing: id  0 | task 1 | draft acceptance = 0.82353 (   42 accepted /    51 generated), mean len =  3.47
+1.33.590.109 I slot      release: id  0 | task 1 | stop processing: n_tokens = 3127, truncated = 0
+1.33.874.857 I srv    operator(): operator(): cleaning up before exit...
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=total graphs=0 graph_us=0 node_wall_us=0 active_thread_us=0 capacity_us=0 idle_or_sync_us=0 logical_read_bytes=0 logical_write_bytes=0
+GGML_CPU_EXPERT_IO_PROFILE nodes=153 selections=1224 unique=1224 duplicates=0 repeated=957 invalid_ids=0 ranges=1224 range_bytes=1363673088 resident_pages=1224 sampled_pages=1224 advice_calls=0 advice_bytes=0 advice_failures=0 advice_skips=0 advice_us=0 advice_slow=0 advice_disabled=0 resident_skips=0
