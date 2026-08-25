@@ -1894,7 +1894,8 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
          ggml_tensor * up_exps_s,
          ggml_tensor * gate_exps_s,
          ggml_tensor * down_exps_s,
-         ggml_tensor * selected_experts_in) const {
+         ggml_tensor * selected_experts_in,
+         const llama_layer * moe_cache) const {
     return build_moe_ffn(
         cur,
         gate_inp,  /* gate_inp_b  */ nullptr,
@@ -1915,7 +1916,8 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
         up_exps_s,
         gate_exps_s,
         down_exps_s,
-        selected_experts_in
+        selected_experts_in,
+        moe_cache
     );
 }
 
@@ -1943,7 +1945,8 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
          ggml_tensor * up_exps_s,
          ggml_tensor * gate_exps_s,
          ggml_tensor * down_exps_s,
-         ggml_tensor * selected_experts_in) const {
+         ggml_tensor * selected_experts_in,
+         const llama_layer * moe_cache) const {
     const int64_t n_embd   = cur->ne[0];
     const int64_t n_tokens = cur->ne[1];
     const bool weight_before_ffn = arch == LLM_ARCH_LLAMA4; // for llama4, we apply the sigmoid-ed weights before the FFN
@@ -2092,10 +2095,51 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
         cb(cur, "ffn_moe_weighted", il);
     }
 
+    // The profile-driven cache is also the deterministic partition that makes
+    // the video's CPU/GPU overlap possible: one uninterrupted cold CPU chain,
+    // one uninterrupted hot GPU chain, and one merge. Keep it decode-only;
+    // prompt batches lose more to remapping and merging than overlap saves.
+    const bool use_moe_packs = n_tokens <= 8 && moe_cache && moe_cache->moe_map_hot && !gate_up_exps &&
+        !up_exps_s && !gate_exps_s && !down_exps_s && !up_exps_b && !gate_exps_b &&
+        !down_exps_b && type_op == LLM_FFN_SILU && gate_exps && !weight_before_ffn &&
+        hparams.swiglu_clamp_exp[il] <= 1e-6f;
+    ggml_tensor * ids_hot = nullptr;
+    ggml_tensor * ids_cold = nullptr;
+    if (use_moe_packs) {
+        // top-k IDs are a strided view; materialize before flattening.
+        ggml_tensor * ids_flat = ggml_cont_1d(ctx0, selected_experts, n_expert_used*n_tokens);
+        ids_hot = ggml_reshape_2d(ctx0, ggml_get_rows(ctx0, moe_cache->moe_map_hot, ids_flat), n_expert_used, n_tokens);
+        ids_cold = ggml_reshape_2d(ctx0, ggml_get_rows(ctx0, moe_cache->moe_map_cold, ids_flat), n_expert_used, n_tokens);
+        cb(ids_hot, "ffn_moe_ids_hot", il);
+        cb(ids_cold, "ffn_moe_ids_cold", il);
+    }
+
     ggml_tensor * up = nullptr;
     ggml_tensor * experts = nullptr;
 
-    if (gate_up_exps) {
+    if (use_moe_packs) {
+        auto build_pack_chain = [&](ggml_tensor * w_gate, ggml_tensor * w_up, ggml_tensor * w_down, ggml_tensor * ids) {
+            ggml_tensor * gate = ggml_mul_mat_id(ctx0, w_gate, cur, ids);
+            gate->op_params[0] = 1; // mapped IDs may contain -1
+            ggml_tensor * up_p = ggml_mul_mat_id(ctx0, w_up, cur, ids);
+            up_p->op_params[0] = 1;
+            ggml_tensor * act = ggml_swiglu_split(ctx0, gate, up_p);
+            ggml_tensor * down = ggml_mul_mat_id(ctx0, w_down, act, ids);
+            down->op_params[0] = 1;
+            return down;
+        };
+
+        // Build cold first so split order is [CPU cold, GPU hot, merge].
+        ggml_tensor * cold = build_pack_chain(gate_exps, up_exps, down_exps, ids_cold);
+        cb(cold, "ffn_moe_down_cold", il);
+        ggml_tensor * hot = build_pack_chain(moe_cache->ffn_gate_exps_hot, moe_cache->ffn_up_exps_hot, moe_cache->ffn_down_exps_hot, ids_hot);
+        cb(hot, "ffn_moe_down_hot", il);
+        experts = ggml_add(ctx0, cold, hot);
+        cb(experts, "ffn_moe_down", il);
+        if (cparams.sched_async_cpu) {
+            ggml_backend_sched_set_tensor_backend(sched, experts, backend_cpu);
+        }
+    } else if (gate_up_exps) {
         // merged gate_up path: one mul_mat_id, then split into gate and up views
         ggml_tensor * gate_up = build_lora_mm_id(gate_up_exps, cur, selected_experts, up_exps_s); // [n_ff*2, n_expert_used, n_tokens]
         cb(gate_up, "ffn_moe_gate_up", il);
@@ -2145,9 +2189,10 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
         }
     }
 
-    const bool has_gate = gate_exps || gate_up_exps;
+    if (!use_moe_packs) {
+        const bool has_gate = gate_exps || gate_up_exps;
 
-    switch (type_op) {
+        switch (type_op) {
         case LLM_FFN_SILU:
             if (gate_exps) {
                 if (il >= 0) {
@@ -2225,9 +2270,10 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
         cb(experts, "ffn_moe_down_scaled", il);
     }
 
-    if (down_exps_b) {
-        experts = ggml_add_id(ctx0, experts, down_exps_b, selected_experts);
-        cb(experts, "ffn_moe_down_biased", il);
+        if (down_exps_b) {
+            experts = ggml_add_id(ctx0, experts, down_exps_b, selected_experts);
+            cb(experts, "ffn_moe_down_biased", il);
+        }
     }
 
     if (!weight_before_ffn) {

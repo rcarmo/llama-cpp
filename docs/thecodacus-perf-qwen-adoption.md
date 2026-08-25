@@ -176,19 +176,81 @@ Defaults remain unchanged. If evaluating the existing placement controls:
 
 `GGML_CUDA_REGISTER_HOST=1` is relevant only with mmap-backed CPU weights. The active RTX 3060 launcher uses `--no-mmap`, so host registration does not apply without changing load policy.
 
+## Video follow-up: parallel CPU/GPU chains
+
+The follow-up audit used Codacus' video `k_LostFpatg`, *How Fast Can One RTX 3060 Actually Run 35B?*, as the authoritative design description. The audio was transcribed locally because the advertised caption track was empty.
+
+The mechanism is not generic caching alone:
+
+1. build one uninterrupted cold CPU expert chain and one uninterrupted hot GPU expert chain;
+2. prevent backend assignment from migrating the hot cache weights to CPU;
+3. merge the disjoint zero-padded results exactly once;
+4. optionally run the cold CPU split on a context-owned worker while the GPU split runs;
+5. restrict the split path to decode-size batches because prompt merge overhead dominates.
+
+The implementation adds:
+
+- `--sched-async-cpu` / `--no-sched-async-cpu`, default off;
+- one lazily created, bounded worker per scheduler/context;
+- exact dependency joins based on tensors produced by the pending CPU split;
+- eligibility restricted to CPU splits ending in `ffn_moe_down_cold-*`;
+- worker drain before mode changes and destruction;
+- error propagation from worker compute;
+- optional `GGML_SCHED_ASYNC_CPU_PROFILE=1` telemetry;
+- a CPU-only lifecycle/numerical regression test.
+
+The profile-driven cache is the deterministic partition source. It materializes strided top-k IDs, uses `-1` skip semantics, builds separate hot/cold chains, marks GPU cache tensors as weights, and is enabled only for decode batches of eight tokens or fewer. MTP's separate layer remains uncached; target and MTP contexts each own their scheduler worker.
+
+### High-residency Qwen placement result
+
+Matched RTX 3060 tests used Qwen3.6 35B-A3B Q2_K_XL, all non-expert layers on GPU, all original routed experts on CPU, native MTP depth one, and 64 profile-selected hot slots per layer.
+
+| Mode | Generation tok/s | Prompt tok/s |
+|---|---:|---:|
+| Cache off, serialized | 41.15 | 35.34 |
+| 64 slots, serialized | 57.89 | 51.83 |
+
+The static high-residency placement improved generation by **40.7%** and reproduced the video's reported 42 to 55 tok/s class of gain. Six repeated outputs were identical.
+
+### Async scheduler result
+
+The asynchronous path was correct but did not improve generation on this host:
+
+| Model/cache | Serialized | Async | Delta |
+|---|---:|---:|---:|
+| Q2_K_XL, 64 slots | 57.69 | 57.67 | approximately neutral |
+| Q4_K_XL, 32 slots | 47.36 | 46.44 | -2.0% |
+
+Target-only and native-MTP sync/async outputs were bit-for-bit identical at the text level for 128 generated tokens. Native MTP accepted 62 of 65 drafts in both modes. Profiling showed real but small overlap; cold Q2/Q4 splits were generally too short to amortize dispatch and join costs on this host.
+
+Therefore async scheduling remains an explicit experimental opt-in. It is not enabled in any production launcher.
+
+### Validation
+
+The final CUDA tree passed:
+
+```text
+8/8 focused tests
+```
+
+Coverage included backend operations, semantic replay, quantization, expert-I/O planning, model-load cancellation, repeated-context thread safety, and the new async scheduler lifecycle test. The scheduler test exercises serialized/async repeated computes, mode toggles, synchronization, output equality, and teardown.
+
 ## Final decision
 
 Accepted:
 
-- the already-integrated opt-in mmap registration and bounded expert prefetch scheduler;
-- routing trace and simulation tooling;
-- explicit Qwen placement methodology and performance gates.
+- profile-driven static hot-expert placement for high-residency Qwen experiments;
+- decode-only uninterrupted hot/cold expert chains with one merge;
+- lazy context-owned asynchronous CPU split support, default off;
+- overlap telemetry and scheduler lifecycle coverage;
+- the already-integrated mmap registration and bounded expert prefetch scheduler;
+- routing trace and policy simulation tooling.
 
-Rejected:
+Not promoted to defaults:
 
-- static hot-expert VRAM cache;
-- default async CPU split scheduling;
-- production enablement of scheduler prefetch for the current five-layer placement;
-- fused TurboQuant attention for the active q4 KV profile.
+- asynchronous CPU/GPU scheduling, because generation was neutral or slower here;
+- scheduler prefetch for the current five-layer production placement;
+- fused TurboQuant attention for the active q4 KV profile;
+- adaptive global hot-store code from PR #26824, which has multi-context ownership and sidecar warm-start defects.
 
-Revisit the cache only when a trace demonstrates stronger routing skew, more CPU-resident MoE layers make transfer cost dominant, or a backend can fuse hot/cold dispatch without duplicating the FFN graph.
+Rollback is immediate: omit the cache profile/slot options and leave `--sched-async-cpu` unset or pass `--no-sched-async-cpu`.

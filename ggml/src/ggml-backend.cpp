@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -793,6 +794,10 @@ struct ggml_sched_cpu_async {
     bool                    job_done    = false;
     bool                    stop        = false;
     bool                    pending     = false; // main-thread view: a job is queued or running
+    std::chrono::steady_clock::time_point job_started;
+    uint64_t                jobs        = 0;
+    uint64_t                job_us      = 0;
+    uint64_t                wait_us     = 0;
 
     ggml_sched_cpu_async() {
         worker = std::thread([this]() {
@@ -808,8 +813,11 @@ struct ggml_sched_cpu_async {
                 lock.unlock();
 
                 enum ggml_status status = ggml_backend_graph_compute_async(backend, graph);
+                const auto finished = std::chrono::steady_clock::now();
 
                 lock.lock();
+                job_us += std::chrono::duration_cast<std::chrono::microseconds>(finished - job_started).count();
+                jobs++;
                 job_status = status;
                 job_done   = true;
                 cv.notify_all();
@@ -838,9 +846,24 @@ struct ggml_sched_cpu_async {
             job_status  = GGML_STATUS_SUCCESS;
             job_done    = false;
             job_ready   = true;
+            job_started = std::chrono::steady_clock::now();
         }
         cv.notify_all();
         pending = true;
+    }
+
+    bool produces(const struct ggml_tensor * tensor) {
+        if (!pending || tensor == nullptr) {
+            return false;
+        }
+        std::lock_guard<std::mutex> lock(mtx);
+        for (int i = 0; i < job_graph->n_nodes; ++i) {
+            const struct ggml_tensor * produced = job_graph->nodes[i];
+            if (produced == tensor || produced->view_src == tensor) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // wait for the in-flight job (if any); returns its status
@@ -848,10 +871,28 @@ struct ggml_sched_cpu_async {
         if (!pending) {
             return GGML_STATUS_SUCCESS;
         }
+        const auto wait_started = std::chrono::steady_clock::now();
         std::unique_lock<std::mutex> lock(mtx);
         cv.wait(lock, [this]() { return job_done; });
+        wait_us += std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now() - wait_started).count();
         pending = false;
         return job_status;
+    }
+
+    void log_profile() const {
+        if (getenv("GGML_SCHED_ASYNC_CPU_PROFILE") == nullptr || jobs == 0) {
+            return;
+        }
+        const uint64_t overlap_us = job_us > wait_us ? job_us - wait_us : 0;
+        fprintf(stderr, "async CPU splits: jobs=%llu cpu=%.3f ms wait=%.3f ms overlap=%.3f ms\n",
+                (unsigned long long) jobs, job_us/1000.0, wait_us/1000.0, overlap_us/1000.0);
+    }
+
+    void reset_profile() {
+        jobs = 0;
+        job_us = 0;
+        wait_us = 0;
     }
 };
 
@@ -1783,8 +1824,11 @@ static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_ba
 static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
     struct ggml_backend_sched_split * splits = sched->splits;
+    if (sched->cpu_async != nullptr) {
+        sched->cpu_async->reset_profile();
+    }
 
-    if (sched->cpu_async->pending) {
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
         // A job left over from an aborted eval references stale split memory.
         enum ggml_status ec = sched->cpu_async->join();
         if (ec != GGML_STATUS_SUCCESS) {
@@ -1805,13 +1849,13 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         ggml_backend_buffer_t prefetch_saved_buffer = NULL;
         void * prefetch_saved_data = NULL;
 
-        // an async CPU split may still be computing; join before anything that
-        // depends on it: another CPU split, or a split reading a CPU tensor
+        // One CPU job is allowed at a time. A later non-CPU split may overlap
+        // when it only shares pre-existing read-only inputs with the CPU job;
+        // join only if it consumes a tensor actually produced by that job.
         if (sched->async_cpu_enabled && sched->cpu_async->pending) {
             bool must_join = split_backend_id == sched->n_backends - 1;
             for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
-                ggml_backend_t input_backend = ggml_backend_sched_get_tensor_backend(sched, split->inputs[input_id]);
-                must_join = input_backend == sched->backends[sched->n_backends - 1];
+                must_join = sched->cpu_async->produces(split->inputs[input_id]);
             }
             if (must_join) {
                 enum ggml_status ec = sched->cpu_async->join();
@@ -1983,7 +2027,14 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         }
 
         if (!sched->callback_eval) {
-            if (sched->async_cpu_enabled && split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1) {
+            // Only the deliberately independent cold-expert chain is eligible.
+            // Generic CPU splits can be tiny or part of the critical path and
+            // must retain the serialized scheduler behavior.
+            const bool is_cold_expert_split = split->graph.n_nodes >= 4 &&
+                    strstr(split->graph.nodes[split->graph.n_nodes - 1]->name, "ffn_moe_down_cold-") != nullptr;
+            const bool async_cpu_split = sched->async_cpu_enabled && is_cold_expert_split &&
+                    split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1;
+            if (async_cpu_split) {
                 // run the CPU split on the worker; the loop continues launching
                 // later splits until one depends on this split's outputs
                 sched->cpu_async->launch(split_backend, &split->graph);
@@ -2042,11 +2093,14 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         }
     }
 
-    if (sched->cpu_async->pending) {
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
         enum ggml_status ec = sched->cpu_async->join();
         if (ec != GGML_STATUS_SUCCESS) {
             return ec;
         }
+    }
+    if (sched->cpu_async != nullptr) {
+        sched->cpu_async->log_profile();
     }
 
     return GGML_STATUS_SUCCESS;
@@ -2128,7 +2182,7 @@ ggml_backend_sched_t ggml_backend_sched_new(
     // default of 3 covers the gate/up/down expert tensors of one MoE layer
     sched->prefetch_n_slots = prefetch_n_slots <= 1 ? 3 : std::min(prefetch_n_slots, GGML_SCHED_MAX_PREFETCH_SLOTS);
 
-    sched->cpu_async = new ggml_sched_cpu_async();
+    sched->cpu_async = nullptr;
     sched->async_cpu_enabled = false;
 
     ggml_backend_sched_reset(sched);
@@ -2261,7 +2315,7 @@ enum ggml_status ggml_backend_sched_graph_compute_async(ggml_backend_sched_t sch
 
 void ggml_backend_sched_synchronize(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
-    if (sched->cpu_async->pending) {
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
         (void) sched->cpu_async->join();
     }
     for (int i = 0; i < sched->n_backends; i++) {
@@ -2284,6 +2338,9 @@ void ggml_backend_sched_set_async_cpu(ggml_backend_sched_t sched, bool enabled) 
         return;
     }
     ggml_backend_sched_synchronize(sched);
+    if (enabled && sched->cpu_async == nullptr) {
+        sched->cpu_async = new ggml_sched_cpu_async();
+    }
     sched->async_cpu_enabled = enabled;
 }
 

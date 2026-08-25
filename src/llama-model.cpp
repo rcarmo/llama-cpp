@@ -1775,6 +1775,9 @@ void llama_model_base::init_moe_expert_cache() {
         }
         return;
     }
+    // Pin cache weights to the GPU backend even when the CPU merge consumes
+    // their output; otherwise scheduler assignment can migrate the hot chain.
+    ggml_backend_buffer_set_usage(buf, GGML_BACKEND_BUFFER_USAGE_WEIGHTS);
 
     // fill packs (expert dim is outermost: one contiguous slab per expert)
     std::vector<uint8_t> slab;
