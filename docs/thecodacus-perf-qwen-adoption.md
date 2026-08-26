@@ -254,3 +254,47 @@ Not promoted to defaults:
 - adaptive global hot-store code from PR #26824, which has multi-context ownership and sidecar warm-start defects.
 
 Rollback is immediate: omit the cache profile/slot options and leave `--sched-async-cpu` unset or pass `--no-sched-async-cpu`.
+
+## Production promotion: RTX 3060 Qwen3.6 service
+
+A dedicated promotion campaign built a durable routing profile from five representative workloads and evaluated the exact 32K service topology.
+
+Selected configuration:
+
+```text
+model: Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf
+context: 32768
+batch / ubatch: 1024 / 1024
+non-expert layers: all on CUDA
+original routed experts: first 5 MoE layers on CPU
+hot cache: 36 profile-selected experts per CPU-resident layer
+KV: q4_0 / q4_0
+loading: no-mmap
+native MTP depth: 1
+async CPU scheduler: off
+```
+
+Matched six-request result:
+
+| Mode | Prompt tok/s | Generation tok/s | Peak process VRAM |
+|---|---:|---:|---:|
+| Existing cache-off production | 1185.17 | 72.51 | 11,424 MiB |
+| Selected 36-slot profile | 1190.89 | 77.75 | 11,598 MiB |
+
+The selected profile improves generation by **7.2%** with no prompt regression. Slot 40 was faster in some runs but reduced prompt throughput and left less operational VRAM headroom. Slot 48 failed under load. MTP depths two and three either exceeded VRAM, crashed under load, or reduced draft acceptance, so depth one remains selected.
+
+Acceptance evidence:
+
+- 29,020-token prompt completed at 1193.55 prompt tok/s;
+- sustained 1,024-token generation completed at 78.03 tok/s;
+- client cancellation followed by a successful recovery request;
+- deterministic repeated outputs within the selected configuration;
+- stable native-MTP execution and generated-token counts;
+- focused backend, semantic replay, scheduler, thread-safety, expert-I/O, quantization, and model-load tests passed.
+
+Cross-backend placement changes numerical trajectories: cache-off CPU expert kernels and cache-on CUDA expert kernels do not produce byte-identical greedy text. This is expected floating-point backend drift, not nondeterminism within the selected configuration, and is explicitly part of the production acceptance record.
+
+Durable profile and provenance:
+
+- `tools/pi/profiles/qwen36-35b-a3b/production-routing.csv`
+- `tools/pi/profiles/qwen36-35b-a3b/README.md`

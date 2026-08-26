@@ -10,26 +10,40 @@ set -euo pipefail
 # - 32K context is deliberate for speed: a 26K-token smoke test measured about
 #   900 prompt tok/s and 52.7 generation tok/s before later llama.cpp updates.
 # - 128K and 262K contexts work as long-context/coherence modes but are slower.
-# - After the July 2026 merge, the fastest reliable RTX 3060 profile uses
-#   q4_0 KV cache, `--no-mmap`, native MTP draft depth 1, and MoE-aware
-#   placement (`--n-gpu-layers all --n-cpu-moe 5`). This measured ~70 tok/s on
-#   a controlled 160-token local prompt, with higher draft depths and larger
-#   n_cpu_moe values slower.
+# - The selected August 2026 profile adds a durable routing-driven 36-slot
+#   expert pack to the existing five CPU-MoE layers. At exact 32K settings it
+#   measured 77.75 generation tok/s and 1190.89 prompt tok/s over six requests
+#   (+7.2% generation versus the matched cache-off baseline). Native MTP depth
+#   1 remains selected; deeper MTP exceeded VRAM or reduced acceptance.
 
 MODEL_DIR=${MODEL_DIR:-/workspace/models/gguf-misc}
 LLAMA_SERVER=${LLAMA_SERVER:-/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin/llama-server}
 SLOT_SAVE_PATH=${SLOT_SAVE_PATH:-/workspace/tmp/llama-server-slots/qwen36-27b}
+MOE_CACHE_PROFILE=${LLAMA_MOE_CACHE_PROFILE:-/workspace/projects/llama.cpp/llama.cpp/tools/pi/profiles/qwen36-35b-a3b/production-routing.csv}
+MOE_CACHE_SLOTS=${LLAMA_MOE_CACHE_SLOTS:-36}
 if [[ ! -x "$LLAMA_SERVER" ]]; then
   LLAMA_SERVER=$(command -v llama-server)
 fi
 
+if [[ ! -s "$MOE_CACHE_PROFILE" ]]; then
+  echo "missing or empty MoE routing profile: $MOE_CACHE_PROFILE" >&2
+  exit 1
+fi
+if [[ ! "$MOE_CACHE_SLOTS" =~ ^[0-9]+$ ]] || (( MOE_CACHE_SLOTS < 1 )); then
+  echo "invalid LLAMA_MOE_CACHE_SLOTS: $MOE_CACHE_SLOTS" >&2
+  exit 1
+fi
+
 export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 export LD_LIBRARY_PATH=/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin:${LD_LIBRARY_PATH:-}
+export GGML_MOE_CACHE_PROFILE=$MOE_CACHE_PROFILE
+export GGML_MOE_CACHE_SLOTS=$MOE_CACHE_SLOTS
 mkdir -p "$SLOT_SAVE_PATH"
 
 exec "$LLAMA_SERVER" \
   --model "$MODEL_DIR/Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf" \
   --spec-type draft-mtp --spec-draft-n-max 1 \
+  --no-sched-async-cpu \
   --alias qwen36-35b-a3b-mtp-q2 \
   --host 0.0.0.0 --port 8090 \
   --threads 8 --threads-batch 8 \
