@@ -44,7 +44,18 @@ Matched six-request measurements at exact 32K service settings:
 | Cache off | 1185.17 | 72.51 | 11,424 MiB |
 | 36 slots | 1190.89 | 77.75 | 11,598 MiB |
 
-Generation improved 7.2% with no prompt regression. A 29,020-token prompt completed at 1193.55 prompt tok/s. Client cancellation/recovery and a sustained 1,024-token generation completed successfully.
+Generation improved 7.2% with no prompt regression in the promotion matrix. A 29,020-token prompt completed at 1193.55 prompt tok/s. Client cancellation/recovery and a sustained 1,024-token generation completed successfully.
+
+Final post-deployment six-request measurement on the service port:
+
+```text
+five full 256-token requests: 79.66 generation tok/s
+all six requests, including one early EOG: 77.86 generation tok/s
+prompt average: 1180.37 tok/s
+peak Qwen process VRAM: 11,598 MiB
+```
+
+Against the matched cache-off baseline of 72.51 generation tok/s and 1185.17 prompt tok/s, the full-length deployed result is approximately 9.9% faster in generation with a 0.4% prompt reduction. Device-wide headroom is tight when unrelated GPU processes are present; slot 40 and above are not production-safe at 32K.
 
 ## Important correctness note
 

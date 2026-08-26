@@ -281,7 +281,9 @@ Matched six-request result:
 | Existing cache-off production | 1185.17 | 72.51 | 11,424 MiB |
 | Selected 36-slot profile | 1190.89 | 77.75 | 11,598 MiB |
 
-The selected profile improves generation by **7.2%** with no prompt regression. Slot 40 was faster in some runs but reduced prompt throughput and left less operational VRAM headroom. Slot 48 failed under load. MTP depths two and three either exceeded VRAM, crashed under load, or reduced draft acceptance, so depth one remains selected.
+The selected profile improves generation by **7.2%** with no prompt regression in the promotion matrix. Slot 40 was faster in some runs but reduced prompt throughput and left less operational VRAM headroom. Slot 48 failed under load. MTP depths two and three either exceeded VRAM, crashed under load, or reduced draft acceptance, so depth one remains selected.
+
+Final post-deployment measurement through the live service produced 79.66 generation tok/s over five full 256-token requests (77.86 tok/s across all six requests including one early EOG), 1180.37 prompt tok/s, and 11,598 MiB peak Qwen process VRAM. Against the matched cache-off baseline, full-length generation improved about **9.9%** while prompt throughput changed by about **-0.4%**.
 
 Acceptance evidence:
 
