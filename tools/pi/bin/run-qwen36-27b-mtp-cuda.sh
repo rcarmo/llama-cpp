@@ -35,7 +35,12 @@ if [[ ! "$MOE_CACHE_SLOTS" =~ ^[0-9]+$ ]] || (( MOE_CACHE_SLOTS < 1 )); then
 fi
 
 export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
-export LD_LIBRARY_PATH=/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin:${LD_LIBRARY_PATH:-}
+OPENSSL_LIB=${OPENSSL_LIB:-/home/linuxbrew/.linuxbrew/opt/openssl@3/lib}
+if [[ -d "$OPENSSL_LIB" ]]; then
+  export LD_LIBRARY_PATH=/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin:$OPENSSL_LIB:${LD_LIBRARY_PATH:-}
+else
+  export LD_LIBRARY_PATH=/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin:${LD_LIBRARY_PATH:-}
+fi
 export GGML_MOE_CACHE_PROFILE=$MOE_CACHE_PROFILE
 export GGML_MOE_CACHE_SLOTS=$MOE_CACHE_SLOTS
 mkdir -p "$SLOT_SAVE_PATH"
