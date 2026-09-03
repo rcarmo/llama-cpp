@@ -6,7 +6,7 @@
       "service": "llama-qwen36-27b-mtp.service",
       "slots": 1,
       "ctx_per_slot": 32768,
-      "note": "Active Qwen3.6 35B-A3B native-MTP Q2_K_XL profile. Tuned for tok/s after July 2026 merge: ctx=32768, fa=on, batch=1024, ubatch=1024, n_gpu_layers=all, n_cpu_moe=5, cache=q4_0/q4_0, no_mmap=true, spec_draft_n_max=1. Turbo KV is available for experiments but slower on this profile."
+      "note": "Active Qwen3.6 35B-A3B native-MTP Q2_K_XL profile. Selected August 2026 settings: ctx=32768, fa=on, batch/ubatch=1024, n_gpu_layers=all, n_cpu_moe=5, q4_0/q4_0 KV, no_mmap, MTP depth 1, profile-driven MoE cache with 36 slots/layer, async CPU scheduler off. Matched six-request result: 77.75 generation tok/s and 1190.89 prompt tok/s; 29,020-token prompt and cancellation/recovery validated."
     },
     "gemma4-e2b-qat-mtp": {
       "url": "http://localhost:8090",

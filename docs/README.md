@@ -27,6 +27,7 @@ the repository root README.
 - [Qwen 3.8 27B Sigma campaign](../benchmarks/intel-1340p/qwen38-campaign/report.md)
 - [Qwen 3.8 evidence and reproduction index](../benchmarks/intel-1340p/qwen38-campaign/README.md)
 - [Expert-I/O baseline and controls](expert-io-adoption-baseline.md)
+- [thecodacus/perf Qwen placement assessment](thecodacus-perf-qwen-adoption.md)
 - [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md)
 - [Intel CPU/Vulkan campaign report](../benchmarks/intel-1340p/final-report-20260731.md)
 - [Qwen 128K Fieldfare report](../benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md)

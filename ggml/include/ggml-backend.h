@@ -154,6 +154,8 @@ extern "C" {
         bool buffer_from_host_ptr;
         // event synchronization
         bool events;
+        // mmap is supported for loading
+        bool mmap_support;
     };
 
     // all the device properties
@@ -334,6 +336,11 @@ extern "C" {
     GGML_API void                 ggml_backend_sched_set_tensor_backend(ggml_backend_sched_t sched, struct ggml_tensor * node, ggml_backend_t backend);
     GGML_API ggml_backend_t       ggml_backend_sched_get_tensor_backend(ggml_backend_sched_t sched, struct ggml_tensor * node);
 
+    // Opt in to one scheduler-owned CPU worker that can overlap an independent
+    // CPU graph split with later non-CPU splits. Changing this mode synchronizes
+    // the scheduler first. Disabled by default.
+    GGML_API void                 ggml_backend_sched_set_async_cpu(ggml_backend_sched_t sched, bool enabled);
+
     // Split graph without allocating it
     GGML_API void                 ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgraph * graph);
 
@@ -421,6 +428,10 @@ extern "C" {
 
     // Compare the output of two backends
     GGML_API bool ggml_backend_compare_graph_backend(ggml_backend_t backend1, ggml_backend_t backend2, struct ggml_cgraph * graph, ggml_backend_eval_callback callback, void * user_data, struct ggml_tensor const * const * test_nodes, size_t num_test_nodes);
+
+    // returns true for ops that may require additional memory for fleeting data on some backends,
+    // i.e. the backend's get_alloc_size may return more than ggml_nbytes for the output tensor
+    GGML_API bool ggml_backend_op_alloc_size_may_expand(enum ggml_op op);
 
     // Tensor initialization
     GGML_API enum ggml_status ggml_backend_tensor_alloc(ggml_backend_buffer_t buffer, struct ggml_tensor * tensor, void * addr);

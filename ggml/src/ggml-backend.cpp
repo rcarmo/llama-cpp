@@ -20,6 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <unordered_map>
 #include <vector>
 
 #ifdef __APPLE__
@@ -64,6 +69,13 @@ size_t ggml_backend_buft_get_alloc_size(ggml_backend_buffer_type_t buft, const s
     if (buft->iface.get_alloc_size) {
         size_t size = buft->iface.get_alloc_size(buft, tensor);
         assert(size >= ggml_nbytes(tensor));
+
+        // [TAG_ALLOC_SIZE_EXPAND]
+        // if you hit this assert, update ggml_backend_op_alloc_size_may_expand() accordingly
+        GGML_ASSERT(size <= ggml_nbytes(tensor) ||
+                    ggml_op_is_empty(tensor->op) ||
+                    ggml_backend_op_alloc_size_may_expand(tensor->op));
+
         return size;
     }
     return ggml_nbytes(tensor);
@@ -182,6 +194,8 @@ void ggml_backend_buffer_set_usage(ggml_backend_buffer_t buffer, enum ggml_backe
     // FIXME: add a generic callback to the buffer interface
     if (ggml_backend_buffer_is_multi_buffer(buffer)) {
         ggml_backend_multi_buffer_set_usage(buffer, usage);
+    } else if (ggml_backend_buffer_is_meta(buffer)) {
+        ggml_backend_meta_buffer_set_usage(buffer, usage);
     }
 }
 
@@ -556,10 +570,10 @@ void ggml_backend_event_wait(ggml_backend_t backend, ggml_backend_event_t event)
     backend->iface.event_wait(backend, event);
 }
 
-static void ggml_backend_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * cgraph) {
+static void ggml_backend_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * cgraph, struct ggml_backend_graph_optimize_params * params) {
     GGML_ASSERT(backend);
     if (backend->iface.graph_optimize != NULL) {
-        backend->iface.graph_optimize(backend, cgraph);
+        backend->iface.graph_optimize(backend, cgraph, params);
     }
 }
 
@@ -776,6 +790,122 @@ struct ggml_backend_sched_split {
     struct ggml_cgraph graph;
 };
 
+// async execution of CPU splits (GGML_SCHED_ASYNC_CPU): a persistent worker
+// computes a CPU split while the main thread keeps launching later splits that
+// do not depend on it, so an independent GPU split overlaps the CPU compute
+struct ggml_sched_cpu_async {
+    std::thread             worker;
+    std::mutex              mtx;
+    std::condition_variable cv;
+    ggml_backend_t          job_backend = nullptr;
+    struct ggml_cgraph *    job_graph   = nullptr;
+    enum ggml_status        job_status  = GGML_STATUS_SUCCESS;
+    bool                    job_ready   = false;
+    bool                    job_done    = false;
+    bool                    stop        = false;
+    bool                    pending     = false; // main-thread view: a job is queued or running
+    std::chrono::steady_clock::time_point job_started;
+    uint64_t                jobs        = 0;
+    uint64_t                job_us      = 0;
+    uint64_t                wait_us     = 0;
+
+    ggml_sched_cpu_async() {
+        worker = std::thread([this]() {
+            for (;;) {
+                std::unique_lock<std::mutex> lock(mtx);
+                cv.wait(lock, [this]() { return job_ready || stop; });
+                if (stop) {
+                    return;
+                }
+                job_ready = false;
+                ggml_backend_t   backend = job_backend;
+                ggml_cgraph *    graph   = job_graph;
+                lock.unlock();
+
+                enum ggml_status status = ggml_backend_graph_compute_async(backend, graph);
+                const auto finished = std::chrono::steady_clock::now();
+
+                lock.lock();
+                job_us += std::chrono::duration_cast<std::chrono::microseconds>(finished - job_started).count();
+                jobs++;
+                job_status = status;
+                job_done   = true;
+                cv.notify_all();
+            }
+        });
+    }
+
+    ~ggml_sched_cpu_async() {
+        // The graph view belongs to the scheduler. Drain queued/running work
+        // before the scheduler storage can be destroyed.
+        (void) join();
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            stop = true;
+        }
+        cv.notify_all();
+        worker.join();
+    }
+
+    void launch(ggml_backend_t backend, struct ggml_cgraph * graph) {
+        GGML_ASSERT(!pending);
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            job_backend = backend;
+            job_graph   = graph;
+            job_status  = GGML_STATUS_SUCCESS;
+            job_done    = false;
+            job_ready   = true;
+            job_started = std::chrono::steady_clock::now();
+        }
+        cv.notify_all();
+        pending = true;
+    }
+
+    bool produces(const struct ggml_tensor * tensor) {
+        if (!pending || tensor == nullptr) {
+            return false;
+        }
+        std::lock_guard<std::mutex> lock(mtx);
+        for (int i = 0; i < job_graph->n_nodes; ++i) {
+            const struct ggml_tensor * produced = job_graph->nodes[i];
+            if (produced == tensor || produced->view_src == tensor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // wait for the in-flight job (if any); returns its status
+    enum ggml_status join() {
+        if (!pending) {
+            return GGML_STATUS_SUCCESS;
+        }
+        const auto wait_started = std::chrono::steady_clock::now();
+        std::unique_lock<std::mutex> lock(mtx);
+        cv.wait(lock, [this]() { return job_done; });
+        wait_us += std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now() - wait_started).count();
+        pending = false;
+        return job_status;
+    }
+
+    void log_profile() const {
+        if (getenv("GGML_SCHED_ASYNC_CPU_PROFILE") == nullptr || jobs == 0) {
+            return;
+        }
+        const uint64_t overlap_us = job_us > wait_us ? job_us - wait_us : 0;
+        fprintf(stderr, "async CPU splits: jobs=%llu cpu=%.3f ms wait=%.3f ms overlap=%.3f ms\n",
+                (unsigned long long) jobs, job_us/1000.0, wait_us/1000.0, overlap_us/1000.0);
+    }
+
+    void reset_profile() {
+        jobs = 0;
+        job_us = 0;
+        wait_us = 0;
+    }
+};
+
 struct ggml_backend_sched {
     bool is_reset; // true if the scheduler has been reset since the last graph split
     bool is_alloc;
@@ -836,6 +966,11 @@ struct ggml_backend_sched {
     ggml_backend_event_t prefetch_free[GGML_SCHED_MAX_PREFETCH_SLOTS];
     bool prefetch_used[GGML_SCHED_MAX_PREFETCH_SLOTS];
     int prefetch_cur;
+
+    // One bounded scheduler-owned CPU worker. It remains dormant unless the
+    // owning context explicitly enables asynchronous CPU split execution.
+    struct ggml_sched_cpu_async * cpu_async;
+    bool async_cpu_enabled;
 
     int debug;
 
@@ -1456,11 +1591,40 @@ void ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgra
         sched->prev_leaf_backend_ids = tmp;
     }
 
+    // optimize the split graphs and collect the allocation dependencies added by the backends
+    // this needs to happen before we make graph_copy, so they are in sync
+    // TODO: this may create many small allocations in the scheduler, restructure to use a flat array
+    std::unordered_map<ggml_tensor *, std::vector<ggml_tensor *>> alloc_deps;
+
+    struct ggml_backend_graph_optimize_params opt_params = {
+        /* .add_alloc_dep = */ [](void * user_data, ggml_tensor * tensor, ggml_tensor * until) {
+            auto & deps = *(std::unordered_map<ggml_tensor *, std::vector<ggml_tensor *>> *) user_data;
+            std::vector<ggml_tensor *> & keep = deps[until];
+            if (std::find(keep.begin(), keep.end(), tensor) == keep.end()) {
+                keep.push_back(tensor);
+            }
+        },
+        /* .user_data     = */ &alloc_deps,
+    };
+
+    for (int i = 0; i < sched->n_splits; i++) {
+        struct ggml_backend_sched_split * split = &sched->splits[i];
+        split->graph = ggml_graph_view(graph, split->i_start, split->i_end);
+
+        ggml_backend_graph_optimize(sched->backends[split->backend_id], &split->graph, &opt_params);
+    }
+
+    // each dep is added to graph_copy as a GGML_OP_NONE node with the kept tensors as srcs
+    int n_dep_nodes = 0;
+    for (const auto & it : alloc_deps) {
+        n_dep_nodes += (it.second.size() + GGML_MAX_SRC - 1) / GGML_MAX_SRC;
+    }
+
     int total_inputs = sched->n_graph_inputs;
     for (int i = 0; i < sched->n_splits; i++) {
         total_inputs += sched->splits[i].n_inputs;
     }
-    int graph_size = std::max(graph->n_nodes, graph->n_leafs) + total_inputs * 2 * sched->n_copies;
+    int graph_size = std::max(graph->n_nodes, graph->n_leafs) + total_inputs * 2 * sched->n_copies + n_dep_nodes;
 
     // remember the actual graph_size for performing reallocation checks later [GGML_SCHED_DEBUG_REALLOC]
     sched->debug_prev_graph_size = sched->debug_graph_size;
@@ -1478,13 +1642,10 @@ void ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgra
 
     struct ggml_cgraph * graph_copy = &sched->graph;
 
+    int n_dep_nodes_added = 0;
+
     for (int i = 0; i < sched->n_splits; i++) {
         struct ggml_backend_sched_split * split = &sched->splits[i];
-        split->graph = ggml_graph_view(graph, split->i_start, split->i_end);
-
-        // Optimize this split of the graph. This needs to happen before we make graph_copy,
-        // so they are in sync.
-        ggml_backend_graph_optimize(sched->backends[split->backend_id], &split->graph);
 
         // add inputs to the graph copy so that they are allocated by ggml-alloc at the start of the split
         for (int j = 0; j < split->n_inputs; j++) {
@@ -1509,8 +1670,31 @@ void ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgra
             assert(graph_copy->size > graph_copy->n_nodes);
             sched->node_backend_ids[graph_copy->n_nodes] = tensor_backend_id(graph->nodes[j]);
             graph_copy->nodes[graph_copy->n_nodes++] = graph->nodes[j];
+
+            if (alloc_deps.empty()) {
+                continue;
+            }
+
+            // add a dependency node so that the kept tensors are not freed before this node is computed
+            auto it = alloc_deps.find(graph->nodes[j]);
+            if (it != alloc_deps.end()) {
+                const std::vector<ggml_tensor *> & keep = it->second;
+                for (size_t k = 0; k < keep.size(); k += GGML_MAX_SRC) {
+                    struct ggml_tensor * dep = ggml_view_tensor(sched->ctx, keep[k]);
+                    for (size_t s = 0; s < GGML_MAX_SRC && k + s < keep.size(); s++) {
+                        dep->src[s] = keep[k + s];
+                    }
+                    assert(graph_copy->size > graph_copy->n_nodes);
+                    sched->node_backend_ids[graph_copy->n_nodes] = split->backend_id;
+                    graph_copy->nodes[graph_copy->n_nodes++] = dep;
+                    n_dep_nodes_added++;
+                }
+            }
         }
     }
+
+    // a mismatch means a backend added a dep with an `until` tensor that is not a node of the optimized graph
+    GGML_ASSERT(n_dep_nodes_added == n_dep_nodes);
 
     if (sched->n_copies > 1) {
         // add input copies as leafs so that they are allocated first
@@ -1699,10 +1883,23 @@ static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_ba
 static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
     struct ggml_backend_sched_split * splits = sched->splits;
+    if (sched->cpu_async != nullptr) {
+        sched->cpu_async->reset_profile();
+    }
+
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
+        // A job left over from an aborted eval references stale split memory.
+        enum ggml_status ec = sched->cpu_async->join();
+        if (ec != GGML_STATUS_SUCCESS) {
+            return ec;
+        }
+    }
 
     ggml_tensor * prev_ids_tensor = nullptr;
     std::vector<int32_t> ids;
     std::vector<ggml_bitset_t> used_ids;
+
+    int prev_backend_id = -1;
 
     for (int split_id = 0; split_id < sched->n_splits; split_id++) {
         struct ggml_backend_sched_split * split = &splits[split_id];
@@ -1712,6 +1909,32 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         ggml_tensor * prefetch_input_cpy = NULL;
         ggml_backend_buffer_t prefetch_saved_buffer = NULL;
         void * prefetch_saved_data = NULL;
+
+        // One CPU job is allowed at a time. A later non-CPU split may overlap
+        // when it only shares pre-existing read-only inputs with the CPU job;
+        // join only if it consumes a tensor actually produced by that job.
+        if (sched->async_cpu_enabled && sched->cpu_async->pending) {
+            bool must_join = split_backend_id == sched->n_backends - 1;
+            for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
+                must_join = sched->cpu_async->produces(split->inputs[input_id]);
+            }
+            if (must_join) {
+                enum ggml_status ec = sched->cpu_async->join();
+                if (ec != GGML_STATUS_SUCCESS) {
+                    return ec;
+                }
+            }
+        }
+
+        // ensure the previous split's async work has completed before we start
+        // this split, the allocator may have reused buffer regions across splits
+        if (split->n_inputs == 0 && prev_backend_id >= 0 && prev_backend_id != split_backend_id) {
+            if (sched->events[prev_backend_id][sched->cur_copy] != NULL) {
+                ggml_backend_event_synchronize(sched->events[prev_backend_id][sched->cur_copy]);
+            } else {
+                ggml_backend_synchronize(sched->backends[prev_backend_id]);
+            }
+        }
 
         // copy the input tensors to the split backend
         for (int input_id = 0; input_id < split->n_inputs; input_id++) {
@@ -1809,7 +2032,10 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
                         for (int64_t i1 = 0; i1 < ids_tensor->ne[1]; i1++) {
                             for (int64_t i0 = 0; i0 < ids_tensor->ne[0]; i0++) {
                                 int32_t id = ids[i1 * ids_tensor->nb[1]/sizeof(int32_t) + i0 * ids_tensor->nb[0]/sizeof(int32_t)];
-                                GGML_ASSERT(id >= 0 && id < n_expert);
+                                if (id < 0) {
+                                    continue; // expert not owned by this pack (hot/cold split)
+                                }
+                                GGML_ASSERT(id < n_expert);
                                 ggml_bitset_set(used_ids.data(), id);
                             }
                         }
@@ -1872,6 +2098,19 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         }
 
         if (!sched->callback_eval) {
+            // Only the deliberately independent cold-expert chain is eligible.
+            // Generic CPU splits can be tiny or part of the critical path and
+            // must retain the serialized scheduler behavior.
+            const bool is_cold_expert_split = split->graph.n_nodes >= 4 &&
+                    strstr(split->graph.nodes[split->graph.n_nodes - 1]->name, "ffn_moe_down_cold-") != nullptr;
+            const bool async_cpu_split = sched->async_cpu_enabled && is_cold_expert_split &&
+                    split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1;
+            if (async_cpu_split) {
+                // run the CPU split on the worker; the loop continues launching
+                // later splits until one depends on this split's outputs
+                sched->cpu_async->launch(split_backend, &split->graph);
+                continue;
+            }
             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
             if (split_prefetch_slot != -1) {
                 // the kernels have captured the slot address at launch, safe to restore
@@ -1917,12 +2156,22 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
             }
         }
 
-        // record the event of this copy
-        if (split->n_inputs > 0) {
-            if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
-                ggml_backend_event_record(sched->events[split_backend_id][sched->cur_copy], split_backend);
-            }
+        // record the event of this split
+        if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
+            ggml_backend_event_record(sched->events[split_backend_id][sched->cur_copy], split_backend);
         }
+
+        prev_backend_id = split_backend_id;
+    }
+
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
+        enum ggml_status ec = sched->cpu_async->join();
+        if (ec != GGML_STATUS_SUCCESS) {
+            return ec;
+        }
+    }
+    if (sched->cpu_async != nullptr) {
+        sched->cpu_async->log_profile();
     }
 
     return GGML_STATUS_SUCCESS;
@@ -2004,6 +2253,9 @@ ggml_backend_sched_t ggml_backend_sched_new(
     // default of 3 covers the gate/up/down expert tensors of one MoE layer
     sched->prefetch_n_slots = prefetch_n_slots <= 1 ? 3 : std::min(prefetch_n_slots, GGML_SCHED_MAX_PREFETCH_SLOTS);
 
+    sched->cpu_async = nullptr;
+    sched->async_cpu_enabled = false;
+
     ggml_backend_sched_reset(sched);
 
     return sched;
@@ -2028,6 +2280,7 @@ void ggml_backend_sched_free(ggml_backend_sched_t sched) {
         }
         ggml_backend_free(sched->prefetch_backend);
     }
+    delete sched->cpu_async;
     ggml_gallocr_free(sched->galloc);
     ggml_free(sched->ctx);
     ggml_hash_set_free(&sched->hash_set);
@@ -2133,6 +2386,9 @@ enum ggml_status ggml_backend_sched_graph_compute_async(ggml_backend_sched_t sch
 
 void ggml_backend_sched_synchronize(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
+    if (sched->cpu_async != nullptr && sched->cpu_async->pending) {
+        (void) sched->cpu_async->join();
+    }
     for (int i = 0; i < sched->n_backends; i++) {
         ggml_backend_synchronize(sched->backends[i]);
     }
@@ -2145,6 +2401,18 @@ void ggml_backend_sched_synchronize(ggml_backend_sched_t sched) {
         // which avoids changes in the graph that could cause CUDA or other graphs to be disabled
         sched->next_copy = 0;
     }
+}
+
+void ggml_backend_sched_set_async_cpu(ggml_backend_sched_t sched, bool enabled) {
+    GGML_ASSERT(sched);
+    if (sched->async_cpu_enabled == enabled) {
+        return;
+    }
+    ggml_backend_sched_synchronize(sched);
+    if (enabled && sched->cpu_async == nullptr) {
+        sched->cpu_async = new ggml_sched_cpu_async();
+    }
+    sched->async_cpu_enabled = enabled;
 }
 
 void ggml_backend_sched_set_eval_callback(ggml_backend_sched_t sched, ggml_backend_sched_eval_callback callback, void * user_data) {
@@ -2209,6 +2477,23 @@ ggml_backend_t ggml_backend_sched_get_tensor_backend(ggml_backend_sched_t sched,
 }
 
 // utils
+
+// [TAG_ALLOC_SIZE_EXPAND]
+// returns true for ops that may require additional memory for fleeting data on some backends,
+// i.e. the backend's get_alloc_size may return more than ggml_nbytes for the output tensor
+bool ggml_backend_op_alloc_size_may_expand(enum ggml_op op) {
+    switch (op) {
+        case GGML_OP_FLASH_ATTN_EXT:
+        case GGML_OP_MUL_MAT_ID:
+        case GGML_OP_CUMSUM:
+        case GGML_OP_CONCAT:
+        case GGML_OP_ARGSORT:
+        case GGML_OP_TOP_K:
+            return true;
+        default:
+            return false;
+    }
+}
 
 enum ggml_status ggml_backend_view_init(struct ggml_tensor * tensor) {
     GGML_ASSERT(tensor);
