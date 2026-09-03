@@ -1,0 +1,1 @@
+Fixed. The issue was that `clamp` only clamped the minimum but not the maximum. The fix wraps the result with `Math.min(max, ...)` so values above `max` are also capped. The test now passes.

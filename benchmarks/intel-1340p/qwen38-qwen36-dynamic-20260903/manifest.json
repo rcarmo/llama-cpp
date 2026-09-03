@@ -1,0 +1,65 @@
+{
+  "campaign": "qwen38-qwen36-dynamic-20260903",
+  "date": "2026-09-03",
+  "platform": {
+    "name": "intel-1340p",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-1340P",
+    "logical_cpus": 16,
+    "memory_total_kib": 32577828,
+    "kernel": "Linux 7.1.5-201.fc44.x86_64 x86_64"
+  },
+  "repository": {
+    "checkout_commit": "23b5cbe56b7640baca77c12ce19d36c681eb0887"
+  },
+  "runtime": {
+    "binary": "build-intel-clang/bin/llama-server",
+    "version": 10579,
+    "commit": "abdbeadfb",
+    "compiler": "Clang 22.1.8",
+    "sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab"
+  },
+  "models": [
+    {
+      "name": "Qwen3.8-27B-UD-Q4_K_XL.gguf",
+      "repository": "unsloth/Qwen3.8-27B-GGUF",
+      "revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+      "size_bytes": 17559178144,
+      "sha256": "3f227079003add2511437e5b1e94812e363385225bf6a9b47b0054a72bc8b01e"
+    },
+    {
+      "name": "Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+      "repository": "unsloth/Qwen3.6-35B-A3B-MTP-GGUF",
+      "revision": "5bc3e238d916f48a861bac2f8a1990a0e9b7e98d",
+      "size_bytes": 12574128416,
+      "sha256": "ed7cda7e38985b4fcff76475865135039641d2bfbac3c169df15ca770f37fb0c"
+    }
+  ],
+  "profiles": {
+    "performance": {
+      "threads": 4,
+      "context": 8192,
+      "mtp": false,
+      "prompt_tokens": [512, 1024],
+      "generation_prompt_tokens": 512,
+      "generation_tokens": 64
+    },
+    "quality": {
+      "threads": 2,
+      "context": 8192,
+      "mtp": true,
+      "draft_depth_min": 1,
+      "draft_depth_max": 3,
+      "api_cases": 6,
+      "pi_tasks": 4
+    }
+  },
+  "safety": {
+    "cool_start_max_c": 60,
+    "cool_start_max_load_1m": 1.5,
+    "thermal_abort_c": 95,
+    "thermal_abort_consecutive_seconds": 3,
+    "zram_size_gib": 8,
+    "zram_priority": 100
+  },
+  "report": "report.md"
+}

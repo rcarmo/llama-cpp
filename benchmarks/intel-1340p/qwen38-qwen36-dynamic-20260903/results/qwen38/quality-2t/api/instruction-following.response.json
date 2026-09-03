@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\n  \"status\": \"ready\",\n  \"files\": [\n    \"src/a.cpp\",\n    \"tests/a.cpp\"\n  ],\n  \"tests\": 2\n}",
+        "reasoning_content": "We need to respond to user: \"Return one JSON object with exactly these keys in this order: status, files, tests. Set status to ready, files to [\"src/a.cpp\",\"tests/a.cpp\"], and tests to 2.\"\n\nNeed output only JSON object, exact keys order. No explanations. Final JSON:\n{\n  \"status\": \"ready\",\n  \"files\": [\"src/a.cpp\", \"tests/a.cpp\"],\n  \"tests\": 2\n}\nEnsure valid JSON.\n"
+      }
+    }
+  ],
+  "created": 1788455697,
+  "model": "qwen3.8-27b-ud-q4-k-xl-mtp",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 149,
+    "prompt_tokens": 105,
+    "total_tokens": 254,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-XZkVvHg02cgx11ReUM4fkC8BGCwMcwkx",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 105,
+    "prompt_ms": 42902.936,
+    "prompt_per_token_ms": 408.5993904761905,
+    "prompt_per_second": 2.447384952861967,
+    "predicted_n": 149,
+    "predicted_ms": 88569.82,
+    "predicted_per_token_ms": 594.4283221476511,
+    "predicted_per_second": 1.6822886170481093,
+    "draft_n": 132,
+    "draft_n_accepted": 105
+  }
+}

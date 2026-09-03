@@ -1,0 +1,22 @@
+[Unit]
+Description=Qwen 3.8 27B local llama.cpp provider (manual, memory-exclusive)
+After=network-online.target
+Wants=network-online.target
+Conflicts=llama-gemma-local-provider.service llama-maple-local-provider.service llama-qwen-longctx.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/agent/workspace/projects/llama-cpp
+Environment=LLAMA_HOST=127.0.0.1
+Environment=LLAMA_PORT=8094
+Environment=LLAMA_CTX=8192
+Environment=LLAMA_KV=q4_0
+Environment=LLAMA_MTP_DEPTH=3
+ExecStart=/var/home/agent/workspace/projects/llama-cpp/tools/run-intel-qwen38.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=45
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=default.target

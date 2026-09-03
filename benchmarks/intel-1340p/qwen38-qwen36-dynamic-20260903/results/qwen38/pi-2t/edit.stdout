@@ -1,0 +1,5 @@
+Test passes. Done.
+
+- **Bug**: `src/clamp.ts` returned `Math.max(min, value)`, ignoring `max` — so values above the range weren't clamped.
+- **Fix**: `return Math.min(max, Math.max(min, value));` in `src/clamp.ts:2`
+- **Result**: `bun test` → 1 pass, 0 fail. No other files touched.

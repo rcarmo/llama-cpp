@@ -1,0 +1,49 @@
+{
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "The user wants to find Vulkan shader and dispatch code related to \"Q2_K multi-column matrix-vector decode\".\nI need to search the repository for this specific functionality.\nThe search should likely look for \"Q2_K\", \"multi-column\", \"matrix-vector\", \"decode\", \"vulkan\", \"shader\", \"dispatch\".\n\nLet's start by searching for \"Q2_K\" and \"multi-column\" or \"matrix-vector\" in the repository.\nI will use the `search_repository` tool.\n\nFirst, I'll search for \"Q2_K multi-column\" or similar terms.\nThe path should probably",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "search_repository",
+              "arguments": "{\"query\":\"Q2_K multi-column matrix-vector decode\",\"path\":\".\",\"max_results\":10}"
+            },
+            "id": "3LwZQO2VyPLXqGkQdnYpI18zbiPKkPif"
+          }
+        ]
+      }
+    }
+  ],
+  "created": 1788449711,
+  "model": "qwen3.6-35b-a3b-ud-q2-k-xl-mtp",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 185,
+    "prompt_tokens": 363,
+    "total_tokens": 548,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-BClHuMcW35tCE5aC7Ls6yHHyXYZmkM5t",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 363,
+    "prompt_ms": 13637.774,
+    "prompt_per_token_ms": 37.569625344352616,
+    "prompt_per_second": 26.61724706686003,
+    "predicted_n": 185,
+    "predicted_ms": 13413.983,
+    "predicted_per_token_ms": 72.50801621621622,
+    "predicted_per_second": 13.791578534131137,
+    "draft_n": 174,
+    "draft_n_accepted": 128
+  }
+}

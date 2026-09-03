@@ -1,0 +1,11 @@
+76 |       new Response(process.stdout).text(),
+77 |       new Response(process.stderr).text(),
+78 |       process.exited,
+79 |     ]);
+80 |     wallMs = performance.now() - started;
+81 |     if (exitCode !== 0) throw new Error(`${fixture.id}: curl exit ${exitCode}: ${errorText.trim()}`);
+                                       ^
+error: cached-followup: curl exit 28: curl: (28) Operation timed out after 1800000 milliseconds with 0 bytes received
+      at /var/home/agent/workspace/projects/llama-cpp/benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/run-matched-corpus.ts:81:35
+
+Bun v1.4.0 (Linux x64)
