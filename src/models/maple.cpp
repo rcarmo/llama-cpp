@@ -4,7 +4,7 @@ void llama_model_maple::load_arch_hparams(llama_model_loader & ml) {
     hparams.swa_type = LLAMA_SWA_TYPE_STANDARD;
 
     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS, hparams.f_norm_rms_eps);
-    ml.get_key(LLM_KV_EXPERT_FEED_FORWARD_LENGTH,  hparams.n_ff_exp);
+    ml.get_key_or_arr(LLM_KV_EXPERT_FEED_FORWARD_LENGTH, hparams.n_ff_exp_arr, hparams.n_layer_all);
     ml.get_key(LLM_KV_ATTENTION_SLIDING_WINDOW,    hparams.n_swa);
     ml.get_key_or_arr(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN, hparams.is_swa_impl, hparams.n_layer());
     ml.get_key_or_arr(LLM_KV_SWIGLU_CLAMP_EXP, hparams.swiglu_clamp_exp, hparams.n_layer());
@@ -15,7 +15,7 @@ void llama_model_maple::load_arch_hparams(llama_model_loader & ml) {
     if (hparams.n_rot_swa != 64) {
         throw std::runtime_error("Maple sliding-attention layers require 64 rotary dimensions");
     }
-    if (hparams.n_expert != 256 || hparams.n_expert_used != 8) {
+    if (hparams.n_expert != 256 || hparams.n_expert_used() != 8) {
         throw std::runtime_error("Maple requires 256 experts with 8 active experts");
     }
 
@@ -40,10 +40,11 @@ void llama_model_maple::load_arch_tensors(llama_model_loader &) {
         layer.attn_q_norm    = create_tensor(tn(LLM_TENSOR_ATTN_Q_NORM,    "weight", il), {n_embd_head_k}, 0);
         layer.attn_k_norm    = create_tensor(tn(LLM_TENSOR_ATTN_K_NORM,    "weight", il), {n_embd_head_k}, 0);
 
-        layer.ffn_gate_inp  = create_tensor(tn(LLM_TENSOR_FFN_GATE_INP,  "weight", il), {n_embd, n_expert}, 0);
-        layer.ffn_gate_exps   = create_tensor(tn(LLM_TENSOR_FFN_GATE_EXPS, "weight", il), {n_embd, hparams.n_ff_exp, n_expert}, 0);
-        layer.ffn_up_exps     = create_tensor(tn(LLM_TENSOR_FFN_UP_EXPS,   "weight", il), {n_embd, hparams.n_ff_exp, n_expert}, 0);
-        layer.ffn_down_exps   = create_tensor(tn(LLM_TENSOR_FFN_DOWN_EXPS, "weight", il), {hparams.n_ff_exp, n_embd, n_expert}, 0);
+        const int64_t n_ff_exp = hparams.n_ff_exp(il);
+        layer.ffn_gate_inp    = create_tensor(tn(LLM_TENSOR_FFN_GATE_INP,   "weight", il), {n_embd, n_expert}, 0);
+        layer.ffn_gate_exps   = create_tensor(tn(LLM_TENSOR_FFN_GATE_EXPS, "weight", il), {n_embd, n_ff_exp, n_expert}, 0);
+        layer.ffn_up_exps     = create_tensor(tn(LLM_TENSOR_FFN_UP_EXPS,   "weight", il), {n_embd, n_ff_exp, n_expert}, 0);
+        layer.ffn_down_exps   = create_tensor(tn(LLM_TENSOR_FFN_DOWN_EXPS, "weight", il), {n_ff_exp, n_embd, n_expert}, 0);
     }
 }
 
