@@ -11,11 +11,15 @@
 #include <atomic>
 #include <chrono>
 #include <thread>
+#ifdef TEST_ASYNC_NVTX
+#include <nvToolsExt.h>
+#endif
 
 static std::atomic<int> active_compute{0};
 static std::atomic<bool> concurrent_compute{false};
 static std::atomic<bool> inject_failure{false};
 static ggml_backend_t failing_backend = nullptr;
+static bool widen_cpu_test_window = true;
 static ggml_status (*cpu_compute)(ggml_backend_t, ggml_cgraph *) = nullptr;
 
 static ggml_status observed_compute(ggml_backend_t backend, ggml_cgraph * graph) {
@@ -24,9 +28,17 @@ static ggml_status observed_compute(ggml_backend_t backend, ggml_cgraph * graph)
     }
     // Widen the observation window; this measures simultaneous execution, not
     // a throughput claim. No unbounded barrier can hang the serialized control.
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    if (widen_cpu_test_window) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+#ifdef TEST_ASYNC_NVTX
+    nvtxRangePushA("async-test CPU compute");
+#endif
     const ggml_status status = backend == failing_backend && inject_failure.exchange(false)
             ? GGML_STATUS_FAILED : cpu_compute(backend, graph);
+#ifdef TEST_ASYNC_NVTX
+    nvtxRangePop();
+#endif
     active_compute.fetch_sub(1);
     return status;
 }
@@ -40,12 +52,52 @@ static ggml_tensor * make_branch(ggml_context * ctx, ggml_tensor * input, float 
     return d;
 }
 
+static int test_routed_experts() {
+    ggml_backend_t backend = ggml_backend_cpu_init();
+    ggml_backend_t backends[] = { backend };
+    auto sched = ggml_backend_sched_new(backends, nullptr, 1, 64, false, true);
+    auto ctx = ggml_init({2 * 1024 * 1024, nullptr, true});
+    auto weights = ggml_new_tensor_3d(ctx, GGML_TYPE_F32, 32, 16, 4);
+    auto input = ggml_new_tensor_3d(ctx, GGML_TYPE_F32, 32, 1, 2);
+    auto ids = ggml_new_tensor_2d(ctx, GGML_TYPE_I32, 2, 2);
+    ggml_set_input(weights); ggml_set_input(input); ggml_set_input(ids);
+    auto out = ggml_mul_mat_id(ctx, weights, input, ids);
+    ggml_set_output(out);
+    auto graph = ggml_new_graph(ctx);
+    ggml_build_forward_expand(graph, out);
+    GGML_ASSERT(ggml_backend_sched_alloc_graph(sched, graph));
+    std::vector<float> w(32 * 16 * 4), x(32 * 2), result(16 * 2 * 2);
+    int32_t selected[] = {0, 3, 2, 0}; // repeated and nonadjacent experts
+    for (size_t i = 0; i < w.size(); ++i) w[i] = float(int(i % 11) - 5) / 8;
+    for (size_t i = 0; i < x.size(); ++i) x[i] = float(int(i % 7) - 3) / 4;
+    for (bool enabled : {false, true, true, false}) {
+        ggml_backend_sched_set_async_cpu(sched, enabled);
+        ggml_backend_tensor_set(weights, w.data(), 0, w.size() * sizeof(float));
+        ggml_backend_tensor_set(input, x.data(), 0, x.size() * sizeof(float));
+        ggml_backend_tensor_set(ids, selected, 0, sizeof(selected));
+        GGML_ASSERT(ggml_backend_sched_graph_compute(sched, graph) == GGML_STATUS_SUCCESS);
+        ggml_backend_tensor_get(out, result.data(), 0, result.size() * sizeof(float));
+        for (int token = 0; token < 2; ++token) for (int pick = 0; pick < 2; ++pick)
+            for (int row = 0; row < 16; ++row) {
+                float expected = 0;
+                for (int k = 0; k < 32; ++k)
+                    expected += w[(selected[token * 2 + pick] * 16 + row) * 32 + k] * x[token * 32 + k];
+                GGML_ASSERT(std::fabs(result[(token * 2 + pick) * 16 + row] - expected) < 1e-5f);
+            }
+    }
+    ggml_backend_sched_free(sched); ggml_free(ctx); ggml_backend_free(backend);
+    std::puts("routed expert async regression passed");
+    return 0;
+}
+
 int main(int argc, char ** argv) {
+    if (argc > 1 && std::strcmp(argv[1], "moe") == 0) return test_routed_experts();
     const bool single_backend = argc > 1 && std::strcmp(argv[1], "single") == 0;
     const bool alias_write = argc > 1 && std::strcmp(argv[1], "alias") == 0;
     const bool reuse = argc > 1 && std::strcmp(argv[1], "reuse") == 0;
     const bool failure = argc > 1 && std::strcmp(argv[1], "failure") == 0;
     const bool gpu = argc > 1 && std::strcmp(argv[1], "gpu") == 0;
+    widen_cpu_test_window = !gpu;
     ggml_backend_t hot_backend;
     if (gpu) {
         ggml_backend_load_all();
@@ -87,7 +139,7 @@ int main(int argc, char ** argv) {
     ggml_context * ctx = ggml_init(params);
     GGML_ASSERT(ctx != nullptr);
 
-    constexpr int64_t n = 4096;
+    const int64_t n = gpu ? 1024 * 1024 : 4096;
     ggml_tensor * cold_input = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, n);
     ggml_tensor * hot_input  = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, n);
     ggml_set_input(cold_input);
@@ -144,6 +196,9 @@ int main(int argc, char ** argv) {
 
     for (bool enabled : { false, true, true, false, true }) {
         concurrent_compute.store(false);
+#ifdef TEST_ASYNC_NVTX
+        nvtxRangePushA(enabled ? "async mode" : "sync mode");
+#endif
         ggml_backend_sched_set_async_cpu(sched, enabled);
         for (int repeat = 0; repeat < 3; ++repeat) {
             // Scheduler graph inputs are application-owned and refreshed for
@@ -169,6 +224,9 @@ int main(int argc, char ** argv) {
             GGML_ASSERT(concurrent_compute.load() == (enabled && !single_backend && !alias_write));
         }
         GGML_ASSERT(active_compute.load() == 0);
+#ifdef TEST_ASYNC_NVTX
+        nvtxRangePop();
+#endif
     }
 
     if (failure) {

@@ -303,6 +303,7 @@ add_test(NAME test-sched-async-cpu-worker COMMAND test-sched-async-cpu single)
 add_test(NAME test-sched-async-cpu-alias COMMAND test-sched-async-cpu alias)
 add_test(NAME test-sched-async-cpu-reuse COMMAND test-sched-async-cpu reuse)
 add_test(NAME test-sched-async-cpu-failure COMMAND test-sched-async-cpu failure)
+add_test(NAME test-sched-async-cpu-moe COMMAND test-sched-async-cpu moe)
 
 # the tensor API kernels come from a separate metallib - check they produce correct results
 # ref: https://github.com/ggml-org/llama.cpp/issues/27473
