@@ -1547,6 +1547,31 @@ void ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgra
 
             // check if we should start a new split based on the sources of the current node
             bool need_new_split = false;
+            // Preserve an independent device prefix before its first CPU
+            // consumer. Otherwise one large device split forces a join before
+            // even its independent projections can be submitted.
+            if (sched->async_cpu_enabled && node_backend_id == cur_backend_id &&
+                    cur_backend_id != sched->n_backends - 1 && i > split->i_start) {
+                for (int j = 0; j < GGML_MAX_SRC; ++j) {
+                    ggml_tensor * src = node->src[j];
+                    if (!src) { continue; }
+                    while (src->view_src) { src = src->view_src; }
+                    // CPU-backed state/weights are not necessarily produced by
+                    // a CPU job. Only split for a producer in the latest CPU
+                    // split, otherwise recurrent graphs fragment excessively.
+                    for (int s = i_split - 1; s >= 0; --s) {
+                        if (sched->splits[s].backend_id != sched->n_backends - 1) { continue; }
+                        for (int k = sched->splits[s].i_start; k < sched->splits[s].i_end; ++k) {
+                            if (graph->nodes[k] == src && !ggml_is_view_op(src->op)) {
+                                need_new_split = true;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    if (need_new_split) { break; }
+                }
+            }
             if (node_backend_id == cur_backend_id && split->n_inputs > 0) {
                 for (int j = 0; j < GGML_MAX_SRC; j++) {
                     struct ggml_tensor * src = node->src[j];
@@ -2003,6 +2028,13 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         // when it only shares pre-existing read-only inputs with the CPU job;
         // join only if it consumes a tensor actually produced by that job.
         if (sched->async_cpu_enabled && sched->cpu_async->pending) {
+            if (getenv("GGML_SCHED_ASYNC_CPU_TRACE")) {
+                fprintf(stderr, "async next split=%d backend=%s nodes=%d first=%s last=%s eligible=%d\n",
+                        split_id, ggml_backend_name(split_backend), split->graph.n_nodes,
+                        split->graph.n_nodes ? split->graph.nodes[0]->name : "empty",
+                        split->graph.n_nodes ? split->graph.nodes[split->graph.n_nodes - 1]->name : "empty",
+                        (int) ggml_sched_cpu_async::eligible(split->graph));
+            }
             bool must_join = split_backend_id == sched->n_backends - 1 ||
                     !ggml_sched_cpu_async::eligible(split->graph);
             for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
@@ -2021,6 +2053,9 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
                 for (int j = 0; !must_join && j < GGML_MAX_SRC; ++j) {
                     must_join = sched->cpu_async->produces(node->src[j]);
                 }
+            }
+            if (getenv("GGML_SCHED_ASYNC_CPU_TRACE")) {
+                fprintf(stderr, "async next split=%d join=%d\n", split_id, (int) must_join);
             }
             if (must_join) {
                 enum ggml_status ec = sched->cpu_async->join();
