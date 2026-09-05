@@ -19,19 +19,19 @@ and GPU-offload modes were selected.
 
 ## Active tested profile
 
-The currently preferred interactive Gemma profile is:
+The current installed model profile is:
 
 ```text
-llama-gemma-e2b-qat.service
-model:       gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf
-draft:       mtp-gemma-4-E2B-it-qat-Q4_0.gguf
-ctx:         131072 total, parallel=2, 65536 per slot
-KV:          f16/f16
-MTP:         draft-mtp, --spec-draft-n-max 1
+llama-qwen38-27b-ud-q4.service
+model:       Qwen3.8-27B-UD-Q4_K_XL.gguf
+ctx:         32768 total, one slot
+placement:   39 GPU layers, q4_0 target/draft KV
+MTP:         embedded NextN, --spec-draft-n-max 1
 ```
 
-On the RTX 3060 this draft depth was faster than both no speculative decoding
-and the earlier `--spec-draft-n-max 4` setting for the tested prompt mix.
+This dense model does not use the fork's MoE cache or cold-expert async CPU
+scheduler. See `PROFILES.md` and `../../docs/qwen38-27b-ud-q4-rtx3060-report.md`
+for the measured placement and feasibility results.
 
 ## Install/update on the Pi host
 
@@ -40,7 +40,7 @@ From a llama.cpp checkout:
 ```bash
 ./tools/pi/install.sh
 systemctl --user daemon-reload
-systemctl --user restart llama-gemma-e2b-qat.service
+systemctl --user restart llama-qwen38-27b-ud-q4.service
 ```
 
 The installer copies launch scripts to `$HOME/.local/bin`, user units to

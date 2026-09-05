@@ -25,7 +25,8 @@ CUDA allocations.
 |---|---|---|
 | `llama-gemma-e2b-qat.service` | `bin/run-gemma-e2b-qat-cuda.sh` | Current default fast interactive Gemma 4 E2B QAT + MTP server. |
 | `llama-gemma-e4b-qat.service` | `bin/run-gemma-e4b-qat-cuda.sh` | Larger Gemma 4 E4B QAT + MTP trial; flash attention is disabled due startup instability seen on this box. |
-| `llama-qwen36-27b-mtp.service` | `bin/run-qwen36-27b-mtp-cuda.sh` | Qwen3.6 35B-A3B Q2 native-MTP speed/long-context profile. Name is historical. |
+| `llama-qwen38-27b-ud-q4.service` | `bin/run-qwen38-27b-ud-q4-cuda.sh` | Qwen3.8 27B Unsloth Dynamic Q4_K_XL, 32K context, embedded MTP. |
+| `llama-qwen36-27b-mtp.service` | `bin/run-qwen36-27b-mtp-cuda.sh` | Historical Qwen3.6 35B-A3B Q2 native-MTP profile; model currently absent from this host. |
 | `llama-qwen35b-a3b.service` | `bin/run-qwen35b-a3b-cuda.sh` | Older Qwen 35B A3B profile retained for reference. |
 | `llama-ui-search-mcp.service` | `llama-ui-search-mcp/search_mcp.py` | Safe web-search MCP exposed to llama-ui via proxy. |
 
@@ -78,6 +79,38 @@ Forced 180-token sweep with `ignore_eos=true`:
 
 Conclusion: on this hardware, `draft_n_max=1` is the best default for Gemma E2B
 QAT + MTP; `2` is close enough to re-test for different workloads.
+
+## Qwen3.8 27B Unsloth Dynamic Q4_K_XL profile
+
+Script:
+
+```text
+bin/run-qwen38-27b-ud-q4-cuda.sh
+```
+
+Selected RTX 3060 settings:
+
+```text
+--ctx-size 32768
+--n-gpu-layers 39
+--threads 4 --threads-batch 4
+--batch-size 1024 --ubatch-size 256
+--cache-type-k q4_0 --cache-type-v q4_0
+--spec-draft-type-k q4_0 --spec-draft-type-v q4_0
+--flash-attn auto
+--spec-type draft-mtp
+--spec-draft-n-min 1 --spec-draft-n-max 1
+--no-sched-async-cpu
+```
+
+The model is dense, not MoE. Expert caching, expert prefetch, `--n-cpu-moe`,
+and the current cold-expert-only async scheduler are inapplicable. Coarse
+contiguous layer offload outperformed selective CPU dense-FFN placement.
+
+The GGUF embeds its one-layer NextN/MTP head; no sidecar is required. Depth 1
+was faster than depths 2 and 3. Sustained 512-token generation measured 5.45
+tok/s, and a 27,617-token prompt processed at 207.97 prompt tok/s. See
+`docs/qwen38-27b-ud-q4-rtx3060-report.md` for the full matrix and validation.
 
 ## Qwen3.6 35B-A3B Q2 native-MTP profile
 
