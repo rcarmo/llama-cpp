@@ -53,10 +53,39 @@ All other selected settings remain: four threads, 32K single slot, q4 KV,
 Flash Attention, native MTP depth one, resident loading and async CPU off.
 The generalised async scheduler did not improve the previous matched MoE tests.
 
+## Near-32K agentic validation
+
+Set `BENCH_ROWS=1700` to generate the larger tool result. The fixture bounds
+rows to 1-1700 and calls the chat token-count endpoint before each completion,
+rejecting requests whose prompt plus the 512-token output budget exceeds 32K.
+Invalid row counts are rejected before any request.
+
+```bash
+BENCH_ROWS=1700 bun tools/pi/benchmarks/qwen-agentic.ts /workspace/tmp/agentic-long
+```
+
+Two repeated cycles reached 31,689 prompt tokens. The tool-result turn processed
+31,226 new tokens at 1,249.75 and 1,231.59 tok/s. The final turn reused 31,613
+tokens and processed only 76 new tokens, generating at 65.69 and 65.32 tok/s.
+Total cycle times were 34.02 and 29.45 seconds, including token-count requests.
+Both responses correctly identified zero as unlimited retries and recommended
+setting maxRetries to 3. A preceding 27,889-token cycle also passed, although
+its decode timings were much lower under contention.
+
+A normal-size three-turn task immediately afterward passed in 6.98 seconds;
+health remained OK. Process VRAM after these varied graph shapes reached
+11,576 MiB, higher than the short-prompt footprint. This leaves little margin
+for additional GPU workloads; the successful runs do not guarantee that every
+possible request shape will fit. No fresh configuration change was made during
+this follow-up.
+
 ## Limits and rollback
 
-This pass covers a deterministic tool fixture and approximately 5.8K tokens of
-history, not arbitrary agents or full-32K semantic quality. No broad model
+The initial sweep covered approximately 5.8K tokens of history. Subsequent
+long-context validation reached 31,689 prompt tokens in two repeated agentic
+cycles, with the correct serial tool calls and configuration correction. This
+is a deterministic fixture, not a claim about arbitrary agents or full-32K
+semantic quality. No broad model
 instruction-following defect is claimed fixed by a request-policy change.
 No CUDA runtime source change was needed for the selected configuration.
 
