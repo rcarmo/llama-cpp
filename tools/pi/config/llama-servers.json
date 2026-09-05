@@ -13,7 +13,7 @@
       "service": "llama-qwen36-27b-mtp.service",
       "slots": 1,
       "ctx_per_slot": 32768,
-      "note": "Active September retune: native MTP UD-Q2_K_XL, 32K, 24 profiled cache slots, four threads, batch 1024/ubatch 512, mlock loading, async off. Six repeated sync runs 82.97-84.26 tok/s; sustained 1024 tokens 84.08 tok/s. Async slower in matched tests."
+      "note": "Agentic tuning: native MTP UD-Q2_K_XL, 32K, 16 cache slots, four threads, batch/ubatch 1024, mlock, async off. Tool-result prefill 3.88s vs 4.87s; deployed three-turn task 7.48s; sustained decode 82.55 tok/s. See docs/qwen36-agentic-tuning.md."
     },
     "gemma4-e2b-qat-mtp": {
       "url": "http://localhost:8090",

@@ -4,7 +4,10 @@ set -euo pipefail
 # llama.cpp Qwen3.6 35B-A3B native MTP profile for RTX 3060 trial.
 # Conservative single-slot profile; this is a large ~12GiB GGUF.
 #
-# September 2026 retune: 24 cache slots, four threads and ubatch 512.
+# Agentic retune: 16 cache slots, four threads and ubatch 1024.
+# Five repeated tool cycles passed; 5.3K-token tool prefill fell ~21%.
+# cache-reuse is unsupported by this hybrid context; prefix caching stays on.
+# Prior decode-oriented September retune: 24 slots and ubatch 512.
 # Six matched synchronous runs: 82.97-84.26 generation tok/s. Generalized
 # async was slower; keep it off. The old 36-slot/1024-ubatch setup hit OOM.
 # See docs/qwen36-async-retune.md.
@@ -24,7 +27,7 @@ MODEL_DIR=${MODEL_DIR:-/workspace/models/gguf-misc}
 LLAMA_SERVER=${LLAMA_SERVER:-/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin/llama-server}
 SLOT_SAVE_PATH=${SLOT_SAVE_PATH:-/workspace/tmp/llama-server-slots/qwen36-27b}
 MOE_CACHE_PROFILE=${LLAMA_MOE_CACHE_PROFILE:-/workspace/projects/llama.cpp/llama.cpp/tools/pi/profiles/qwen36-35b-a3b/production-routing.csv}
-MOE_CACHE_SLOTS=${LLAMA_MOE_CACHE_SLOTS:-24}
+MOE_CACHE_SLOTS=${LLAMA_MOE_CACHE_SLOTS:-16}
 if [[ ! -x "$LLAMA_SERVER" ]]; then
   LLAMA_SERVER=$(command -v llama-server)
 fi
@@ -56,7 +59,7 @@ exec "$LLAMA_SERVER" \
   --alias qwen36-35b-a3b-mtp-q2 \
   --host 0.0.0.0 --port 8090 \
   --threads 4 --threads-batch 4 \
-  --batch-size 1024 --ubatch-size 512 \
+  --batch-size 1024 --ubatch-size 1024 \
   --ctx-size 32768 \
   --parallel 1 \
   --cache-type-k q4_0 --cache-type-v q4_0 \
@@ -64,7 +67,6 @@ exec "$LLAMA_SERVER" \
   -fa on \
   --jinja \
   --cache-prompt \
-  --cache-reuse 512 \
   --ctx-checkpoints 32 \
   --checkpoint-min-step 128 \
   --cache-ram -1 \
