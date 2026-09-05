@@ -25,6 +25,14 @@ This is an Unsloth Dynamic/adaptive quant. Its tensor mix is not uniform Q4:
 | Q3_K | 3 |
 | IQ3_S | 1 |
 
+## Subsequent scheduler extension
+
+The [generalised async CPU scheduler](general-async-cpu.md) supersedes the
+cold-expert-only implementation described in this campaign. It can submit
+independent dense projection work, but the tested Qwen placements showed no
+end-to-end gain. The selected service therefore keeps async CPU disabled.
+The measurements below describe the original campaign, not the new scheduler.
+
 ## Architecture and splitting conclusion
 
 The GGUF has 866 tensors and 65 blocks (`blk.0` through `blk.64`) under the

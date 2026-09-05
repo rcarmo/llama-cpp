@@ -4,6 +4,11 @@ This index highlights fork-specific implementation, validation, and performance
 reports. General llama.cpp build/model/server documentation remains linked from
 the repository root README.
 
+## CPU/GPU scheduling
+
+- [Generalised async CPU scheduler: design, safety, usage, tests and profiling](general-async-cpu.md)
+- [Qwen3.8 27B Unsloth Dynamic RTX 3060 campaign](qwen38-27b-ud-q4-rtx3060-report.md)
+
 ## Start here
 
 - [Build guide](build.md)
