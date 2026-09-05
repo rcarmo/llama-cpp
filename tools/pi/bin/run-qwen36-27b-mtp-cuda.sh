@@ -4,7 +4,11 @@ set -euo pipefail
 # llama.cpp Qwen3.6 35B-A3B native MTP profile for RTX 3060 trial.
 # Conservative single-slot profile; this is a large ~12GiB GGUF.
 #
-# Tuned RTX 3060 profile notes:
+# September 2026 retune: 24 cache slots, four threads and ubatch 512.
+# Six matched synchronous runs: 82.97-84.26 generation tok/s. Generalized
+# async was slower; keep it off. The old 36-slot/1024-ubatch setup hit OOM.
+# See docs/qwen36-async-retune.md.
+# Historical RTX 3060 profile notes:
 # - Historical script name says 27B, but the current model path is the faster
 #   Qwen3.6 35B-A3B Q2 native-MTP GGUF.
 # - 32K context is deliberate for speed: a 26K-token smoke test measured about
@@ -20,7 +24,7 @@ MODEL_DIR=${MODEL_DIR:-/workspace/models/gguf-misc}
 LLAMA_SERVER=${LLAMA_SERVER:-/workspace/projects/llama.cpp/llama.cpp/build-cuda/bin/llama-server}
 SLOT_SAVE_PATH=${SLOT_SAVE_PATH:-/workspace/tmp/llama-server-slots/qwen36-27b}
 MOE_CACHE_PROFILE=${LLAMA_MOE_CACHE_PROFILE:-/workspace/projects/llama.cpp/llama.cpp/tools/pi/profiles/qwen36-35b-a3b/production-routing.csv}
-MOE_CACHE_SLOTS=${LLAMA_MOE_CACHE_SLOTS:-36}
+MOE_CACHE_SLOTS=${LLAMA_MOE_CACHE_SLOTS:-24}
 if [[ ! -x "$LLAMA_SERVER" ]]; then
   LLAMA_SERVER=$(command -v llama-server)
 fi
@@ -51,12 +55,12 @@ exec "$LLAMA_SERVER" \
   --no-sched-async-cpu \
   --alias qwen36-35b-a3b-mtp-q2 \
   --host 0.0.0.0 --port 8090 \
-  --threads 8 --threads-batch 8 \
-  --batch-size 1024 --ubatch-size 1024 \
+  --threads 4 --threads-batch 4 \
+  --batch-size 1024 --ubatch-size 512 \
   --ctx-size 32768 \
   --parallel 1 \
   --cache-type-k q4_0 --cache-type-v q4_0 \
-  --no-mmap \
+  --load-mode mlock \
   -fa on \
   --jinja \
   --cache-prompt \

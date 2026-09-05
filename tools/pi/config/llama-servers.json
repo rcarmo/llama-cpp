@@ -1,19 +1,19 @@
 {
-  "default": "qwen38-27b-ud-q4-xl-mtp",
+  "default": "qwen36-35b-a3b-mtp-q2",
   "servers": {
     "qwen38-27b-ud-q4-xl-mtp": {
       "url": "http://localhost:8090",
       "service": "llama-qwen38-27b-ud-q4.service",
       "slots": 1,
       "ctx_per_slot": 32768,
-      "note": "Validated Qwen3.8 27B Unsloth Dynamic UD-Q4_K_XL profile: 39 GPU layers, q4_0 target and draft KV, flash-attn auto, batch/ubatch 1024/256, embedded MTP depth 1, four CPU threads, async CPU scheduler off, no MoE cache. Sustained 512-token generation 5.45 tok/s; 27,617-token prompt and cancellation/recovery validated."
+      "note": "Stopped; retained as rollback. Dense 27B profile measured 5.45 tok/s sustained; shares port 8090."
     },
     "qwen36-35b-a3b-mtp-q2": {
       "url": "http://localhost:8090",
       "service": "llama-qwen36-27b-mtp.service",
       "slots": 1,
       "ctx_per_slot": 32768,
-      "note": "Historical Qwen3.6 35B-A3B native-MTP Q2_K_XL profile. Its GGUF was absent from this host during the September 2026 Qwen3.8 campaign, so the service is stopped until the model is reprovisioned."
+      "note": "Active September retune: native MTP UD-Q2_K_XL, 32K, 24 profiled cache slots, four threads, batch 1024/ubatch 512, mlock loading, async off. Six repeated sync runs 82.97-84.26 tok/s; sustained 1024 tokens 84.08 tok/s. Async slower in matched tests."
     },
     "gemma4-e2b-qat-mtp": {
       "url": "http://localhost:8090",
