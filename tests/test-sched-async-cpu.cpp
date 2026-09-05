@@ -1,11 +1,47 @@
 #include "ggml.h"
 #include "ggml-backend.h"
 #include "ggml-cpu.h"
+#include "../ggml/src/ggml-backend-impl.h"
 
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 #include <vector>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#ifdef TEST_ASYNC_NVTX
+#include <nvToolsExt.h>
+#endif
+
+static std::atomic<int> active_compute{0};
+static std::atomic<bool> concurrent_compute{false};
+static std::atomic<bool> inject_failure{false};
+static ggml_backend_t failing_backend = nullptr;
+static bool widen_cpu_test_window = true;
+static ggml_status (*cpu_compute)(ggml_backend_t, ggml_cgraph *) = nullptr;
+
+static ggml_status observed_compute(ggml_backend_t backend, ggml_cgraph * graph) {
+    if (active_compute.fetch_add(1) > 0) {
+        concurrent_compute.store(true);
+    }
+    // Widen the observation window; this measures simultaneous execution, not
+    // a throughput claim. No unbounded barrier can hang the serialized control.
+    if (widen_cpu_test_window) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+#ifdef TEST_ASYNC_NVTX
+    nvtxRangePushA("async-test CPU compute");
+#endif
+    const ggml_status status = backend == failing_backend && inject_failure.exchange(false)
+            ? GGML_STATUS_FAILED : cpu_compute(backend, graph);
+#ifdef TEST_ASYNC_NVTX
+    nvtxRangePop();
+#endif
+    active_compute.fetch_sub(1);
+    return status;
+}
 
 static ggml_tensor * make_branch(ggml_context * ctx, ggml_tensor * input, float scale0, float scale1, const char * name) {
     ggml_tensor * a = ggml_scale(ctx, input, scale0);
@@ -16,16 +52,83 @@ static ggml_tensor * make_branch(ggml_context * ctx, ggml_tensor * input, float 
     return d;
 }
 
-int main() {
-    ggml_backend_t hot_backend  = ggml_backend_cpu_init();
+static int test_routed_experts() {
+    ggml_backend_t backend = ggml_backend_cpu_init();
+    ggml_backend_t backends[] = { backend };
+    auto sched = ggml_backend_sched_new(backends, nullptr, 1, 64, false, true);
+    auto ctx = ggml_init({2 * 1024 * 1024, nullptr, true});
+    auto weights = ggml_new_tensor_3d(ctx, GGML_TYPE_F32, 32, 16, 4);
+    auto input = ggml_new_tensor_3d(ctx, GGML_TYPE_F32, 32, 1, 2);
+    auto ids = ggml_new_tensor_2d(ctx, GGML_TYPE_I32, 2, 2);
+    ggml_set_input(weights); ggml_set_input(input); ggml_set_input(ids);
+    auto out = ggml_mul_mat_id(ctx, weights, input, ids);
+    ggml_set_output(out);
+    auto graph = ggml_new_graph(ctx);
+    ggml_build_forward_expand(graph, out);
+    GGML_ASSERT(ggml_backend_sched_alloc_graph(sched, graph));
+    std::vector<float> w(32 * 16 * 4), x(32 * 2), result(16 * 2 * 2);
+    int32_t selected[] = {0, 3, 2, 0}; // repeated and nonadjacent experts
+    for (size_t i = 0; i < w.size(); ++i) w[i] = float(int(i % 11) - 5) / 8;
+    for (size_t i = 0; i < x.size(); ++i) x[i] = float(int(i % 7) - 3) / 4;
+    for (bool enabled : {false, true, true, false}) {
+        ggml_backend_sched_set_async_cpu(sched, enabled);
+        ggml_backend_tensor_set(weights, w.data(), 0, w.size() * sizeof(float));
+        ggml_backend_tensor_set(input, x.data(), 0, x.size() * sizeof(float));
+        ggml_backend_tensor_set(ids, selected, 0, sizeof(selected));
+        GGML_ASSERT(ggml_backend_sched_graph_compute(sched, graph) == GGML_STATUS_SUCCESS);
+        ggml_backend_tensor_get(out, result.data(), 0, result.size() * sizeof(float));
+        for (int token = 0; token < 2; ++token) for (int pick = 0; pick < 2; ++pick)
+            for (int row = 0; row < 16; ++row) {
+                float expected = 0;
+                for (int k = 0; k < 32; ++k)
+                    expected += w[(selected[token * 2 + pick] * 16 + row) * 32 + k] * x[token * 32 + k];
+                GGML_ASSERT(std::fabs(result[(token * 2 + pick) * 16 + row] - expected) < 1e-5f);
+            }
+    }
+    ggml_backend_sched_free(sched); ggml_free(ctx); ggml_backend_free(backend);
+    std::puts("routed expert async regression passed");
+    return 0;
+}
+
+int main(int argc, char ** argv) {
+    if (argc > 1 && std::strcmp(argv[1], "moe") == 0) return test_routed_experts();
+    const bool single_backend = argc > 1 && std::strcmp(argv[1], "single") == 0;
+    const bool alias_write = argc > 1 && std::strcmp(argv[1], "alias") == 0;
+    const bool reuse = argc > 1 && std::strcmp(argv[1], "reuse") == 0;
+    const bool failure = argc > 1 && std::strcmp(argv[1], "failure") == 0;
+    const bool gpu = argc > 1 && std::strcmp(argv[1], "gpu") == 0;
+    widen_cpu_test_window = !gpu;
+    ggml_backend_t hot_backend;
+    if (gpu) {
+        ggml_backend_load_all();
+        ggml_backend_dev_t dev = ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_GPU);
+        if (!dev) { std::puts("GPU unavailable: skipped"); return 77; }
+        hot_backend = ggml_backend_dev_init(dev, nullptr);
+    } else {
+        hot_backend = ggml_backend_cpu_init();
+    }
     ggml_backend_t cold_backend = ggml_backend_cpu_init();
     GGML_ASSERT(hot_backend != nullptr && cold_backend != nullptr);
 
-    ggml_backend_cpu_set_n_threads(hot_backend, 2);
+    cpu_compute = cold_backend->iface.graph_compute;
+    if (!gpu) {
+        GGML_ASSERT(cpu_compute == hot_backend->iface.graph_compute);
+        hot_backend->iface.graph_compute = observed_compute;
+    }
+    cold_backend->iface.graph_compute = observed_compute;
+
+    if (!gpu) ggml_backend_cpu_set_n_threads(hot_backend, 2);
     ggml_backend_cpu_set_n_threads(cold_backend, 2);
 
     ggml_backend_t backends[] = { hot_backend, cold_backend };
-    ggml_backend_sched_t sched = ggml_backend_sched_new(backends, nullptr, 2, 64, false, true);
+    // Distinct buffer-type identities prevent pass 3 from coalescing both CPU
+    // instances. Allocation/support behavior remains that of the CPU backend.
+    ggml_backend_buffer_type cold_buft = *ggml_backend_cpu_buffer_type();
+    ggml_backend_buffer_type_t bufts[] = { ggml_backend_get_default_buffer_type(hot_backend), &cold_buft };
+    ggml_backend_sched_t sched = ggml_backend_sched_new(
+            single_backend ? backends + 1 : backends,
+            single_backend ? bufts + 1 : bufts, single_backend ? 1 : 2, 64, false, true);
+    ggml_backend_t other_backend = single_backend ? cold_backend : hot_backend;
     GGML_ASSERT(sched != nullptr);
 
     ggml_init_params params = {
@@ -36,34 +139,52 @@ int main() {
     ggml_context * ctx = ggml_init(params);
     GGML_ASSERT(ctx != nullptr);
 
-    constexpr int64_t n = 4096;
+    const int64_t n = gpu ? 1024 * 1024 : 4096;
     ggml_tensor * cold_input = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, n);
     ggml_tensor * hot_input  = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, n);
     ggml_set_input(cold_input);
     ggml_set_input(hot_input);
 
-    ggml_tensor * cold = make_branch(ctx, cold_input, 2.0f, 0.5f, "ffn_moe_down_cold-0");
-    ggml_tensor * hot  = make_branch(ctx, hot_input,  3.0f, 0.25f, "ffn_moe_down_hot-0");
-    ggml_tensor * out  = ggml_add(ctx, cold, hot);
+    ggml_tensor * cold = make_branch(ctx, cold_input, 2.0f, 0.5f, "independent_cpu_branch");
+    ggml_tensor * hot;
+    if (alias_write) {
+        ggml_tensor * view = ggml_view_1d(ctx, cold_input, n, 0);
+        ggml_tensor * nested = ggml_view_1d(ctx, view, n, 0);
+        hot = ggml_scale_inplace(ctx, nested, 3.0f);
+        ggml_set_name(hot, "aliased_write");
+    } else {
+        hot = make_branch(ctx, hot_input, 3.0f, 0.25f, "independent_other_branch");
+    }
+    // A consumer through nested views must join the CPU producer, even though
+    // neither view has pointer identity with the producing operation.
+    ggml_tensor * cold_view = ggml_view_1d(ctx, cold, n, 0);
+    ggml_tensor * cold_nested_view = ggml_view_1d(ctx, cold_view, n, 0);
+    ggml_tensor * out  = ggml_add(ctx, cold_nested_view, hot);
     ggml_set_output(out);
 
     ggml_cgraph * graph = ggml_new_graph(ctx);
     ggml_build_forward_expand(graph, out);
 
     ggml_backend_sched_set_tensor_backend(sched, cold_input, cold_backend);
-    ggml_backend_sched_set_tensor_backend(sched, hot_input,  hot_backend);
+    ggml_backend_sched_set_tensor_backend(sched, hot_input,  other_backend);
+    bool hot_chain = false;
     for (int i = 0; i < ggml_graph_n_nodes(graph); ++i) {
         ggml_tensor * node = ggml_graph_node(graph, i);
+        if (node->src[0] == hot_input || node == hot) { hot_chain = true; }
+        // Retain intermediates in this overlap fixture so allocator reuse does
+        // not legitimately force serialization of otherwise independent work.
+        if (!reuse) { ggml_set_output(node); }
         if (node == out) {
             ggml_backend_sched_set_tensor_backend(sched, node, cold_backend);
-        } else if (node == hot || node->src[0] == hot_input || (node->src[0] && node->src[0]->src[0] == hot_input)) {
-            ggml_backend_sched_set_tensor_backend(sched, node, hot_backend);
+        } else if (hot_chain) {
+            ggml_backend_sched_set_tensor_backend(sched, node, other_backend);
         } else {
             ggml_backend_sched_set_tensor_backend(sched, node, cold_backend);
         }
     }
 
     GGML_ASSERT(ggml_backend_sched_alloc_graph(sched, graph));
+    GGML_ASSERT(single_backend || ggml_backend_sched_get_n_splits(sched) >= 3);
 
     std::vector<float> cold_data(n), hot_data(n), output(n);
     for (int64_t i = 0; i < n; ++i) {
@@ -71,21 +192,26 @@ int main() {
         hot_data[i]  = float((i % 13) - 6) / 6.0f;
     }
     ggml_backend_tensor_set(cold_input, cold_data.data(), 0, cold_data.size() * sizeof(float));
-    ggml_backend_tensor_set(hot_input,  hot_data.data(),  0, hot_data.size()  * sizeof(float));
+    if (!alias_write) ggml_backend_tensor_set(hot_input,  hot_data.data(),  0, hot_data.size()  * sizeof(float));
 
     for (bool enabled : { false, true, true, false, true }) {
+        concurrent_compute.store(false);
+#ifdef TEST_ASYNC_NVTX
+        nvtxRangePushA(enabled ? "async mode" : "sync mode");
+#endif
         ggml_backend_sched_set_async_cpu(sched, enabled);
         for (int repeat = 0; repeat < 3; ++repeat) {
             // Scheduler graph inputs are application-owned and refreshed for
             // every evaluation, matching llama_context graph execution.
             ggml_backend_tensor_set(cold_input, cold_data.data(), 0, cold_data.size() * sizeof(float));
-            ggml_backend_tensor_set(hot_input,  hot_data.data(),  0, hot_data.size()  * sizeof(float));
+            if (!alias_write) ggml_backend_tensor_set(hot_input,  hot_data.data(),  0, hot_data.size()  * sizeof(float));
             const ggml_status status = ggml_backend_sched_graph_compute(sched, graph);
             GGML_ASSERT(status == GGML_STATUS_SUCCESS);
             ggml_backend_tensor_get(out, output.data(), 0, output.size() * sizeof(float));
             for (int64_t i = 0; i < n; ++i) {
                 const float expected = 2.0f * cold_data[i] * cold_data[i] + cold_data[i]
-                                     + 2.25f * hot_data[i] * hot_data[i] + hot_data[i];
+                                     + (alias_write ? 3.0f * cold_data[i]
+                                                    : 2.25f * hot_data[i] * hot_data[i] + hot_data[i]);
                 if (std::fabs(output[i] - expected) >= 1e-5f) {
                     std::fprintf(stderr, "mismatch enabled=%d repeat=%d i=%lld got=%g expected=%g\n",
                             enabled ? 1 : 0, repeat, (long long) i, output[i], expected);
@@ -94,9 +220,36 @@ int main() {
             }
         }
         ggml_backend_sched_synchronize(sched);
+        if (!reuse && !gpu) {
+            GGML_ASSERT(concurrent_compute.load() == (enabled && !single_backend && !alias_write));
+        }
+        GGML_ASSERT(active_compute.load() == 0);
+#ifdef TEST_ASYNC_NVTX
+        nvtxRangePop();
+#endif
     }
 
+    if (failure) {
+        ggml_backend_sched_set_async_cpu(sched, true);
+        for (ggml_backend_t backend : { cold_backend, hot_backend }) {
+            failing_backend = backend;
+            inject_failure.store(true);
+            GGML_ASSERT(ggml_backend_sched_graph_compute_async(sched, graph) == GGML_STATUS_FAILED);
+            GGML_ASSERT(active_compute.load() == 0);
+            // A failure must not poison the next evaluation.
+            GGML_ASSERT(ggml_backend_sched_graph_compute(sched, graph) == GGML_STATUS_SUCCESS);
+        }
+        failing_backend = nullptr;
+    }
+
+    // Reset/reallocation and teardown after async submission must be safe.
+    ggml_backend_sched_reset(sched);
+    GGML_ASSERT(ggml_backend_sched_alloc_graph(sched, graph));
+    ggml_backend_tensor_set(cold_input, cold_data.data(), 0, cold_data.size() * sizeof(float));
+    if (!alias_write) ggml_backend_tensor_set(hot_input, hot_data.data(), 0, hot_data.size() * sizeof(float));
+    GGML_ASSERT(ggml_backend_sched_graph_compute_async(sched, graph) == GGML_STATUS_SUCCESS);
     ggml_backend_sched_free(sched);
+    GGML_ASSERT(active_compute.load() == 0);
     ggml_free(ctx);
     ggml_backend_free(hot_backend);
     ggml_backend_free(cold_backend);

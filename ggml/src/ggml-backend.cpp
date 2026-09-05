@@ -863,6 +863,37 @@ struct ggml_sched_cpu_async {
         pending = true;
     }
 
+    // Include physical storage overlap: the allocator can reuse a region for a
+    // different tensor, and views can alias through more than one parent.
+    static bool aliases(const ggml_tensor * a, const ggml_tensor * b) {
+        if (!a || !b) {
+            return false;
+        }
+        const ggml_tensor * root_a = a;
+        const ggml_tensor * root_b = b;
+        while (root_a->view_src) { root_a = root_a->view_src; }
+        while (root_b->view_src) { root_b = root_b->view_src; }
+        if (root_a == root_b) {
+            return true;
+        }
+        if (!a->data || !b->data) {
+            // Before allocation, distinct roots have no known storage alias.
+            return false;
+        }
+        // Different non-host buffers may use independent address spaces.
+        if (root_a->buffer != root_b->buffer &&
+                (!root_a->buffer || !root_b->buffer ||
+                 !ggml_backend_buffer_is_host(root_a->buffer) ||
+                 !ggml_backend_buffer_is_host(root_b->buffer))) {
+            return false;
+        }
+        const uintptr_t pa = reinterpret_cast<uintptr_t>(a->data);
+        const uintptr_t pb = reinterpret_cast<uintptr_t>(b->data);
+        const size_t na = ggml_nbytes(a);
+        const size_t nb = ggml_nbytes(b);
+        return na != 0 && nb != 0 && (pa <= pb ? pb - pa < na : pa - pb < nb);
+    }
+
     bool produces(const struct ggml_tensor * tensor) {
         if (!pending || tensor == nullptr) {
             return false;
@@ -870,11 +901,62 @@ struct ggml_sched_cpu_async {
         std::lock_guard<std::mutex> lock(mtx);
         for (int i = 0; i < job_graph->n_nodes; ++i) {
             const struct ggml_tensor * produced = job_graph->nodes[i];
-            if (produced == tensor || produced->view_src == tensor) {
+            if (!ggml_is_view_op(produced->op) && aliases(produced, tensor)) {
                 return true;
             }
         }
         return false;
+    }
+
+    // A later write must also wait for outstanding CPU reads (WAR) and writes
+    // (WAW), even when no graph edge connects the two tensor objects.
+    bool conflicts_with_write(const ggml_tensor * tensor) {
+        if (!pending || !tensor) {
+            return false;
+        }
+        for (int i = 0; i < job_graph->n_nodes; ++i) {
+            const ggml_tensor * node = job_graph->nodes[i];
+            if (aliases(node, tensor)) {
+                return true;
+            }
+            for (int j = 0; j < GGML_MAX_SRC; ++j) {
+                if (aliases(node->src[j], tensor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Only operations whose side effects are represented by dst/src storage
+    // participate initially. In particular, custom callbacks and state/cache
+    // update operations retain serialized execution.
+    static bool eligible(const ggml_cgraph & graph) {
+        bool compute = false;
+        for (int i = 0; i < graph.n_nodes; ++i) {
+            const ggml_tensor * node = graph.nodes[i];
+            if (ggml_is_view_op(node->op)) {
+                continue;
+            }
+            switch (node->op) {
+                case GGML_OP_NONE: break;
+                case GGML_OP_MUL_MAT:
+                case GGML_OP_MUL_MAT_ID:
+                case GGML_OP_ADD:
+                case GGML_OP_MUL:
+                case GGML_OP_SCALE:
+                case GGML_OP_SQR:
+                case GGML_OP_UNARY:
+                case GGML_OP_GLU:
+                case GGML_OP_CLAMP:
+                case GGML_OP_RMS_NORM:
+                    compute = true;
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return compute;
     }
 
     // wait for the in-flight job (if any); returns its status
@@ -896,7 +978,7 @@ struct ggml_sched_cpu_async {
             return;
         }
         const uint64_t overlap_us = job_us > wait_us ? job_us - wait_us : 0;
-        fprintf(stderr, "async CPU splits: jobs=%llu cpu=%.3f ms wait=%.3f ms overlap=%.3f ms\n",
+        fprintf(stderr, "async CPU splits: jobs=%llu cpu=%.3f ms wait=%.3f ms unjoined=%.3f ms (not device overlap)\n",
                 (unsigned long long) jobs, job_us/1000.0, wait_us/1000.0, overlap_us/1000.0);
     }
 
@@ -1465,6 +1547,31 @@ void ggml_backend_sched_split_graph(ggml_backend_sched_t sched, struct ggml_cgra
 
             // check if we should start a new split based on the sources of the current node
             bool need_new_split = false;
+            // Preserve an independent device prefix before its first CPU
+            // consumer. Otherwise one large device split forces a join before
+            // even its independent projections can be submitted.
+            if (sched->async_cpu_enabled && node_backend_id == cur_backend_id &&
+                    cur_backend_id != sched->n_backends - 1 && i > split->i_start) {
+                for (int j = 0; j < GGML_MAX_SRC; ++j) {
+                    ggml_tensor * src = node->src[j];
+                    if (!src) { continue; }
+                    while (src->view_src) { src = src->view_src; }
+                    // CPU-backed state/weights are not necessarily produced by
+                    // a CPU job. Only split for a producer in the latest CPU
+                    // split, otherwise recurrent graphs fragment excessively.
+                    for (int s = i_split - 1; s >= 0; --s) {
+                        if (sched->splits[s].backend_id != sched->n_backends - 1) { continue; }
+                        for (int k = sched->splits[s].i_start; k < sched->splits[s].i_end; ++k) {
+                            if (graph->nodes[k] == src && !ggml_is_view_op(src->op)) {
+                                need_new_split = true;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    if (need_new_split) { break; }
+                }
+            }
             if (node_backend_id == cur_backend_id && split->n_inputs > 0) {
                 for (int j = 0; j < GGML_MAX_SRC; j++) {
                     struct ggml_tensor * src = node->src[j];
@@ -1882,6 +1989,12 @@ static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_ba
 }
 
 static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t sched) {
+    // Every exit, including a later backend's failure, must release the worker's
+    // borrowed graph before a caller can reset/reallocate scheduler storage.
+    struct cpu_job_drain {
+        ggml_sched_cpu_async * worker;
+        ~cpu_job_drain() { if (worker) { (void) worker->join(); } }
+    } drain{sched->cpu_async};
     GGML_ASSERT(sched);
     struct ggml_backend_sched_split * splits = sched->splits;
     if (sched->cpu_async != nullptr) {
@@ -1915,9 +2028,34 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         // when it only shares pre-existing read-only inputs with the CPU job;
         // join only if it consumes a tensor actually produced by that job.
         if (sched->async_cpu_enabled && sched->cpu_async->pending) {
-            bool must_join = split_backend_id == sched->n_backends - 1;
+            if (getenv("GGML_SCHED_ASYNC_CPU_TRACE")) {
+                fprintf(stderr, "async next split=%d backend=%s nodes=%d first=%s last=%s eligible=%d\n",
+                        split_id, ggml_backend_name(split_backend), split->graph.n_nodes,
+                        split->graph.n_nodes ? split->graph.nodes[0]->name : "empty",
+                        split->graph.n_nodes ? split->graph.nodes[split->graph.n_nodes - 1]->name : "empty",
+                        (int) ggml_sched_cpu_async::eligible(split->graph));
+            }
+            bool must_join = split_backend_id == sched->n_backends - 1 ||
+                    !ggml_sched_cpu_async::eligible(split->graph);
             for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
                 must_join = sched->cpu_async->produces(split->inputs[input_id]);
+            }
+            for (int input_id = 0; !must_join && input_id < split->n_inputs; input_id++) {
+                must_join = sched->cpu_async->conflicts_with_write(
+                        tensor_copy(split->inputs[input_id], split_backend_id, sched->cur_copy));
+            }
+            for (int i = 0; !must_join && i < split->graph.n_nodes; ++i) {
+                const ggml_tensor * node = split->graph.nodes[i];
+                if (ggml_is_view_op(node->op)) {
+                    continue;
+                }
+                must_join = sched->cpu_async->conflicts_with_write(node);
+                for (int j = 0; !must_join && j < GGML_MAX_SRC; ++j) {
+                    must_join = sched->cpu_async->produces(node->src[j]);
+                }
+            }
+            if (getenv("GGML_SCHED_ASYNC_CPU_TRACE")) {
+                fprintf(stderr, "async next split=%d join=%d\n", split_id, (int) must_join);
             }
             if (must_join) {
                 enum ggml_status ec = sched->cpu_async->join();
@@ -1929,7 +2067,10 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
 
         // ensure the previous split's async work has completed before we start
         // this split, the allocator may have reused buffer regions across splits
-        if (split->n_inputs == 0 && prev_backend_id >= 0 && prev_backend_id != split_backend_id) {
+        const bool independent_of_cpu_job = sched->cpu_async && sched->cpu_async->pending &&
+                prev_backend_id == sched->n_backends - 1;
+        if (split->n_inputs == 0 && prev_backend_id >= 0 && prev_backend_id != split_backend_id &&
+                !independent_of_cpu_job) {
             if (sched->events[prev_backend_id][sched->cur_copy] != NULL) {
                 ggml_backend_event_synchronize(sched->events[prev_backend_id][sched->cur_copy]);
             } else {
@@ -2099,17 +2240,19 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
         }
 
         if (!sched->callback_eval) {
-            // Only the deliberately independent cold-expert chain is eligible.
-            // Generic CPU splits can be tiny or part of the critical path and
-            // must retain the serialized scheduler behavior.
-            const bool is_cold_expert_split = split->graph.n_nodes >= 4 &&
-                    strstr(split->graph.nodes[split->graph.n_nodes - 1]->name, "ffn_moe_down_cold-") != nullptr;
-            const bool async_cpu_split = sched->async_cpu_enabled && is_cold_expert_split &&
-                    split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1;
+            const bool async_cpu_split = sched->async_cpu_enabled &&
+                    split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1 &&
+                    !sched->prefetch_experts && ggml_sched_cpu_async::eligible(split->graph);
             if (async_cpu_split) {
-                // run the CPU split on the worker; the loop continues launching
-                // later splits until one depends on this split's outputs
+                // The allocator assumes serial split execution. Drain all earlier
+                // submissions (including input copies) before handing storage to
+                // the CPU worker. Later independent splits can still overlap;
+                // their RAW/WAR/WAW hazards are checked before copies or compute.
+                for (int b = 0; b < sched->n_backends; ++b) {
+                    ggml_backend_synchronize(sched->backends[b]);
+                }
                 sched->cpu_async->launch(split_backend, &split->graph);
+                prev_backend_id = split_backend_id;
                 continue;
             }
             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
