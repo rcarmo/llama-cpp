@@ -1244,6 +1244,7 @@ struct ggml_cuda_graph {
     size_t num_nodes = 0;
     std::vector<cudaGraphNode_t> nodes;
     bool disable_due_to_gpu_arch = false;
+    bool disable_due_to_allocation = false;
     bool warmup_complete = false;
     uint64_t uid = 0;
     int64_t last_used_time = 0;
@@ -1257,7 +1258,7 @@ struct ggml_cuda_graph {
 
     bool is_enabled() const {
         static const bool disable_cuda_graphs_due_to_env = (getenv("GGML_CUDA_DISABLE_GRAPHS") != nullptr);
-        return !(disable_due_to_gpu_arch || disable_cuda_graphs_due_to_env);
+        return !(disable_due_to_gpu_arch || disable_due_to_allocation || disable_cuda_graphs_due_to_env);
     }
 #endif
 };

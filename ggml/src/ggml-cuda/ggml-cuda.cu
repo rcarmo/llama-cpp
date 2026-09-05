@@ -2648,7 +2648,7 @@ static bool ggml_cuda_graph_update_required(ggml_backend_cuda_context * cuda_ctx
     return res;
 }
 
-static void ggml_cuda_graph_update_executable(ggml_backend_cuda_context * cuda_ctx, const void * graph_key) {
+static cudaError_t ggml_cuda_graph_update_executable(ggml_backend_cuda_context * cuda_ctx, const void * graph_key) {
     ggml_cuda_graph * graph = cuda_ctx->cuda_graph(graph_key);
 
 #if CUDART_VERSION >= 12000
@@ -2670,10 +2670,9 @@ static void ggml_cuda_graph_update_executable(ggml_backend_cuda_context * cuda_c
         (void)cudaGetLastError();
         CUDA_CHECK(cudaGraphExecDestroy(graph->instance));
         graph->instance = nullptr;
-        CUDA_CHECK(cudaGraphInstantiate(&graph->instance, graph->graph, NULL, NULL, 0));
-    } else {
-        GGML_ASSERT(stat == cudaSuccess);
+        return cudaGraphInstantiate(&graph->instance, graph->graph, NULL, NULL, 0);
     }
+    return stat;
 }
 #endif // USE_CUDA_GRAPH
 
@@ -4399,12 +4398,30 @@ static void ggml_cuda_graph_evaluate_and_capture(ggml_backend_cuda_context * cud
 
     if (use_cuda_graph) {
         ggml_cuda_graph * graph = cuda_ctx->cuda_graph(graph_key);
-        if (graph->instance == nullptr) { // Create executable graph from captured graph.
-            CUDA_CHECK(cudaGraphInstantiate(&graph->instance, graph->graph, NULL, NULL, 0));
+        cudaError_t executable_status = cudaSuccess;
+        if (graph->instance == nullptr) {
+            executable_status = cudaGraphInstantiate(&graph->instance, graph->graph, NULL, NULL, 0);
+        } else if (cuda_graph_update_required) {
+            executable_status = ggml_cuda_graph_update_executable(cuda_ctx, graph_key);
         }
-        if (cuda_graph_update_required) { // Update graph executable
-            ggml_cuda_graph_update_executable(cuda_ctx, graph_key);
+        if (executable_status == cudaErrorMemoryAllocation) {
+            // Capture only recorded these operations; no graph launch occurred.
+            // Never retry launch/kernel errors: that could repeat state writes.
+            (void) cudaGetLastError();
+            CUDA_CHECK(cudaStreamSynchronize(cuda_ctx->stream()));
+            if (graph->instance != nullptr) {
+                CUDA_CHECK(cudaGraphExecDestroy(graph->instance));
+                graph->instance = nullptr;
+            }
+            CUDA_CHECK(cudaGraphDestroy(graph->graph));
+            graph->graph = nullptr;
+            graph->disable_due_to_allocation = true;
+            GGML_LOG_WARN("CUDA graph executable allocation failed; using eager execution for graph %llu\n",
+                    (unsigned long long) graph->uid);
+            ggml_cuda_graph_evaluate_and_capture(cuda_ctx, cgraph, false, false, graph_key);
+            return;
         }
+        CUDA_CHECK(executable_status);
         // Launch graph
         CUDA_CHECK(cudaGraphLaunch(graph->instance, cuda_ctx->stream()));
 #else
