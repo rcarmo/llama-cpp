@@ -5,6 +5,14 @@ on port 8090. The generalised async scheduler was tested, but the selected
 configuration keeps it disabled: CPU/GPU dispatch overhead outweighed its gain
 on this workload.
 
+## Status of this report
+
+This is the decode-oriented restoration baseline. The subsequent
+[agentic tuning](qwen36-agentic-tuning.md) supersedes the settings below with
+16 cache slots and microbatch 1024, and adds near-32K validation. The
+[CUDA executable allocation recovery fix](cuda-graph-allocation-recovery.md)
+was deployed afterward. Historical measurements below are not reruns of that fix.
+
 ## Model and selected settings
 
 Source: `unsloth/Qwen3.6-35B-A3B-MTP-GGUF`, file

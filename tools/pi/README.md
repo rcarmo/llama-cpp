@@ -19,19 +19,24 @@ and GPU-offload modes were selected.
 
 ## Active tested profile
 
-The current installed model profile is:
+The active RTX 3060 profile is Qwen3.6 MoE, tuned for agentic tool cycles:
 
 ```text
-llama-qwen38-27b-ud-q4.service
-model:       Qwen3.8-27B-UD-Q4_K_XL.gguf
+llama-qwen36-27b-mtp.service
+model:       Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf
 ctx:         32768 total, one slot
-placement:   39 GPU layers, q4_0 target/draft KV
-MTP:         embedded NextN, --spec-draft-n-max 1
+placement:   all layers on CUDA, first five MoE layers on CPU
+cache:       16 profiled expert slots; q4_0 KV
+execution:   four threads, batch/microbatch 1024/1024, mlock
+MTP:         native NextN, --spec-draft-n-max 1
+async CPU:   off (slower in matched measurements)
 ```
 
-This dense model does not use the fork's MoE cache or cold-expert async CPU
-scheduler. See `PROFILES.md` and `../../docs/qwen38-27b-ud-q4-rtx3060-report.md`
-for the measured placement and feasibility results.
+See [agentic tuning](../../docs/qwen36-agentic-tuning.md),
+[MoE restoration and async comparison](../../docs/qwen36-async-retune.md), and
+[CUDA graph allocation recovery](../../docs/cuda-graph-allocation-recovery.md).
+Qwen3.8 is retained as a stopped rollback service. The generalised scheduler is
+merged but remains default-off; its measured overlap did not yield a Qwen gain.
 
 ## Install/update on the Pi host
 
@@ -40,7 +45,8 @@ From a llama.cpp checkout:
 ```bash
 ./tools/pi/install.sh
 systemctl --user daemon-reload
-systemctl --user restart llama-qwen38-27b-ud-q4.service
+systemctl --user stop llama-qwen38-27b-ud-q4.service
+systemctl --user restart llama-qwen36-27b-mtp.service
 ```
 
 The installer copies launch scripts to `$HOME/.local/bin`, user units to

@@ -238,15 +238,19 @@ These are small samples with diagnostic logging, so they establish no general
 performance ranking. They do establish that this placement has not earned a
 production recommendation.
 
-The routed-expert fixture is not a full MoE-model regression. The previous
-Qwen3.6 model files were absent during this work; its routing, hot/cold placement
-and MTP behaviour have not been revalidated against this extension. Synthetic
-kernel overlap likewise does not establish useful overlap on a full model.
+The routed-expert fixture is not a full MoE-model regression. Qwen3.6 files
+were absent during the initial extension work, but the subsequent
+[MoE restoration](qwen36-async-retune.md) verified identical tokens across 12
+resident sync/async runs with native MTP and a 24-slot cache. Async was about
+3.4% slower in the cleaner comparison. This covers that prompt and placement,
+not every MoE architecture. Synthetic kernel overlap does not establish useful
+overlap on a full model.
 
 ## Deployment and further work
 
-Leave `--no-sched-async-cpu` in the current Qwen3.8 launcher. The merge changes
-source, not the running binary or service configuration. To roll back an
+Leave `--no-sched-async-cpu` in the active Qwen3.6 launcher and retained Qwen3.8
+rollback launcher. The merged code has since been rebuilt and deployed, but
+production still uses synchronous scheduling. To roll back an
 experimental caller, disable the flag and recreate its context; restore the
 previous tensor placement as well if overrides were added for the experiment.
 
@@ -254,5 +258,5 @@ Further optimisation needs larger independent work relative to transfer,
 barrier and dispatch costs, plus a full-model device trace. Broadening the
 allowlist or removing drains without modelling memory hazards would trade
 correctness for an unproven speedup. Production enablement still requires
-repeatable end-to-end gains, full-model MoE regression, target/MTP parity,
+repeatable end-to-end gains, broader full-model MoE regression, target/MTP parity,
 cancellation/recovery and a realistic VRAM margin.

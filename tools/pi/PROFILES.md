@@ -15,22 +15,42 @@ shared port: 8090
 ```
 
 Only one heavyweight model service should own port `8090` and the GPU at a
-time. Before large model benchmarks, stop llama services and restart/stop
-GPU-heavy Docker containers such as ComfyUI/InvokeAI/Jupyter if they have stale
-CUDA allocations.
+time. Stop the active model service before controlled GPU benchmarks and arrange
+recovery on exit. Inspect unrelated GPU workloads, but do not stop or restart
+them without approval; include their allocations in the headroom calculation.
 
 ## Services
 
 | Service | Launch script | Intended use |
 |---|---|---|
-| `llama-gemma-e2b-qat.service` | `bin/run-gemma-e2b-qat-cuda.sh` | Current default fast interactive Gemma 4 E2B QAT + MTP server. |
+| `llama-gemma-e2b-qat.service` | `bin/run-gemma-e2b-qat-cuda.sh` | Alternative fast interactive Gemma 4 E2B QAT + MTP profile. |
 | `llama-gemma-e4b-qat.service` | `bin/run-gemma-e4b-qat-cuda.sh` | Larger Gemma 4 E4B QAT + MTP trial; flash attention is disabled due startup instability seen on this box. |
 | `llama-qwen38-27b-ud-q4.service` | `bin/run-qwen38-27b-ud-q4-cuda.sh` | Qwen3.8 27B Unsloth Dynamic Q4_K_XL, 32K context, embedded MTP. |
-| `llama-qwen36-27b-mtp.service` | `bin/run-qwen36-27b-mtp-cuda.sh` | Historical Qwen3.6 35B-A3B Q2 native-MTP profile; model currently absent from this host. |
+| `llama-qwen36-27b-mtp.service` | `bin/run-qwen36-27b-mtp-cuda.sh` | Active Qwen3.6 35B-A3B native-MTP agentic profile; service name is historical. |
 | `llama-qwen35b-a3b.service` | `bin/run-qwen35b-a3b-cuda.sh` | Older Qwen 35B A3B profile retained for reference. |
 | `llama-ui-search-mcp.service` | `llama-ui-search-mcp/search_mcp.py` | Safe web-search MCP exposed to llama-ui via proxy. |
 
-## Current preferred profile: Gemma E2B QAT + MTP
+## Active profile: Qwen3.6 MoE agentic tuning
+
+Current launcher: `bin/run-qwen36-27b-mtp-cuda.sh`. It selects 16 expert-cache
+slots, four threads, batch and microbatch 1024, 32K single-slot context, q4 KV,
+mlock loading, Flash Attention and native MTP depth one. Async CPU is off.
+
+The agentic fixture's tool-result prefill fell from 4.87 to 3.88 seconds; the
+three-turn task fell from 8.38 to 7.48 seconds. Sustained decode measured 82.55
+tok/s, slightly below the previous decode-oriented 84.08 tok/s. Near-32K turns
+reused 31,613 tokens and evaluated only 76 new tokens. These measurements are
+workload-specific, not a quality or throughput comparison across models.
+
+See [agentic tuning](../../docs/qwen36-agentic-tuning.md) for failure analysis,
+contention outliers and rollback, and [CUDA recovery](../../docs/cuda-graph-allocation-recovery.md)
+for the subsequently deployed engine fix. VRAM reached 11,576 MiB after varied
+request shapes; the graph fallback does not make all GPU OOM recoverable.
+
+The sections below preserve earlier model campaigns. Their measurements and
+selected settings are historical unless explicitly superseded above.
+
+## Historical Gemma E2B QAT + MTP profile
 
 Script:
 
@@ -104,7 +124,8 @@ Selected RTX 3060 settings:
 ```
 
 The model is dense, not MoE. Expert caching, expert prefetch, `--n-cpu-moe`,
-and the current cold-expert-only async scheduler are inapplicable. Coarse
+are inapplicable. The generalised async scheduler was later tested, but did not
+improve dense Qwen throughput. Coarse
 contiguous layer offload outperformed selective CPU dense-FFN placement.
 
 The GGUF embeds its one-layer NextN/MTP head; no sidecar is required. Depth 1

@@ -4,6 +4,12 @@ This index highlights fork-specific implementation, validation, and performance
 reports. General llama.cpp build/model/server documentation remains linked from
 the repository root README.
 
+## RTX 3060 agentic service
+
+- [Qwen3.6 agentic tuning and near-32K validation](qwen36-agentic-tuning.md)
+- [Qwen3.6 restoration and matched async comparison](qwen36-async-retune.md)
+- [CUDA graph allocation recovery: engine fix and fault injection](cuda-graph-allocation-recovery.md)
+
 ## CPU/GPU scheduling
 
 - [Generalised async CPU scheduler: design, safety, usage, tests and profiling](general-async-cpu.md)

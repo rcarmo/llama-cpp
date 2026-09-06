@@ -1,6 +1,9 @@
 # Qwen3.8 27B Unsloth Dynamic Q4_K_XL on RTX 3060
 
 Validated on 4–5 September 2026 against repository commit `c4682a1f5`.
+This is a historical campaign: Qwen3.8 is now stopped and retained as rollback.
+The active service is the [restored Qwen3.6 MoE](qwen36-async-retune.md), with
+[subsequent agentic tuning](qwen36-agentic-tuning.md).
 
 ## Artifact
 
@@ -169,5 +172,6 @@ parallel execution design.
 
 Stop `llama-qwen38-27b-ud-q4.service`. Any other model service sharing port 8090
 can then be started after confirming that its GGUF exists. The previous Qwen3.6
-launcher is retained, but its GGUF was no longer present on this host during the
-campaign and its restart loop was stopped.
+launcher is retained. Its GGUF was absent during this campaign, but has since
+been restored and the Qwen3.6 service is active. Stop that service before
+starting Qwen3.8, since both share port 8090.

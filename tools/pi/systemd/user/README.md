@@ -13,8 +13,8 @@ Start one model service at a time because the model services share port `8090`
 and contend for the same RTX 3060 VRAM:
 
 ```bash
-systemctl --user restart llama-qwen38-27b-ud-q4.service
-systemctl --user stop llama-qwen36-27b-mtp.service llama-gemma-e4b-qat.service llama-gemma-e2b-qat.service
+systemctl --user stop llama-qwen38-27b-ud-q4.service llama-gemma-e4b-qat.service llama-gemma-e2b-qat.service
+systemctl --user start llama-qwen36-27b-mtp.service
 ```
 
 The `llama-ui-search-mcp.service` is independent and listens on `127.0.0.1:8092`.

@@ -15,6 +15,15 @@ mock data. Its final-answer check is a lexical smoke check, not a semantic judge
 inspect the saved answer for incorrect explanations even when `passed` is true.
 `parallel_tool_calls:false` makes the serial inspection contract explicit.
 
+## Subsequent engine fix
+
+The [CUDA graph allocation recovery](cuda-graph-allocation-recovery.md) change
+has since been merged and deployed. The OOM discussion below records the tuning
+pass: reducing cache footprint mitigated it before the engine fix existed.
+No controlled pre/post-fix latency comparison has been run; the latest deployment
+smoke passed but took 12.09 seconds under unmatched host conditions. Do not
+attribute this report's tuning gains to the engine fix.
+
 ## Failures and root causes
 
 | Observation | Cause and resolution |
