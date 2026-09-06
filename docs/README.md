@@ -12,6 +12,8 @@ the repository root README.
 
 ## CPU/GPU scheduling
 
+- [GPU prefill offload and bounded expert staging: controls, tests and measured no-go](gpu-prefill-staging.md)
+
 - [Generalised async CPU scheduler: design, safety, usage, tests and profiling](general-async-cpu.md)
 - [Qwen3.8 27B Unsloth Dynamic RTX 3060 campaign](qwen38-27b-ud-q4-rtx3060-report.md)
 
