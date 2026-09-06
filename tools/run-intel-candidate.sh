@@ -15,6 +15,8 @@ cont_batching=${LLAMA_CONT_BATCHING:-on}
 cpus=${LLAMA_CPUS:-0-7}
 process_cpus=${LLAMA_PROCESS_CPUS:-0-15}
 threads=${LLAMA_THREADS:-8}
+threads_batch=${LLAMA_THREADS_BATCH:-$threads}
+cpus_batch=${LLAMA_CPUS_BATCH:-$cpus}
 batch=${LLAMA_BATCH:-512}
 ubatch=${LLAMA_UBATCH:-128}
 kv=${LLAMA_KV:-f16}
@@ -42,6 +44,22 @@ runtime=$build/runtime
 [[ $kv_unified == on || $kv_unified == off ]] || { echo "LLAMA_KV_UNIFIED must be on or off" >&2; exit 2; }
 [[ $cont_batching == on || $cont_batching == off ]] || { echo "LLAMA_CONT_BATCHING must be on or off" >&2; exit 2; }
 [[ $threads =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_THREADS must be positive" >&2; exit 2; }
+[[ $threads_batch =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_THREADS_BATCH must be positive" >&2; exit 2; }
+[[ $cpus_batch =~ ^([0-9]{1,3})-([0-9]{1,3})$ ]] || { echo "LLAMA_CPUS_BATCH must be a lo-hi range" >&2; exit 2; }
+cpus_batch_lo=$((10#${BASH_REMATCH[1]}))
+cpus_batch_hi=$((10#${BASH_REMATCH[2]}))
+(( cpus_batch_lo <= cpus_batch_hi && cpus_batch_hi < 512 )) || { echo "LLAMA_CPUS_BATCH must be ascending within 0-511" >&2; exit 2; }
+# llama-server exposes the assistant batch mask, but not its batch range flag.
+cpus_batch_mask=
+for (( nibble=cpus_batch_hi/4; nibble>=0; nibble-- )); do
+  bits=0
+  for (( bit=0; bit<4; bit++ )); do
+    cpu=$((nibble*4+bit))
+    if (( cpu >= cpus_batch_lo && cpu <= cpus_batch_hi )); then bits=$((bits | (1 << bit))); fi
+  done
+  printf -v digit '%x' "$bits"
+  cpus_batch_mask+=$digit
+done
 [[ $use_mtp == 0 || $use_mtp == 1 ]] || { echo "LLAMA_USE_MTP must be 0 or 1" >&2; exit 2; }
 [[ $use_mtp == 0 || $draft =~ ^[1-9][0-9]*$ ]] || { echo "LLAMA_MTP_DEPTH must be positive when MTP is enabled" >&2; exit 2; }
 [[ $flash_attn == on || $flash_attn == off || $flash_attn == auto ]] || { echo "LLAMA_FLASH_ATTN must be on, off or auto" >&2; exit 2; }
@@ -64,7 +82,9 @@ spec=()
 if [[ $use_mtp == 1 ]]; then
   spec=(
     --spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max "$draft"
-    --spec-draft-threads "$threads" --spec-draft-threads-batch "$threads"
+    --spec-draft-threads "$threads" --spec-draft-threads-batch "$threads_batch"
+    --spec-draft-cpu-range "$cpus" --spec-draft-cpu-strict 1
+    --spec-draft-cpu-mask-batch "$cpus_batch_mask" --spec-draft-cpu-strict-batch 1
     --spec-draft-type-k "$kv" --spec-draft-type-v "$kv"
   )
   [[ -z $draft_model ]] || spec+=(--model-draft "$draft_model")
@@ -97,6 +117,7 @@ cmd=(
   --model "$model" --alias "$alias"
   --load-mode "$load_mode" --gpu-layers 0
   --threads "$threads" --cpu-range "$cpus" --cpu-strict 1
+  --threads-batch "$threads_batch" --cpu-range-batch "$cpus_batch" --cpu-strict-batch 1
   --ctx-size "$ctx" "${concurrency[@]}"
   --batch-size "$batch" --ubatch-size "$ubatch"
   --cache-type-k "$kv" --cache-type-v "$kv"

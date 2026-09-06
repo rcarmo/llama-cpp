@@ -1,5 +1,7 @@
 # Intel i5-1340P Gemma 4 E4B runbook
 
+> Historical campaign settings. The current service uses [gemma-local-provider-runbook.md](gemma-local-provider-runbook.md), including the September 2026 16-thread prefill rollout. Observed OpenMP worker affinity remains CPUs 0-15; strict P-core-only decoding was requested but not enforced.
+
 This runbook records the validated 128K Gemma 4 E4B model profile on the LattePanda Sigma: a separate four-block assistant model with MTP depth 3, F16 KV cache and Flash Attention disabled. The deployed two-slot Pi provider is documented in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
 
 ## Hardware and software

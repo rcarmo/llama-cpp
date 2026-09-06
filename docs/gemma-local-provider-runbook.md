@@ -17,7 +17,12 @@ The user service `llama-gemma-local-provider.service` exposes Gemma 4 E4B throug
 | Continuous batching | Enabled |
 | Prompt-state cache limit | 12,288 MiB, allocated on demand |
 | Idle-slot cache admission | Enabled |
-| KV reuse chunk | 256 tokens |
+| Chunk-shift hint | 256 tokens; disabled by this Gemma context, not a cache-hit guarantee |
+| Decode / prefill threads | 8 / 16, for target and MTP assistant |
+| Requested decode / prefill CPU ranges | 0-7 / 0-15; OpenMP affinity limitation below |
+| MTP depth | 3 |
+| KV / Flash Attention | F16 / off |
+| Batch / microbatch | 1024 / 256 |
 | Context checkpoints | 32, spaced by at least 8,192 tokens |
 | Server socket timeout | 10,800 seconds |
 | Slot-state directory | `~/.cache/llama-candidates/gemma4/slots/` |
@@ -28,16 +33,39 @@ Two requests execute concurrently. Three or four callers run in two-request wave
 
 The service is workspace-coupled: the installed unit executes `tools/run-intel-candidate.sh`, while the environment file names the workspace build and GGUF files. Moving, rebuilding or deleting those paths changes the live service.
 
+Current deployment was verified on 6 September 2026. The prefill change retains the existing binary and both GGUFs; it does not deploy the experimental GPU handoff or async scheduling paths.
+
 Validated artefacts:
 
 | Artefact | Identity |
 |---|---|
-| llama.cpp source/build | commit `4196ec8088080522bb0828b2960accc59b8ee1b0`, server build 10504 |
+| Deployed llama.cpp binary | `b10579-abdbeadfb`; retained during the September rollout |
+| Workspace source | merge `4e9740248`, including origin `8697affbf`; not the deployed binary revision |
 | Target GGUF | `gemma-4-E4B_q4_0-it.gguf`, SHA-256 `676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee` |
 | MTP assistant GGUF | `gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf`, SHA-256 `49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc` |
-| Pi CLI | 0.83.0 |
+| Original August Pi CLI validation | 0.83.0; not rerun during the September rollout |
 
 The model directory also contains an `mmproj` file, but this provider is registered for text input only and does not load it.
+
+## Prefill tuning (6 September 2026)
+
+The installed profile sets `LLAMA_THREADS_BATCH=16` and `LLAMA_CPUS_BATCH=0-15`, retaining `LLAMA_THREADS=8`, `LLAMA_CPUS=0-7` and process affinity `0-15`. Both target and assistant use the separate batch-thread count. Profiles without batch overrides inherit their decode settings.
+
+The launcher converts the batch range to the assistant's hexadecimal CPU mask. This binary accepts `--spec-draft-cpu-mask-batch` but rejects `--spec-draft-cpu-range-batch` for the server. Verify both the generated arguments and the real parser without loading weights:
+
+```bash
+bash tools/test-intel-candidate-launcher.sh --installed-parser
+```
+
+CPU masks express requested placement, not proven worker binding. Observed threads retained CPUs 0-15, and this server path does not attach the configured common threadpools. The OpenMP backend therefore does not establish strict P-core-only decode affinity. The measured improvement validates the 8/16 thread-count configuration as deployed, not a claim of enforced per-worker placement. Do not enable new binding policies without another matched test.
+
+The live before/after 4K pair improved prefill from 61.35 to 70.68 tok/s and request time from 74.04 to 65.44 seconds, with identical generated tokens. This is rollout verification, not a new balanced benchmark: the older process paged in swapped memory. The earlier balanced campaign measured 13.8% less prefill time and 12.4% less request time. A subsequent live edit/test loop passed two independent tests and six assertions, retaining prefix reuse on all four follow-up rounds.
+
+Rollback of thread tuning alone: set `LLAMA_THREADS_BATCH=8` and `LLAMA_CPUS_BATCH=0-7` in the installed environment, wait for idle slots and restart. For the exact prior launcher/environment, use the verified backups under `/var/home/agent/workspace/reports/gemma-deployment-20260906/rollback/`; do not overwrite unrelated later configuration changes. The binary was not replaced.
+
+The live 32K check at two-slot production geometry reached 50.34 tok/s prefill and 8.61 tok/s decode. Its append reused 32,895 tokens and evaluated eight in 425 ms of prefill. Peak temperature was 97 C, retained as annotation-only; process swap and throttle-counter increments were zero. This did not test a full 128K prompt.
+
+Deployment evidence: `/var/home/agent/workspace/reports/gemma-deployment-20260906/`.
 
 ## Selected role
 
