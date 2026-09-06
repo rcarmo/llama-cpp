@@ -5707,7 +5707,22 @@ static ggml_backend_feature * ggml_backend_cuda_get_features(ggml_backend_reg_t 
     GGML_UNUSED(reg);
 }
 
+// Residency changes invalidate captured device addresses even when tensor
+// metadata survives. The caller must drain every backend sharing the weights.
+static void ggml_backend_cuda_clear_graphs(ggml_backend_t backend) {
+    GGML_ASSERT(ggml_backend_is_cuda(backend));
+    ggml_backend_synchronize(backend);
+#ifdef USE_CUDA_GRAPH
+    auto * ctx = static_cast<ggml_backend_cuda_context *>(backend->context);
+    ggml_cuda_set_device(ctx->device);
+    ctx->cuda_graphs.clear();
+#endif
+}
+
 static void * ggml_backend_cuda_reg_get_proc_address(ggml_backend_reg_t reg, const char * name) {
+    if (strcmp(name, "ggml_backend_clear_graphs") == 0) {
+        return (void *) ggml_backend_cuda_clear_graphs;
+    }
     GGML_UNUSED(reg);
     if (strcmp(name, "ggml_backend_comm_init") == 0) {
         return (void *)ggml_backend_cuda_comm_init;

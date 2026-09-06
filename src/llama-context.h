@@ -56,6 +56,8 @@ struct llama_context {
     void sched_reserve();
 
     void synchronize();
+    // Internal model-residency boundary; caller holds the shared-model lease.
+    void invalidate_residency_graphs();
 
     const llama_model   & get_model()   const;
     const llama_cparams & get_cparams() const;

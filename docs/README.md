@@ -12,6 +12,8 @@ the repository root README.
 
 ## CPU/GPU scheduling
 
+- [Shared-budget expert-cache relocation: controls, validation and measured limits](shared-vram-relocation.md)
+
 - [GPU prefill offload and bounded expert staging: controls, tests and measured no-go](gpu-prefill-staging.md)
 
 - [Generalised async CPU scheduler: design, safety, usage, tests and profiling](general-async-cpu.md)

@@ -47,7 +47,8 @@ int main(int argc, char ** argv) {
         }
     }
     const int gpu_dev_count = (int)gpus.size();
-    const int num_models = gpu_dev_count + 1 + 1; // GPUs + 1 CPU model + 1 layer split
+    // Stress shared residency without loading several full model copies.
+    const int num_models = getenv("LLAMA_TEST_SINGLE_MODEL") ? 1 : gpu_dev_count + 1 + 1;
     //const int num_models = std::max(1, gpu_dev_count);
     const int num_contexts = std::max(1, params.n_parallel);
 

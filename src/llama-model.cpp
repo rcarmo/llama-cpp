@@ -1,4 +1,5 @@
 #include "llama-model.h"
+#include "llama-context.h"
 
 #include "llama-arch.h"
 #include "llama-ext.h"
@@ -1153,6 +1154,23 @@ struct llama_model::impl {
     // model memory mapped files
     llama_mmaps mappings;
 
+    struct residency_tensor {
+        ggml_tensor * tensor;
+        size_t offset;
+        std::vector<uint8_t> host;
+    };
+    std::vector<residency_tensor> residency_tensors;
+    size_t residency_ctx_index = SIZE_MAX;
+    size_t residency_bytes = 0;
+    ggml_backend_buffer_type_t residency_buft = nullptr;
+    bool residency_evicted = false;
+    std::recursive_mutex residency_mutex;
+    std::vector<llama_context *> residency_contexts;
+    bool shared_residency = [] {
+        const char * value = std::getenv("LLAMA_SHARED_VRAM");
+        return value && std::strcmp(value, "1") == 0;
+    }();
+
     // objects representing data potentially being locked in memory
     llama_mlocks mlock_bufs;
     llama_mlocks mlock_mmaps;
@@ -1185,6 +1203,77 @@ llama_model::llama_model(const llama_model_params & params) : params(params), pi
         this->params.tensor_split = pimpl->tensor_split_owned.data();
     }
     pimpl->has_tensor_overrides = params.tensor_buft_overrides && params.tensor_buft_overrides[0].pattern;
+}
+
+bool llama_model::shared_residency_enabled() const {
+    return pimpl->shared_residency;
+}
+
+std::unique_lock<std::recursive_mutex> llama_model::lock_residency() const {
+    return std::unique_lock<std::recursive_mutex>(pimpl->residency_mutex);
+}
+
+void llama_model::register_residency_context(llama_context * ctx) const {
+    if (!shared_residency_enabled()) return;
+    auto lock = lock_residency();
+    pimpl->residency_contexts.push_back(ctx);
+    // Multiple schedulers must never each retain the entire borrowed budget.
+    ggml_backend_sched_set_prefetch_cap(ctx->get_sched(), pimpl->residency_bytes);
+}
+
+void llama_model::unregister_residency_context(llama_context * ctx) const {
+    if (!shared_residency_enabled()) return;
+    auto lock = lock_residency();
+    auto & contexts = pimpl->residency_contexts;
+    contexts.erase(std::remove(contexts.begin(), contexts.end(), ctx), contexts.end());
+}
+
+void llama_model::invalidate_residency_contexts() const {
+    auto lock = lock_residency();
+    // Drain all users before invalidating any graph or freeing shared weights.
+    for (auto * ctx : pimpl->residency_contexts) ctx->synchronize();
+    for (auto * ctx : pimpl->residency_contexts) ctx->invalidate_residency_graphs();
+}
+
+bool llama_model::prepare_residency(bool prefill, llama_context * owner) const {
+    if (!shared_residency_enabled() || pimpl->residency_ctx_index == SIZE_MAX) return true;
+    auto lock = lock_residency();
+    // Only the active owner may retain borrowed staging across batches.
+    for (auto * ctx : pimpl->residency_contexts) {
+        if (ctx != owner) ggml_backend_sched_release_prefetch(ctx->get_sched());
+    }
+    if (prefill == pimpl->residency_evicted) return true;
+    invalidate_residency_contexts();
+    auto & buffers = pimpl->ctxs_bufs[pimpl->residency_ctx_index].second;
+    if (prefill) {
+        for (auto & saved : pimpl->residency_tensors) {
+            saved.tensor->data = nullptr;
+            saved.tensor->buffer = nullptr;
+        }
+        buffers.clear();
+        pimpl->residency_evicted = true;
+        fprintf(stderr, "shared VRAM: released %zu cache bytes for prefill\n", pimpl->residency_bytes);
+        return true;
+    }
+    auto * buffer = ggml_backend_buft_alloc_buffer(pimpl->residency_buft, pimpl->residency_bytes);
+    if (!buffer) return false;
+    ggml_backend_buffer_set_usage(buffer, GGML_BACKEND_BUFFER_USAGE_WEIGHTS);
+    auto * base = static_cast<uint8_t *>(ggml_backend_buffer_get_base(buffer));
+    for (auto & saved : pimpl->residency_tensors) {
+        if (ggml_backend_tensor_alloc(buffer, saved.tensor, base + saved.offset) != GGML_STATUS_SUCCESS) {
+            for (auto & s : pimpl->residency_tensors) {
+                s.tensor->buffer = nullptr;
+                s.tensor->data = nullptr;
+            }
+            ggml_backend_buffer_free(buffer);
+            return false;
+        }
+        ggml_backend_tensor_set(saved.tensor, saved.host.data(), 0, saved.host.size());
+    }
+    buffers.emplace_back(buffer);
+    pimpl->residency_evicted = false;
+    fprintf(stderr, "shared VRAM: restored %zu cache bytes for decode\n", pimpl->residency_bytes);
+    return true;
 }
 
 llama_model::~llama_model() {
@@ -1994,6 +2083,18 @@ void llama_model_base::init_moe_expert_cache() {
 
     pimpl->ctxs_bufs.emplace_back(ggml_context_ptr{ctx}, std::vector<ggml_backend_buffer_ptr>{});
     pimpl->ctxs_bufs.back().second.emplace_back(buf);
+    if (shared_residency_enabled()) {
+        pimpl->residency_ctx_index = pimpl->ctxs_bufs.size() - 1;
+        pimpl->residency_bytes = ggml_backend_buffer_get_size(buf);
+        pimpl->residency_buft = buft;
+        auto * base = static_cast<uint8_t *>(ggml_backend_buffer_get_base(buf));
+        for (ggml_tensor * t = ggml_get_first_tensor(ctx); t; t = ggml_get_next_tensor(ctx, t)) {
+            impl::residency_tensor saved { t, size_t(static_cast<uint8_t *>(t->data) - base), {} };
+            saved.host.resize(ggml_nbytes(t));
+            ggml_backend_tensor_get(t, saved.host.data(), 0, saved.host.size());
+            pimpl->residency_tensors.push_back(std::move(saved));
+        }
+    }
 
     LLAMA_LOG_INFO("%s: expert cache: %zu layers x %d slots, %.2f MiB uploaded to %s\n",
         __func__, pack_layers.size(), n_slots, total_bytes/1024.0/1024.0, ggml_backend_buft_name(buft));
