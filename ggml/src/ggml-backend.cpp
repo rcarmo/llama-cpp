@@ -9,6 +9,7 @@
 #endif
 
 #include "ggml-backend.h"
+#include "ggml-prefetch-budget.h"
 #include "ggml-backend-impl.h"
 #include "ggml-alloc.h"
 #include "ggml-impl.h"
@@ -1935,6 +1936,37 @@ static size_t ggml_backend_sched_prefetch_max_size(ggml_backend_sched_t sched) {
 }
 
 static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_backend_t split_backend, size_t size) {
+    size = std::max(size, ggml_backend_sched_prefetch_max_size(sched));
+    // Budget staging separately from scheduler-owned copies. Reserve headroom
+    // for graph executables and other allocations; this is a snapshot, not a
+    // guarantee against concurrent allocations on the device.
+    const char * budget_env = getenv("GGML_SCHED_PREFETCH_BUDGET_MIB");
+    const char * reserve_env = getenv("GGML_SCHED_PREFETCH_RESERVE_MIB");
+    if (budget_env) {
+        size_t budget = 0, reserve = 256 * 1024 * 1024;
+        if (!ggml_prefetch_parse_mib(budget_env, budget) || (reserve_env && !ggml_prefetch_parse_mib(reserve_env, reserve))) {
+            GGML_LOG_WARN("invalid expert staging budget; prefetch disabled\n");
+            ggml_backend_sched_prefetch_disable(sched, split_backend);
+            return false;
+        }
+        size_t slots[GGML_SCHED_MAX_PREFETCH_SLOTS] = {};
+        for (int i = 0; i < sched->prefetch_n_slots; ++i) {
+            slots[i] = sched->prefetch_slots[i] ? ggml_backend_buffer_get_size(sched->prefetch_slots[i]) : 0;
+        }
+        ggml_backend_dev_props props;
+        ggml_backend_dev_get_props(split_backend->device, &props);
+        const bool fits = ggml_prefetch_budget_fits(slots, sched->prefetch_n_slots, size,
+                budget, props.memory_free, reserve);
+        if (getenv("GGML_SCHED_PREFETCH_TRACE")) {
+            fprintf(stderr, "prefetch admission: slot_bytes=%zu slots=%d budget=%zu free=%zu reserve=%zu admitted=%d\n",
+                    size, sched->prefetch_n_slots, budget, props.memory_free, reserve, (int) fits);
+        }
+        if (!fits) {
+            GGML_LOG_DEBUG("expert staging budget/headroom insufficient; using ordinary transfers\n");
+            ggml_backend_sched_prefetch_disable(sched, split_backend);
+            return false;
+        }
+    }
     if (sched->prefetch_backend == NULL) {
         ggml_backend_dev_t dev = split_backend->device;
         ggml_backend_dev_props props;
@@ -1957,8 +1989,6 @@ static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_ba
             }
         }
     }
-
-    size = std::max(size, ggml_backend_sched_prefetch_max_size(sched));
 
     ggml_backend_buffer_type_t buft = ggml_backend_get_default_buffer_type(split_backend);
     for (int i = 0; i < sched->prefetch_n_slots; i++) {
