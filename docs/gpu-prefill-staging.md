@@ -97,10 +97,28 @@ produced matching tool arguments and final text. An admitted run reached
 short-task recovery passed afterward. This is response parity for the fixture,
 not a claim of exhaustive numerical equivalence.
 
-Staging-buffer allocation failure has not yet been fault-injected. Existing
-allocator-failure handling and event lifetime code were reused, not independently
-proven by the arithmetic helper tests. No new alias handling or operation
-semantics were introduced. Explicit phase classification, CPU placement fallback,
+Staging-buffer allocation failure was injected on the first and second slot,
+armed after model loading. Both cases completed two agentic cycles and matched
+the ordinary-transfer control's tool arguments and final text. The second case
+exercises partial-ring cleanup. No new alias handling or operation semantics
+were introduced. These integration checks supplement, rather than replace, the
+arithmetic helper tests.
+
+The Linux-only test interposer is not linked into production:
+
+```bash
+g++ -shared -fPIC -Iggml/include tests/prefetch-allocation-fault.cpp \
+  -ldl -o /tmp/prefetch-fault.so
+# Launch candidate with LD_PRELOAD=/tmp/prefetch-fault.so and:
+# PREFETCH_FAULT_MARKER=/tmp/prefetch-armed
+# PREFETCH_FAULT_BYTES=102760448 PREFETCH_FAULT_NTH=2
+# After /health is OK, touch /tmp/prefetch-armed before the first request.
+```
+
+Match the byte size to the admission trace of the tested model. The shim fails
+the selected matching buffer allocation once; it is not a universal allocator
+fault injector. Injection logs must follow staging admission to confirm the
+intended path was exercised. Explicit phase classification, CPU placement fallback,
 and a calibrated transfer-versus-compute cost model remain outside this patch.
 
 Production is unchanged: prefetch remains off and the offload threshold remains
