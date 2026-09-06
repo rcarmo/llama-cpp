@@ -1,0 +1,13 @@
+[Unit]
+Description=llama.cpp Qwen3.8 27B Unsloth Dynamic Q4_K_XL + embedded MTP (CUDA, single 32k slot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/run-qwen38-27b-ud-q4-cuda.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

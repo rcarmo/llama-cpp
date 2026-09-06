@@ -38,7 +38,17 @@ The validated Sigma has:
 
 Eight inference threads pinned to logical CPUs `0-7` perform best for the 35B-A3B models. Adding the E-cores reduces generation throughput. The server process may use CPUs `0-15` for HTTP and supporting work while model compute remains on the P-core SMT pairs.
 
-### Build the selected CPU backend
+### RTX 3060 agentic service
+
+The separate RTX 3060 host runs Qwen3.6 35B-A3B native MTP with the
+[agentic profile](docs/qwen36-agentic-tuning.md). Deployment files live in
+[tools/pi](tools/pi/README.md). The [generalised async scheduler](docs/general-async-cpu.md)
+is opt-in; matched Qwen tests did not justify enabling it. The
+[CUDA graph allocation fix](docs/cuda-graph-allocation-recovery.md) recovers
+pre-launch executable allocation failures without replaying launched kernels.
+These results do not change the Sigma or SpaceMIT selections above.
+
+## Build the selected CPU backend
 
 ```bash
 BUILD_JOBS=2 tools/build-intel-1340p.sh

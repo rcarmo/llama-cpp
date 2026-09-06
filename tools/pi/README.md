@@ -19,19 +19,24 @@ and GPU-offload modes were selected.
 
 ## Active tested profile
 
-The currently preferred interactive Gemma profile is:
+The active RTX 3060 profile is Qwen3.6 MoE, tuned for agentic tool cycles:
 
 ```text
-llama-gemma-e2b-qat.service
-model:       gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf
-draft:       mtp-gemma-4-E2B-it-qat-Q4_0.gguf
-ctx:         131072 total, parallel=2, 65536 per slot
-KV:          f16/f16
-MTP:         draft-mtp, --spec-draft-n-max 1
+llama-qwen36-27b-mtp.service
+model:       Qwen3.6-35B-A3B-UD-Q2_K_XL-MTP.gguf
+ctx:         32768 total, one slot
+placement:   all layers on CUDA, first five MoE layers on CPU
+cache:       16 profiled expert slots; q4_0 KV
+execution:   four threads, batch/microbatch 1024/1024, mlock
+MTP:         native NextN, --spec-draft-n-max 1
+async CPU:   off (slower in matched measurements)
 ```
 
-On the RTX 3060 this draft depth was faster than both no speculative decoding
-and the earlier `--spec-draft-n-max 4` setting for the tested prompt mix.
+See [agentic tuning](../../docs/qwen36-agentic-tuning.md),
+[MoE restoration and async comparison](../../docs/qwen36-async-retune.md), and
+[CUDA graph allocation recovery](../../docs/cuda-graph-allocation-recovery.md).
+Qwen3.8 is retained as a stopped rollback service. The generalised scheduler is
+merged but remains default-off; its measured overlap did not yield a Qwen gain.
 
 ## Install/update on the Pi host
 
@@ -40,7 +45,8 @@ From a llama.cpp checkout:
 ```bash
 ./tools/pi/install.sh
 systemctl --user daemon-reload
-systemctl --user restart llama-gemma-e2b-qat.service
+systemctl --user stop llama-qwen38-27b-ud-q4.service
+systemctl --user restart llama-qwen36-27b-mtp.service
 ```
 
 The installer copies launch scripts to `$HOME/.local/bin`, user units to

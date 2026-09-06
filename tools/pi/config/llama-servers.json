@@ -1,12 +1,19 @@
 {
   "default": "qwen36-35b-a3b-mtp-q2",
   "servers": {
+    "qwen38-27b-ud-q4-xl-mtp": {
+      "url": "http://localhost:8090",
+      "service": "llama-qwen38-27b-ud-q4.service",
+      "slots": 1,
+      "ctx_per_slot": 32768,
+      "note": "Stopped; retained as rollback. Dense 27B profile measured 5.45 tok/s sustained; shares port 8090."
+    },
     "qwen36-35b-a3b-mtp-q2": {
       "url": "http://localhost:8090",
       "service": "llama-qwen36-27b-mtp.service",
       "slots": 1,
       "ctx_per_slot": 32768,
-      "note": "Active Qwen3.6 35B-A3B native-MTP Q2_K_XL profile. Selected August 2026 settings: ctx=32768, fa=on, batch/ubatch=1024, n_gpu_layers=all, n_cpu_moe=5, q4_0/q4_0 KV, no_mmap, MTP depth 1, profile-driven MoE cache with 36 slots/layer, async CPU scheduler off. Matched six-request result: 77.75 generation tok/s and 1190.89 prompt tok/s; 29,020-token prompt and cancellation/recovery validated."
+      "note": "Agentic tuning: native MTP UD-Q2_K_XL, 32K, 16 cache slots, four threads, batch/ubatch 1024, mlock, async off. Tool-result prefill 3.88s vs 4.87s; deployed three-turn task 7.48s; sustained decode 82.55 tok/s. See docs/qwen36-agentic-tuning.md."
     },
     "gemma4-e2b-qat-mtp": {
       "url": "http://localhost:8090",
