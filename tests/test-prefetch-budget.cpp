@@ -4,6 +4,14 @@
 #include <initializer_list>
 
 int main() {
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(77594624, 80619520, 2) == 1);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(102760448, 80619520, 2) == 0);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(40, 80, 2) == 2);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(40, 79, 2) == 1);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(0, 80, 2) == 0);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(40, 0, 2) == 0);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(40, 80, 0) == 0);
+    GGML_ASSERT(ggml_prefetch_borrowed_slots(SIZE_MAX, SIZE_MAX, 8) == 1);
     size_t bytes = 123;
     GGML_ASSERT(ggml_prefetch_parse_mib("0", bytes) && bytes == 0);
     GGML_ASSERT(ggml_prefetch_parse_mib("256", bytes) && bytes == 256 * 1024 * 1024);

@@ -18,6 +18,14 @@ inline bool ggml_prefetch_parse_mib(const char * text, size_t & bytes) {
     return true;
 }
 
+// Choose complete-tensor slots without multiplying potentially large sizes.
+// Zero means ordinary transfers; never divide by an empty request.
+inline size_t ggml_prefetch_borrowed_slots(size_t requested, size_t capacity, size_t configured) {
+    if (requested == 0 || configured == 0) return 0;
+    const size_t fits = capacity / requested;
+    return fits < configured ? fits : configured;
+}
+
 // Slots grow serially: allocate replacement, then release old allocation.
 // free_bytes already excludes existing slots; reserve is untouched headroom.
 inline bool ggml_prefetch_budget_fits(const size_t * slots, size_t count,
