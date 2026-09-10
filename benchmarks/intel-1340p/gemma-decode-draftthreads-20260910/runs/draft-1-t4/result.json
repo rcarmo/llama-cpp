@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "order": 1,
+  "threads": 4,
+  "timings": {
+    "cache_n": 64658,
+    "prompt_n": 25,
+    "prompt_ms": 1682.488,
+    "prompt_per_token_ms": 67.29952,
+    "prompt_per_second": 14.85894698803201,
+    "predicted_n": 128,
+    "predicted_ms": 15516.611,
+    "predicted_per_token_ms": 121.2235234375,
+    "predicted_per_second": 8.249224009031353,
+    "draft_n": 110,
+    "draft_n_accepted": 90
+  },
+  "answer": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+  "pass": true,
+  "scope": "Independentdraftdecode4/8only;targetsmallbatch8/largeprefill16,draftbatch16,CPU8/MTP3/F16/FAofffixed;4observationspermode,nocodingqualityclaim",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "targetBatchThreads": 16,
+    "draftDecodeThreads": 4,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-decode-smallbatch-20260910/runtime-cpu",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 525.2710849999994,
+      "package_j": 8.430704,
+      "timings": {
+        "restore_ms": 524.076
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 17233.330491,
+      "package_j": 580.637674,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1682.488,
+        "prompt_per_token_ms": 67.29952,
+        "prompt_per_second": 14.85894698803201,
+        "predicted_n": 128,
+        "predicted_ms": 15516.611,
+        "predicted_per_token_ms": 121.2235234375,
+        "predicted_per_second": 8.249224009031353,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 69,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11973667,
+    "peak_trial_rss_kib": 11977020,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23892668,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T23:30:50.353Z"
+}
