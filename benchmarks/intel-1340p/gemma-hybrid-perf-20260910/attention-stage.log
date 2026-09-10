@@ -1,0 +1,20 @@
+true
+true
+{"label":"restore-0","device":"vulkan","wall_ms":506.75383299999976,"package_j":7.514446,"timings":{"restore_ms":504.803},"n_read":1091923940,"token_hash":null}
+{"label":"tail-0","device":"vulkan","wall_ms":36402.668435,"package_j":918.185332,"timings":{"cache_n":64658,"prompt_n":1022,"prompt_ms":29854.033,"prompt_per_token_ms":29.211382583170256,"prompt_per_second":34.23323073301353,"predicted_n":21,"predicted_ms":6523.086,"predicted_per_token_ms":326.15430000000003,"predicted_per_second":3.066033469434559},"token_hash":"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+{"label":"restore-1","device":"vulkan","wall_ms":296.53726799999276,"package_j":4.394215,"timings":{"restore_ms":295.244},"n_read":1091923940,"token_hash":null}
+{"label":"tail-1","device":"vulkan","wall_ms":36340.54358499999,"package_j":925.724742,"timings":{"cache_n":64658,"prompt_n":1022,"prompt_ms":29742.755,"prompt_per_token_ms":29.102500000000003,"prompt_per_second":34.36130916587922,"predicted_n":21,"predicted_ms":6568.718,"predicted_per_token_ms":328.4359,"predicted_per_second":3.0447341475155425},"token_hash":"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+FINISHED attention64-off true
+{"label":"restore-0","device":"vulkan","wall_ms":550.3318510000008,"package_j":8.83561,"timings":{"restore_ms":544.693},"n_read":1091923940,"token_hash":null}
+{"label":"tail-0","device":"vulkan","wall_ms":152792.088019,"package_j":3414.144153,"timings":{"cache_n":64658,"prompt_n":1022,"prompt_ms":146093.502,"prompt_per_token_ms":142.94863209393347,"prompt_per_second":6.995519896565967,"predicted_n":32,"predicted_ms":6672.408,"predicted_per_token_ms":215.23896774193548,"predicted_per_second":4.645998865776793},"token_hash":"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"}
+ 9 |  else copyFileSync(orig+'/slots/long64.slot',state);
+10 |  await t.start('vulkan');copyFileSync(state,t.dir+'/slots/state.slot');const f=await Bun.file(root+'/runs/vulkan64-tail-profile/fixture.json').json();const rows=[];
+11 |  for(let i=0;i<2;i++){
+12 |   await t.req('vulkan','restore-'+i,{filename:'state.slot'},'/slots/0?action=restore');const r=await t.req('vulkan','tail-'+i,{prompt:f.prompt,n_predict:32,temperature:0,top_k:1,cache_prompt:true,id_slot:0});
+13 |   rows.push({rep:i,timings:r.timings,answer:r.content,pass:['CEDAR-481','MAPLE-726','BIRCH-953'].every(x=>r.content.includes(x))});
+14 |   if(r.timings.cache_n<64500||r.timings.prompt_n>2000||!rows[i].pass)throw Error('Tail correctness/coverage');
+                                                                                ^
+error: Tail correctness/coverage
+      at /var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/attention-screen.ts:14:76
+
+FINISHED attention64-on false

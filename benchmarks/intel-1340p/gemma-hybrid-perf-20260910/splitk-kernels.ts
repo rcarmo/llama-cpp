@@ -1,0 +1,7 @@
+/** SCRIPT_JDOC:
+{"summary":"Native F16 long-attention matmul regression controls for isolated split-K dispatch","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root}from'./campaign';import{openSync}from'node:fs';
+const t=new Trial('splitk-kernel-precision',{maintenance:true});const results:any[]=[];
+try{await t.begin();for(const split of [1,2,4,8]){await t.check();const fd=openSync(t.dir+'/split-'+split+'.log','a');const p=Bun.spawn(['/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/bin/test-backend-ops','test','-b','Vulkan0','-o','MUL_MAT','--test-file',root+'/splitk/kernel-cases-precision.txt','-j','1'],{stdout:fd,stderr:fd,env:{...process.env,LD_LIBRARY_PATH:root+'/runtime-splitk/bin:'+root+'/runtime-splitk/runtime',GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K:String(split),GGML_VK_VISIBLE_DEVICES:'0'}});t.servers.push({p,fd,device:'kernel'});const timer=setTimeout(()=>{t.error='Kernel timeout';p.kill('SIGTERM')},120000);const rc=await p.exited;clearTimeout(timer);results.push({split,rc});await t.stop('kernel');if(t.error)throw Error(t.error);if(rc!==0&&rc!==1)throw Error('Kernel unexpected exit '+rc)}
+}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish({ok:!t.error,results,all_numeric_tests_pass:results.every(x=>x.rc===0),limits:'Two synthetic F16 long reductions at default/F32 accumulation vs CPU. Baseline failures retained and compared; ok means diagnostic completed, not numerical pass. Task/state tests separately required'});if(!r.ok)process.exitCode=1}

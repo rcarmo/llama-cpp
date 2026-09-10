@@ -1,0 +1,12 @@
+{
+ "reviewer":"github-copilot/gpt-5.4 via delegate judge",
+ "scope":"Attached experimental split-K diff and offline test only; not full source independent review",
+ "findings":[
+  "No obvious arithmetic or empty-tail issue forK>=32768 and splits2/4/8 with256-alignment.",
+  "Gate affects any non-coopmat Intel F16 GEMM matching shape, broader than tested PCI8086:a7a0; not a generic attention operator identifier.",
+  "Override could bypass unseen heuristic preconditions; review full ggml_vk_guess_split_k before retention.",
+  "JS logic test defaulted to1 rather than original heuristic and source assertions are not native numerical proof."
+ ],
+ "local_followup":"Read complete heuristic: disable_split_k is sole early safety return; remaining logic selects by core occupancy then avoids empty256-rounded tails. Override preserves disable flag; K bound proves nonempty tails for2/4/8. Native tests verify real dispatch on tested hardware. Broad platform applicability is unverified; patch stays opt-in experimental, not a deployment candidate.",
+ "retention":"Preserve benchmarked source unchanged alongside findings; any promoted implementation must narrow device/shape scope and validate broader native paths. No claim of independent full review."
+}

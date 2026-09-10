@@ -1,0 +1,22 @@
+ggml_vulkan: Found 1 Vulkan devices:
+ggml_vulkan: 0 = Intel(R) Iris(R) Xe Graphics (RPL-P) (Intel open-source Mesa driver) | uma: 1 | fp16: 1 | bf16: 0 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: none | tier: 1 (fp16-integer-dot)
+Testing 2 devices
+
+Backend 1/2: Vulkan0
+  Device description: Intel(R) Iris(R) Xe Graphics (RPL-P)
+  Device memory: 23860 MB (21474 MB free)
+
+[MUL_MAT] ERR = 0.000692352 > 0.000500000   MUL_MAT(name=attn-splitk-default,type=f32,ne=[512,64,1,1],op_params=[],sources=f16[32768,512,1,1],f32[32768,64,1,1]): [1;31mFAIL[0m
+  MUL_MAT(name=attn-splitk-f32,type=f32,ne=[512,64,1,1],op_params=[0:10],sources=f16[32768,512,1,1],f32[32768,64,1,1]): [1;32mOK[0m
+[MUL_MAT] ERR = 0.001388645 > 0.000500000   MUL_MAT(name=attn-splitk-default,type=f32,ne=[512,256,1,1],op_params=[],sources=f16[65536,512,1,1],f32[65536,256,1,1]): [1;31mFAIL[0m
+  MUL_MAT(name=attn-splitk-f32,type=f32,ne=[512,256,1,1],op_params=[0:10],sources=f16[65536,512,1,1],f32[65536,256,1,1]): [1;32mOK[0m
+  2/4 tests passed
+
+Failing tests:
+  MUL_MAT(name=attn-splitk-default,type=f32,ne=[512,64,1,1],op_params=[],sources=f16[32768,512,1,1],f32[32768,64,1,1])
+  MUL_MAT(name=attn-splitk-default,type=f32,ne=[512,256,1,1],op_params=[],sources=f16[65536,512,1,1],f32[65536,256,1,1])
+  Backend Vulkan0: [1;31mFAIL[0m
+Backend 2/2: CPU
+  Skipping
+1/2 backends passed
+[1;31mFAIL[0m

@@ -1,0 +1,75 @@
+{
+  "ok": true,
+  "timings": {
+    "cache_n": 64658,
+    "prompt_n": 1022,
+    "prompt_ms": 29878.003,
+    "prompt_per_token_ms": 29.234836594911936,
+    "prompt_per_second": 34.205766697325785,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0,
+    "predicted_per_second": 0
+  },
+  "scope": "Profile only to establish actual split-K dispatch; not a speed measurement",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/runtime-splitk",
+    "preserveSwaPadding": true,
+    "perfVulkan": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K": "4"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "vulkan",
+      "wall_ms": 524.3531300000004,
+      "package_j": 7.42442,
+      "timings": {
+        "restore_ms": 522.52
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail",
+      "device": "vulkan",
+      "wall_ms": 29908.727092999998,
+      "package_j": 735.297373,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29878.003,
+        "prompt_per_token_ms": 29.234836594911936,
+        "prompt_per_second": 34.205766697325785,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 85,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5240062,
+    "peak_trial_rss_kib": 5243620,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23625480,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T18:14:19.332Z"
+}

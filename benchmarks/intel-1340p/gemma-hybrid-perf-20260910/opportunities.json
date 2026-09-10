@@ -1,0 +1,10 @@
+{
+ "policy":"Do not equate minor regression with lack of potential. Preserve candidates, observed benefits and conditions for retesting. Correctness failures are separate from latency trade-offs.",
+ "branches":[
+  {"candidate":"GPUubatch1024","status":"retained conditional candidate, not default","benefit":"64K-tail1022-token prefill5.52% faster acrossABBA/BAAB","cost":"Single fresh64K prefill3.14% slower, whole request3.33% slower; not balanced full run","next":"Context-phase-specific batch selection with matched full runs, combined with attention changes; bounded768-cell export now verified"},
+  {"candidate":"Aligned compact hybrid","status":"best validated whole-workflow configuration so far","benefit":"64,663-token finite correct handoff; coding whole28.79% faster","cost":"Coding warm3.42% slower on4/profile","next":"Broader task suite and route lifecycle; keep whole vs warm costs separate"},
+  {"candidate":"Intel split-K4/8","status":"retained opt-in numerical candidate; confirmed tail timing neutral","benefit":"Default-precision synthetic long reductions improve from2/4 baseline numerical controls to4/4","cost":"ABBA/BAAB split4 tail median+0.056% vs split1; no reliable speed gain; profile timings intrusive","next":"Combine with workload-specific shapes/batches; narrow device scope, finite state/handoff and full64K/coding checks before any promotion"},
+  {"candidate":"GPUFlashAttention","status":"diagnostic branch, not quality-eligible","benefit":"Potential memory/attention fusion mechanism","cost":"64K-tail~4.9x slower, unused-token output despite exact layout roundtrip","next":"Isolate native attention correctness/precision on actual masked shapes before more timing; do not conflate output failure with proven serialized corruption"},
+  {"candidate":"CPUthreads/MTP","status":"retain default8/MTP3","benefit":"Best measured among bounded tested choices","cost":"p4/all16 slightly slower; explicitOMP8/MTP1/MTP5 slower","next":"Different code/task/context mix could move optimum; no claim all possible thread/ISA profiles exhausted"}
+ ]
+}

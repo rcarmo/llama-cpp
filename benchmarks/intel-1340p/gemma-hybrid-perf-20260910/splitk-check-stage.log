@@ -1,0 +1,13 @@
+true
+true
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"Native F16 long-attention matmul regression controls for isolated split-K dispatch","kind":"mixed","weight":"heavy","role":"entrypoint"}
+3 | */
+4 | import{Trial,root}from'./campaign';import{openSync}from'node:fs';
+5 | const t=new Trial('splitk-kernel-controls',{maintenance:true});const results:any[]=[];
+6 | try{await t.begin();for(const split of [1,2,4,8]){await t.check();const fd=openSync(t.dir+'/split-'+split+'.log','a');const p=Bun.spawn(['/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/bin/test-backend-ops','test','-b','Vulkan0','-o','MUL_MAT','--test-file',root+'/splitk/kernel-cases.txt','-j','1'],{stdout:fd,stderr:fd,env:{...process.env,LD_LIBRARY_PATH:root+'/runtime-splitk/bin:'+root+'/runtime-splitk/runtime',GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K:String(split),GGML_VK_VISIBLE_DEVICES:'0'}});t.servers.push({p,fd,device:'kernel'});const timer=setTimeout(()=>{t.error='Kernel timeout';p.kill('SIGTERM')},120000);const rc=await p.exited;clearTimeout(timer);results.push({split,rc});await t.stop('kernel');if(rc!==0||t.error)throw Error(t.error||'Kernel numeric failure split'+split)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ^
+error: Kernel numeric failure split1
+      at /var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/splitk-kernels.ts:6:758
+
+FINISHED splitk-kernel-controls false

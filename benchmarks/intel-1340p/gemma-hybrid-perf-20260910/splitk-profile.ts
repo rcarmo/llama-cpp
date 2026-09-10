@@ -1,0 +1,6 @@
+/** SCRIPT_JDOC:
+{"summary":"Verify split-K dispatch using Vulkan per-op timings on a retained64K tail; diagnostic only","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root}from'./campaign';import{copyFileSync}from'node:fs';
+const t=new Trial('splitk64-dispatch-profile',{maintenance:true,format:'f16',fa:false,full:false,ctx:147456,parallel:2,cache:0,vulkanBuild:root+'/runtime-splitk',preserveSwaPadding:true,perfVulkan:true,extraEnv:{GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K:'4'}});let result:any={};
+try{await t.begin();await t.start('vulkan');copyFileSync('/var/home/agent/workspace/reports/gemma-context-coding-20260910/runs/compact64-aligned/slots/long64.slot',t.dir+'/slots/state.slot');const f=await Bun.file(root+'/runs/vulkan64-tail-profile/fixture.json').json();await t.req('vulkan','restore',{filename:'state.slot'},'/slots/0?action=restore');const r=await t.req('vulkan','tail',{prompt:f.prompt,n_predict:1,temperature:0,cache_prompt:true,id_slot:0});result={ok:r.timings.cache_n>=64500&&r.timings.prompt_n===1022,timings:r.timings,scope:'Profile only to establish actual split-K dispatch; not a speed measurement'};}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}
