@@ -1,0 +1,145 @@
+{
+  "ok": true,
+  "actual_tokens": 64663,
+  "total_ms": 691385.238347,
+  "state_bytes": 1091923940,
+  "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+  "pass": true,
+  "cache_n": 64662,
+  "prompt_n": 1,
+  "append": "MAPLE-726",
+  "append_pass": true,
+  "append_cache_n": 64684,
+  "append_prompt_n": 15,
+  "limits": "Fresh64K exact-device long-attention F32 candidate vs retained earlier64K control; not a balanced full64K series. CPU unchanged FA-off/ubatch256; GPUubatch256. Counterbalanced64Ktail evidence separate; sameGPUresidency as earlierfull64K.",
+  "state_finite": true,
+  "swa_max_cells": 768,
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 256,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu",
+    "preserveSwaPadding": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32"
+    }
+  },
+  "calls": [
+    {
+      "label": "prefill",
+      "device": "vulkan",
+      "wall_ms": 679865.364002,
+      "package_j": 24903.684171,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 64662,
+        "prompt_ms": 679832.717,
+        "prompt_per_token_ms": 10.513635782994648,
+        "prompt_per_second": 95.11457507568,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "save",
+      "device": "vulkan",
+      "wall_ms": 4209.064568000031,
+      "package_j": 47.297547,
+      "timings": {
+        "save_ms": 4207.916
+      },
+      "n_written": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 339.6154679999454,
+      "package_j": 4.821216,
+      "timings": {
+        "restore_ms": 338.505
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 3498.766871999949,
+      "package_j": 111.743489,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 265.983,
+        "prompt_per_token_ms": 265.983,
+        "prompt_per_second": 3.759638773906603,
+        "predicted_n": 21,
+        "predicted_ms": 3006.661,
+        "predicted_per_token_ms": 143.17433333333332,
+        "predicted_per_second": 6.984492099375354,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 21,
+        "prompt_tokens": 64663,
+        "total_tokens": 64684,
+        "prompt_tokens_details": {
+          "cached_tokens": 64662
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "append",
+      "device": "cpu",
+      "wall_ms": 2521.790127000073,
+      "package_j": 85.891504,
+      "timings": {
+        "cache_n": 64684,
+        "prompt_n": 15,
+        "prompt_ms": 1222.783,
+        "prompt_per_token_ms": 81.51886666666665,
+        "prompt_per_second": 12.26709890471163,
+        "predicted_n": 7,
+        "predicted_ms": 1187.253,
+        "predicted_per_token_ms": 169.60757142857142,
+        "predicted_per_second": 5.895963202451373,
+        "draft_n": 6,
+        "draft_n_accepted": 5
+      },
+      "usage": {
+        "completion_tokens": 7,
+        "prompt_tokens": 64699,
+        "total_tokens": 64706,
+        "prompt_tokens_details": {
+          "cached_tokens": 64684
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 100,
+    "hot": true,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12070507,
+    "peak_trial_rss_kib": 17074768,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 17323412,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T20:18:12.226Z"
+}

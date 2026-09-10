@@ -1,0 +1,31 @@
+{
+  "declared_before_measured_requests": true,
+  "failed_preflight": "batch-0-256 failed before anyAPIinferencecalls:identitycheckexpected.so.0.23.0butloader.maps.so.0;bothhash3d679dce59a861095089582b5a870b19d97e44d65ad7e24e2a77b02a697475b8. Originalresult/logretained,no timinglost/repeated,productionautomaticallyrestored.",
+  "fix": "Match actual mappedlibrarypathwithstrict retainedruntimeprefix thenhashthatmappedfile;do not loosen hash orbackend identity check.",
+  "rerun": "Measuredrunsuseunique measure-order-ubatch names,preservingfailedpreflight. ABBAorderandallnativeparametersunchanged.",
+  "confirmed": {
+    "runs": 8,
+    "pp256_ms": 27260.0635,
+    "pp1024_ms": 25322.5385,
+    "improvement_pct": 7.107558645268741,
+    "finite1024state": true,
+    "swa_cells": 768
+  },
+  "full64_prespecified": {
+    "clearance": "2026-09-10T21:16:01Z",
+    "scope": "Onefresh64663token FP32+GPU1024 into unchangedCPU256 vs retainedFP32+256control;noglobaldefaultclaim",
+    "fixed": "CPU8/16 MTP3 FAoff F16 CPU2x128K GPU2x72K onepopulatedconversation,sameGPUresidency",
+    "gates": "finiteKV exactEOF/SWAcap,3keyrecall,1evaluatedCPUtoken,appendcacheandrecall,6GiBreserve,zerotrialswaptarget,automaticunchangedrestore"
+  },
+  "full64_completed": {
+    "total_ms": 715245.8902939999,
+    "prefill_ms": 700866.379,
+    "total_reduction_pct": -3.4511370251478324,
+    "prefill_reduction_pct": -3.0939467127764075,
+    "finite": true,
+    "cache_n": 64662,
+    "prompt_n": 1,
+    "restored_pid": 626449
+  },
+  "decision": "KeepFP32+256forwholeprefill;FP32+1024tailgainretainedwithoutglobaldefaultchange"
+}

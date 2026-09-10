@@ -1,0 +1,13 @@
+true
+true
+15 |     await t.begin();
+16 |     const worker = await t.start('vulkan');
+17 |     const maps = readFileSync(`/proc/${worker.p.pid}/maps`, 'utf8');
+18 |     const library = runtime + '/bin/libggml-vulkan.so.0.23.0';
+19 |     const digest = createHash('sha256').update(readFileSync(library)).digest('hex');
+20 |     if (!maps.includes(library) || digest !== '3d679dce59a861095089582b5a870b19d97e44d65ad7e24e2a77b02a697475b8') throw Error('Retained selector runtime identity');
+                                                                                                                             ^
+error: Retained selector runtime identity
+      at /var/home/agent/workspace/reports/gemma-f32-batch-20260910/batch-screen.ts:20:121
+
+FINISHED batch-0-256 false
