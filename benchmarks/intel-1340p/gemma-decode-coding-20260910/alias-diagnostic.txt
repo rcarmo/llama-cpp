@@ -1,0 +1,18 @@
+{
+  rc: 0,
+  timedOut: false,
+  stdout: "bun test v1.4.1 (4661e494f)\n",
+  stderr: "\nindependent.test.ts:\n(pass) empty and single reversed [0.65ms]\n(pass) unsorted overlapping touching nested [0.13ms]\n(pass) preserve input and independent output [0.09ms]\n(pass) zero and duplicate intervals [0.05ms]\n(pass) negative fractional endpoints [0.07ms]\n(pass) invalid lengths/nonfinite/non-numeric [0.19ms]\n\n 6 pass\n 0 fail\n 16 expect() calls\nRan 6 tests across 1 file. [8.00ms]\n",
+  args: [
+    "podman", "--root", "/var/home/agent/workspace/projects/.podman-llama-storage", "--runroot",
+    "/var/home/agent/workspace/projects/.podman-llama-run", "--storage-driver", "vfs", "--cgroup-manager=cgroupfs",
+    "run", "--rm", "--name", "gemma-code-check-alias", "--network=none", "--read-only", "--cap-drop=ALL",
+    "--security-opt=no-new-privileges", "--security-opt=label=disable", "--userns=keep-id",
+    "--memory=512m", "--memory-swap=512m", "--pids-limit=64", "--tmpfs", "/tmp:rw,nosuid,size=32m",
+    "-v", "/var/home/agent/workspace/reports/gemma-decode-coding-20260910/alias-diagnostic:/case:ro",
+    "-v", "/var/opt/piclaw/releases/piclaw-3.1.1-linux-x64-baseline/bun/bin/bun:/tmp/host-bun:ro",
+    "--workdir", "/case", "localhost/llama-intel-vulkan-validation:fedora44", "/tmp/host-bun",
+    "test", "independent.test.ts"
+  ],
+  pass: true,
+}
