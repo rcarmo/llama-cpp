@@ -11,6 +11,10 @@ test('SSE mismatch and missing completion rejected', () => {
     expect(() => new SseTiming(5000, false).finish()).toThrow('Incomplete');
     const s = new SseTiming(5000, true); s.feed(bytes('data: [DONE]\n\n')); expect(() => s.finish()).toThrow('timing missing');
 });
+test('native completion terminates with stop=true instead of OpenAI DONE', () => {
+    const s = new SseTiming(0, false, true); s.feed(bytes('data: {"content":"OK","stop":true}\n\n')); expect(() => s.finish()).not.toThrow();
+    const chat = new SseTiming(0, false); chat.feed(bytes('data: {"stop":true}\n\n')); expect(() => chat.finish()).toThrow('Incomplete');
+});
 test('native signal termination is not a live process', () => {
     expect(processAlive({ exitCode: null, signalCode: null })).toBe(true);
     expect(processAlive({ exitCode: null, signalCode: 'SIGKILL' })).toBe(false);

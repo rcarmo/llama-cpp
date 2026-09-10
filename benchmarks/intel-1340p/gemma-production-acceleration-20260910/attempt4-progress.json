@@ -1,0 +1,203 @@
+[
+  {
+    "label": "cold-sse",
+    "route": "gpu-cold",
+    "tool": {
+      "id": "bGSWYRS0qNoBuQxWxIEeH8DnHD3ajMZt",
+      "type": "function",
+      "function": {
+        "name": "lookup_stock",
+        "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+      }
+    },
+    "timings": {
+      "cache_n": 5235,
+      "prompt_n": 1,
+      "prompt_ms": 94.419,
+      "prompt_per_token_ms": 94.419,
+      "prompt_per_second": 10.591088658003157,
+      "predicted_n": 19,
+      "predicted_ms": 666.406,
+      "predicted_per_token_ms": 35.074,
+      "predicted_per_second": 28.511147858812798,
+      "draft_n": 15,
+      "draft_n_accepted": 13
+    }
+  },
+  {
+    "label": "warm-tool",
+    "route": "cpu-owner",
+    "ms": 696.3746400000018,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "23"
+          }
+        }
+      ],
+      "created": 1789078150,
+      "model": "gemma-4-e4b-qat-mtp",
+      "system_fingerprint": "b10579-abdbeadfb",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 5281,
+        "total_tokens": 5284,
+        "prompt_tokens_details": {
+          "cached_tokens": 5254
+        }
+      },
+      "id": "chatcmpl-KAZaWscSKUGGDAxH0opl1A0yXBS1I4TE",
+      "timings": {
+        "cache_n": 5254,
+        "prompt_n": 27,
+        "prompt_ms": 531.554,
+        "prompt_per_token_ms": 19.687185185185186,
+        "prompt_per_second": 50.794463027274745,
+        "predicted_n": 3,
+        "predicted_ms": 127.565,
+        "predicted_per_token_ms": 42.52166666666667,
+        "predicted_per_second": 23.51742249049504,
+        "draft_n": 3,
+        "draft_n_accepted": 2
+      }
+    }
+  },
+  {
+    "label": "other-owner",
+    "route": "cpu",
+    "ms": 532.4080819999945,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "OTHER-17"
+          }
+        }
+      ],
+      "created": 1789078151,
+      "model": "gemma-4-e4b-qat-mtp",
+      "system_fingerprint": "b10579-abdbeadfb",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 15,
+        "total_tokens": 20,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "id": "chatcmpl-GLM3gkO3frE9AlCsPbDkQxsWnledUvmE",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 15,
+        "prompt_ms": 328.784,
+        "prompt_per_token_ms": 21.91893333333333,
+        "prompt_per_second": 45.62265803688744,
+        "predicted_n": 5,
+        "predicted_ms": 114.535,
+        "predicted_per_token_ms": 22.907,
+        "predicted_per_second": 43.6547780154538,
+        "draft_n": 3,
+        "draft_n_accepted": 3
+      }
+    }
+  },
+  {
+    "label": "return-owner",
+    "route": "cpu-owner",
+    "ms": 265.1843930000032,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "23"
+          }
+        }
+      ],
+      "created": 1789078151,
+      "model": "gemma-4-e4b-qat-mtp",
+      "system_fingerprint": "b10579-abdbeadfb",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 5281,
+        "total_tokens": 5284,
+        "prompt_tokens_details": {
+          "cached_tokens": 5280
+        }
+      },
+      "id": "chatcmpl-nDmUpAWklLMBUNFfndfRZBkXCfHPQEOl",
+      "timings": {
+        "cache_n": 5280,
+        "prompt_n": 1,
+        "prompt_ms": 99.47,
+        "prompt_per_token_ms": 99.47,
+        "prompt_per_second": 10.053282396702523,
+        "predicted_n": 3,
+        "predicted_ms": 126.023,
+        "predicted_per_token_ms": 42.007666666666665,
+        "predicted_per_second": 23.805178419812258,
+        "draft_n": 3,
+        "draft_n_accepted": 2
+      }
+    }
+  },
+  {
+    "label": "queued-and-decode-cancel",
+    "pass": true
+  },
+  {
+    "label": "native-gpu-kill-fallback",
+    "route": "cpu",
+    "ms": 56385.947618,
+    "response": {
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "FALLBACK-42"
+          }
+        }
+      ],
+      "created": 1789078209,
+      "model": "gemma-4-e4b-qat-mtp",
+      "system_fingerprint": "b10579-abdbeadfb",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 6,
+        "prompt_tokens": 4079,
+        "total_tokens": 4085,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "id": "chatcmpl-vg79HxP7IYEigYdLVaOTz4hXpQAsgqne",
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 4079,
+        "prompt_ms": 56117.57,
+        "prompt_per_token_ms": 13.757678352537386,
+        "prompt_per_second": 72.6866826200778,
+        "predicted_n": 6,
+        "predicted_ms": 247.761,
+        "predicted_per_token_ms": 41.2935,
+        "predicted_per_second": 24.216886434911068,
+        "draft_n": 6,
+        "draft_n_accepted": 5
+      }
+    }
+  }
+]

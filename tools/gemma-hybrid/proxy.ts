@@ -113,7 +113,7 @@ export class HybridProxy {
             // Keep admission until the native byte stream reaches EOF or cancellation drains the slot.
             const reader = upstream.body.getReader();
             responseReader = reader; abortCleanup = () => cleanup(false);
-            const timing = new SseTiming(tokens?.length ?? 0, gpu);
+            const timing = new SseTiming(tokens?.length ?? 0, gpu, path === '/completion');
             const stream = new ReadableStream<Uint8Array>({
                 pull: async controller => {
                     try {

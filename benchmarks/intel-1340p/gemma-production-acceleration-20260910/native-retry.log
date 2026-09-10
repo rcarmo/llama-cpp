@@ -1,0 +1,13 @@
+true
+true
+Running as unit: gemma-hybrid-staging.service; invocation ID: 48594e5f73b14b41802af7a23383fdbd
+24 | try{
+25 |  await guard();await Bun.sleep(1200);await guard();timer=setInterval(async()=>{if(busy)return;busy=true;try{await guard()}catch(e){stopped=String(e);await command(['systemctl','--user','stop','gemma-hybrid-staging.service']).catch(()=>{})}finally{busy=false}},750);
+26 |  await health();
+27 |  // Cold native SSE is consumed verbatim; reconstruct only the fixture tool call for this test.
+28 |  const r=await fetch(base+'/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...defaults,messages,tools,tool_choice:'required',stream:true,stream_options:{include_usage:true}}),signal:AbortSignal.timeout(180000),timeout:false});
+29 |  const route=r.headers.get('x-hybrid-route'),raw=await r.text();save('cold-sse',{route,status:r.status,raw});if(!r.ok||route!=='gpu-cold'||!raw.includes('[DONE]'))throw Error('Coldstreamroute');
+                                                                                                                                                                              ^
+error: Coldstreamroute
+      at /var/home/agent/workspace/reports/gemma-production-acceleration-20260910/native-test.ts:29:170
+

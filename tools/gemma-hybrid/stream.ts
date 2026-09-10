@@ -6,7 +6,7 @@ export class SseTiming {
     private pending = '';
     timings: any;
     done = false;
-    constructor(private promptTokens: number, private requireHandoff: boolean) {}
+    constructor(private promptTokens: number, private requireHandoff: boolean, private nativeCompletion = false) {}
     feed(value: Uint8Array) {
         this.pending += this.decoder.decode(value, { stream: true });
         if (this.pending.length > 2 * 1024 * 1024) throw Error('Native SSE record exceeds bound');
@@ -19,6 +19,7 @@ export class SseTiming {
             if (!data) continue;
             const result = JSON.parse(data);
             if (result.error) throw Error('Native stream reported an error');
+            if (this.nativeCompletion && result.stop === true) this.done = true;
             if (result.timings) {
                 this.timings = result.timings;
                 if (this.requireHandoff && ((this.timings.cache_n ?? -1) < this.promptTokens - 2 || (this.timings.prompt_n ?? Infinity) > 2)) throw Error('Native streamed handoff coverage mismatch');
