@@ -153,7 +153,7 @@ Git checkpoints:
 
 To conserve context space, load these resources as needed:
 
-Skills: reusable task workflows live in the [skills/](skills/) directory - check there for a skill matching your task before starting.
+Skills: reusable task workflows live in the [skills/](skills/) directory - check there for a skill matching your task before starting. For GPU-prefill/CPU-SIMD tuning, long-context handoff or coding-round benchmarks, use [hybrid-inference-optimization](skills/hybrid-inference-optimization/SKILL.md).
 
 General documentations:
 - [Contributing guidelines](CONTRIBUTING.md)
