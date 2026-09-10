@@ -1,0 +1,20 @@
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -1561,6 +1561,8 @@
+ UseGgmlGemm1:;
+ #endif
+ 
++    const bool shape_profile = ggml_cpu_shape_profile_enabled();
++    const int64_t pack_started = shape_profile ? ggml_cpu_whole_token_profile_time_us() : 0;
+     if (src1->type != vec_dot_type) {
+         char * wdata = params->wdata;
+ 
+@@ -1598,6 +1600,8 @@
+     #endif
+     }
+ 
++    if (shape_profile && src1->type != vec_dot_type) ggml_cpu_shape_profile_pack(dst, nth, ggml_cpu_whole_token_profile_time_us() - pack_started, "generic_pack_thread");
++
+     if (ith == 0) {
+         // Every thread starts at ith, so the first unprocessed chunk is nth.  This save a bit of coordination right at the start.
+         atomic_store_explicit(&params->threadpool->current_chunk, nth, memory_order_relaxed);

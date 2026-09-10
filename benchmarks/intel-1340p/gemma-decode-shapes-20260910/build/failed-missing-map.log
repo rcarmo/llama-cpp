@@ -1,0 +1,148 @@
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/whole-token-profile.cpp:276:
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:6:13: error: no template named 'unordered_map' in namespace 'std'; did you mean 'unordered_set'?
+    6 | static std::unordered_map<std::string, shape_row> shape_rows;
+      |        ~~~~~^~~~~~~~~~~~~
+      |             unordered_set
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/unordered_set.h:107:11: note: 'unordered_set' declared here
+  107 |     class unordered_set
+      |           ^
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/whole-token-profile.cpp:276:
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:31:9: error: no member named 'second' in 'std::basic_string<char>'
+   31 |     it->second.calls++;
+      |     ~~~~^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:32:9: error: no member named 'second' in 'std::basic_string<char>'
+   32 |     it->second.elapsed_us += static_cast<uint64_t>(std::max<int64_t>(0, elapsed));
+      |     ~~~~^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:36:128: error: no member named 'first' in 'std::basic_string<char>'
+   36 |     for (const auto & entry : shape_rows) std::fprintf(stderr, "GGML_CPU_SHAPE_PROFILE %s calls=%llu elapsed_us=%llu\n", entry.first.c_str(), (unsigned long long) entry.second.calls, (unsigned long long) entry.second.elapsed_us);
+      |                                                                                                                          ~~~~~ ^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:36:170: error: no member named 'second' in 'std::basic_string<char>'
+   36 |     for (const auto & entry : shape_rows) std::fprintf(stderr, "GGML_CPU_SHAPE_PROFILE %s calls=%llu elapsed_us=%llu\n", entry.first.c_str(), (unsigned long long) entry.second.calls, (unsigned long long) entry.second.elapsed_us);
+      |                                                                                                                                                                    ~~~~~ ^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:36:211: error: no member named 'second' in 'std::basic_string<char>'
+   36 |     for (const auto & entry : shape_rows) std::fprintf(stderr, "GGML_CPU_SHAPE_PROFILE %s calls=%llu elapsed_us=%llu\n", entry.first.c_str(), (unsigned long long) entry.second.calls, (unsigned long long) entry.second.elapsed_us);
+      |                                                                                                                                                                                                             ~~~~~ ^
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/whole-token-profile.cpp:22:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/unordered_set:43:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/unordered_set.h:33:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:37:
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable_policy.h:1099:18: error: static assertion failed due to requirement 'std::__is_invocable<const (anonymous namespace)::shape_row &, const std::basic_string<char, std::char_traits<char>, std::allocator<char>> &>{}': hash function must be invocable with an argument of key type
+ 1099 |           static_assert(__is_invocable<const _Hash&, const _Kt&>{},
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:2302:29: note: in instantiation of function template specialization 'std::__detail::_Hash_code_base<std::basic_string<char>, std::basic_string<char>, std::__detail::_Identity, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, true>::_M_hash_code_tr<std::basic_string<char>>' requested here
+ 2302 |         __loc._M_hash_code = this->_M_hash_code_tr(__k);
+      |                                    ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:917:16: note: in instantiation of function template specialization 'std::_Hashtable<std::basic_string<char>, std::basic_string<char>, std::allocator<std::basic_string<char>>, std::__detail::_Identity, std::equal_to<std::basic_string<char>>, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true>>::_M_locate_tr<std::basic_string<char>>' requested here
+  917 |       { return _M_locate_tr<key_type>(__k); }
+      |                ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:1968:23: note: in instantiation of member function 'std::_Hashtable<std::basic_string<char>, std::basic_string<char>, std::allocator<std::basic_string<char>>, std::__detail::_Identity, std::equal_to<std::basic_string<char>>, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true>>::_M_locate' requested here
+ 1968 |     { return iterator(_M_locate(__k)); }
+      |                       ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/unordered_set.h:773:21: note: in instantiation of member function 'std::_Hashtable<std::basic_string<char>, std::basic_string<char>, std::allocator<std::basic_string<char>>, std::__detail::_Identity, std::equal_to<std::basic_string<char>>, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true>>::find' requested here
+  773 |       { return _M_h.find(__x); }
+      |                     ^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:26:26: note: in instantiation of member function 'std::unordered_set<std::basic_string<char>, (anonymous namespace)::shape_row>::find' requested here
+   26 |     auto it = shape_rows.find(key);
+      |                          ^
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/whole-token-profile.cpp:22:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/unordered_set:43:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/unordered_set.h:33:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:37:
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable_policy.h:1101:11: error: type 'const (anonymous namespace)::shape_row' does not provide a call operator
+ 1101 |           return _M_hash._M_obj(__k);
+      |                  ^~~~~~~~~~~~~~
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/whole-token-profile.cpp:5:
+In file included from /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/build/source/ggml/src/ggml-cpu/expert-io-plan.h:5:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/string:46:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/allocator.h:46:
+In file included from /usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/x86_64-redhat-linux/bits/c++allocator.h:33:
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/new_allocator.h:203:23: error: no matching constructor for initialization of 'std::basic_string<char>'
+  203 |         { ::new((void *)__p) _Up(std::forward<_Args>(__args)...); }
+      |                              ^   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/alloc_traits.h:714:8: note: in instantiation of function template specialization 'std::__new_allocator<std::__detail::_Hash_node<std::basic_string<char>, true>>::construct<std::basic_string<char>, char (&)[512], (anonymous namespace)::shape_row>' requested here
+  714 |           __a.construct(__p, std::forward<_Args>(__args)...);
+      |               ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable_policy.h:1575:27: note: in instantiation of function template specialization 'std::allocator_traits<std::allocator<std::__detail::_Hash_node<std::basic_string<char>, true>>>::construct<std::basic_string<char>, char (&)[512], (anonymous namespace)::shape_row>' requested here
+ 1575 |             __node_alloc_traits::construct(__alloc, __n->_M_valptr(),
+      |                                  ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:2369:13: note: in instantiation of function template specialization 'std::__detail::_Hashtable_alloc<std::allocator<std::__detail::_Hash_node<std::basic_string<char>, true>>>::_M_allocate_node<char (&)[512], (anonymous namespace)::shape_row>' requested here
+ 2369 |                   = this->_M_allocate_node(std::forward<_Args>(__args)...);
+      |                           ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/hashtable.h:1050:13: note: in instantiation of function template specialization 'std::_Hashtable<std::basic_string<char>, std::basic_string<char>, std::allocator<std::basic_string<char>>, std::__detail::_Identity, std::equal_to<std::basic_string<char>>, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true>>::_M_emplace_uniq<char (&)[512], (anonymous namespace)::shape_row>' requested here
+ 1050 |             return _M_emplace_uniq(std::forward<_Args>(__args)...);
+      |                    ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/unordered_set.h:447:16: note: in instantiation of function template specialization 'std::_Hashtable<std::basic_string<char>, std::basic_string<char>, std::allocator<std::basic_string<char>>, std::__detail::_Identity, std::equal_to<std::basic_string<char>>, (anonymous namespace)::shape_row, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true>>::emplace<char (&)[512], (anonymous namespace)::shape_row>' requested here
+  447 |         { return _M_h.emplace(std::forward<_Args>(__args)...); }
+      |                       ^
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/patch/shape-profile.inc:29:25: note: in instantiation of function template specialization 'std::unordered_set<std::basic_string<char>, (anonymous namespace)::shape_row>::emplace<char (&)[512], (anonymous namespace)::shape_row>' requested here
+   29 |         it = shape_rows.emplace(key, shape_row{}).first;
+      |                         ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:708:7: note: candidate constructor not viable: no known conversion from '(anonymous namespace)::shape_row' to 'size_type' (aka 'unsigned long') for 2nd argument
+  708 |       basic_string(const _CharT* __s, size_type __n,
+      |       ^                               ~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:730:7: note: candidate constructor template not viable: no known conversion from '(anonymous namespace)::shape_row' to 'const std::allocator<char>' for 2nd argument
+  730 |       basic_string(const _CharT* __s, const _Alloc& __a = _Alloc())
+      |       ^                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:633:7: note: candidate constructor not viable: no known conversion from '(anonymous namespace)::shape_row' to 'size_type' (aka 'unsigned long') for 2nd argument
+  633 |       basic_string(const basic_string& __str, size_type __pos,
+      |       ^                                       ~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:827:7: note: candidate constructor not viable: no known conversion from '(anonymous namespace)::shape_row' to 'const std::allocator<char>' for 2nd argument
+  827 |       basic_string(const basic_string& __str, const _Alloc& __a)
+      |       ^                                       ~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:832:7: note: candidate constructor not viable: no known conversion from '(anonymous namespace)::shape_row' to 'const std::allocator<char>' for 2nd argument
+  832 |       basic_string(basic_string&& __str, const _Alloc& __a)
+      |       ^                                  ~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:191:7: note: candidate constructor not viable: no known conversion from 'char[512]' to '__sv_wrapper' for 1st argument
+  191 |       basic_string(__sv_wrapper __svw, const _Alloc& __a)
+      |       ^            ~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:753:7: note: candidate constructor template not viable: no known conversion from 'char[512]' to 'size_type' (aka 'unsigned long') for 1st argument
+  753 |       basic_string(size_type __n, _CharT __c, const _Alloc& __a = _Alloc())
+      |       ^            ~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:822:7: note: candidate constructor not viable: no known conversion from 'char[512]' to 'initializer_list<char>' for 1st argument
+  822 |       basic_string(initializer_list<_CharT> __l, const _Alloc& __a = _Alloc())
+      |       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:876:9: note: candidate template ignored: deduced conflicting types for parameter '_InputIterator' ('char *' vs. '(anonymous namespace)::shape_row')
+  876 |         basic_string(_InputIterator __beg, _InputIterator __end,
+      |         ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:911:2: note: candidate template ignored: requirement 'std::__and_<std::is_convertible<const char (&)[512], std::basic_string_view<char, std::char_traits<char>>>, std::__not_<std::is_convertible<const char (*)[512], const std::basic_string<char, std::char_traits<char>, std::allocator<char>> *>>, std::__not_<std::is_convertible<const char (&)[512], const char *>>>::value' was not satisfied [with _Tp = char[512]]
+  911 |         basic_string(const _Tp& __t, const _Alloc& __a = _Alloc())
+      |         ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:605:7: note: candidate constructor not viable: requires single argument '__a', but 2 arguments were provided
+  605 |       basic_string(const _Alloc& __a) _GLIBCXX_NOEXCEPT
+      |       ^            ~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:617:7: note: candidate constructor not viable: requires single argument '__str', but 2 arguments were provided
+  617 |       basic_string(const basic_string& __str)
+      |       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:766:7: note: candidate constructor not viable: requires single argument '__str', but 2 arguments were provided
+  766 |       basic_string(basic_string&& __str) noexcept
+      |       ^            ~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:650:7: note: candidate constructor not viable: requires 3 arguments, but 2 were provided
+  650 |       basic_string(const basic_string& __str, size_type __pos,
+      |       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  651 |                    size_type __n)
+      |                    ~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:589:7: note: candidate constructor not viable: requires 0 arguments, but 2 were provided
+  589 |       basic_string()
+      |       ^
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:668:7: note: candidate constructor not viable: requires 4 arguments, but 2 were provided
+  668 |       basic_string(const basic_string& __str, size_type __pos,
+      |       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  669 |                    size_type __n, const _Alloc& __a)
+      |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/bin/../lib/gcc/x86_64-redhat-linux/16/../../../../include/c++/16/bits/basic_string.h:899:2: note: candidate constructor template not viable: requires at least 3 arguments, but 2 were provided
+  899 |         basic_string(const _Tp& __t, size_type __pos, size_type __n,
+      |         ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  900 |                      const _Alloc& __a = _Alloc())
+      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+9 errors generated.
+ 5 | const root='/var/home/agent/workspace/reports/gemma-decode-shapes-20260910',repo='/var/home/agent/workspace/projects/llama-cpp',build=repo+'/build-intel-clang';
+ 6 | const entries=JSON.parse(readFileSync(build+'/compile_commands.json','utf8'));
+ 7 | const names=['whole-token-profile.cpp','ggml-cpu.c','repack.cpp'],commands:string[]=[],objects:any[]=[];
+ 8 | for(const name of names){const entry=entries.find(x=>x.file.endsWith('/'+name));if(!entry)throw Error('Missingcompile '+name);const object=entry.command.match(/ -o (\S+) /)?.[1];if(!object)throw Error('Noobject');let cc=entry.command.replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replaceAll('/usr/lib64/ccache/clang','/usr/sbin/clang').replace(' -o '+object+' ',' -o '+root+'/build/'+name+'.o ').replace(' -c '+entry.file,' -c '+root+'/patch/'+name);cc=cc.replaceAll('-I'+repo+'/ggml','-I'+root+'/build/source/ggml');cc=cc.replace(' -I',' -I'+root+'/patch -I');commands.push(cc);objects.push({old:object,replacement:root+'/build/'+name+'.o'});}
+ 9 | const p=Bun.spawn(['/usr/sbin/ninja-build','-C',build,'-t','commands','bin/libggml-cpu.so.0.18.1'],{stdout:'pipe',stderr:'pipe'});const out=await new Response(p.stdout).text();if(await p.exited)throw Error(await new Response(p.stderr).text());let link=out.trim().split('\n').findLast(l=>l.includes('-o bin/libggml-cpu.so.0.18.1 '));if(!link)throw Error('Link');link=link.replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replace(' -o bin/libggml-cpu.so.0.18.1 ',' -o '+root+'/build/libggml-cpu.so.0.18.1 ').replace('--dependency-file=ggml/src/CMakeFiles/ggml-cpu.dir/link.d','--dependency-file='+root+'/build/link.d');for(const o of objects){if(!link.includes(' '+o.old+' '))throw Error('Objectnotinlink');link=link.replace(' '+o.old+' ',' '+o.replacement+' ')}
+10 | writeFileSync(root+'/build/commands.sh','#!/usr/bin/env bash\nset -euo pipefail\ncd '+build+'\n'+commands.join('\n')+'\n'+link+'\n');const run=Bun.spawn(['/bin/bash',root+'/build/commands.sh'],{stdout:'inherit',stderr:'inherit'});if(await run.exited)throw Error('Diagnosticbuild');
+                                                                                                                                                                                                                                                                     ^
+error: Diagnosticbuild
+      at /var/home/agent/workspace/reports/gemma-decode-shapes-20260910/build/prepare.ts:10:257
+
+Bun v1.4.1 (Linux x64)

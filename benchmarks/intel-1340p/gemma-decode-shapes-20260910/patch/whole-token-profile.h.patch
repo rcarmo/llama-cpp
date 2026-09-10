@@ -1,0 +1,11 @@
+--- a/ggml/src/ggml-cpu/whole-token-profile.h
++++ b/ggml/src/ggml-cpu/whole-token-profile.h
+@@ -10,6 +10,8 @@
+ #endif
+ 
+ bool ggml_cpu_whole_token_profile_enabled(void);
++bool ggml_cpu_shape_profile_enabled(void);
++void ggml_cpu_shape_profile_pack(const struct ggml_tensor * node, int n_threads, int64_t thread_us, const char * path);
+ bool ggml_cpu_expert_io_profile_enabled(void);
+ bool ggml_cpu_expert_io_active(void);
+ int64_t ggml_cpu_whole_token_profile_time_us(void);

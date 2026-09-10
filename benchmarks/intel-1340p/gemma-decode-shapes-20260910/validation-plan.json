@@ -1,0 +1,9 @@
+{
+ "declared_before_build_and_inference":true,
+ "purpose":"Separate matrixnode costs by type/shape/modeltensorname,includingF16attention andQ4/Q8projections on deployedtargetsmallbatchbaseline; measureactivationpackingthreadworkindependently. Thisisdiagnostic,notthroughputcomparison.",
+ "build":"Pinnedabdbeadfb ggml-cpu.c/repack.cpp/whole-token-profile.cpp andheaders,isolatedlibggml-cpurelink,retainalreadydeployedsmallbatchlibllama. No productionfile overwritten.",
+ "counters":"OptinGGML_CPU_SHAPE_PROFILE=1 togetherwithwhole-tokenprofile. Atmost8192shapeentries/process,overflowreported. node_wall singlethreadaggregate;generic_pack_thread/repack_pack_thread sumsallthreadelapsedworkandmustnotbesummedwithnodewallorclaimedDRAMtraffic. Modelsourcetensornames/shapesonly,noprompttext. Mutex/stringoverheadandinstrumentedbarriersareexplicit.",
+ "load":"Two saved64K128tokenruns:currentMTP3 targetsmallbatchenabled,then targetonlysamebinary/profile foroperatorattribution. 64658cached/25evaluated;threekeyrecall/countcoverage. NoGPU/fullprefill.",
+ "safety":"PandaCLEAR23:41:55UTCforboundedbuild+2diagnostics;6GiBreserve/16MiBswap,continuousjobs/nativeCPU/CLI/socketguards,stoponlybuild/trial;restoreCURRENT20260910-smallbatchhybridunit/config,verifytools/cache/mapsflag. NoSTT/privatefiles.",
+ "limits":"Unclassifiedmatmulnameskept,donotcallallmatrixprojection. Packingthreadsumisnotwalltime. Newshapeorquantisedkernelfollowupneedscorrectnessanduninstrumentedgate;noautomaticpromotion. Partialscripteditfailuresfixedbeforebuild;delegateanalysis90stimeoutprovidednoapproval."
+}
