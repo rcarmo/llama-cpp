@@ -1,0 +1,117 @@
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -8,6 +8,7 @@
+ #include "ggml.h"
+ #include "unary-ops.h"
+ #include "vec.h"
++#include "fa-f16-f32-mad.h"
+ 
+ #include <algorithm>
+ #include <cfloat>
+@@ -8560,6 +8561,16 @@
+     GGML_ASSERT((                            q_to_vec_dot) && "fattn: unsupported K-type");
+     GGML_ASSERT((v->type == GGML_TYPE_F32 || v_to_float  ) && "fattn: unsupported V-type");
+ 
++    static const bool f32_value_setting = getenv("GGML_CPU_EXPERIMENTAL_FA_F32_VALUE") != nullptr;
++    const bool f32_value_accumulator = f32_value_setting && !params->use_ref;
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    static const bool fused_f16_setting = getenv("GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE") != nullptr;
++    const bool fused_f16_value = fused_f16_setting && !params->use_ref;
++#else
++    const bool fused_f16_value = false;
++#endif
++    const bool use_f16_accumulator = v->type == GGML_TYPE_F16 && !f32_value_accumulator && !fused_f16_value;
++
+     int ith = params->ith;
+ 
+     for (int ir = ir0; ir < ir1; ++ir) {
+@@ -8579,7 +8590,7 @@
+         ggml_fp16_t * VKQ16 = (ggml_fp16_t *) (VKQ32 + 1*DV); // (temporary) FP16 VKQ accumulator
+         ggml_fp16_t * Q_q   = (ggml_fp16_t *) (VKQ32 + 2*DV); // (temporary) buffer for Q converted to quantized/FP16
+ 
+-        if (v->type == GGML_TYPE_F16) {
++        if (use_f16_accumulator) {
+             memset(VKQ16, 0, DV*sizeof(ggml_fp16_t));
+         } else {
+             memset(VKQ32, 0, DV*sizeof(float));
+@@ -8628,7 +8639,7 @@
+ 
+             const char * v_data = ((const char *) v->data + (ic*nbv1 + iv2*nbv2 + iv3*nbv3));
+ 
+-            if (v->type == GGML_TYPE_F16) {
++            if (use_f16_accumulator) {
+                 if (s > M) {
+                     // s is new maximum, ms < 1.0f, vs == expf(s - s) == 1.0f
+                     M = s;
+@@ -8657,6 +8668,11 @@
+                 }
+ 
+                 // V += v*expf(s - M)
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++                if (fused_f16_value && v->type == GGML_TYPE_F16) {
++                    fa_f16_f32_mad(DV, VKQ32, (const ggml_fp16_t *)v_data, vs);
++                } else
++#endif
+                 if (v_to_float) {
+                     v_to_float(v_data, V32, DV);
+                     ggml_vec_mad_f32(DV, VKQ32, V32, vs);
+@@ -8669,7 +8685,7 @@
+             S = S*ms + vs; // scale and increment sum with partial sum
+         }
+ 
+-        if (v->type == GGML_TYPE_F16) {
++        if (use_f16_accumulator) {
+             for (int64_t d = 0; d < DV; ++d) {
+                 VKQ32[d] = GGML_CPU_FP16_TO_FP32(VKQ16[d]);
+             }
+@@ -8901,7 +8917,9 @@
+                 }
+             }
+             memset(KQ, 0, Q_TILE_SZ * KV_TILE_SZ * sizeof(float));
+-            simd_gemm(KQ, (const float *)Q_q, K_f32, Q_TILE_SZ, DK, KV_TILE_SZ);
++            static const bool active_query_rows = getenv("GGML_CPU_EXPERIMENTAL_FA_ACTIVE_ROWS") != nullptr;
++            const int gemm_rows = active_query_rows ? static_cast<int>(tile_rows) : Q_TILE_SZ;
++            simd_gemm(KQ, (const float *)Q_q, K_f32, gemm_rows, DK, KV_TILE_SZ);
+             ggml_vec_scale_f32(Q_TILE_SZ * KV_TILE_SZ, KQ, scale);
+ 
+             // Set padded KQ entries to -inf so softmax gives them zero weight
+@@ -8964,7 +8982,7 @@
+                     memset(KQ + tq * KV_TILE_SZ, 0, KV_TILE_SZ * sizeof(float));
+                 }
+             }
+-            simd_gemm(VKQ32, KQ, V32, Q_TILE_SZ, KV_TILE_SZ, DV);
++            simd_gemm(VKQ32, KQ, V32, gemm_rows, KV_TILE_SZ, DV);
+         }
+ 
+         // sinks (apply only to valid rows in the tile)
+@@ -9179,14 +9197,17 @@
+ 
+         ggml_barrier(params->threadpool);
+ 
+-        const int64_t dr = (nr + nchunk - 1) / nchunk;
++        int64_t dr = (nr + nchunk - 1) / nchunk;
+ 
+         static constexpr int64_t Q_TILE_SZ  = ggml_fa_tile_config::Q;
++        static const bool small_query_tiles = getenv("GGML_CPU_EXPERIMENTAL_FA_SMALL_QUERY") != nullptr;
++        const bool use_small_tiles = small_query_tiles && neq1 > 1 && neq1 < Q_TILE_SZ && nek1 >= 32768 &&
++            k->type == GGML_TYPE_F16 && v->type == GGML_TYPE_F16;
+         bool use_tiled = !use_ref &&
+                                (q->type == GGML_TYPE_F32 &&
+                                 kv_is_f32_or_f16 &&
+                                 k->type == v->type &&
+-                                neq1 >= Q_TILE_SZ);
++                                (neq1 >= Q_TILE_SZ || use_small_tiles));
+ #ifdef GGML_SIMD
+ #if defined(__ARM_FEATURE_SVE)
+         const int64_t f32_epr = svcntw();
+@@ -9195,6 +9216,10 @@
+ #endif
+         use_tiled &= (DV % f32_epr == 0);
+ #endif
++        if (use_tiled && use_small_tiles) {
++            dr = neq1;
++            nchunk = nr / dr;
++        }
+         int current_chunk = ith;
+ 
+         while (current_chunk < nchunk) {

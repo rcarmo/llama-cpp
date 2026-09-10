@@ -1,0 +1,21 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-cpu-fa-20260910/state-layout.test.ts:
+(pass) validated subset emits v2 with byte-identical payload [175.62ms]
+(pass) rejects mismatched version and stream layout [28.46ms]
+(pass) rejects truncated and trailing content [92.97ms]
+(pass) rejects unexpected cell extension/schema and never overwrites source [55.86ms]
+(pass) unwraps newer text-only token envelope; rejects media [194.99ms]
+(pass) blocked transpose handles non-tile shapes and preserves every bit [5.92ms]
+(pass) full Gemma state roundtrip has exact original bytes [150.80ms]
+(pass) FA-on v3 wrapper alignment preserves transposed-independent KV bytes [170.48ms]
+
+reports/gemma-cpu-fa-20260910/accumulator.test.ts:
+(pass) only one-chunk value accumulator changes, no allocation or inputK mutation [0.43ms]
+(pass) default retainsF16 and opt-in changes onlyF16 V [0.06ms]
+(pass) small-query chunks cover complete head rows without overlap [1.62ms]
+
+ 11 pass
+ 0 fail
+ 7440 expect() calls
+Ran 11 tests across 2 files. [895.00ms]

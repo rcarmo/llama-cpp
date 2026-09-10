@@ -1,0 +1,91 @@
+{
+  "ok": true,
+  "profile": "on-fused",
+  "fa": true,
+  "mtp": true,
+  "conversion_ms": 2492.121646,
+  "rows": [
+    {
+      "rep": 0,
+      "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 3375.47,
+        "prompt_per_token_ms": 135.0188,
+        "prompt_per_second": 7.406376000971717,
+        "predicted_n": 128,
+        "predicted_ms": 26887.378,
+        "predicted_per_token_ms": 210.057640625,
+        "predicted_per_second": 4.760598076911776,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      }
+    }
+  ],
+  "pass": true,
+  "scope": "CPU FA-on/off on retained binary; same native GPU-FA-off source KV with exact F16 layout conversion. No GPU inference here. Nonpredict timing includes only request; conversion/startup/restore separate. Screen results require counterbalanced confirmation.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": true,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-cpu-fa-20260910/runtime-cpu",
+    "extraEnv": {
+      "GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "cpu",
+      "wall_ms": 515.146474000001,
+      "package_j": 8.715676,
+      "timings": {
+        "restore_ms": 514.239
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode-0",
+      "device": "cpu",
+      "wall_ms": 30281.659408,
+      "package_j": 1142.473211,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 3375.47,
+        "prompt_per_token_ms": 135.0188,
+        "prompt_per_second": 7.406376000971717,
+        "predicted_n": 128,
+        "predicted_ms": 26887.378,
+        "predicted_per_token_ms": 210.057640625,
+        "predicted_per_second": 4.760598076911776,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 81,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11876360,
+    "peak_trial_rss_kib": 11879680,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23941632,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T19:17:55.069Z"
+}

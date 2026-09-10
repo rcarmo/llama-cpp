@@ -1,0 +1,36 @@
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -8,6 +8,7 @@
+ #include "ggml.h"
+ #include "unary-ops.h"
+ #include "vec.h"
++#include "fa-f16-f32-mad.h"
+ 
+ #include <algorithm>
+ #include <cfloat>
+@@ -8561,7 +8562,12 @@
+     GGML_ASSERT((v->type == GGML_TYPE_F32 || v_to_float  ) && "fattn: unsupported V-type");
+ 
+     static const bool f32_value_accumulator = getenv("GGML_CPU_EXPERIMENTAL_FA_F32_VALUE") != nullptr;
+-    const bool use_f16_accumulator = v->type == GGML_TYPE_F16 && !f32_value_accumulator;
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    static const bool fused_f16_value = getenv("GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE") != nullptr;
++#else
++    const bool fused_f16_value = false;
++#endif
++    const bool use_f16_accumulator = v->type == GGML_TYPE_F16 && !f32_value_accumulator && !fused_f16_value;
+ 
+     int ith = params->ith;
+ 
+@@ -8660,6 +8666,11 @@
+                 }
+ 
+                 // V += v*expf(s - M)
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++                if (fused_f16_value && v->type == GGML_TYPE_F16) {
++                    fa_f16_f32_mad(DV, VKQ32, (const ggml_fp16_t *)v_data, vs);
++                } else
++#endif
+                 if (v_to_float) {
+                     v_to_float(v_data, V32, DV);
+                     ggml_vec_mad_f32(DV, VKQ32, V32, vs);

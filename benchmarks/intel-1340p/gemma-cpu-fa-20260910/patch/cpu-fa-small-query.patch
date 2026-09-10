@@ -1,0 +1,33 @@
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -9182,14 +9182,17 @@
+ 
+         ggml_barrier(params->threadpool);
+ 
+-        const int64_t dr = (nr + nchunk - 1) / nchunk;
++        int64_t dr = (nr + nchunk - 1) / nchunk;
+ 
+         static constexpr int64_t Q_TILE_SZ  = ggml_fa_tile_config::Q;
++        static const bool small_query_tiles = getenv("GGML_CPU_EXPERIMENTAL_FA_SMALL_QUERY") != nullptr;
++        const bool use_small_tiles = small_query_tiles && neq1 > 1 && neq1 < Q_TILE_SZ && nek1 >= 32768 &&
++            k->type == GGML_TYPE_F16 && v->type == GGML_TYPE_F16;
+         bool use_tiled = !use_ref &&
+                                (q->type == GGML_TYPE_F32 &&
+                                 kv_is_f32_or_f16 &&
+                                 k->type == v->type &&
+-                                neq1 >= Q_TILE_SZ);
++                                (neq1 >= Q_TILE_SZ || use_small_tiles));
+ #ifdef GGML_SIMD
+ #if defined(__ARM_FEATURE_SVE)
+         const int64_t f32_epr = svcntw();
+@@ -9198,6 +9201,10 @@
+ #endif
+         use_tiled &= (DV % f32_epr == 0);
+ #endif
++        if (use_tiled && use_small_tiles) {
++            dr = neq1;
++            nchunk = nr / dr;
++        }
+         int current_chunk = ith;
+ 
+         while (current_chunk < nchunk) {

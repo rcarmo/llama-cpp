@@ -1,0 +1,141 @@
+{
+  "ok": true,
+  "profile": "on-active",
+  "fa": true,
+  "mtp": true,
+  "conversion_ms": 2446.429346,
+  "rows": [
+    {
+      "rep": 0,
+      "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 5027.44,
+        "prompt_per_token_ms": 201.09759999999997,
+        "prompt_per_second": 4.972709768788887,
+        "predicted_n": 128,
+        "predicted_ms": 76810.612,
+        "predicted_per_token_ms": 600.08290625,
+        "predicted_per_second": 1.6664364033448922,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      }
+    },
+    {
+      "rep": 1,
+      "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 4347.425,
+        "prompt_per_token_ms": 173.89700000000002,
+        "prompt_per_second": 5.750530486437374,
+        "predicted_n": 128,
+        "predicted_ms": 87605.55,
+        "predicted_per_token_ms": 684.418359375,
+        "predicted_per_second": 1.4610946452593472,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      }
+    }
+  ],
+  "pass": true,
+  "scope": "CPU FA-on/off on retained binary; same native GPU-FA-off source KV with exact F16 layout conversion. No GPU inference here. Nonpredict timing includes only request; conversion/startup/restore separate. Screen results require counterbalanced confirmation.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": true,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-cpu-fa-20260910/runtime-cpu",
+    "extraEnv": {
+      "GGML_CPU_EXPERIMENTAL_FA_SMALL_QUERY": "1",
+      "GGML_CPU_EXPERIMENTAL_FA_ACTIVE_ROWS": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "cpu",
+      "wall_ms": 658.0939319999998,
+      "package_j": 11.561554,
+      "timings": {
+        "restore_ms": 656.206
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode-0",
+      "device": "cpu",
+      "wall_ms": 81868.665748,
+      "package_j": 2613.667808,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 5027.44,
+        "prompt_per_token_ms": 201.09759999999997,
+        "prompt_per_second": 4.972709768788887,
+        "predicted_n": 128,
+        "predicted_ms": 76810.612,
+        "predicted_per_token_ms": 600.08290625,
+        "predicted_per_second": 1.6664364033448922,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    },
+    {
+      "label": "restore-1",
+      "device": "cpu",
+      "wall_ms": 378.1446200000064,
+      "package_j": 6.128891,
+      "timings": {
+        "restore_ms": 377.079
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode-1",
+      "device": "cpu",
+      "wall_ms": 91982.91221799998,
+      "package_j": 2970.617334,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 4347.425,
+        "prompt_per_token_ms": 173.89700000000002,
+        "prompt_per_second": 5.750530486437374,
+        "predicted_n": 128,
+        "predicted_ms": 87605.55,
+        "predicted_per_token_ms": 684.418359375,
+        "predicted_per_second": 1.4610946452593472,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 86,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12005712,
+    "peak_trial_rss_kib": 12009032,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23085492,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T19:09:37.133Z"
+}
