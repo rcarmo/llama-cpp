@@ -1,0 +1,18 @@
+{
+  "reviewer": "github-copilot/gpt-5.4 delegated judge",
+  "scope": "Read-only harness/audit review during the ongoing ABBA block; no native rerun",
+  "findings": [
+    "route_total_ms sums routed request wall times and excludes tool execution and initialCPUstartup; it is not full task elapsed time",
+    "Original warmcache audit proves coldfixture reuse but not the complete growing transcript",
+    "audit_pass alone does not establish complete four-run block; require complete and all_tasks_pass",
+    "F32 environment variable is applied to CPU process as well, but retainedCPUhasnoVulkanbackend andGPUlayers0",
+    "Build/source identity inherited from previous verifiedattentionruntime; no newbuild"
+  ],
+  "actions": [
+    "Report route timing with exact boundaries; preserve raw startup/end timestamps separately",
+    "Strengthen offline audit to compare warm cache against preceding renderedprompt+generatedoutput, allowing two-token boundary overlap",
+    "Retain complete/all_tasks_pass as separate mandatory final report fields",
+    "Do not edit runtimeharness midblock; capture allowlisted live processenvironment/maps to verify actualf32profile andCPUbackend",
+    "Keep shared prior runtime-sourcehash provenance and append livecoding map capture; avoid rewriting historical baseline records"
+  ]
+}

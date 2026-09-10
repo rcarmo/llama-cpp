@@ -1,0 +1,12 @@
+{
+  "declared_before_inference": true,
+  "hypothesis": "The exact-IrisXe FP32 long-attention selector improves a real coding/tool workflow once cold context exceeds32768; warm rounds stay on retainedCPU and should remain similar.",
+  "why_new": "Earlier median coding fixture was3216 tokens; it did not exercise the selector. Tail confirmation and fresh64K recall already complete; do not repeat them.",
+  "profiles": ["base", "f32", "f32", "base"],
+  "budget": "One4-runABBA block,35-40K initial tokens,onecodingtask/run,atmost6rounds,max640generatedtokens/round;35minute absolute supervised cap. Expected25minutes; no build.",
+  "fixture": "Same median read/edit/test fixture and independent tests as aligned campaign;onlyinitial synthetic review-record padding grows150->1800 lines. Cold fixture tokenized and saved before prefill;fail outside35000..40000.",
+  "fixed": "GPUmicrobatch256,batch1024,F16,FAoff;CPUretainedabdbeadfb,8decode/16prefill,MTP3,128Kx2;GPU72Kx2;compact768padding and validatedv3-to-v2 transfer;parkGPUbeforefirstCPUdecode;allwarmroundsCPU.",
+  "checks": "All3tooltypesavailable;read-before-edit;unchangedindependenttests;successfulagenttestrun+independentpass+nonemptyfinal. CPU firstdecode<=2evaluatedtokens andnearcompletecache;cachedwarmroutes;correctsource repair withoutmutation/empty/even bugs. Preservefailedruns,drift notparitygate.",
+  "measurements": "AllfourindividualcoldGPUpp_ms,coldroutewall_ms(includesGPUstartup/save/convert/restore/park),warmroutewall_ms,wholeworkflow sum,outputtokens/toolcounts;pairedorder and taskdifferences reported. Two/profile is a bounded screen,not noninferiorityproof.",
+  "safety": "Rui resumedgoal20:18:32UTC;Panda speechCLEAR20:23:05UTC snapshot. Recheckimmediatelyandcontinuouslyjobs/nativeCPU/whisperCLI/queuedbytes;6GiBreserve;<=16MiBtrialprocessswap;temperaturesannotation-only. Stoponlytrials;automaticunchangedproductionrestore;noSTT/privatefiles."
+}

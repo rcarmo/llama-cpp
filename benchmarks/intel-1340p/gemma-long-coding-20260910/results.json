@@ -1,0 +1,570 @@
+{
+  "audit_pass": true,
+  "complete": true,
+  "all_tasks_pass": true,
+  "rows": [
+    {
+      "order": 0,
+      "profile": "base",
+      "ok": true,
+      "task_pass": true,
+      "fixture_tokens": 38666,
+      "fixture_sha256": "be59e8e6469853f87b3fe29edff2775936b1642cb81e1ac4927d238310afa9ba",
+      "prefill_ms": 337635.305,
+      "cold_route_ms": 351667.95113099995,
+      "first_32768_ms_from_progress": 253680,
+      "remaining_prefill_ms_from_progress": 83955.305,
+      "warm_route_ms": 31624.99066099996,
+      "route_total_ms": 383292.9417919999,
+      "rounds": 4,
+      "output_tokens": 213,
+      "tools": [
+        [
+          "read_file"
+        ],
+        [
+          "edit_file"
+        ],
+        [
+          "run_tests"
+        ],
+        []
+      ],
+      "independent": {
+        "rc": 0,
+        "stdout": "bun test v1.4.1 (4661e494f)\n",
+        "stderr": "\nmedian.test.ts:\n(pass) odd/even/empty/no mutation [0.22ms]\n\n 1 pass\n 0 fail\n 5 expect() calls\nRan 1 test across 1 file. [2.00ms]\n"
+      },
+      "resources": {
+        "peak_trial_pss_kib": 12375046,
+        "peak_trial_rss_kib": 15001180,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17412420,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 100,
+        "hot": true,
+        "abort_enabled": false
+      },
+      "growing_cache": [
+        {
+          "round": 1,
+          "previous_prompt_and_output": 38685,
+          "cached": 38685,
+          "evaluated": 56
+        },
+        {
+          "round": 2,
+          "previous_prompt_and_output": 38873,
+          "cached": 38873,
+          "evaluated": 14
+        },
+        {
+          "round": 3,
+          "previous_prompt_and_output": 38896,
+          "cached": 38895,
+          "evaluated": 108
+        }
+      ],
+      "routes": [
+        {
+          "label": "median-0-round-0",
+          "wall_ms": 351667.95113099995,
+          "routed": true,
+          "prefill": {
+            "tokens": 38666,
+            "park_ms": 237.77385699999286
+          },
+          "cache": 38665,
+          "evaluated": 1,
+          "usage": {
+            "completion_tokens": 19,
+            "prompt_tokens": 38666,
+            "total_tokens": 38685,
+            "prompt_tokens_details": {
+              "cached_tokens": 38665
+            }
+          }
+        },
+        {
+          "label": "median-0-round-1",
+          "wall_ms": 16060.510931999946,
+          "routed": false,
+          "cache": 38685,
+          "evaluated": 56,
+          "usage": {
+            "completion_tokens": 132,
+            "prompt_tokens": 38741,
+            "total_tokens": 38873,
+            "prompt_tokens_details": {
+              "cached_tokens": 38685
+            }
+          }
+        },
+        {
+          "label": "median-0-round-2",
+          "wall_ms": 2159.1759489999968,
+          "routed": false,
+          "cache": 38873,
+          "evaluated": 14,
+          "usage": {
+            "completion_tokens": 9,
+            "prompt_tokens": 38887,
+            "total_tokens": 38896,
+            "prompt_tokens_details": {
+              "cached_tokens": 38873
+            }
+          }
+        },
+        {
+          "label": "median-0-round-3",
+          "wall_ms": 13405.303780000017,
+          "routed": false,
+          "cache": 38895,
+          "evaluated": 108,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 39003,
+            "total_tokens": 39056,
+            "prompt_tokens_details": {
+              "cached_tokens": 38895
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order": 1,
+      "profile": "f32",
+      "ok": true,
+      "task_pass": true,
+      "fixture_tokens": 38666,
+      "fixture_sha256": "be59e8e6469853f87b3fe29edff2775936b1642cb81e1ac4927d238310afa9ba",
+      "prefill_ms": 331844.25,
+      "cold_route_ms": 344941.51831699995,
+      "first_32768_ms_from_progress": 254890,
+      "remaining_prefill_ms_from_progress": 76954.25,
+      "warm_route_ms": 31425.232485000044,
+      "route_total_ms": 376366.750802,
+      "rounds": 4,
+      "output_tokens": 213,
+      "tools": [
+        [
+          "read_file"
+        ],
+        [
+          "edit_file"
+        ],
+        [
+          "run_tests"
+        ],
+        []
+      ],
+      "independent": {
+        "rc": 0,
+        "stdout": "bun test v1.4.1 (4661e494f)\n",
+        "stderr": "\nmedian.test.ts:\n(pass) odd/even/empty/no mutation [0.31ms]\n\n 1 pass\n 0 fail\n 5 expect() calls\nRan 1 test across 1 file. [3.00ms]\n"
+      },
+      "resources": {
+        "peak_trial_pss_kib": 12199396,
+        "peak_trial_rss_kib": 17082912,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17265116,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 100,
+        "hot": true,
+        "abort_enabled": false
+      },
+      "growing_cache": [
+        {
+          "round": 1,
+          "previous_prompt_and_output": 38685,
+          "cached": 38685,
+          "evaluated": 56
+        },
+        {
+          "round": 2,
+          "previous_prompt_and_output": 38873,
+          "cached": 38873,
+          "evaluated": 14
+        },
+        {
+          "round": 3,
+          "previous_prompt_and_output": 38896,
+          "cached": 38895,
+          "evaluated": 108
+        }
+      ],
+      "routes": [
+        {
+          "label": "median-0-round-0",
+          "wall_ms": 344941.51831699995,
+          "routed": true,
+          "prefill": {
+            "tokens": 38666,
+            "park_ms": 163.03952500002924
+          },
+          "cache": 38665,
+          "evaluated": 1,
+          "usage": {
+            "completion_tokens": 19,
+            "prompt_tokens": 38666,
+            "total_tokens": 38685,
+            "prompt_tokens_details": {
+              "cached_tokens": 38665
+            }
+          }
+        },
+        {
+          "label": "median-0-round-1",
+          "wall_ms": 16605.447670000023,
+          "routed": false,
+          "cache": 38685,
+          "evaluated": 56,
+          "usage": {
+            "completion_tokens": 132,
+            "prompt_tokens": 38741,
+            "total_tokens": 38873,
+            "prompt_tokens_details": {
+              "cached_tokens": 38685
+            }
+          }
+        },
+        {
+          "label": "median-0-round-2",
+          "wall_ms": 2197.884678000002,
+          "routed": false,
+          "cache": 38873,
+          "evaluated": 14,
+          "usage": {
+            "completion_tokens": 9,
+            "prompt_tokens": 38887,
+            "total_tokens": 38896,
+            "prompt_tokens_details": {
+              "cached_tokens": 38873
+            }
+          }
+        },
+        {
+          "label": "median-0-round-3",
+          "wall_ms": 12621.900137000019,
+          "routed": false,
+          "cache": 38895,
+          "evaluated": 108,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 39003,
+            "total_tokens": 39056,
+            "prompt_tokens_details": {
+              "cached_tokens": 38895
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "profile": "f32",
+      "ok": true,
+      "task_pass": true,
+      "fixture_tokens": 38666,
+      "fixture_sha256": "be59e8e6469853f87b3fe29edff2775936b1642cb81e1ac4927d238310afa9ba",
+      "prefill_ms": 331513.788,
+      "cold_route_ms": 344319.289521,
+      "first_32768_ms_from_progress": 254640,
+      "remaining_prefill_ms_from_progress": 76873.788,
+      "warm_route_ms": 31710.881621999957,
+      "route_total_ms": 376030.17114299996,
+      "rounds": 4,
+      "output_tokens": 213,
+      "tools": [
+        [
+          "read_file"
+        ],
+        [
+          "edit_file"
+        ],
+        [
+          "run_tests"
+        ],
+        []
+      ],
+      "independent": {
+        "rc": 0,
+        "stdout": "bun test v1.4.1 (4661e494f)\n",
+        "stderr": "\nmedian.test.ts:\n(pass) odd/even/empty/no mutation [0.32ms]\n\n 1 pass\n 0 fail\n 5 expect() calls\nRan 1 test across 1 file. [3.00ms]\n"
+      },
+      "resources": {
+        "peak_trial_pss_kib": 12898342,
+        "peak_trial_rss_kib": 15788924,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17272060,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 100,
+        "hot": true,
+        "abort_enabled": false
+      },
+      "growing_cache": [
+        {
+          "round": 1,
+          "previous_prompt_and_output": 38685,
+          "cached": 38685,
+          "evaluated": 56
+        },
+        {
+          "round": 2,
+          "previous_prompt_and_output": 38873,
+          "cached": 38873,
+          "evaluated": 14
+        },
+        {
+          "round": 3,
+          "previous_prompt_and_output": 38896,
+          "cached": 38895,
+          "evaluated": 108
+        }
+      ],
+      "routes": [
+        {
+          "label": "median-0-round-0",
+          "wall_ms": 344319.289521,
+          "routed": true,
+          "prefill": {
+            "tokens": 38666,
+            "park_ms": 159.0469720000401
+          },
+          "cache": 38665,
+          "evaluated": 1,
+          "usage": {
+            "completion_tokens": 19,
+            "prompt_tokens": 38666,
+            "total_tokens": 38685,
+            "prompt_tokens_details": {
+              "cached_tokens": 38665
+            }
+          }
+        },
+        {
+          "label": "median-0-round-1",
+          "wall_ms": 16656.29004599998,
+          "routed": false,
+          "cache": 38685,
+          "evaluated": 56,
+          "usage": {
+            "completion_tokens": 132,
+            "prompt_tokens": 38741,
+            "total_tokens": 38873,
+            "prompt_tokens_details": {
+              "cached_tokens": 38685
+            }
+          }
+        },
+        {
+          "label": "median-0-round-2",
+          "wall_ms": 2147.9685249999748,
+          "routed": false,
+          "cache": 38873,
+          "evaluated": 14,
+          "usage": {
+            "completion_tokens": 9,
+            "prompt_tokens": 38887,
+            "total_tokens": 38896,
+            "prompt_tokens_details": {
+              "cached_tokens": 38873
+            }
+          }
+        },
+        {
+          "label": "median-0-round-3",
+          "wall_ms": 12906.623051000002,
+          "routed": false,
+          "cache": 38895,
+          "evaluated": 108,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 39003,
+            "total_tokens": 39056,
+            "prompt_tokens_details": {
+              "cached_tokens": 38895
+            }
+          }
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "profile": "base",
+      "ok": true,
+      "task_pass": true,
+      "fixture_tokens": 38666,
+      "fixture_sha256": "be59e8e6469853f87b3fe29edff2775936b1642cb81e1ac4927d238310afa9ba",
+      "prefill_ms": 339892.383,
+      "cold_route_ms": 352515.362106,
+      "first_32768_ms_from_progress": 255030,
+      "remaining_prefill_ms_from_progress": 84862.38299999997,
+      "warm_route_ms": 31864.925475999946,
+      "route_total_ms": 384380.28758199996,
+      "rounds": 4,
+      "output_tokens": 213,
+      "tools": [
+        [
+          "read_file"
+        ],
+        [
+          "edit_file"
+        ],
+        [
+          "run_tests"
+        ],
+        []
+      ],
+      "independent": {
+        "rc": 0,
+        "stdout": "bun test v1.4.1 (4661e494f)\n",
+        "stderr": "\nmedian.test.ts:\n(pass) odd/even/empty/no mutation [0.31ms]\n\n 1 pass\n 0 fail\n 5 expect() calls\nRan 1 test across 1 file. [3.00ms]\n"
+      },
+      "resources": {
+        "peak_trial_pss_kib": 12197927,
+        "peak_trial_rss_kib": 17081420,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17284164,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 100,
+        "hot": true,
+        "abort_enabled": false
+      },
+      "growing_cache": [
+        {
+          "round": 1,
+          "previous_prompt_and_output": 38685,
+          "cached": 38685,
+          "evaluated": 56
+        },
+        {
+          "round": 2,
+          "previous_prompt_and_output": 38873,
+          "cached": 38873,
+          "evaluated": 14
+        },
+        {
+          "round": 3,
+          "previous_prompt_and_output": 38896,
+          "cached": 38895,
+          "evaluated": 108
+        }
+      ],
+      "routes": [
+        {
+          "label": "median-0-round-0",
+          "wall_ms": 352515.362106,
+          "routed": true,
+          "prefill": {
+            "tokens": 38666,
+            "park_ms": 156.4238550000009
+          },
+          "cache": 38665,
+          "evaluated": 1,
+          "usage": {
+            "completion_tokens": 19,
+            "prompt_tokens": 38666,
+            "total_tokens": 38685,
+            "prompt_tokens_details": {
+              "cached_tokens": 38665
+            }
+          }
+        },
+        {
+          "label": "median-0-round-1",
+          "wall_ms": 16714.808326,
+          "routed": false,
+          "cache": 38685,
+          "evaluated": 56,
+          "usage": {
+            "completion_tokens": 132,
+            "prompt_tokens": 38741,
+            "total_tokens": 38873,
+            "prompt_tokens_details": {
+              "cached_tokens": 38685
+            }
+          }
+        },
+        {
+          "label": "median-0-round-2",
+          "wall_ms": 1937.0261189999874,
+          "routed": false,
+          "cache": 38873,
+          "evaluated": 14,
+          "usage": {
+            "completion_tokens": 9,
+            "prompt_tokens": 38887,
+            "total_tokens": 38896,
+            "prompt_tokens_details": {
+              "cached_tokens": 38873
+            }
+          }
+        },
+        {
+          "label": "median-0-round-3",
+          "wall_ms": 13213.09103099996,
+          "routed": false,
+          "cache": 38895,
+          "evaluated": 108,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 39003,
+            "total_tokens": 39056,
+            "prompt_tokens_details": {
+              "cached_tokens": 38895
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "modes": {
+    "base": {
+      "n": 2,
+      "passes": 2,
+      "prefill_ms": 338763.844,
+      "cold_route_ms": 352091.6566185,
+      "warm_route_ms": 31744.958068499953,
+      "route_total_ms": 383836.61468699994,
+      "output_tokens": 213,
+      "rounds": 4
+    },
+    "f32": {
+      "n": 2,
+      "passes": 2,
+      "prefill_ms": 331679.019,
+      "cold_route_ms": 344630.40391899995,
+      "warm_route_ms": 31568.0570535,
+      "route_total_ms": 376198.4609725,
+      "output_tokens": 213,
+      "rounds": 4
+    }
+  },
+  "reduction_pct": {
+    "prefill_ms": 2.091375784483074,
+    "cold_route_ms": 2.1191222680929656,
+    "warm_route_ms": 0.5572570441524372,
+    "route_total_ms": 1.9899492185570966
+  },
+  "limits": [
+    "One synthetic coding task and one ABBA block, two/profile; no broad quality equivalence",
+    "Only normal versus FP32 selector changed; whole GPU prefill mostly below the32768 gate",
+    "Route total is sum of request-route wall times, excluding external tool execution and initial CPU startup",
+    "Output/tool-path variation is retained; compare token counts as well as wall time",
+    "Production remains original CPU; no deployment"
+  ]
+}
