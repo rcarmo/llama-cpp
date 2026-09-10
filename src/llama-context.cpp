@@ -87,6 +87,11 @@ llama_context::llama_context(
     cvec(std::make_unique<llama_adapter_cvec>()),
     loras(std::make_unique<llama_adapter_loras>()),
     balloc(std::make_unique<llama_batch_allocr>(model.hparams.n_pos_per_embd())) {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
+    if (!model.prepare_residency(false, this)) {
+        throw std::runtime_error("failed to restore shared VRAM residency for context creation");
+    }
     // TODO warning when creating llama_context with awkward ctx size that is not a power of 2,
     //     may need to be backend-dependent
     LLAMA_LOG_INFO("%s: constructing llama_context\n", __func__);
@@ -477,11 +482,15 @@ llama_context::llama_context(
             sampling.token_ids_full_vocab[i] = i;
         }
     }
+    model.register_residency_context(this);
 }
 
 llama_context::~llama_context() {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // wait for any pending asynchronous copies into the output buffers before they are freed
     synchronize();
+    model.unregister_residency_context(this);
 
     // when training, ggml_opt allocates extra buffers through the scheduler, so the sizes no longer match the expectation
     if (!model.hparams.no_alloc && !opt_ctx) {
@@ -712,6 +721,32 @@ void llama_context::sched_reserve() {
 
     LLAMA_LOG_INFO("%s: reserve took %.2f ms, sched copies = %d\n",
             __func__, (t_end_us - t_start_us)/1000.0, ggml_backend_sched_get_n_copies(sched.get()));
+}
+
+void llama_context::invalidate_residency_graphs() {
+    synchronize();
+    if (sched) {
+        ggml_backend_sched_release_prefetch(sched.get());
+    }
+    for (auto & backend : backends) {
+        auto dev = ggml_backend_get_device(backend.get());
+        if (!dev) {
+            continue;
+        }
+        auto reg = ggml_backend_dev_backend_reg(dev);
+        using clear_graphs_fn = void (*)(ggml_backend_t);
+        auto clear = reinterpret_cast<clear_graphs_fn>(
+                ggml_backend_reg_get_proc_address(reg, "ggml_backend_clear_graphs"));
+        if (clear) {
+            clear(backend.get());
+        }
+    }
+    if (gf_res_prev) {
+        gf_res_prev->reset();
+    }
+    if (sched) {
+        ggml_backend_sched_reset(sched.get());
+    }
 }
 
 void llama_context::synchronize() {
@@ -1335,6 +1370,16 @@ bool llama_context::set_adapter_cvec(
 }
 
 llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, llm_graph_type gtype, llama_memory_context_i * mctx, ggml_status & ret) {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
+    struct residency_drain {
+        llama_context * ctx;
+        ~residency_drain() { if (ctx) ctx->synchronize(); }
+    } drain { model.shared_residency_enabled() ? this : nullptr };
+    if (!model.prepare_residency(ubatch.n_tokens > 8, this)) {
+        ret = GGML_STATUS_ALLOC_FAILED;
+        return nullptr;
+    }
     if (mctx && !mctx->apply()) {
         LLAMA_LOG_ERROR("%s: failed to apply memory context\n", __func__);
         ret = GGML_STATUS_FAILED;
@@ -1407,6 +1452,8 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
 }
 
 int llama_context::encode(const llama_batch & batch_inp) {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
     // so accept either present rather than requiring exactly one.
     GGML_ASSERT(batch_inp.token || batch_inp.embd);
@@ -1645,6 +1692,8 @@ static bool needs_raw_logits(const llama_ubatch & ubatch, const std::map<llama_s
 }
 
 int llama_context::decode(const llama_batch & batch_inp) {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
     // so accept either present rather than requiring exactly one.
     GGML_ASSERT(batch_inp.token || batch_inp.embd);
@@ -2418,6 +2467,9 @@ static void ubatch_prepare_reserve(
 
 ggml_cgraph * llama_context::graph_reserve(
         uint32_t n_tokens, uint32_t n_seqs, uint32_t n_outputs, const llama_memory_context_i * mctx, bool split_only, size_t * sizes) {
+    auto residency_lock = model.shared_residency_enabled()
+        ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
+    if (!model.prepare_residency(false, this)) return nullptr;
     LLAMA_LOG_DEBUG("%s: reserving a graph for ubatch with n_tokens = %4u, n_seqs = %2u, n_outputs = %4u\n", __func__, n_tokens, n_seqs, n_outputs);
     GGML_ASSERT(n_outputs >= 1);
 
@@ -3406,6 +3458,9 @@ static void llama_set_param(struct ggml_tensor * tensor, llama_opt_param_filter 
 }
 
 void llama_context::opt_init(struct llama_model * model, struct llama_opt_params lopt_params) {
+    if (model->shared_residency_enabled()) {
+        throw std::runtime_error("shared VRAM residency is inference-only; disable LLAMA_SHARED_VRAM for training");
+    }
     GGML_ASSERT(!opt_ctx);
     model->hparams.n_ctx_train = lopt_params.n_ctx_train > 0 ? lopt_params.n_ctx_train : n_ctx();
     const uint32_t n_batch     = std::min(this->n_batch(),  model->hparams.n_ctx_train);

@@ -9,6 +9,7 @@
 #endif
 
 #include "ggml-backend.h"
+#include "ggml-prefetch-budget.h"
 #include "ggml-backend-impl.h"
 #include "ggml-alloc.h"
 #include "ggml-impl.h"
@@ -1044,6 +1045,8 @@ struct ggml_backend_sched {
     bool prefetch_experts;
     ggml_backend_t prefetch_backend;
     int prefetch_n_slots;
+    size_t prefetch_cap;
+    bool prefetch_cap_enabled;
     ggml_backend_buffer_t prefetch_slots[GGML_SCHED_MAX_PREFETCH_SLOTS];
     ggml_backend_event_t prefetch_ready[GGML_SCHED_MAX_PREFETCH_SLOTS];
     ggml_backend_event_t prefetch_free[GGML_SCHED_MAX_PREFETCH_SLOTS];
@@ -1900,6 +1903,25 @@ static bool ggml_backend_sched_alloc_splits(ggml_backend_sched_t sched) {
     return true;
 }
 
+void ggml_backend_sched_set_prefetch_cap(ggml_backend_sched_t sched, size_t bytes) {
+    sched->prefetch_cap_enabled = bytes != SIZE_MAX;
+    sched->prefetch_cap = bytes;
+}
+
+void ggml_backend_sched_release_prefetch(ggml_backend_sched_t sched) {
+    // Phase boundaries must release retained staging before restoring model
+    // residency. Keep the configured ring size so the next prefill can retry.
+    ggml_backend_sched_synchronize(sched);
+    for (int i = 0; i < GGML_SCHED_MAX_PREFETCH_SLOTS; ++i) {
+        if (sched->prefetch_slots[i]) {
+            ggml_backend_buffer_free(sched->prefetch_slots[i]);
+            sched->prefetch_slots[i] = nullptr;
+        }
+        sched->prefetch_used[i] = false;
+    }
+    sched->prefetch_cur = 0;
+}
+
 static void ggml_backend_sched_prefetch_disable(ggml_backend_sched_t sched, ggml_backend_t split_backend) {
     sched->prefetch_experts = false;
     if (sched->prefetch_backend) {
@@ -1935,6 +1957,58 @@ static size_t ggml_backend_sched_prefetch_max_size(ggml_backend_sched_t sched) {
 }
 
 static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_backend_t split_backend, size_t size) {
+    if (!sched->prefetch_cap_enabled) {
+        size = std::max(size, ggml_backend_sched_prefetch_max_size(sched));
+    } else {
+        const size_t slots = ggml_prefetch_borrowed_slots(size, sched->prefetch_cap, sched->prefetch_n_slots);
+        if (slots == 0) {
+            // Keep a smaller ring for later eligible tensors.
+            return false;
+        }
+        if (slots < size_t(sched->prefetch_n_slots)) {
+            ggml_backend_sched_release_prefetch(sched);
+            sched->prefetch_n_slots = int(slots);
+        }
+    }
+    if (sched->prefetch_cap_enabled) {
+        // Enforce the borrowed capacity during growth as well as at rest.
+        for (int i = 0; i < sched->prefetch_n_slots; ++i) {
+            if (sched->prefetch_slots[i] && ggml_backend_buffer_get_size(sched->prefetch_slots[i]) < size) {
+                ggml_backend_sched_release_prefetch(sched);
+                break;
+            }
+        }
+    }
+    // Budget staging separately from scheduler-owned copies. Reserve headroom
+    // for graph executables and other allocations; this is a snapshot, not a
+    // guarantee against concurrent allocations on the device.
+    const char * budget_env = getenv("GGML_SCHED_PREFETCH_BUDGET_MIB");
+    const char * reserve_env = getenv("GGML_SCHED_PREFETCH_RESERVE_MIB");
+    if (budget_env) {
+        size_t budget = 0, reserve = 256 * 1024 * 1024;
+        if (!ggml_prefetch_parse_mib(budget_env, budget) || (reserve_env && !ggml_prefetch_parse_mib(reserve_env, reserve))) {
+            GGML_LOG_WARN("invalid expert staging budget; prefetch disabled\n");
+            ggml_backend_sched_prefetch_disable(sched, split_backend);
+            return false;
+        }
+        size_t slots[GGML_SCHED_MAX_PREFETCH_SLOTS] = {};
+        for (int i = 0; i < sched->prefetch_n_slots; ++i) {
+            slots[i] = sched->prefetch_slots[i] ? ggml_backend_buffer_get_size(sched->prefetch_slots[i]) : 0;
+        }
+        ggml_backend_dev_props props;
+        ggml_backend_dev_get_props(split_backend->device, &props);
+        const bool fits = ggml_prefetch_budget_fits(slots, sched->prefetch_n_slots, size,
+                budget, props.memory_free, reserve);
+        if (getenv("GGML_SCHED_PREFETCH_TRACE")) {
+            fprintf(stderr, "prefetch admission: slot_bytes=%zu slots=%d budget=%zu free=%zu reserve=%zu admitted=%d\n",
+                    size, sched->prefetch_n_slots, budget, props.memory_free, reserve, (int) fits);
+        }
+        if (!fits) {
+            GGML_LOG_DEBUG("expert staging budget/headroom insufficient; using ordinary transfers\n");
+            ggml_backend_sched_prefetch_disable(sched, split_backend);
+            return false;
+        }
+    }
     if (sched->prefetch_backend == NULL) {
         ggml_backend_dev_t dev = split_backend->device;
         ggml_backend_dev_props props;
@@ -1957,8 +2031,6 @@ static bool ggml_backend_sched_prefetch_init(ggml_backend_sched_t sched, ggml_ba
             }
         }
     }
-
-    size = std::max(size, ggml_backend_sched_prefetch_max_size(sched));
 
     ggml_backend_buffer_type_t buft = ggml_backend_get_default_buffer_type(split_backend);
     for (int i = 0; i < sched->prefetch_n_slots; i++) {
@@ -2136,8 +2208,8 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
                 }
 
                 // when offloading MoE weights, we can reduce the amount of data copied by copying only the experts that are used
-                ggml_tensor * node = split->graph.nodes[0];
-                if (split->graph.n_nodes > 0 &&
+                ggml_tensor * node = split->graph.n_nodes > 0 ? split->graph.nodes[0] : nullptr;
+                if (node &&
                     ggml_backend_buffer_get_usage(input->buffer) == GGML_BACKEND_BUFFER_USAGE_WEIGHTS &&
                     ggml_backend_buffer_is_host(input->buffer) && (
                     (node->src[0] == input_cpy && node->op == GGML_OP_MUL_MAT_ID)
@@ -2201,8 +2273,11 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
                     };
 
                     int id = 0;
-                    while (!ggml_bitset_get(used_ids.data(), id)) {
+                    while (id < n_expert && !ggml_bitset_get(used_ids.data(), id)) {
                         id++;
+                    }
+                    if (id == n_expert) {
+                        continue; // All routes masked in a hot/cold pack.
                     }
                     int32_t first_id = id;
                     int32_t last_id = first_id;

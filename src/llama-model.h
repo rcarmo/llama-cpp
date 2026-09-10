@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <mutex>
 
 struct llama_cparams;
 struct llama_ubatch;
@@ -763,6 +764,13 @@ struct llama_model {
     llama_memory_i * create_memory(const llama_memory_params & params, const llama_cparams & cparams) const;
 
     ggml_cgraph * build_graph(const llm_graph_params & params) const;
+
+    bool shared_residency_enabled() const;
+    std::unique_lock<std::recursive_mutex> lock_residency() const;
+    void register_residency_context(llama_context * ctx) const;
+    void unregister_residency_context(llama_context * ctx) const;
+    void invalidate_residency_contexts() const;
+    bool prepare_residency(bool prefill, llama_context * owner) const;
 
     virtual void load_stats  (llama_model_loader & ml) = 0;
     virtual void load_hparams(llama_model_loader & ml) = 0;

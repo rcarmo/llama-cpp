@@ -219,7 +219,20 @@ int main(int argc, char ** argv) {
                 }
             }
         }
+        ggml_backend_sched_set_prefetch_cap(sched, 0);
+        ggml_backend_sched_release_prefetch(sched); // must also drain pending CPU work
+        ggml_backend_sched_release_prefetch(sched); // idempotent
+        ggml_backend_sched_set_prefetch_cap(sched, SIZE_MAX);
         ggml_backend_sched_synchronize(sched);
+        if (gpu) {
+            auto reg = ggml_backend_dev_backend_reg(ggml_backend_get_device(hot_backend));
+            using clear_fn = void (*)(ggml_backend_t);
+            auto clear = reinterpret_cast<clear_fn>(ggml_backend_reg_get_proc_address(reg, "ggml_backend_clear_graphs"));
+            if (clear) {
+                clear(hot_backend);
+                clear(hot_backend); // also exercise an empty cache
+            }
+        }
         if (!reuse && !gpu) {
             GGML_ASSERT(concurrent_compute.load() == (enabled && !single_backend && !alias_write));
         }
