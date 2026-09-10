@@ -1,0 +1,7 @@
+/** SCRIPT_JDOC:
+{"summary":"Verify native long-attention matrix cases and actual tile override in bounded diagnostic","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root}from'./campaign';import{openSync}from'node:fs';
+const t=new Trial('attention-native-controls',{maintenance:true});const rows:any[]=[];
+try{await t.begin();for(const mode of ['base','small','f32']){await t.check();const fd=openSync(t.dir+'/'+mode+'.log','a');const p=Bun.spawn(['/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/bin/test-backend-ops','test','-b','Vulkan0','-o','MUL_MAT','--test-file',root+'/attention-cases.txt','-j','1'],{stdout:fd,stderr:fd,env:{...process.env,LD_LIBRARY_PATH:root+'/runtime-gpu/bin:'+root+'/runtime-gpu/runtime',GGML_VK_EXPERIMENTAL_ATTN_MODE:mode,GGML_VK_EXPERIMENTAL_ATTN_TRACE:'1',GGML_VK_VISIBLE_DEVICES:'0'}});t.servers.push({p,fd,device:'kernel'});const timer=setTimeout(()=>{t.error='Native timeout';p.kill('SIGTERM')},120000);const rc=await p.exited;clearTimeout(timer);rows.push({mode,rc});await t.stop('kernel');if(t.error)throw Error(t.error);if(rc!==0&&rc!==1)throw Error('Native unexpected exit'+rc)}
+}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish({ok:!t.error,rows,scope:'Diagnostic completed not equal allnumericspass. Defaultprecisionbaseline errorsretained; traceonlyforactualselectedtiles,notwalltimecomparisons.'});if(!r.ok)process.exitCode=1}

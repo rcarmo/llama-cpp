@@ -1,0 +1,9 @@
+/** SCRIPT_JDOC:
+{"summary":"Screen device-scoped F16 long-attention small tiles/F32 accumulation on retained64K state","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root,save}from'./campaign';import{copyFileSync}from'node:fs';
+const mode=process.argv[2],order=process.argv[3];if(!['base','small','f32'].includes(mode))throw Error('mode');if(order!==undefined&&!/^[0-7]$/.test(order))throw Error('order');
+const t=new Trial(order===undefined?'screen64-'+mode:`confirm64-${order}-${mode}`,{maintenance:true,format:'f16',fa:false,full:false,ctx:147456,parallel:2,cache:0,ubatch:256,batch:1024,vulkanBuild:root+'/runtime-gpu',preserveSwaPadding:true,extraEnv:mode==='base'?{}:{GGML_VK_EXPERIMENTAL_ATTN_MODE:mode}});let result:any={};
+try{await t.begin();await t.start('vulkan');copyFileSync('/var/home/agent/workspace/reports/gemma-context-coding-20260910/runs/compact64-aligned/slots/long64.slot',t.dir+'/slots/state.slot');const f=await Bun.file('/var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/runs/vulkan64-tail-profile/fixture.json').json(),rows=[];
+ for(let i=0;i<(order===undefined?2:1);i++){await t.req('vulkan','restore-'+i,{filename:'state.slot'},'/slots/0?action=restore');const r=await t.req('vulkan','tail-'+i,{prompt:f.prompt,n_predict:32,temperature:0,top_k:1,cache_prompt:true,id_slot:0});const row={rep:i,answer:r.content,pass:['CEDAR-481','MAPLE-726','BIRCH-953'].every(x=>r.content.includes(x)),timings:r.timings};rows.push(row);result={ok:true,mode,rows,scope:order===undefined?'Sequential shape-specific screen; retained64K same KV and1022-token tail, no full-prefill claim':'Counterbalanced confirmation, same source state/prompt; not full fresh64K'};if(!row.pass||r.timings.cache_n!==64658||r.timings.prompt_n!==1022)throw Error('Recall/cache coverage gate');}
+}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}

@@ -1,0 +1,11 @@
+{
+ "declared_before_inference":true,
+ "scope":"ExactPCI8086:a7a0 non-coopmat long F16attention-shaped matrix products; GPUFA-off. No repeat of prior batch/splitK screens.",
+ "hypotheses":["Smaller32x32 matrix tile may improve occupancy/register usage for long attention products vs current medium64x64","ExplicitF32 accumulation may alter accuracy/performance of long value reductions relative toF16 default"],
+ "gates":"F16/F32 types,query>=64,one matrix axis>=32768 and other<=1024; available small/aligned pipelines only; original64bit indexing and splitK decisions retained. Otherdevice/shape/default path unchanged.",
+ "profiles":["base","small","f32"],
+ "screen":"Same retained finite64KGPU state,1022tail tokens,32output budget;2/profile. Correct3-keyrecall,64658cache,1022evaluated. Runtime source fixed and trace disabled for timings.",
+ "confirmation":"Onlypromising candidates needABBA/BAAB4/profile, native long-matmul precision checks and finite state/handoff. Trace case proves dispatch separately; no profilewalltiming speedup claim.",
+ "safety":"Freshspeechclearance19:38:14UTC,immediate+continuousjobs/native/socket checks,6GiBreserve,16MiBtrialswap,temperature annotation,supervisedtimeboundoriginalGemma stop/restore. NoSTT/private data modifications.",
+ "retention":"Minorregressions may reveal useful future opportunities; retain exact measured costs/conditions. Commit/push reviewedforkcheckpoints, no deployment."
+}

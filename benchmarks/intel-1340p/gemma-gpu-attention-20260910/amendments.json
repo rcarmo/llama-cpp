@@ -1,0 +1,73 @@
+{
+  "declared_before_full64": true,
+  "screen": "Small32x32tile slower(~33.2stailvs30.18baseline) butcorrect; retainpotentialshape-specificbranch. F32accumulationpasses6/6nativecasesvsbaseline4/6withdefaultprecisionfailuresretained.",
+  "confirmed": "ABBA/BAAB8runs4/profile:1022-tailprefillmedian29.812579->27.397059s(-8.10235%).Same64658cached,1022evaluated,21generatedtokens. Actualmode/tiletracedonlyinnativediagnostic;timingsuntraced.",
+  "full64": "Onefresh64663-token exactfixture, GPU256microbatch CPU256/retainedbaseline, samecompacttwoGPU72K/twoCPU128Klayout. ForceF32onlydevicea7a0/longF16attention-shapedGEMMs>=32K, compareearlierfull64Ktemporalcontrol. Notbalancedfreshseries;verifyfiniteKV,recall,MTPappendandhandoff.",
+  "interpretation": "HigherprecisionmayimprovetimingbyavoidingF16accumulatoroverhead;actualhardwaremechanismnotindependentlymeasured. KQalreadyrequestsF32,changeprincipallyaffectsvalueattentionreduction. NoFAenabled,nokernel/layout/tokenchanges.",
+  "policy": "Keepconditionalbenefitsandminorregressionsasopportunities. Commit/pushcheckpointaftertests, nohybriddeployment.",
+  "full64_completed": {
+    "total_ms": 691385.238347,
+    "prefill_ms": 679832.717,
+    "reduction_pct": 7.422405419473199,
+    "prefill_reduction_pct": 7.450134727223157,
+    "finite": true,
+    "cache_n": 64662,
+    "prompt_n": 1,
+    "append_cache_n": 64684,
+    "append_prompt_n": 15,
+    "scope": "Single temporal full64 pair; startup, append and scan outside measured total"
+  },
+  "restoration": {
+    "pass": true,
+    "pid": 612228,
+    "verified_at": "2026-09-10T20:19:24.334Z",
+    "swap_kib": 0,
+    "tool_cases": [
+      {
+        "case": "explicit-none",
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        },
+        "finish": "stop",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 150,
+          "total_tokens": 153,
+          "prompt_tokens_details": {
+            "cached_tokens": 100
+          }
+        },
+        "pass": true
+      },
+      {
+        "case": "explicit-auto",
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        },
+        "finish": "stop",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 150,
+          "total_tokens": 153,
+          "prompt_tokens_details": {
+            "cached_tokens": 145
+          }
+        },
+        "pass": true
+      },
+      {
+        "case": "append",
+        "message": {
+          "role": "assistant",
+          "content": "RESTORED"
+        },
+        "cache_n": 145,
+        "prompt_n": 22,
+        "pass": true
+      }
+    ]
+  },
+  "provenance": "Actual loaded library hashes captured during full64; patch reconstructs host source exactly from4e9740248; original compiler labels retained as historical artefacts"
+}
