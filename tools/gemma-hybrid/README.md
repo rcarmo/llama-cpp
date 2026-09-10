@@ -2,6 +2,10 @@
 
 Opt-in loopback adapter for the tested Intel Gemma configuration. GPU cold text prefill uses the pinned Vulkan FP32 selector with microbatch256; generation and warm turns use the retained CPU8/prefill16, MTP3, F16 KV, FA-off worker.
 
+## Deployed CPU decode refinement
+
+The qualified `20260910-smallbatch` release adds the opt-in retained-ABI [small target-batch patch](patches/README.md). CPU Gemma target batches of at most four tokens use the8-thread decode pool; large prefill remains16-threaded and the assistant is unchanged. Eight counterbalanced64K runs measured16.52% faster generation, with finite KV, tool/cache and large-prefill checks passing. Configuration must pin the candidate `libllama` hash and set `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH=1`; the source patch alone does not activate it.
+
 ## Run
 
 ```

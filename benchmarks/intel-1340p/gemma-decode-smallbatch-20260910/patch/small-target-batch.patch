@@ -1,0 +1,18 @@
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -1378,7 +1378,14 @@
+         //LLAMA_LOG_INFO("graph set inputs time: %.3f ms\n", (ggml_time_us() - t_start_us)/1000.0);
+     }
+ 
+-    const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1);
++    // Keep large prefill parallelism; small Gemma target batches use the decode pool.
++    static const bool small_target_batch = [] {
++        const char * value = std::getenv("LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH");
++        return value != nullptr && std::strcmp(value, "1") == 0;
++    }();
++    const bool use_decode_pool = small_target_batch && model.arch == LLM_ARCH_GEMMA4 &&
++        model.n_gpu_layers() == 0 && ubatch.n_tokens <= 4;
++    const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1 && !use_decode_pool);
+     if (status != GGML_STATUS_SUCCESS) {
+         LLAMA_LOG_ERROR("%s: failed to compute graph, compute status: %d\n", __func__, status);
+         ret = status;

@@ -1,0 +1,129 @@
+{
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookup_stock exactly once. After its result arrives, answer with the returned quantity."
+      },
+      {
+        "role": "user",
+        "content": "How many items of SKU PANDA-FA are in stock? Look it up, then reply with the quantity only."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "lookup_stock",
+              "arguments": "{\"sku\":\"PANDA-FA\"}"
+            },
+            "id": "KgpGO2XfYL2YmYM0OSYeABrHEzwFTUrs"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "KgpGO2XfYL2YmYM0OSYeABrHEzwFTUrs",
+        "content": "{\"sku\":\"PANDA-FA\",\"quantity\":23}"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "description": "Read fixture stock",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 64,
+    "cache_prompt": true,
+    "id_slot": 1,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "tool_choice": "none"
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        }
+      }
+    ],
+    "created": 1789080821,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 3,
+      "prompt_tokens": 139,
+      "total_tokens": 142,
+      "prompt_tokens_details": {
+        "cached_tokens": 91
+      }
+    },
+    "id": "chatcmpl-nrr7fH3SheumAHKTR8Gshw2zEBDMV6E3",
+    "timings": {
+      "cache_n": 91,
+      "prompt_n": 48,
+      "prompt_ms": 779.089,
+      "prompt_per_token_ms": 16.231020833333336,
+      "prompt_per_second": 61.61041934875219,
+      "predicted_n": 3,
+      "predicted_ms": 166.187,
+      "predicted_per_token_ms": 55.39566666666667,
+      "predicted_per_second": 18.051953522236996,
+      "draft_n": 3,
+      "draft_n_accepted": 3
+    }
+  },
+  "measurement": {
+    "label": "tool-answer",
+    "device": "cpu",
+    "wall_ms": 951.3861120000001,
+    "package_j": 39.188072,
+    "timings": {
+      "cache_n": 91,
+      "prompt_n": 48,
+      "prompt_ms": 779.089,
+      "prompt_per_token_ms": 16.231020833333336,
+      "prompt_per_second": 61.61041934875219,
+      "predicted_n": 3,
+      "predicted_ms": 166.187,
+      "predicted_per_token_ms": 55.39566666666667,
+      "predicted_per_second": 18.051953522236996,
+      "draft_n": 3,
+      "draft_n_accepted": 3
+    },
+    "usage": {
+      "completion_tokens": 3,
+      "prompt_tokens": 139,
+      "total_tokens": 142,
+      "prompt_tokens_details": {
+        "cached_tokens": 91
+      }
+    },
+    "token_hash": null
+  }
+}

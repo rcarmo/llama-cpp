@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{audit}from'./audit-results';
+test('complete retained measurements reconstruct promoteddecodecandidate',()=>{const r=audit(import.meta.dir);expect(r.rows.length).toBe(8);expect(r.decode_gain_pct).toBeCloseTo(16.518778,5);expect(r.lifecycle.pass).toBe(true);expect(r.production.pass).toBe(true);expect(r.prefill[0].prompt_ms).toBe(66832.285);expect(r.prefill[1].prompt_ms).toBe(66402.589)});
