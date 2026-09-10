@@ -10,7 +10,7 @@ This skill reviews changes against llama.cpp's conventions and the pitfalls that
 - **Self-review (default):** review the contributor's own local changes (uncommitted work, or a branch vs `master`) as a pre-PR pass. Ask which if it's ambiguous; default to `git diff master...HEAD` plus any uncommitted changes.
 - **Read-only review of a PR/file:** if the user points at a PR number or specific files (including code they didn't write), review those and report findings.
 
-In both modes the output is **private review notes for the user to read and act on** - it is never something to post. This is a hard rule from `AGENTS.md`: an agent must NEVER write, or help write, a PR comment, a review comment, or a reply to a reviewer, by any means including `gh`. Do not offer to. If the user asks you to post the notes, refuse and point them at that rule. Present findings in the conversation only.
+Default to private review notes. For this fork, owner-authorised documentation, commit messages and Git checkpoints are allowed under `AGENTS.md`. Posting review notes requires an explicit destination and authorisation. If the destination is upstream `ggml-org/llama.cpp`, consult its current submission policy; fork authorisation does not extend there.
 
 Before starting, read `AGENTS.md` and `CONTRIBUTING.md` if not already in context - the "Coding guidelines", "Naming guidelines", and AI usage sections are the baseline this review enforces. For a diff that adds a new model architecture, also read `docs/development/HOWTO-add-model.md` and consider the dedicated `add-new-model` skill.
 
@@ -28,6 +28,8 @@ Always run the **Scope and quick-reject gate**, the **Security review**, and the
 
 ## Scope and quick-reject gate (always)
 
+Apply maintainer/submission requirements below to upstream PR work. For owner-directed fork experiments, record the same risks without treating upstream approval or an existing issue as permission prerequisites.
+
 These are the patterns that get PRs closed without a full review. Check them first - a finding here is more important than any code nit, because it can mean the change shouldn't be a PR in its current form at all.
 
 - Is there a prior issue/discussion for this? Features are supposed to start as an issue, not a PR (`CONTRIBUTING.md`). If this is a nontrivial feature with no linked issue, flag it and suggest opening one first.
@@ -38,7 +40,7 @@ These are the patterns that get PRs closed without a full review. Check them fir
 - Is it invasive - new subsystem, core-API reshaping, changes to shared graph/sampler code that other models don't need? Flag it and suggest a discussion with maintainers before investing further.
 - Is it niche/vendor-specific in a way that adds a maintenance burden nobody will own long-term? Flag the maintenance-ownership question.
 - Is the change semantically correct, or a plausible-looking "fix" that misunderstands the code? Sanity-check the actual behavior, not just that it compiles.
-- AI-disclosure: if AI meaningfully contributed, is the PR template's disclosure section filled in? Remind the user. Never suggest writing the PR description or commit message for them.
+- AI-disclosure: if AI meaningfully contributed, is the PR template's disclosure section filled in? For the fork, use the authorised disclosure and `Assisted-by:` convention. Upstream submissions follow upstream human-authorship requirements.
 
 ## Security review (mandatory)
 
@@ -146,4 +148,4 @@ Group findings by severity so the user knows what actually blocks a merge:
 2. **Will slow the review** - convention/naming/comment violations, missing tests/docs/perf data, missing API justification or example.
 3. **Nits** - minor style, optional cleanups.
 
-For each finding, point to the file and line and say concretely what to change and why. Do not rewrite the whole diff unprompted; let the contributor make the fixes so they own and understand them. And do not draft any PR text, commit message, or reviewer reply - that is the contributor's to write.
+For each finding, point to the file and line and explain what to change and why. Make requested fixes in small tested checkpoints. Fork commit messages and documentation may be drafted when authorised; upstream submissions follow the destination's current policy.
