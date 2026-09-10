@@ -1,0 +1,1304 @@
+{
+  "audit_pass": true,
+  "production_promoted": false,
+  "restoration": {
+    "finished": "2026-09-10T17:03:35.564Z",
+    "failure": "",
+    "calls": 4,
+    "rows": [
+      {
+        "case": "explicit-none",
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        },
+        "finish": "stop",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 150,
+          "total_tokens": 153,
+          "prompt_tokens_details": {
+            "cached_tokens": 100
+          }
+        },
+        "pass": true
+      },
+      {
+        "case": "explicit-auto",
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        },
+        "finish": "stop",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 150,
+          "total_tokens": 153,
+          "prompt_tokens_details": {
+            "cached_tokens": 145
+          }
+        },
+        "pass": true
+      },
+      {
+        "case": "append",
+        "message": {
+          "role": "assistant",
+          "content": "RESTORED"
+        },
+        "cache_n": 145,
+        "prompt_n": 22,
+        "pass": true
+      }
+    ],
+    "limits": "One observation per variant; prompt sensitivity and tool-choice differences are diagnostic, not broad tool reliability evidence."
+  },
+  "compact": {
+    "off": {
+      "native": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "ok": true,
+      "padding": false,
+      "hybrid": false,
+      "tokens": 4348,
+      "state_bytes": 92269100,
+      "answer": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "pass": true,
+      "append": "START key: CEDAR-481.",
+      "append_pass": true,
+      "cache_n": 0,
+      "prompt_n": 4348,
+      "append_cache_n": 4369,
+      "append_prompt_n": 16,
+      "state_finite": true,
+      "config": {
+        "maintenance": true,
+        "format": "f16",
+        "fa": false,
+        "full": false,
+        "ctx": 16384,
+        "parallel": 1,
+        "cache": 0,
+        "cpuBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-cpu",
+        "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+        "preserveSwaPadding": false
+      },
+      "calls": [
+        {
+          "label": "prefill",
+          "device": "cpu",
+          "wall_ms": 69907.00904,
+          "package_j": 2754.256438,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 4347,
+            "prompt_ms": 69903.013,
+            "prompt_per_token_ms": 16.080748332183116,
+            "prompt_per_second": 62.18616070240062,
+            "predicted_n": 1,
+            "predicted_ms": 0.001,
+            "predicted_per_token_ms": 0,
+            "predicted_per_second": 0
+          },
+          "token_hash": "dbd59852f46207af2d5daa2e1b546a20b719f1648b90cf70d7756aceed84967f"
+        },
+        {
+          "label": "save",
+          "device": "cpu",
+          "wall_ms": 51.831781000000774,
+          "package_j": 0.967282,
+          "timings": {
+            "save_ms": 50.024
+          },
+          "n_written": 92269100,
+          "token_hash": null
+        },
+        {
+          "label": "native",
+          "device": "cpu",
+          "wall_ms": 1062.7967370000115,
+          "package_j": 39.088462,
+          "timings": {
+            "cache_n": 4347,
+            "prompt_n": 1,
+            "prompt_ms": 85.278,
+            "prompt_per_token_ms": 85.278,
+            "prompt_per_second": 11.726353807547081,
+            "predicted_n": 22,
+            "predicted_ms": 920.923,
+            "predicted_per_token_ms": 43.853476190476194,
+            "predicted_per_second": 22.803209388841413,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 4347
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "erase",
+          "device": "cpu",
+          "wall_ms": 3.0271520000096643,
+          "package_j": 0.875242,
+          "token_hash": null
+        },
+        {
+          "label": "restore",
+          "device": "cpu",
+          "wall_ms": 22.721898999996483,
+          "package_j": 0.613707,
+          "timings": {
+            "restore_ms": 21.912
+          },
+          "n_read": 92269100,
+          "token_hash": null
+        },
+        {
+          "label": "decode",
+          "device": "cpu",
+          "wall_ms": 71796.09605099999,
+          "package_j": 2863.212336,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 4348,
+            "prompt_ms": 70799.933,
+            "prompt_per_token_ms": 16.283333256669735,
+            "prompt_per_second": 61.4124874948681,
+            "predicted_n": 22,
+            "predicted_ms": 983.23,
+            "predicted_per_token_ms": 46.82047619047619,
+            "predicted_per_second": 21.3581766219501,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "append",
+          "device": "cpu",
+          "wall_ms": 1212.36924,
+          "package_j": 42.831799,
+          "timings": {
+            "cache_n": 4369,
+            "prompt_n": 16,
+            "prompt_ms": 618.896,
+            "prompt_per_token_ms": 38.681,
+            "prompt_per_second": 25.852485716501644,
+            "predicted_n": 11,
+            "predicted_ms": 570.536,
+            "predicted_per_token_ms": 57.053599999999996,
+            "predicted_per_second": 17.527377764067474,
+            "draft_n": 9,
+            "draft_n_accepted": 9
+          },
+          "usage": {
+            "completion_tokens": 11,
+            "prompt_tokens": 4385,
+            "total_tokens": 4396,
+            "prompt_tokens_details": {
+              "cached_tokens": 4369
+            }
+          },
+          "token_hash": null
+        }
+      ],
+      "thermal": {
+        "peak_c": 89,
+        "hot": false,
+        "abort_enabled": false
+      },
+      "resources": {
+        "peak_trial_pss_kib": 8025895,
+        "peak_trial_rss_kib": 8029968,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 27426852,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "finished_at": "2026-09-10T16:27:11.896Z"
+    },
+    "on": {
+      "native": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "ok": true,
+      "padding": true,
+      "hybrid": false,
+      "tokens": 4348,
+      "state_bytes": 102757932,
+      "answer": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "pass": true,
+      "append": "START key: CEDAR-481.",
+      "append_pass": true,
+      "cache_n": 4347,
+      "prompt_n": 1,
+      "append_cache_n": 4369,
+      "append_prompt_n": 16,
+      "state_finite": true,
+      "config": {
+        "maintenance": true,
+        "format": "f16",
+        "fa": false,
+        "full": false,
+        "ctx": 16384,
+        "parallel": 1,
+        "cache": 0,
+        "cpuBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-cpu",
+        "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+        "preserveSwaPadding": true
+      },
+      "calls": [
+        {
+          "label": "prefill",
+          "device": "cpu",
+          "wall_ms": 69996.099119,
+          "package_j": 2807.180619,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 4347,
+            "prompt_ms": 69990.641,
+            "prompt_per_token_ms": 16.10090660225443,
+            "prompt_per_second": 62.10830388022878,
+            "predicted_n": 1,
+            "predicted_ms": 0.001,
+            "predicted_per_token_ms": 0,
+            "predicted_per_second": 0
+          },
+          "token_hash": "dbd59852f46207af2d5daa2e1b546a20b719f1648b90cf70d7756aceed84967f"
+        },
+        {
+          "label": "save",
+          "device": "cpu",
+          "wall_ms": 100.5050510000001,
+          "package_j": 2.033259,
+          "timings": {
+            "save_ms": 52.263
+          },
+          "n_written": 102757932,
+          "token_hash": null
+        },
+        {
+          "label": "native",
+          "device": "cpu",
+          "wall_ms": 1029.7195890000003,
+          "package_j": 38.746666,
+          "timings": {
+            "cache_n": 4347,
+            "prompt_n": 1,
+            "prompt_ms": 89.654,
+            "prompt_per_token_ms": 89.654,
+            "prompt_per_second": 11.15399201374172,
+            "predicted_n": 22,
+            "predicted_ms": 923.356,
+            "predicted_per_token_ms": 43.96933333333333,
+            "predicted_per_second": 22.743123995512025,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 4347
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "erase",
+          "device": "cpu",
+          "wall_ms": 3.276490999996895,
+          "package_j": 0.734739,
+          "token_hash": null
+        },
+        {
+          "label": "restore",
+          "device": "cpu",
+          "wall_ms": 60.42615499999374,
+          "package_j": 1.215695,
+          "timings": {
+            "restore_ms": 22.005
+          },
+          "n_read": 102757932,
+          "token_hash": null
+        },
+        {
+          "label": "decode",
+          "device": "cpu",
+          "wall_ms": 1047.201396999997,
+          "package_j": 39.370383,
+          "timings": {
+            "cache_n": 4347,
+            "prompt_n": 1,
+            "prompt_ms": 84.488,
+            "prompt_per_token_ms": 84.488,
+            "prompt_per_second": 11.836000378752011,
+            "predicted_n": 22,
+            "predicted_ms": 943.184,
+            "predicted_per_token_ms": 44.91352380952381,
+            "predicted_per_second": 22.265008736365335,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 4347
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "append",
+          "device": "cpu",
+          "wall_ms": 1069.4866820000025,
+          "package_j": 40.703814,
+          "timings": {
+            "cache_n": 4369,
+            "prompt_n": 16,
+            "prompt_ms": 494.862,
+            "prompt_per_token_ms": 30.928875,
+            "prompt_per_second": 32.33224616155615,
+            "predicted_n": 11,
+            "predicted_ms": 565.374,
+            "predicted_per_token_ms": 56.537400000000005,
+            "predicted_per_second": 17.687406920021083,
+            "draft_n": 9,
+            "draft_n_accepted": 9
+          },
+          "usage": {
+            "completion_tokens": 11,
+            "prompt_tokens": 4385,
+            "total_tokens": 4396,
+            "prompt_tokens_details": {
+              "cached_tokens": 4369
+            }
+          },
+          "token_hash": null
+        }
+      ],
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      },
+      "resources": {
+        "peak_trial_pss_kib": 8046458,
+        "peak_trial_rss_kib": 8050540,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 27514440,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "finished_at": "2026-09-10T16:28:42.109Z"
+    },
+    "gpu": {
+      "ok": true,
+      "padding": true,
+      "hybrid": true,
+      "tokens": 4348,
+      "state_bytes": 102757932,
+      "answer": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "pass": true,
+      "append": "START key: CEDAR-481.",
+      "append_pass": true,
+      "cache_n": 4347,
+      "prompt_n": 1,
+      "append_cache_n": 4369,
+      "append_prompt_n": 16,
+      "state_finite": true,
+      "config": {
+        "maintenance": true,
+        "format": "f16",
+        "fa": false,
+        "full": false,
+        "ctx": 16384,
+        "parallel": 1,
+        "cache": 0,
+        "cpuBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-cpu",
+        "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+        "preserveSwaPadding": true
+      },
+      "calls": [
+        {
+          "label": "prefill",
+          "device": "vulkan",
+          "wall_ms": 30883.480023000004,
+          "package_j": 883.02545,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 4347,
+            "prompt_ms": 30878.629,
+            "prompt_per_token_ms": 7.103434322521279,
+            "prompt_per_second": 140.77697555807933,
+            "predicted_n": 1,
+            "predicted_ms": 0.001,
+            "predicted_per_token_ms": 0,
+            "predicted_per_second": 0
+          },
+          "token_hash": "dbd59852f46207af2d5daa2e1b546a20b719f1648b90cf70d7756aceed84967f"
+        },
+        {
+          "label": "save",
+          "device": "vulkan",
+          "wall_ms": 3500.344824,
+          "package_j": 34.301609,
+          "timings": {
+            "save_ms": 3446.564
+          },
+          "n_written": 102757932,
+          "token_hash": null
+        },
+        {
+          "label": "restore",
+          "device": "cpu",
+          "wall_ms": 29.67844299999706,
+          "package_j": 0.689207,
+          "timings": {
+            "restore_ms": 28.2
+          },
+          "n_read": 102757932,
+          "token_hash": null
+        },
+        {
+          "label": "decode",
+          "device": "cpu",
+          "wall_ms": 1424.0564610000001,
+          "package_j": 48.339781,
+          "timings": {
+            "cache_n": 4347,
+            "prompt_n": 1,
+            "prompt_ms": 95.371,
+            "prompt_per_token_ms": 95.371,
+            "prompt_per_second": 10.485367669417329,
+            "predicted_n": 22,
+            "predicted_ms": 1308.125,
+            "predicted_per_token_ms": 62.291666666666664,
+            "predicted_per_second": 16.05351170568562,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 4347
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "append",
+          "device": "cpu",
+          "wall_ms": 1323.8806780000014,
+          "package_j": 45.727727,
+          "timings": {
+            "cache_n": 4369,
+            "prompt_n": 16,
+            "prompt_ms": 685.157,
+            "prompt_per_token_ms": 42.8223125,
+            "prompt_per_second": 23.352311951859207,
+            "predicted_n": 11,
+            "predicted_ms": 626.985,
+            "predicted_per_token_ms": 62.6985,
+            "predicted_per_second": 15.949344880659027,
+            "draft_n": 9,
+            "draft_n_accepted": 9
+          },
+          "usage": {
+            "completion_tokens": 11,
+            "prompt_tokens": 4385,
+            "total_tokens": 4396,
+            "prompt_tokens_details": {
+              "cached_tokens": 4369
+            }
+          },
+          "token_hash": null
+        }
+      ],
+      "thermal": {
+        "peak_c": 96,
+        "hot": true,
+        "abort_enabled": false
+      },
+      "resources": {
+        "peak_trial_pss_kib": 8221123,
+        "peak_trial_rss_kib": 13078944,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23627752,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "finished_at": "2026-09-10T16:29:39.267Z"
+    },
+    "aligned": {
+      "ok": true,
+      "answer": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+      "pass": true,
+      "append": "START key: CEDAR-481.",
+      "append_pass": true,
+      "cache_n": 4347,
+      "prompt_n": 1,
+      "append_cache_n": 4369,
+      "append_prompt_n": 16,
+      "config": {
+        "maintenance": true,
+        "build": "baseline",
+        "format": "f16",
+        "fa": false,
+        "full": false,
+        "ctx": 262144,
+        "parallel": 2,
+        "cache": 256
+      },
+      "calls": [
+        {
+          "label": "restore",
+          "device": "cpu",
+          "wall_ms": 57.151616000000104,
+          "package_j": 0.975095,
+          "timings": {
+            "restore_ms": 55.666
+          },
+          "n_read": 102757924,
+          "token_hash": null
+        },
+        {
+          "label": "decode",
+          "device": "cpu",
+          "wall_ms": 1709.721466,
+          "package_j": 53.551315,
+          "timings": {
+            "cache_n": 4347,
+            "prompt_n": 1,
+            "prompt_ms": 104.565,
+            "prompt_per_token_ms": 104.565,
+            "prompt_per_second": 9.563429445799263,
+            "predicted_n": 22,
+            "predicted_ms": 1586.289,
+            "predicted_per_token_ms": 72.10404545454546,
+            "predicted_per_second": 13.868847353792406,
+            "draft_n": 18,
+            "draft_n_accepted": 15
+          },
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 4348,
+            "total_tokens": 4370,
+            "prompt_tokens_details": {
+              "cached_tokens": 4347
+            }
+          },
+          "token_hash": null
+        },
+        {
+          "label": "append",
+          "device": "cpu",
+          "wall_ms": 1044.379497,
+          "package_j": 37.757533,
+          "timings": {
+            "cache_n": 4369,
+            "prompt_n": 16,
+            "prompt_ms": 645.462,
+            "prompt_per_token_ms": 40.341375,
+            "prompt_per_second": 24.788446105270335,
+            "predicted_n": 11,
+            "predicted_ms": 380.079,
+            "predicted_per_token_ms": 34.55263636363637,
+            "predicted_per_second": 28.9413516663641,
+            "draft_n": 9,
+            "draft_n_accepted": 9
+          },
+          "usage": {
+            "completion_tokens": 11,
+            "prompt_tokens": 4385,
+            "total_tokens": 4396,
+            "prompt_tokens_details": {
+              "cached_tokens": 4369
+            }
+          },
+          "token_hash": null
+        }
+      ],
+      "thermal": {
+        "peak_c": 62,
+        "hot": false,
+        "abort_enabled": false
+      },
+      "resources": {
+        "peak_trial_pss_kib": 11916454,
+        "peak_trial_rss_kib": 11920404,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23287120,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "finished_at": "2026-09-10T16:38:34.638Z"
+    }
+  },
+  "long": {
+    "ok": true,
+    "actual_tokens": 64663,
+    "context_per_gpu_stream": 73728,
+    "context_per_cpu_stream": 131072,
+    "streams": 2,
+    "total_ms": 746817.0257390001,
+    "state_bytes": 1091923940,
+    "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+    "pass": true,
+    "append": "MAPLE-726",
+    "append_pass": true,
+    "cache_n": 64662,
+    "prompt_n": 1,
+    "append_cache_n": 64684,
+    "append_prompt_n": 15,
+    "limits": "One64K positional recall/append pair, not repeated speedup or full two128K service qualification. Startup excluded; save/restore included. Finite scan outside timed request.",
+    "state_finite": true,
+    "config": {
+      "maintenance": true,
+      "format": "f16",
+      "fa": false,
+      "full": false,
+      "ctx": 147456,
+      "cpuCtx": 262144,
+      "parallel": 2,
+      "cache": 256,
+      "build": "baseline",
+      "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+      "preserveSwaPadding": true
+    },
+    "calls": [
+      {
+        "label": "prefill",
+        "device": "vulkan",
+        "wall_ms": 734663.919104,
+        "package_j": 26713.03574,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 64662,
+          "prompt_ms": 734558.3,
+          "prompt_per_token_ms": 11.359968760632212,
+          "prompt_per_second": 88.028411087316,
+          "predicted_n": 1,
+          "predicted_ms": 0.001,
+          "predicted_per_token_ms": 0,
+          "predicted_per_second": 0
+        },
+        "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "label": "save",
+        "device": "vulkan",
+        "wall_ms": 4583.464473000029,
+        "package_j": 50.811455,
+        "timings": {
+          "save_ms": 4582.196
+        },
+        "n_written": 1091923940,
+        "token_hash": null
+      },
+      {
+        "label": "restore",
+        "device": "cpu",
+        "wall_ms": 515.2386229999829,
+        "package_j": 7.644268,
+        "timings": {
+          "restore_ms": 494.237
+        },
+        "n_read": 1091923924,
+        "token_hash": null
+      },
+      {
+        "label": "decode",
+        "device": "cpu",
+        "wall_ms": 3388.750138000003,
+        "package_j": 109.204005,
+        "timings": {
+          "cache_n": 64662,
+          "prompt_n": 1,
+          "prompt_ms": 316.211,
+          "prompt_per_token_ms": 316.211,
+          "prompt_per_second": 3.162445329226371,
+          "predicted_n": 21,
+          "predicted_ms": 2934.154,
+          "predicted_per_token_ms": 139.72161904761904,
+          "predicted_per_second": 7.157088550907689,
+          "draft_n": 18,
+          "draft_n_accepted": 15
+        },
+        "usage": {
+          "completion_tokens": 21,
+          "prompt_tokens": 64663,
+          "total_tokens": 64684,
+          "prompt_tokens_details": {
+            "cached_tokens": 64662
+          }
+        },
+        "token_hash": null
+      },
+      {
+        "label": "append",
+        "device": "cpu",
+        "wall_ms": 2564.638319999911,
+        "package_j": 84.839321,
+        "timings": {
+          "cache_n": 64684,
+          "prompt_n": 15,
+          "prompt_ms": 1469.287,
+          "prompt_per_token_ms": 97.95246666666667,
+          "prompt_per_second": 10.209033361079218,
+          "predicted_n": 7,
+          "predicted_ms": 971.612,
+          "predicted_per_token_ms": 138.80171428571427,
+          "predicted_per_second": 7.204521969675138,
+          "draft_n": 6,
+          "draft_n_accepted": 5
+        },
+        "usage": {
+          "completion_tokens": 7,
+          "prompt_tokens": 64699,
+          "total_tokens": 64706,
+          "prompt_tokens_details": {
+            "cached_tokens": 64684
+          }
+        },
+        "token_hash": null
+      }
+    ],
+    "thermal": {
+      "peak_c": 100,
+      "hot": true,
+      "abort_enabled": false
+    },
+    "resources": {
+      "peak_trial_pss_kib": 12198358,
+      "peak_trial_rss_kib": 17077492,
+      "peak_trial_swap_kib": 0,
+      "min_available_kib": 16881840,
+      "production_swap_initial_kib": 0,
+      "production_swap_final_kib": 0
+    },
+    "finished_at": "2026-09-10T16:51:26.449Z"
+  },
+  "coding": {
+    "baseline": {
+      "n": 4,
+      "rows": [
+        {
+          "name": "coding-0-baseline",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 68128.73629399999,
+          "warm_ms": 14521.460672999987,
+          "prompt_ms": 3574.165,
+          "decode_ms": 10776.71,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12018242,
+            "peak_trial_rss_kib": 12020236,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 23600844,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-3-baseline",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 67404.633117,
+          "warm_ms": 14062.577648000006,
+          "prompt_ms": 3585.455,
+          "decode_ms": 10420.827,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12010616,
+            "peak_trial_rss_kib": 12014060,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 23629092,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-5-baseline",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 67317.91748900001,
+          "warm_ms": 14060.718728999993,
+          "prompt_ms": 3933.0480000000002,
+          "decode_ms": 9972.548999999999,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12012351,
+            "peak_trial_rss_kib": 12014688,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 23622588,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-6-baseline",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 68119.249831,
+          "warm_ms": 14239.185528000002,
+          "prompt_ms": 3593.294,
+          "decode_ms": 10496.369,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12010653,
+            "peak_trial_rss_kib": 12014084,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 23639756,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        }
+      ],
+      "whole_median_ms": 67761.94147399999,
+      "warm_median_ms": 14150.881588000004
+    },
+    "hybrid": {
+      "n": 4,
+      "rows": [
+        {
+          "name": "coding-1-hybrid",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 48056.14774499999,
+          "warm_ms": 14404.387052999999,
+          "prompt_ms": 3695.063,
+          "decode_ms": 10660.048999999999,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12116805,
+            "peak_trial_rss_kib": 17078388,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 17167904,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-2-hybrid",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 47980.483135999995,
+          "warm_ms": 14443.929937,
+          "prompt_ms": 3910.5,
+          "decode_ms": 10477.049,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 174,
+          "accepted": 131,
+          "resources": {
+            "peak_trial_pss_kib": 12116678,
+            "peak_trial_rss_kib": 17078196,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 17148060,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-4-hybrid",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 48645.101692,
+          "warm_ms": 14825.932277,
+          "prompt_ms": 3716.092,
+          "decode_ms": 10978.134,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 174,
+          "accepted": 131,
+          "resources": {
+            "peak_trial_pss_kib": 12116423,
+            "peak_trial_rss_kib": 17077864,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 17098272,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        },
+        {
+          "name": "coding-7-hybrid",
+          "ok": true,
+          "pass": true,
+          "whole_ms": 48445.783996000006,
+          "warm_ms": 15036.841253999992,
+          "prompt_ms": 3767.075,
+          "decode_ms": 11218.119,
+          "evaluated": 178,
+          "generated": 191,
+          "draft": 177,
+          "accepted": 130,
+          "resources": {
+            "peak_trial_pss_kib": 12475669,
+            "peak_trial_rss_kib": 14921076,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 17163016,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          }
+        }
+      ],
+      "whole_median_ms": 48250.9658705,
+      "warm_median_ms": 14634.931107
+    }
+  },
+  "coding_complete": true,
+  "warm_change_pct": 3.4206315415038935,
+  "whole_reduction_pct": 28.793412908610783,
+  "all_coding_pass": true,
+  "maintenance_runs": [
+    {
+      "name": "build-guard",
+      "ok": false,
+      "error": "Error: Build exit1",
+      "resources": {
+        "peak_trial_pss_kib": 44448,
+        "peak_trial_rss_kib": 67560,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 30428216,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 53,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "build-guard-retry1",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 50167,
+        "peak_trial_rss_kib": 70896,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 30170680,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 56,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact4-cpu-off",
+      "ok": false,
+      "error": "Error: cpu startup exit 127",
+      "resources": {
+        "peak_trial_pss_kib": 0,
+        "peak_trial_rss_kib": 0,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 30359752,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 41,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact4-cpu-off-r1",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 8025895,
+        "peak_trial_rss_kib": 8029968,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 27426852,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 89,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact4-cpu-on-r1",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 8046458,
+        "peak_trial_rss_kib": 8050540,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 27514440,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact4-hybrid-on-r1",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 8221123,
+        "peak_trial_rss_kib": 13078944,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23627752,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 96,
+        "hot": true,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact4-hybrid-baseline-r1",
+      "ok": false,
+      "error": "Error: HTTP 400 http://127.0.0.1:18792/slots/0?action=restore: {\"error\":{\"code\":400,\"message\":\"Unable to restore slot, no available space in KV cache or invalid slot save file\",\"type\":\"invalid_request_error\"}}",
+      "resources": {
+        "peak_trial_pss_kib": 12050412,
+        "peak_trial_rss_kib": 17077780,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17071460,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact64-hybrid",
+      "ok": false,
+      "error": "Error: Fixture unexpectedly undersized",
+      "resources": {
+        "peak_trial_pss_kib": 10210894,
+        "peak_trial_rss_kib": 15238284,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 18975920,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 66,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "aligned-baseline-replay",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 11916454,
+        "peak_trial_rss_kib": 11920404,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23287120,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 62,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "compact64-aligned",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12198358,
+        "peak_trial_rss_kib": 17077492,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 16881840,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 100,
+        "hot": true,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-0-baseline",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12018242,
+        "peak_trial_rss_kib": 12020236,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23600844,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-1-hybrid",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12116805,
+        "peak_trial_rss_kib": 17078388,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17167904,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 96,
+        "hot": true,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-2-hybrid",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12116678,
+        "peak_trial_rss_kib": 17078196,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17148060,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 95,
+        "hot": true,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-3-baseline",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12010616,
+        "peak_trial_rss_kib": 12014060,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23629092,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-4-hybrid",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12116423,
+        "peak_trial_rss_kib": 17077864,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17098272,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 95,
+        "hot": true,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-5-baseline",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12012351,
+        "peak_trial_rss_kib": 12014688,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23622588,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 90,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-6-baseline",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12010653,
+        "peak_trial_rss_kib": 12014084,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23639756,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 91,
+        "hot": false,
+        "abort_enabled": false
+      }
+    },
+    {
+      "name": "coding-7-hybrid",
+      "ok": true,
+      "resources": {
+        "peak_trial_pss_kib": 12475669,
+        "peak_trial_rss_kib": 14921076,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 17163016,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 95,
+        "hot": true,
+        "abort_enabled": false
+      }
+    }
+  ],
+  "limits": [
+    "One64K positional recall observation, not a measured speedup against CPU64K",
+    "Coding route includes GPU startup/save/format conversion/unload in cold wall; warm stays retained CPU",
+    "Original build/runtime/version/fixture failures are preserved",
+    "No production rollout, external state files, mixed models or native crash qualification"
+  ]
+}

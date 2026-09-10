@@ -1,0 +1,1 @@
+import {test,expect} from 'bun:test';import {median} from './median';test('odd/even/empty/no mutation',()=>{expect(median([1,4,2])).toBe(2);expect(median([1,9,3,5])).toBe(4);expect(()=>median([])).toThrow();const a=[3,1,2];median(a);expect(a).toEqual([3,1,2]);expect(median([-4,-2])).toBe(-3)});

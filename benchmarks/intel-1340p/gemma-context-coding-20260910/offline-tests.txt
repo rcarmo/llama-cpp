@@ -1,0 +1,23 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-context-coding-20260910/padding.test.ts:
+(pass) default source and partial checkpoint behavior unchanged [1.00ms]
+(pass) retained padding satisfies original strict rollback coverage guard [0.27ms]
+(pass) source never exports empty/foreign cells and leaves read path unchanged [0.17ms]
+
+reports/gemma-context-coding-20260910/gemma-state-v2.test.ts:
+(pass) validated subset emits v2 with byte-identical payload [141.86ms]
+(pass) rejects mismatched version and stream layout [24.04ms]
+(pass) rejects truncated and trailing content [107.62ms]
+(pass) rejects unexpected cell extension/schema and never overwrites source [61.24ms]
+(pass) unwraps newer text-only token envelope; rejects media [193.61ms]
+
+reports/gemma-context-coding-20260910/aligned-route.test.ts:
+(pass) production geometry and retained CPU are identical on both paths [0.03ms]
+(pass) explicit conversion and native restore precede GPU parking and CPU decode [0.03ms]
+(pass) prefix ownership is token-based and handoff coverage asserted [0.02ms]
+
+ 11 pass
+ 0 fail
+ 34 expect() calls
+Ran 11 tests across 3 files. [542.00ms]

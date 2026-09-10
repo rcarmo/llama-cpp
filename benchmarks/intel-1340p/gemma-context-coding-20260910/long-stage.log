@@ -1,0 +1,13 @@
+true
+true
+12 |  for(let attempt=0;attempt<12;attempt++){
+13 |   const chosen=[...lines];chosen[0]=`Record START: the key is ${codes[0]}.`;chosen[Math.floor(chosen.length/2)]=`Record MIDDLE: the key is ${codes[1]}.`;chosen[chosen.length-1]=`Record END: the key is ${codes[2]}.`;
+14 |   messages[1].content=chosen.join('\n')+'\nReturn the keys for START, MIDDLE and END in that order, separated by commas.';
+15 |   const rendered=await api('http://127.0.0.1:18792/apply-template',body);tokens=(await api('http://127.0.0.1:18792/tokenize',{content:rendered.prompt,add_special:true,parse_special:true})).tokens;
+16 |   if(tokens.length>=64000&&tokens.length<=65536)break;
+17 |   if(tokens.length>65536)lines.splice(-Math.ceil((tokens.length-65000)/18));else throw Error('Fixture unexpectedly undersized');
+                                                                                            ^
+error: Fixture unexpectedly undersized
+      at /var/home/agent/workspace/reports/gemma-context-coding-20260910/long64.ts:17:88
+
+FINISHED compact64-hybrid false

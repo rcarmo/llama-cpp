@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "answer": "START key: CEDAR-481.\nEND key: BIRCH-953.",
+  "pass": true,
+  "append": "START key: CEDAR-481.",
+  "append_pass": true,
+  "cache_n": 4347,
+  "prompt_n": 1,
+  "append_cache_n": 4369,
+  "append_prompt_n": 16,
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 262144,
+    "parallel": 2,
+    "cache": 256
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 57.151616000000104,
+      "package_j": 0.975095,
+      "timings": {
+        "restore_ms": 55.666
+      },
+      "n_read": 102757924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 1709.721466,
+      "package_j": 53.551315,
+      "timings": {
+        "cache_n": 4347,
+        "prompt_n": 1,
+        "prompt_ms": 104.565,
+        "prompt_per_token_ms": 104.565,
+        "prompt_per_second": 9.563429445799263,
+        "predicted_n": 22,
+        "predicted_ms": 1586.289,
+        "predicted_per_token_ms": 72.10404545454546,
+        "predicted_per_second": 13.868847353792406,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 22,
+        "prompt_tokens": 4348,
+        "total_tokens": 4370,
+        "prompt_tokens_details": {
+          "cached_tokens": 4347
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "append",
+      "device": "cpu",
+      "wall_ms": 1044.379497,
+      "package_j": 37.757533,
+      "timings": {
+        "cache_n": 4369,
+        "prompt_n": 16,
+        "prompt_ms": 645.462,
+        "prompt_per_token_ms": 40.341375,
+        "prompt_per_second": 24.788446105270335,
+        "predicted_n": 11,
+        "predicted_ms": 380.079,
+        "predicted_per_token_ms": 34.55263636363637,
+        "predicted_per_second": 28.9413516663641,
+        "draft_n": 9,
+        "draft_n_accepted": 9
+      },
+      "usage": {
+        "completion_tokens": 11,
+        "prompt_tokens": 4385,
+        "total_tokens": 4396,
+        "prompt_tokens_details": {
+          "cached_tokens": 4369
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 62,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11916454,
+    "peak_trial_rss_kib": 11920404,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23287120,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T16:38:34.638Z"
+}

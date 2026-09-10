@@ -1,0 +1,41 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+warning: no usable GPU found, --gpu-layers-draft option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.972 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.005.160 I srv          init: The UI is disabled
+0.00.005.163 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.005.361 W srv  llama_server: -----------------
+0.00.005.363 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.005.363 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.005.364 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.005.364 W srv  llama_server: -----------------
+0.00.006.719 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.00.548.183 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+0.00.613.664 W srv    load_model: [spec] failed to measure draft model memory: failed to create llama_context from model
+0.01.620.731 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.621.268 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.652.692 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.501.063 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.879.735 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.915.184 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+0.04.382.658 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.383.206 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.384.894 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.414.155 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.04.442.187 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.442.194 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7fa6fbfff040, v = 0x7fa71bfff040
+0.04.442.210 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.442.211 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7fa633b7f040, v = 0x7fa633cff040
+0.04.442.212 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7fa633b7f040, v = 0x7fa633cff040
+0.04.442.212 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7fa633b7f040, v = 0x7fa633cff040
+0.04.442.921 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.04.833.539 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.04.858.823 I srv  llama_server: model loaded
+0.04.858.839 I srv  llama_server: listening on http://127.0.0.1:18792
+0.46.172.885 E state_seq_load_file: unknown (magic, version) for sequence state file: 67677371, 00000003
+0.46.172.902 E srv    send_error: task id = 0, error: Unable to restore slot, no available space in KV cache or invalid slot save file
+0.46.173.061 W srv          stop: cancel task, id_task = 0
+0.46.175.850 I srv    operator(): operator(): cleaning up before exit...

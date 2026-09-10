@@ -1,0 +1,75 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+warning: no usable GPU found, --gpu-layers-draft option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.003.667 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.003.810 I srv          init: The UI is disabled
+0.00.003.810 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.003.939 W srv  llama_server: -----------------
+0.00.003.940 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.003.941 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.003.941 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.003.941 W srv  llama_server: -----------------
+0.00.005.269 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.00.554.784 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+0.00.619.942 W srv    load_model: [spec] failed to measure draft model memory: failed to create llama_context from model
+0.01.623.082 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.623.626 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.657.892 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.516.139 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.899.287 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.934.220 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+0.04.397.710 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.398.262 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.399.941 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.429.162 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.04.457.182 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.457.190 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7fd01ffff040, v = 0x7fd03ffff040
+0.04.457.205 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.457.206 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7fcf57b7f040, v = 0x7fcf57cff040
+0.04.457.207 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7fcf57b7f040, v = 0x7fcf57cff040
+0.04.457.207 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7fcf57b7f040, v = 0x7fcf57cff040
+0.04.499.323 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.05.061.083 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.05.081.931 I srv  llama_server: model loaded
+0.05.081.950 I srv  llama_server: listening on http://127.0.0.1:18792
+0.06.368.152 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.06.368.455 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.24.549.237 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   1159, progress = 0.36, t =  18.18 s / 63.75 tokens per second
+0.41.115.322 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   2183, progress = 0.68, t =  34.75 s / 62.83 tokens per second
+0.53.828.867 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   2956, progress = 0.92, t =  47.46 s / 62.28 tokens per second
+0.57.917.868 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   3212, progress = 1.00, t =  51.55 s / 62.31 tokens per second
+0.59.134.784 I slot print_timing: id  0 | task 0 | prompt eval time =   51893.27 ms /  3216 tokens (   16.14 ms per token,    61.97 tokens per second)
+0.59.134.868 I slot print_timing: id  0 | task 0 |        eval time =     872.87 ms /    19 tokens (   45.94 ms per token,    21.77 tokens per second)
+0.59.134.881 I slot print_timing: id  0 | task 0 |       total time =   52766.15 ms /  3235 tokens
+0.59.134.895 I slot print_timing: id  0 | task 0 |    graphs reused =          4
+0.59.134.910 I slot print_timing: id  0 | task 0 | draft acceptance = 0.93333 (   14 accepted /    15 generated), mean len =  3.80
+0.59.135.434 I slot      release: id  0 | task 0 | stop processing: n_tokens = 3235, truncated = 0
+0.59.567.523 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.59.567.625 I slot launch_slot_: id  0 | task 12 | processing task, is_child = 0
+1.05.304.033 I slot print_timing: id  0 | task 12 | n_decoded =    101, tg =  21.54 t/s, tg_3s =  21.54 t/s
+1.07.268.290 I slot print_timing: id  0 | task 12 | prompt eval time =    1047.07 ms /    56 tokens (   18.70 ms per token,    53.48 tokens per second)
+1.07.268.299 I slot print_timing: id  0 | task 12 |        eval time =    6653.43 ms /   132 tokens (   50.40 ms per token,    19.84 tokens per second)
+1.07.268.300 I slot print_timing: id  0 | task 12 |       total time =    7700.50 ms /   188 tokens
+1.07.268.301 I slot print_timing: id  0 | task 12 |    graphs reused =         39
+1.07.268.306 I slot print_timing: id  0 | task 12 | draft acceptance = 0.85586 (   95 accepted /   111 generated), mean len =  3.57
+1.07.268.450 I slot      release: id  0 | task 12 | stop processing: n_tokens = 3423, truncated = 0
+1.07.490.582 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+1.07.490.689 I slot launch_slot_: id  0 | task 52 | processing task, is_child = 0
+1.08.293.824 I slot print_timing: id  0 | task 52 | prompt eval time =     554.83 ms /    14 tokens (   39.63 ms per token,    25.23 tokens per second)
+1.08.293.843 I slot print_timing: id  0 | task 52 |        eval time =     248.14 ms /     9 tokens (   27.57 ms per token,    36.27 tokens per second)
+1.08.293.843 I slot print_timing: id  0 | task 52 |       total time =     802.96 ms /    23 tokens
+1.08.293.844 I slot print_timing: id  0 | task 52 |    graphs reused =         40
+1.08.293.848 I slot print_timing: id  0 | task 52 | draft acceptance = 1.00000 (    6 accepted /     6 generated), mean len =  4.00
+1.08.294.077 I slot      release: id  0 | task 52 | stop processing: n_tokens = 3445, truncated = 0
+1.08.609.413 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+1.08.609.543 I slot launch_slot_: id  0 | task 57 | processing task, is_child = 0
+1.14.195.923 I slot print_timing: id  0 | task 57 | prompt eval time =    1991.39 ms /   108 tokens (   18.44 ms per token,    54.23 tokens per second)
+1.14.195.937 I slot print_timing: id  0 | task 57 |        eval time =    3594.81 ms /    50 tokens (   71.90 ms per token,    13.91 tokens per second)
+1.14.195.938 I slot print_timing: id  0 | task 57 |       total time =    5586.20 ms /   158 tokens
+1.14.195.939 I slot print_timing: id  0 | task 57 |    graphs reused =         58
+1.14.195.944 I slot print_timing: id  0 | task 57 | draft acceptance = 0.48333 (   29 accepted /    60 generated), mean len =  2.45
+1.14.196.182 I slot      release: id  0 | task 57 | stop processing: n_tokens = 3602, truncated = 0
+1.14.238.771 I srv    operator(): operator(): cleaning up before exit...
