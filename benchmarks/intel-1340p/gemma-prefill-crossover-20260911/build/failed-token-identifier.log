@@ -1,0 +1,30 @@
+ccache: error: Permission denied
+ 5 | const root='/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911',repo='/var/home/agent/workspace/projects/llama-cpp',build='/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-cpu';
+ 6 | const p=Bun.spawn(['/usr/sbin/ninja-build','-C',build,'-t','commands','bin/libllama.so.0.4.0'],{stdout:'pipe',stderr:'pipe'}),text=await new Response(p.stdout).text();if(await p.exited)throw Error(await new Response(p.stderr).text());const lines=text.trim().split('\n');let cc=lines.find(l=>l.includes('src/CMakeFiles/llama.dir/llama-context.cpp.o -c '))!,link=lines.findLast(l=>l.includes('-o bin/libllama.so.0.4.0 '))!;if(!cc||!link)throw Error('Retainedrecipe');
+ 7 | cc=cc.replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replace('-o src/CMakeFiles/llama.dir/llama-context.cpp.o','-o '+root+'/build/llama-context.cpp.o').replace('-c '+repo+'/src/llama-context.cpp','-c '+root+'/patch/llama-context.cpp').replaceAll('-I'+repo+'/src','-I'+root+'/build/source/src').replaceAll('-I'+repo+'/include','-I'+root+'/build/source/include').replaceAll('-I'+repo+'/ggml/include','-I'+root+'/build/source/ggml/include').replace(' -I',' -I'+root+'/build/source/src -I');
+ 8 | link=link.replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replace(' -o bin/libllama.so.0.4.0 ',' -o '+root+'/build/libllama.so.0.4.0 ').replace('--dependency-file=src/CMakeFiles/llama.dir/link.d','--dependency-file='+root+'/build/link.d').replace(' src/CMakeFiles/llama.dir/llama-context.cpp.o ',' '+root+'/build/llama-context.cpp.o ');
+ 9 | link=link.replace(' src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o ',' /var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/build/llama-kv-cache.cpp.o ');
+10 | writeFileSync(root+'/build/commands.sh','#!/bin/bash\nset -euo pipefail\ncd '+build+'\n'+cc+'\n'+link+'\n');const c=Bun.spawn(['/bin/bash',root+'/build/commands.sh'],{stdout:'inherit',stderr:'inherit'});if(await c.exited)throw Error('Capbuild');
+                                                                                                                                                                                                                                        ^
+error: Capbuild
+      at /var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/build/prepare.ts:10:228
+
+Bun v1.4.1 (Linux x64)
+/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/patch/llama-context.cpp:1754:89: error: use of undeclared identifier 'n_tokens'
+ 1754 |     if (model.arch == LLM_ARCH_GEMMA4 && cparams.n_ubatch == 1024 && batch_inp.token && n_tokens > 4 && prefill_cap) {
+      |                                                                                         ^~~~~~~~
+/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/patch/llama-context.cpp:1758:111: error: use of undeclared identifier 'n_tokens'
+ 1758 |             LLAMA_LOG_INFO("PREFILL_CAP allocated=%u active=%u tokens=%d\n", cparams.n_ubatch, active_ubatch, n_tokens);
+      |                                                                                                               ^~~~~~~~
+2 errors generated.
+ 5 | const root='/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911',repo='/var/home/agent/workspace/projects/llama-cpp',build='/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-cpu';
+ 6 | const p=Bun.spawn(['/usr/sbin/ninja-build','-C',build,'-t','commands','bin/libllama.so.0.4.0'],{stdout:'pipe',stderr:'pipe'}),text=await new Response(p.stdout).text();if(await p.exited)throw Error(await new Response(p.stderr).text());const lines=text.trim().split('\n');let cc=lines.find(l=>l.includes('src/CMakeFiles/llama.dir/llama-context.cpp.o -c '))!,link=lines.findLast(l=>l.includes('-o bin/libllama.so.0.4.0 '))!;if(!cc||!link)throw Error('Retainedrecipe');
+ 7 | cc=cc.replace(/^ccache\s+/,'').replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replace('-o src/CMakeFiles/llama.dir/llama-context.cpp.o','-o '+root+'/build/llama-context.cpp.o').replace('-c '+repo+'/src/llama-context.cpp','-c '+root+'/patch/llama-context.cpp').replaceAll('-I'+repo+'/src','-I'+root+'/build/source/src').replaceAll('-I'+repo+'/include','-I'+root+'/build/source/include').replaceAll('-I'+repo+'/ggml/include','-I'+root+'/build/source/ggml/include').replace(' -I',' -I'+root+'/build/source/src -I');
+ 8 | link=link.replaceAll('/usr/lib64/ccache/clang++','/usr/sbin/clang++').replace(' -o bin/libllama.so.0.4.0 ',' -o '+root+'/build/libllama.so.0.4.0 ').replace('--dependency-file=src/CMakeFiles/llama.dir/link.d','--dependency-file='+root+'/build/link.d').replace(' src/CMakeFiles/llama.dir/llama-context.cpp.o ',' '+root+'/build/llama-context.cpp.o ');
+ 9 | link=link.replace(' src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o ',' /var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/build/llama-kv-cache.cpp.o ');
+10 | writeFileSync(root+'/build/commands.sh','#!/bin/bash\nset -euo pipefail\ncd '+build+'\n'+cc+'\n'+link+'\n');const c=Bun.spawn(['/bin/bash',root+'/build/commands.sh'],{stdout:'inherit',stderr:'inherit'});if(await c.exited)throw Error('Capbuild');
+                                                                                                                                                                                                                                        ^
+error: Capbuild
+      at /var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/build/prepare.ts:10:228
+
+Bun v1.4.1 (Linux x64)

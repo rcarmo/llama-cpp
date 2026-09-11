@@ -1,0 +1,11 @@
+/** SCRIPT_JDOC:
+{"summary":"Measure fixed-allocation GPU prefill256/1024 suffixes from identical saved16K32K48K prefixes","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root,save}from'./campaign';import{capture}from'./capture';import{readFileSync,copyFileSync}from'node:fs';
+const n=Number(process.argv[2]),i=Number(process.argv[3]),active=[256,1024,1024,256][i];if(![16384,32768,49152].includes(n)||!active)throw Error('Position/order');
+const source=JSON.parse(readFileSync('/var/home/agent/workspace/reports/gemma-context-coding-20260910/runs/compact64-aligned/fixture.json','utf8'));
+const t=new Trial(`position-${n}-${i}-${active}`,{maintenance:true,build:'baseline',format:'f16',fa:false,full:false,ctx:147456,parallel:2,cache:0,ubatch:1024,batch:1024,vulkanBuild:root+'/runtime-gpu',preserveSwaPadding:true,extraEnv:{GGML_VK_EXPERIMENTAL_ATTN_MODE:'f32',LLAMA_EXPERIMENTAL_PREFILL_UBATCH:String(active)}});let result:any={};
+try{await t.begin();const gpu=await t.start('vulkan');capture(t.dir,gpu.p.pid);copyFileSync(root+`/runs/prefix-checkpoints-16-32-48/slots/prefix-${n}.slot`,t.dir+'/slots/prefix.slot');await t.req('vulkan','restore',{filename:'prefix.slot'},'/slots/0?action=restore');const prompt=source.tokens.slice(0,n+1022);save(t.dir+'/fixture.json',{n,active,max_ubatch:1024,prompt,expected_cache:n,expected_evaluated:1022});const r=await t.req('vulkan','tail',{prompt,n_predict:1,temperature:0,top_k:1,seed:42,id_slot:0,cache_prompt:true});if(r.timings.cache_n!==n||r.timings.prompt_n!==1022||r.timings.predicted_n!==1)throw Error('Matchedsuffixcounts');
+if(i===2||i===3){await t.req('vulkan','save',{filename:'tail.slot'},'/slots/0?action=save');await t.stop('vulkan');const p=Bun.spawn([process.execPath,root+'/inspect-slot.ts',t.dir+'/slots/tail.slot',t.dir+'/finite-scan.json'],{stdout:'ignore',stderr:'pipe'});if(await p.exited)throw Error('Statescan');const kv=JSON.parse(readFileSync(t.dir+'/finite-scan.json','utf8'));if(kv.total_nan||kv.total_inf)throw Error('Nonfinite');}
+result={ok:true,position:n,order:i,active_ubatch:active,max_ubatch:1024,timings:r.timings,scope:'Matched1022-tokenprefill suffix fromfixedmax1024state,notcompletefreshprefill/quality'};
+}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}

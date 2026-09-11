@@ -1,0 +1,93 @@
+{
+  "ok": true,
+  "position": 16384,
+  "order": 2,
+  "active_ubatch": 1024,
+  "max_ubatch": 1024,
+  "timings": {
+    "cache_n": 16384,
+    "prompt_n": 1022,
+    "prompt_ms": 16738.673,
+    "prompt_per_token_ms": 16.37834931506849,
+    "prompt_per_second": 61.05621395435588,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0,
+    "predicted_per_second": 0
+  },
+  "scope": "Matched1022-tokenprefill suffix fromfixedmax1024state,notcompletefreshprefill/quality",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 1024,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runtime-gpu",
+    "preserveSwaPadding": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32",
+      "LLAMA_EXPERIMENTAL_PREFILL_UBATCH": "1024"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "vulkan",
+      "wall_ms": 149.70979199999965,
+      "package_j": 2.249933,
+      "timings": {
+        "restore_ms": 148.313
+      },
+      "n_read": 300164740,
+      "token_hash": null
+    },
+    {
+      "label": "tail",
+      "device": "vulkan",
+      "wall_ms": 16752.222834,
+      "package_j": 368.86252,
+      "timings": {
+        "cache_n": 16384,
+        "prompt_n": 1022,
+        "prompt_ms": 16738.673,
+        "prompt_per_token_ms": 16.37834931506849,
+        "prompt_per_second": 61.05621395435588,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "save",
+      "device": "vulkan",
+      "wall_ms": 6313.531494999999,
+      "package_j": 52.651599,
+      "timings": {
+        "save_ms": 6311.845
+      },
+      "n_written": 316925540,
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 93,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5239497,
+    "peak_trial_rss_kib": 5243052,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 21905776,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T08:19:04.300Z"
+}
