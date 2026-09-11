@@ -87,3 +87,7 @@ Value3no-unroll screen did not confirm: independent8runs+0.088%decode,request0.9
 Two CPU slots at16,384/32,768/64,663 tokens each passed slot0/1/0 reuse with one evaluated token and zero swap, with cacheRAM0. The near130,000-token attempt hit the20-minute request deadline after57,344 newly evaluated tokens of progress; no completed finite state, dualnear128 occupancy or fallback timing qualified. Production12GiB prompt-cache pressure and broad long quality remain unqualified.
 
 The actual128scoretile passed native tests but was313.881%slower at48K; [negative result](../gemma-gpu-scorelarge-20260911/report.md), d52dbc6a4. No new B1/B2 was created. Final B0 identity/tools/cache/zero-swap verification was09:33:52UTC; lightweight idle/no-orphan/stopped-speech observation09:38:24UTC. Supervisor/CPU746174/746192 are dated observations. Restore target remains B0 itself; operational fallback remains ATTN4. No safety finding revoked an unaffected B0 speed scope.
+
+## Authorised SIMD follow-up, 11 September13:18UTC
+
+[Score and packed-Q4 report](../gemma-simd-followup-20260911/report.md): score3 no-unroll passed11nativecases/mode but lost4runABBA1.65%decode,request2.02%slower. ActualpackedQ4stream passed16generic-referencecases/mode and realmodeldispatch;4runABBA4.15%slower,request4.56%slower. TinyBLASQ4 initialcandidate passednative19/mode but realmodel bypassed it; no timingclaim. No finalist/confirmation/deployment. B0 restored13:18:29UTC with exactidentity/tools/cache/zeroSwap. Small gains remain eligible when confirmed; these candidates lost.

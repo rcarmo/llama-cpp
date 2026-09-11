@@ -1,0 +1,12 @@
+PASS speech state
+true
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"ConfirmoptinF16four-queryGEMM tile on deployedsmallbatchbaseline","kind":"mixed","weight":"heavy","role":"entrypoint"}
+3 | */
+4 | import{Trial,root,save}from'./campaign';import{copyFileSync,readFileSync}from'node:fs';
+5 | const order=Number(process.argv[2]),modes=[0,1,1,0,1,0,0,1];if(!Number.isInteger(order)||order<0||order>3)throw Error('Order');const threads=modes[order];
+                                                                                                                    ^
+error: Order
+      at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/screen.ts:5:113
+
+Bun v1.4.1 (Linux x64)
