@@ -1,0 +1,67 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-b1-release-20260911/stage-owner.test.ts:
+(pass) normal stage owns lease until restoration verification [1.46ms]
+(pass) simultaneous launch/rejected second poststop cannot restore first [0.51ms]
+(pass) failed preflight never gains restoration permission [0.35ms]
+(pass) queued cancellation/no lease is no-op [0.13ms]
+(pass) abort/owner crash after stop-intent restores the frozen current release [0.43ms]
+(pass) crash during work followed by new owner is refused, original cleanup allowed [0.53ms]
+(pass) delayed old poststop cannot release or restart a new owner [0.72ms]
+(pass) restoring owner holds lease during verification, rejects next stage [0.52ms]
+(pass) cleanup failure keeps lease and never starts production [0.48ms]
+(pass) verification failure/cancel keeps lease for explicit recovery [0.62ms]
+(pass) changed release blocks obsolete restoration [0.51ms]
+
+reports/gemma-b1-release-20260911/closeout.test.ts:
+(pass) original failure is reproduced on both arms and stays a failure, not qualification [0.30ms]
+1 | import{test,expect}from'bun:test';import{readFileSync,readdirSync}from'node:fs';import{createHash}from'node:crypto';import{resources}from'./preflight';import{parse,summarize}from'./meter';const root=import.meta.dir,j=(p:string)=>JSON.parse(readFileSync(root+'/'+p,'utf8')),txt=(p:string)=>readFileSync(root+'/'+p,'utf8');
+2 | test('original failure is reproduced on both arms and stays a failure, not qualification',()=>{for(const mode of[0,1]){const r=j(`runs/restore-append-mode${mode}/result.json`);expect(r.cache_loss).toBe(true);expect(r.bounded_wall_ms).toBeLessThan(1000);const h=j(`runs/restore-append-mode${mode}/history.json`);expect(h.token_count).toBe(64684);expect(h.caches.map(c=>c.streams[0].cells)).toEqual([64684,512]);expect(h.caches.every(c=>c.streams[1].cells===0)).toBe(true)}});
+3 | test('exact repaired restore-tool-append maintains tokens, slot isolation and MTP',()=>{for(const mode of[0,1]){const base=`runs/repair-append-mode${mode}`,r=j(base+'/result.json'),h=j(base+'/history.json'),old=j(`runs/restore-append-mode${mode}/history.json`);expect(r.ok).toBe(true);expect(r.cache_loss).toBe(false);expect(r.append).toMatchObject({cache_n:64684,prompt_n:15});expect(r.answer).toContain('MAPLE-726');expect(h.tokens_sha256).toBe(old.tokens_sha256);expect(h.caches.map(c=>c.streams[0].cells)).toEqual([64684,766]);expect(h.caches.every(c=>c.streams[1].cells===0)).toBe(true);expect(r.calls.map(c=>c.label)).toEqual(['restore','recall','save','self-restore','toolcall','toolanswer','long-append']);expect(r.calls[1].timings.draft_n_accepted).toBe(15)}});
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+error: expect(received).toEqual(expected)
+
+  [
+    "restore",
+    "recall",
+    "save",
+    "self-restore",
+-   "toolcall",
+-   "toolanswer",
++   "tool-call",
++   "tool-answer",
+    "long-append",
+  ]
+
+- Expected  - 2
++ Received  + 2
+
+      at <anonymous> (/var/home/agent/workspace/reports/gemma-b1-release-20260911/closeout.test.ts:3:625)
+(fail) exact repaired restore-tool-append maintains tokens, slot isolation and MTP [0.30ms]
+(pass) all original and repaired F16 tensor payloads finite to exact EOF [0.34ms]
+(pass) all common cells compare by explicit position, without sorted-ring assumptions [0.18ms]
+1 | import{test,expect}from'bun:test';import{readFileSync,readdirSync}from'node:fs';import{createHash}from'node:crypto';import{resources}from'./preflight';import{parse,summarize}from'./meter';const root=import.meta.dir,j=(p:string)=>JSON.parse(readFileSync(root+'/'+p,'utf8')),txt=(p:string)=>readFileSync(root+'/'+p,'utf8');
+2 | test('original failure is reproduced on both arms and stays a failure, not qualification',()=>{for(const mode of[0,1]){const r=j(`runs/restore-append-mode${mode}/result.json`);expect(r.cache_loss).toBe(true);expect(r.bounded_wall_ms).toBeLessThan(1000);const h=j(`runs/restore-append-mode${mode}/history.json`);expect(h.token_count).toBe(64684);expect(h.caches.map(c=>c.streams[0].cells)).toEqual([64684,512]);expect(h.caches.every(c=>c.streams[1].cells===0)).toBe(true)}});
+3 | test('exact repaired restore-tool-append maintains tokens, slot isolation and MTP',()=>{for(const mode of[0,1]){const base=`runs/repair-append-mode${mode}`,r=j(base+'/result.json'),h=j(base+'/history.json'),old=j(`runs/restore-append-mode${mode}/history.json`);expect(r.ok).toBe(true);expect(r.cache_loss).toBe(false);expect(r.append).toMatchObject({cache_n:64684,prompt_n:15});expect(r.answer).toContain('MAPLE-726');expect(h.tokens_sha256).toBe(old.tokens_sha256);expect(h.caches.map(c=>c.streams[0].cells)).toEqual([64684,766]);expect(h.caches.every(c=>c.streams[1].cells===0)).toBe(true);expect(r.calls.map(c=>c.label)).toEqual(['restore','recall','save','self-restore','toolcall','toolanswer','long-append']);expect(r.calls[1].timings.draft_n_accepted).toBe(15)}});
+4 | test('all original and repaired F16 tensor payloads finite to exact EOF',()=>{for(const mode of[0,1])for(const kind of['restore','repair']){const f=j(`runs/${kind}-append-mode${mode}/finite.json`);expect([f.total_nan,f.total_inf]).toEqual([0,0]);expect(f.parsed_bytes).toBe(f.size);expect(f.layers.length).toBe(48);expect(f.layers.filter(l=>l.cache===1&&l.stream===0).every(l=>l.cells===(kind==='repair'?766:512))).toBe(true)}});
+5 | test('all common cells compare by explicit position, without sorted-ring assumptions',()=>{const a=j('common-state-audit.json');expect(a.pass).toBe(true);expect(a.rows.length).toBe(96);expect(a.rows.every(r=>r.common_sha256.length===64)).toBe(true);expect(a.rows.filter(r=>r.cache===1).every(r=>r.extra_cells===254)).toBe(true);expect(a.rows.filter(r=>r.cache===0).every(r=>r.extra_cells===0)).toBe(true)});
+6 | test('only save-path library changes within the failure-repair comparison',()=>{for(const mode of[0,1]){const a=j(`runs/restore-append-mode${mode}/runtime-provenance.json`),b=j(`runs/repair-append-mode${mode}/runtime-provenance.json`);const byName=(v:any)=>Object.fromEntries(v.files.map(f=>[f.path.split('/').pop(),f.sha256]));const x=byName(a),y=byName(b);expect(Object.keys(x).sort()).toEqual(Object.keys(y).sort());expect(Object.keys(x).filter(k=>x[k]!==y[k])).toEqual(['libllama.so.0']);expect(x['libggml-cpu.so.0']).toBe('98201efbdf2bc0fa7c96acf6f904609dd9f8c6724ed50edf6fed0d841cbc9703ab');expect(b.flags).toContain('LLAMA_EXPERIMENTAL_CPU_SWA_SAVE_PADDING=1')}});
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ^
+error: expect(received).toBe(expected)
+
+Expected: "98201efbdf2bc0fa7c96acf6f904609dd9f8c6724ed50edf6fed0d841cbc9703ab"
+Received: "98201efbdf2bc0fa7c96acf6f904609dd9f8c6724ed50edf6fed0d841cbc970a"
+
+      at <anonymous> (/var/home/agent/workspace/reports/gemma-b1-release-20260911/closeout.test.ts:6:523)
+(fail) only save-path library changes within the failure-repair comparison [0.28ms]
+(pass) save patch is narrow and keeps empty/foreign and partial-state filters [2.85ms]
+(pass) guard stop is retained; no native staging row completed and release held [0.36ms]
+(pass) candidate changes only two CPU libraries and two flags; GPU unchanged [0.26ms]
+(pass) synthetic PMU groups attribute equal work with disabled negative controls [0.23ms]
+(pass) exactly two CPU-only diagnostic profiles; actual counts, guards and residency preserved [46.67ms]
+(pass) latest B0 receipt has idle slots, exact original identities, zero swap and four CPU checks [0.52ms]
+
+ 20 pass
+ 2 fail
+ 131 expect() calls
+Ran 22 tests across 2 files. [415.00ms]

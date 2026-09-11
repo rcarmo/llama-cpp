@@ -107,3 +107,7 @@ The actual128scoretile passed native tests but was313.881%slower at48K; [negativ
 Status is qualified-experimental-not-deployed for saved64Kdecodeonly;B0 stays production. Originalselfrestore→append unexpectedly reevaluated and was abortedbyagentsequencingerror;partialfailure retained,originalsequenceunqualified. Reorderednormalappend andselfrestorepassedseparately. LatestpostPMUrestoration15:13:57UTC differsfromimmutablemanifest's earlierpostqualification15:11:19UTC;botharedatedobservations.
 
 TwoPMUprofilescapturedcore/atomusercounters;IMCpermissiondenied,noDRAMorKV-specificattribution. Headsharing andfusionprototypes conditional-not-run;logicalbuffers/designandpriorFAcosts retained. No forcedimplementationorautomaticdeployment.
+
+## B1 combined release hold,11 September16:20UTC
+
+The [release/attribution closeout](../gemma-b1-release-20260911/report.md) repairs the exact native CPU save->restore->independent tool->append sequence on B0/B1: SWA512->766cells,64684cached/15evaluated; four finite states and96 common-cell bit-exact tensor comparisons. Staging failed the16MiB worker-swap gate duringGPUstartup (352516KiB atabort), zero native staging checks completed; B0 restored, noGPUretry/cutover. Two CPU-only operator profiles passed frozen work but did not justify a new mechanism; no new timing candidate.22tests146assertions pass. PriorB1 +0.703% confirmation remains experimental; combined release held, native serving recovery/cache-pressure unqualified. Append-only event: `baselines/B1-release-hold.json`.

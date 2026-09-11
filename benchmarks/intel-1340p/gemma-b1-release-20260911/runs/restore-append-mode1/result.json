@@ -1,0 +1,158 @@
+{
+  "ok": true,
+  "mode": 1,
+  "cache_loss": true,
+  "abort": "Unexpected prefix cache loss",
+  "bounded_wall_ms": 525.5172309999998,
+  "scope": "Reproduction completed with expected guardedfailure,notqualification",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/runtime-cpu",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 515.8143319999999,
+      "package_j": 6.853925,
+      "timings": {
+        "restore_ms": 514.268
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "recall",
+      "device": "cpu",
+      "wall_ms": 2562.9292969999997,
+      "package_j": 83.224335,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 206.172,
+        "prompt_per_token_ms": 206.172,
+        "prompt_per_second": 4.850319151000136,
+        "predicted_n": 21,
+        "predicted_ms": 2232.05,
+        "predicted_per_token_ms": 106.28809523809525,
+        "predicted_per_second": 9.408391389081785,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 21,
+        "prompt_tokens": 64663,
+        "total_tokens": 64684,
+        "prompt_tokens_details": {
+          "cached_tokens": 64662
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "save",
+      "device": "cpu",
+      "wall_ms": 457.02875499999936,
+      "package_j": 8.371255,
+      "timings": {
+        "save_ms": 456.222
+      },
+      "n_written": 1081795892,
+      "token_hash": null
+    },
+    {
+      "label": "self-restore",
+      "device": "cpu",
+      "wall_ms": 333.4580049999986,
+      "package_j": 4.714038,
+      "timings": {
+        "restore_ms": 332.339
+      },
+      "n_read": 1081795892,
+      "token_hash": null
+    },
+    {
+      "label": "tool-call",
+      "device": "cpu",
+      "wall_ms": 2304.966305,
+      "package_j": 88.265399,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 96,
+        "prompt_ms": 1676.253,
+        "prompt_per_token_ms": 17.46096875,
+        "prompt_per_second": 57.27059101460222,
+        "predicted_n": 18,
+        "predicted_ms": 619.051,
+        "predicted_per_token_ms": 34.39172222222223,
+        "predicted_per_second": 29.07676427305666,
+        "draft_n": 15,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 18,
+        "prompt_tokens": 96,
+        "total_tokens": 114,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-answer",
+      "device": "cpu",
+      "wall_ms": 1237.6368490000004,
+      "package_j": 44.320016,
+      "timings": {
+        "cache_n": 91,
+        "prompt_n": 48,
+        "prompt_ms": 1021.841,
+        "prompt_per_token_ms": 21.288354166666668,
+        "prompt_per_second": 46.974039992523295,
+        "predicted_n": 3,
+        "predicted_ms": 208.259,
+        "predicted_per_token_ms": 69.41966666666666,
+        "predicted_per_second": 14.40513975386418,
+        "draft_n": 3,
+        "draft_n_accepted": 3
+      },
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 139,
+        "total_tokens": 142,
+        "prompt_tokens_details": {
+          "cached_tokens": 91
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 70,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12025926,
+    "peak_trial_rss_kib": 12029288,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24183448,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:49:49.301Z"
+}

@@ -93,3 +93,7 @@ For each relevant coded/tool fixture, run baseline/candidate pairs with seeds42 
 5. I01 interaction, I02 affected recovery, I03 bounded capacity; I04/I05 apply after every improvement rather than only at the end.
 
 Read the decision table after each setback. Continue safe, useful offline work when load is blocked; do not stop the entire optimisation effort on a minor harness error or one noisy timing result.
+
+## B1 combined release hold,11 September16:20UTC
+
+The [release/attribution closeout](../gemma-b1-release-20260911/report.md) repairs the exact native CPU save->restore->independent tool->append sequence on B0/B1: SWA512->766cells,64684cached/15evaluated; four finite states and96 common-cell bit-exact tensor comparisons. Staging failed the16MiB worker-swap gate duringGPUstartup (352516KiB atabort), zero native staging checks completed; B0 restored, noGPUretry/cutover. Two CPU-only operator profiles passed frozen work but did not justify a new mechanism; no new timing candidate.22tests146assertions pass. PriorB1 +0.703% confirmation remains experimental; combined release held, native serving recovery/cache-pressure unqualified. Append-only event: `baselines/B1-release-hold.json`.

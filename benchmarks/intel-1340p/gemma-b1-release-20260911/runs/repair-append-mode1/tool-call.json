@@ -1,0 +1,120 @@
+{
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookup_stock exactly once. After its result arrives, answer with the returned quantity."
+      },
+      {
+        "role": "user",
+        "content": "How many items of SKU PANDA-FA are in stock? Look it up, then reply with the quantity only."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "description": "Read fixture stock",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 64,
+    "cache_prompt": true,
+    "id_slot": 1,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "tool_choice": "required"
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "tool_calls",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "function": {
+                "name": "lookup_stock",
+                "arguments": "{\"sku\":\"PANDA-FA\"}"
+              },
+              "id": "1fez1EeyGEQxMpVyEaxKC6wxyN7SscAP"
+            }
+          ]
+        }
+      }
+    ],
+    "created": 1789142000,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 18,
+      "prompt_tokens": 96,
+      "total_tokens": 114,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-DsSlQFd7k27M8ZfEODBARxZeQZZj38AN",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 96,
+      "prompt_ms": 1589.224,
+      "prompt_per_token_ms": 16.554416666666665,
+      "prompt_per_second": 60.40684006785702,
+      "predicted_n": 18,
+      "predicted_ms": 612.423,
+      "predicted_per_token_ms": 34.0235,
+      "predicted_per_second": 29.39145002718709,
+      "draft_n": 15,
+      "draft_n_accepted": 15
+    }
+  },
+  "measurement": {
+    "label": "tool-call",
+    "device": "cpu",
+    "wall_ms": 2212.069074000001,
+    "package_j": 85.602259,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 96,
+      "prompt_ms": 1589.224,
+      "prompt_per_token_ms": 16.554416666666665,
+      "prompt_per_second": 60.40684006785702,
+      "predicted_n": 18,
+      "predicted_ms": 612.423,
+      "predicted_per_token_ms": 34.0235,
+      "predicted_per_second": 29.39145002718709,
+      "draft_n": 15,
+      "draft_n_accepted": 15
+    },
+    "usage": {
+      "completion_tokens": 18,
+      "prompt_tokens": 96,
+      "total_tokens": 114,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "token_hash": null
+  }
+}

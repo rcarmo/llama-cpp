@@ -1,0 +1,21 @@
+--- a/src/llama-kv-cache.cpp
++++ b/src/llama-kv-cache.cpp
+@@ -6,6 +6,7 @@
+ #include "llama-context.h"
+ 
+ #include <algorithm>
++#include <cstdlib>
+ #include <cassert>
+ #include <cmath>
+ #include <cstring>
+@@ -1988,7 +1989,9 @@
+             add_cell = add_cell && (seq_id == -1 || cells.seq_has(i, seq_id));
+ 
+             // check the cell is not SWA-masked
+-            if (add_cell && seq_id != -1) {
++            const bool keep_padding = std::getenv("LLAMA_EXPERIMENTAL_CPU_SWA_SAVE_PADDING") != nullptr &&
++                n_swa > 0 && swa_type == LLAMA_SWA_TYPE_STANDARD && !(flags & LLAMA_STATE_SEQ_FLAGS_PARTIAL_ONLY);
++            if (add_cell && seq_id != -1 && !keep_padding) {
+                 const bool is_masked = llama_hparams::is_masked_swa(n_swa, swa_type, cells.pos_get(i), cells.seq_pos_max(seq_id));
+ 
+                 add_cell = !is_masked;

@@ -1,0 +1,19 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-b1-release-20260911/stage-owner.test.ts:
+(pass) normal stage owns lease until restoration verification [4.01ms]
+(pass) simultaneous launch/rejected second poststop cannot restore first [1.42ms]
+(pass) failed preflight never gains restoration permission [0.85ms]
+(pass) queued cancellation/no lease is no-op [0.35ms]
+(pass) abort/owner crash after stop-intent restores the frozen current release [1.19ms]
+(pass) crash during work followed by new owner is refused, original cleanup allowed [1.33ms]
+(pass) delayed old poststop cannot release or restart a new owner [1.75ms]
+(pass) restoring owner holds lease during verification, rejects next stage [1.31ms]
+(pass) cleanup failure keeps lease and never starts production [1.15ms]
+(pass) verification failure/cancel keeps lease for explicit recovery [1.13ms]
+(pass) changed release blocks obsolete restoration [1.00ms]
+
+ 11 pass
+ 0 fail
+ 34 expect() calls
+Ran 11 tests across 1 file. [29.00ms]
