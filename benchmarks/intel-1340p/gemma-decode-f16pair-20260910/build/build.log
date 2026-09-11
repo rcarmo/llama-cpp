@@ -1,0 +1,14 @@
+/var/home/agent/workspace/reports/gemma-decode-f16pair-20260910/patch/ggml-cpu.c:1465:29: warning: passing 'const ggml_fp16_t *' (aka 'const unsigned short *') to parameter of type 'void *' discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+ 1465 |                             (const ggml_fp16_t *) (src0_row + ir0 * nb01), (const ggml_fp16_t *) src1_col);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/build/source/ggml/src/ggml-cpu/vec.h:144:117: note: passing argument to parameter 'xv' here
+  144 | inline static void ggml_vec_dot_f16_unroll(const int n, const int xs, float * GGML_RESTRICT s, void * GGML_RESTRICT xv, ggml_fp16_t * GGML_RESTRICT y) {
+      |                                                                                                                     ^
+/var/home/agent/workspace/reports/gemma-decode-f16pair-20260910/patch/ggml-cpu.c:1465:76: warning: passing 'const ggml_fp16_t *' (aka 'const unsigned short *') to parameter of type 'ggml_fp16_t *' (aka 'unsigned short *') discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+ 1465 |                             (const ggml_fp16_t *) (src0_row + ir0 * nb01), (const ggml_fp16_t *) src1_col);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/reports/gemma-decode-shapes-20260910/build/source/ggml/src/ggml-cpu/vec.h:144:149: note: passing argument to parameter 'y' here
+  144 | inline static void ggml_vec_dot_f16_unroll(const int n, const int xs, float * GGML_RESTRICT s, void * GGML_RESTRICT xv, ggml_fp16_t * GGML_RESTRICT y) {
+      |                                                                                                                                                     ^
+2 warnings generated.
+Diagnosticshape+packingruntimebuilt; retainedsmallbatchlibllama; no production modifications

@@ -1,0 +1,48 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+warning: no usable GPU found, --gpu-layers-draft option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.339 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.588 I srv          init: The UI is disabled
+0.00.004.595 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.004.777 W srv  llama_server: -----------------
+0.00.004.779 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.779 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.779 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.780 W srv  llama_server: -----------------
+0.00.006.284 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.00.554.322 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+0.00.619.726 W srv    load_model: [spec] failed to measure draft model memory: failed to create llama_context from model
+0.01.628.869 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.629.424 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.661.659 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.520.667 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.905.217 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.939.756 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+0.04.392.639 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.393.187 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.394.881 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.423.948 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.04.451.569 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.451.575 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7f7f27fff040, v = 0x7f7f47fff040
+0.04.451.590 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.451.591 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7f7e5fb7f040, v = 0x7f7e5fcff040
+0.04.451.591 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7f7e5fb7f040, v = 0x7f7e5fcff040
+0.04.451.592 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7f7e5fb7f040, v = 0x7f7e5fcff040
+0.04.452.300 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.04.774.043 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.04.799.953 I srv  llama_server: model loaded
+0.04.799.972 I srv  llama_server: listening on http://127.0.0.1:18792
+0.06.276.934 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.06.277.031 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.19.131.577 I slot print_timing: id  0 | task 1 | n_decoded =    100, tg =   8.84 t/s, tg_3s =   8.84 t/s
+0.22.336.233 I slot print_timing: id  0 | task 1 | n_decoded =    125, tg =   8.61 t/s, tg_3s =   7.80 t/s
+0.22.732.247 I slot print_timing: id  0 | task 1 | prompt eval time =    1546.28 ms /    25 tokens (   61.85 ms per token,    16.17 tokens per second)
+0.22.732.253 I slot print_timing: id  0 | task 1 |        eval time =   14908.79 ms /   128 tokens (  116.47 ms per token,     8.59 tokens per second)
+0.22.732.254 I slot print_timing: id  0 | task 1 |       total time =   16455.07 ms /   153 tokens
+0.22.732.256 I slot print_timing: id  0 | task 1 |    graphs reused =         34
+0.22.732.260 I slot print_timing: id  0 | task 1 | draft acceptance = 0.81818 (   90 accepted /   110 generated), mean len =  3.43
+0.22.733.644 I slot      release: id  0 | task 1 | stop processing: n_tokens = 64810, truncated = 0
+0.22.898.685 I srv    operator(): operator(): cleaning up before exit...

@@ -1,0 +1,34 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.189 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.350 I srv          init: The UI is disabled
+0.00.004.350 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.004.515 W srv  llama_server: -----------------
+0.00.004.517 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.517 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.517 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.518 W srv  llama_server: -----------------
+0.00.005.958 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.01.066.790 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.067.327 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.098.919 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.01.949.280 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.339.625 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.374.074 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.03.812.753 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.03.819.695 I srv  llama_server: model loaded
+0.03.819.701 I srv  llama_server: listening on http://127.0.0.1:18792
+0.04.341.989 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.04.342.036 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.20.213.097 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   1024, progress = 0.25, t =  15.87 s / 64.52 tokens per second
+0.36.859.017 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   2048, progress = 0.50, t =  32.52 s / 62.98 tokens per second
+0.53.739.163 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   3072, progress = 0.75, t =  49.40 s / 62.19 tokens per second
+1.06.326.538 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   3836, progress = 0.94, t =  61.98 s / 61.89 tokens per second
+1.10.720.899 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   4092, progress = 1.00, t =  66.38 s / 61.65 tokens per second
+1.10.994.799 I slot print_timing: id  0 | task 0 | prompt eval time =   66652.73 ms /  4096 tokens (   16.27 ms per token,    61.45 tokens per second)
+1.10.994.806 I slot print_timing: id  0 | task 0 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+1.10.994.806 I slot print_timing: id  0 | task 0 |       total time =   66652.73 ms /  4097 tokens
+1.10.994.808 I slot print_timing: id  0 | task 0 |    graphs reused =          0
+1.10.994.962 I slot      release: id  0 | task 0 | stop processing: n_tokens = 4096, truncated = 0
+1.11.055.172 I srv    operator(): operator(): cleaning up before exit...
