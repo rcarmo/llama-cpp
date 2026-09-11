@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "mode": "1",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 4096,
+    "prompt_ms": 69295.587,
+    "prompt_per_token_ms": 16.917867919921875,
+    "prompt_per_second": 59.109103152557175,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0.001,
+    "predicted_per_second": 1000000
+  },
+  "tokens": [
+    236770
+  ],
+  "scope": "One unprofiledlargeprefill control/candidate pair,targetonly,nogenerationthroughputclaim;4096tokens/256microbatchunchanged16threadsourcepath",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime-cpu",
+    "format": "f16",
+    "fa": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": false,
+    "ubatch": 256,
+    "batch": 1024,
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "prefill",
+      "device": "cpu",
+      "wall_ms": 69300.91818699999,
+      "package_j": 2722.087026,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 4096,
+        "prompt_ms": 69295.587,
+        "prompt_per_token_ms": 16.917867919921875,
+        "prompt_per_second": 59.109103152557175,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "b95f03a3c210149f37a4021e70b45854bbcb16cd36743fa0b4f6265d2afbe1e3"
+    }
+  ],
+  "thermal": {
+    "peak_c": 86,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11756724,
+    "peak_trial_rss_kib": 11760084,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24274416,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T06:23:31.175Z"
+}

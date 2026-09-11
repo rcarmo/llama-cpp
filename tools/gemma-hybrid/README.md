@@ -8,6 +8,8 @@ The qualified `20260910-smallbatch` release adds the opt-in retained-ABI [small 
 
 The `20260911-attn4` release retains that change and adds the [four-query F16 attention tile](patches/attn4.md). Eight counterbalanced 64K runs measured a further 2.90% median decode gain, from 8.5536 to 8.8020 tok/s. Ranges overlap. The candidate passed native reference tests, finite-state/tools/cache checks and a guarded production SSE cutover. It pins the CPU backend and enables `GGML_CPU_EXPERIMENTAL_ATTN4=1`; GPU and adapter code are unchanged. The previous smallbatch release is the rollback target. An earlier GPU-startup cutover aborted with an unexplained swap peak, rolled back, and is retained in the [evidence report](../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md).
 
+The `20260911-score3-stopped` release adds the [score-only 3x4 tile](../../benchmarks/intel-1340p/gemma-decode-score3-20260911/patch/score3.patch) over ATTN4. The earlier eight-run comparison measured another 3.124% median decode gain (8.6634 to 8.9341 tok/s). Resumed finite64K/tool/cache qualification and one guarded production SSE cutover passed. See the [rollout report](../../benchmarks/intel-1340p/gemma-score3-rollout-20260911/report.md). It also enables the explicit stopped-speech policy below; the rollback target is ATTN4.
+
 ## Run
 
 ```
@@ -32,6 +34,8 @@ This adapter is specific to the validated Gemma E4B compact-SWA F16 FA-off state
 - Non-text chat, custom templates, multiple outputs and other unqualified features bypass GPU. Existing CPU backend compatibility governs those requests.
 
 GPU starts on demand and stops before CPU decoding. Admission checks current speech job/native activity/queued bytes and12GiB available RAM before start, then6GiB reserve and16MiB per-worker swap continuously. Speech contention interrupts GPU work; CPU remains available. Accelerated requests have a20-minute internal deadline. A GPU failure before generation erases the affected CPU slot and falls back to CPU; responses are never replayed after output transmission starts.
+
+When the owner deliberately stops both speech services, `speechMode: "stopped"` requires both loaded units inactive/dead with MainPID0, no speech listeners/connections and no native speech workers. Command failures, unexpected processes or reactivation block GPU admission. The default `speechMode: "active"` still requires a working jobs API; connection errors never imply idle. To use GPU alongside restarted speech, explicitly restore active mode and verify it. CPU fallback remains available in either mode.
 
 Runtime checks do not prove capacity for all two-slot128K workloads. GPU eligibility is restricted when known retained owner prefixes exceed64K. CPU-only oversized requests remain subject to the original service's resource limits. There is no exactly-once external tool execution guarantee; this adapter does not execute tools.
 
