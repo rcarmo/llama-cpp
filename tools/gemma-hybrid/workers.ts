@@ -6,8 +6,9 @@ import { createHash } from 'node:crypto';
 import { convertGemmaV3ToV2 } from './state';
 import type { Backend } from './proxy';
 import { processAlive as alive, convertedTokenCount } from './stream';
+import { checkSpeechJobs, type SpeechMode } from './speech';
 export type Profile = { argv: string[]; env: Record<string, string>; hashes: Record<string, string> };
-export type Config = { host: string; port: number; cpuUrl: string; gpuUrl: string; stateDir: string; cpu: Profile; gpu: Profile; minGpu?: number; maxGpu?: number };
+export type Config = { host: string; port: number; cpuUrl: string; gpuUrl: string; stateDir: string; cpu: Profile; gpu: Profile; minGpu?: number; maxGpu?: number; speechMode?: SpeechMode };
 const text = (p: string) => { try { return readFileSync(p, 'utf8'); } catch { return ''; } };
 const num = (s: string, key: string) => Number(s.match(new RegExp('^' + key + ':\\s+(\\d+)', 'm'))?.[1] ?? 0);
 export class Workers implements Backend {
@@ -72,8 +73,7 @@ export class Workers implements Backend {
     }
     async erase(slot: number) { await this.api(this.config.cpuUrl, `/slots/${slot}?action=erase`, {}); }
     async gpuGuard(beforeStart = false) {
-        const jobs = await fetch('http://127.0.0.1:8092/api/jobs', { signal: AbortSignal.timeout(2500) }).then(r => { if (!r.ok) throw Error('Speech guard unavailable'); return r.json(); });
-        if (!Array.isArray(jobs) || jobs.some(j => !['completed', 'failed', 'cancelled'].includes(j.state))) throw Error('Speech work active');
+        await checkSpeechJobs(this.config.speechMode ?? 'active');
         const current = new Map<number, number>();
         for (const pid of readdirSync('/proc').filter(p => /^\d+$/.test(p))) {
             const comm = text(`/proc/${pid}/comm`).trim();
