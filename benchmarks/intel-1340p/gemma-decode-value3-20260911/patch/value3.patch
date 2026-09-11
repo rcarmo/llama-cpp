@@ -1,0 +1,44 @@
+--- a/ggml/src/ggml-cpu/llamafile/sgemm.cpp
++++ b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
+@@ -507,6 +507,17 @@
+             return true;
+         }
+ #endif
++#if defined(__AVX2__) && defined(__FMA__)
++        const char * value3 = std::getenv("GGML_CPU_EXPERIMENTAL_VALUE4_3ROW");
++        if (m == 512 && k >= 32768 && value3 != nullptr && std::strcmp(value3, "1") == 0) {
++            if (params->ith == 0 && std::getenv("GGML_CPU_VALUE4_3ROW_TRACE") != nullptr) {
++                std::fprintf(stderr, "VALUE4_3ROW m=%lld n=%lld k=%lld tail=%lld threads=%d\n",
++                    (long long)m, (long long)n, (long long)k, (long long)(m%3), params->nth);
++            }
++            gemm_value3(m);
++            return true;
++        }
++#endif
+         gemm<2, 4, 8>(m, n, 1);
+         return true;
+     }
+@@ -610,6 +621,23 @@
+             int64_t ii = begin;
+             for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
+             if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
++            if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
++            job = ggml_threadpool_chunk_add(params->threadpool, 1);
++        }
++        ggml_barrier(params->threadpool);
++    }
++
++    NOINLINE void gemm_value3(int64_t m) {
++        const int64_t nb_job = (m + 11) / 12;
++        if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
++        ggml_barrier(params->threadpool);
++        int64_t job = params->ith;
++        while (job < nb_job) {
++            const int64_t begin = job * 12;
++            const int64_t end = begin + 12 < m ? begin + 12 : m;
++            int64_t ii = begin;
++            for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
++            if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
+             if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
+             job = ggml_threadpool_chunk_add(params->threadpool, 1);
+         }
