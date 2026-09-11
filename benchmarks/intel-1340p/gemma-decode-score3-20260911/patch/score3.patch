@@ -1,0 +1,44 @@
+--- a/ggml/src/ggml-cpu/llamafile/sgemm.cpp
++++ b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
+@@ -496,6 +496,17 @@
+ 
+     bool matmul_attn4(int64_t m, int64_t n) {
+         if (n != 4 || m % 16 != 0 || k % KN != 0) return false;
++#if defined(__AVX2__) && defined(__FMA__)
++        const char * score3 = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE4_3ROW");
++        if (k == 512 && m >= 32768 && score3 != nullptr && std::strcmp(score3, "1") == 0) {
++            if (params->ith == 0 && std::getenv("GGML_CPU_SCORE4_3ROW_TRACE") != nullptr) {
++                std::fprintf(stderr, "SCORE4_3ROW m=%lld n=%lld k=%lld tail=%lld threads=%d\n",
++                    (long long) m, (long long) n, (long long) k, (long long) (m % 3), params->nth);
++            }
++            gemm_score3(m);
++            return true;
++        }
++#endif
+         gemm<2, 4, 8>(m, n, 1);
+         return true;
+     }
+@@ -588,6 +599,23 @@
+                 C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
+     }
+ 
++    NOINLINE void gemm_score3(int64_t m) {
++        const int64_t nb_job = (m + 47) / 48;
++        if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
++        ggml_barrier(params->threadpool);
++        int64_t job = params->ith;
++        while (job < nb_job) {
++            const int64_t begin = job * 48;
++            const int64_t end = begin + 48 < m ? begin + 48 : m;
++            int64_t ii = begin;
++            for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
++            if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
++            if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
++            job = ggml_threadpool_chunk_add(params->threadpool, 1);
++        }
++        ggml_barrier(params->threadpool);
++    }
++
+     template <int RM, int RN, int BM>
+     NOINLINE void gemm(int64_t m, int64_t n, int64_t BN) {
+         GGML_ASSERT(m % (RM * BM) == 0);

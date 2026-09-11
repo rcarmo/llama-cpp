@@ -1,0 +1,14 @@
+true
+true
+17 | const energyPath='/sys/class/powercap/intel-rapl:0/energy_uj';
+18 | async function energy(){const p=Bun.spawn(['sudo','-n','cat',energyPath],{stdout:'pipe',stderr:'ignore'});const [rc,s]=await Promise.all([p.exited,new Response(p.stdout).text()]);return rc===0?Number(s):null}
+19 | export type Cfg={kind?:'screen'|'handoff',format?:'f16'|'q8_0'|'q4_0',fa?:boolean,full?:boolean,ctx?:number,parallel?:number,n?:number,predict?:number,build?:'baseline'|'build-cpu',rounds?:number,verbose?:boolean,cache?:number,sequential?:boolean,warmShape?:boolean,maintenance?:boolean,mtp?:boolean,cpuFull?:boolean,gpuFull?:boolean,cpuCtx?:number,gpuCtx?:number,slotPath?:string,checkpointStep?:number,vulkanF32?:boolean,vulkanBuild?:string,cpuBuild?:string,preserveSwaPadding?:boolean,decodeThreads?:number,targetBatchThreads?:number,draftDecodeThreads?:number,decodeMask?:string,draftMax?:number,extraEnv?:Record<string,string>,perfVulkan?:boolean,ubatch?:number,batch?:number};
+20 | export class Trial{
+21 |  dir:string; servers:any[]=[];samples:any[]=[];calls:any[]=[];phase='init';error='';timer:any;busy=false;lockfd=-1;nativeLast:any[]=[];liveSwap=0;livePid=648747;sequence=0;
+22 |  constructor(public name:string,public cfg:Cfg={}){if(!/^[a-z0-9-]+$/.test(name))throw Error('Unsafe name');this.dir=`${root}/runs/${name}`;if(text(this.dir+'/result.json'))throw Error('Retained run exists: '+name);mkdirSync(this.dir,{recursive:true})}
+                                                                                                                                                                                        ^
+error: Retained run exists: build-score3
+      at new Trial (/var/home/agent/workspace/reports/gemma-decode-score3-20260911/campaign.ts:22:180)
+      at /var/home/agent/workspace/reports/gemma-decode-score3-20260911/build-guard.ts:6:9
+
+Bun v1.4.1 (Linux x64)
