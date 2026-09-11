@@ -1,0 +1,8 @@
+/** SCRIPT_JDOC:
+{"summary":"Check fixed register score loop: seven conversions, twelve FMAs and no spill accesses","kind":"read-only","weight":"lightweight","role":"entrypoint"}
+*/
+import{readFileSync,writeFileSync}from'node:fs';
+export function auditAssembly(source:string){
+ const lines=source.split('\n');const end=lines.findIndex(l=>/\bjb\s+[0-9a-f]+\s+</.test(l));if(end<0)throw Error('Loopback');const address=lines[end].match(/\bjb\s+([0-9a-f]+)/)![1];const start=lines.findIndex(l=>l.trim().startsWith(address+':'));if(start<0||start>=end)throw Error('Loopstart');const loop=lines.slice(start,end+1),fm=loop.filter(l=>l.includes('vfmadd231ps')),cv=loop.filter(l=>l.includes('vcvtph2ps'));if(fm.length!==12||cv.length!==7)throw Error('Loopinstructioncount');if(loop.some(l=>l.includes('%rsp')||l.includes('%rbp')||/\bvmov/.test(l)))throw Error('Loopspill');const regs=fm.map(l=>Number(l.match(/,%ymm(\d+)\s*$/)?.[1])).sort((a,b)=>a-b);if(regs.join(',')!==Array.from({length:12},(_,i)=>i).join(','))throw Error('Accumulatorcoverage');if(!loop.some(l=>/add\s+\$0x10/.test(l)))throw Error('Stride');return{pass:true,loop_address:address,loop_lines:loop.length,fp16_conversions:cv.length,fma_instructions:fm.length,accumulators:regs,inner_stack_accesses:0,scope:'Only reduction loop; function prologue/output stores/call overhead remain',loop};
+}
+if(import.meta.main){const r=auditAssembly(readFileSync(import.meta.dir+'/build/registers-assembly.txt','utf8'));writeFileSync(import.meta.dir+'/assembly-results.json',JSON.stringify(r,null,2)+'\n');console.log({pass:r.pass,converts:r.fp16_conversions,fmas:r.fma_instructions,stack:r.inner_stack_accesses})}

@@ -91,3 +91,7 @@ The actual128scoretile passed native tests but was313.881%slower at48K; [negativ
 ## Authorised SIMD follow-up, 11 September13:18UTC
 
 [Score and packed-Q4 report](../gemma-simd-followup-20260911/report.md): score3 no-unroll passed11nativecases/mode but lost4runABBA1.65%decode,request2.02%slower. ActualpackedQ4stream passed16generic-referencecases/mode and realmodeldispatch;4runABBA4.15%slower,request4.56%slower. TinyBLASQ4 initialcandidate passednative19/mode but realmodel bypassed it; no timingclaim. No finalist/confirmation/deployment. B0 restored13:18:29UTC with exactidentity/tools/cache/zeroSwap. Small gains remain eligible when confirmed; these candidates lost.
+
+## Register-assigned score kernel, 11 September14:06UTC
+
+[Explicit AVX2 score report](../gemma-score-registers-20260911/report.md):12fixedYMMaccumulators removedinner-loopspills;7conversions/12FMAs verified,19nativecases/mode and9standalonebitexact/canarycases pass. Actualmodel2072traces. Four-runABBA9.2872->9.0536tok/s(-2.515%),request+2.251%; no finalist/confirmation/deployment. Calls/outputstores still exist and their cost is not isolated. B0 restored14:06:06UTC with exactidentity/tools/cache/zeroSwap.

@@ -1,0 +1,114 @@
+{
+  "audit_pass": true,
+  "baseline": "B0-score3",
+  "production_changed": false,
+  "asm": {
+    "loop_address": "f6eb5",
+    "conversions": 7,
+    "fmas": 12,
+    "inner_stack_accesses": 0
+  },
+  "native_cases_per_mode": 19,
+  "standalone_cases": 9,
+  "probe_calls": 2072,
+  "results": [
+    {
+      "stage": "screen",
+      "baseline_tps": 9.28717277585726,
+      "candidate_tps": 9.05357431642619,
+      "decode_pct": -2.515280646423712,
+      "request_pct": 2.2510655845303873,
+      "same_output": true,
+      "rows": [
+        {
+          "order": 0,
+          "mode": 0,
+          "tps": 9.234496992980844,
+          "wall_ms": 15411.086078,
+          "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0",
+          "draft_n": 110,
+          "draft_accepted": 90,
+          "resources": {
+            "peak_trial_pss_kib": 11973906,
+            "peak_trial_rss_kib": 11977256,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 24089732,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          },
+          "finished_at": "2026-09-11T14:04:22.301Z"
+        },
+        {
+          "order": 1,
+          "mode": 1,
+          "tps": 9.068504474669329,
+          "wall_ms": 15661.904975999998,
+          "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0",
+          "draft_n": 110,
+          "draft_accepted": 90,
+          "resources": {
+            "peak_trial_pss_kib": 11973934,
+            "peak_trial_rss_kib": 11977420,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 24171544,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          },
+          "finished_at": "2026-09-11T14:04:46.135Z"
+        },
+        {
+          "order": 2,
+          "mode": 1,
+          "tps": 9.038644158183052,
+          "wall_ms": 15738.960245999999,
+          "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0",
+          "draft_n": 110,
+          "draft_accepted": 90,
+          "resources": {
+            "peak_trial_pss_kib": 11973895,
+            "peak_trial_rss_kib": 11977216,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 24183136,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          },
+          "finished_at": "2026-09-11T14:05:10.835Z"
+        },
+        {
+          "order": 3,
+          "mode": 0,
+          "tps": 9.339848558733674,
+          "wall_ms": 15298.486523999998,
+          "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0",
+          "draft_n": 110,
+          "draft_accepted": 90,
+          "resources": {
+            "peak_trial_pss_kib": 11973950,
+            "peak_trial_rss_kib": 11977296,
+            "peak_trial_swap_kib": 0,
+            "min_available_kib": 24204844,
+            "production_swap_initial_kib": 0,
+            "production_swap_final_kib": 0
+          },
+          "finished_at": "2026-09-11T14:05:34.173Z"
+        }
+      ]
+    }
+  ],
+  "restoration": {
+    "verified_at": "2026-09-11T14:06:06.072Z",
+    "info": {
+      "pid": 768321,
+      "cpu_pid": 768339,
+      "port": 8091,
+      "started_at": "2026-09-11T14:05:39.321Z"
+    }
+  },
+  "limits": [
+    "No wholecoldprefill or capacityclaim",
+    "Actualno-spillloop does not guarantee net speed; helper call/outputstore overhead retained",
+    "Model/state hashes inherited frozenT01;screenfixture separatelyhashed",
+    "Same-output is diagnostic; independentretrieval pass enforced",
+    "Qualifiedspeed anddeployment are separate"
+  ]
+}
