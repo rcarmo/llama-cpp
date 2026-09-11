@@ -1,0 +1,51 @@
+--- a/ggml/src/ggml-cpu/llamafile/sgemm.cpp
++++ b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
+@@ -56,6 +56,9 @@
+ 
+ #include <array>
+ #include <type_traits>
++#include <cstdlib>
++#include <cstring>
++#include <cstdio>
+ 
+ #ifdef _MSC_VER
+ #define NOINLINE __declspec(noinline)
+@@ -491,6 +494,12 @@
+         : params(params), A(A), B(B), C(C), k(k), lda(lda), ldb(ldb), ldc(ldc) {
+     }
+ 
++    bool matmul_attn4(int64_t m, int64_t n) {
++        if (n != 4 || m % 16 != 0 || k % KN != 0) return false;
++        gemm<2, 4, 8>(m, n, 1);
++        return true;
++    }
++
+     bool matmul(int64_t m, int64_t n) {
+         if (k % KN != 0)
+             return false;
+@@ -3965,11 +3974,20 @@
+         }
+ #elif (defined(__AVX__) || defined(__AVX2__)) && defined(__F16C__)
+         if (Btype == GGML_TYPE_F16) {
+-            tinyBLAS<8, __m256, __m256, ggml_fp16_t, ggml_fp16_t, float> tb{ params, k,
+-                (const ggml_fp16_t *)A, lda,
+-                (const ggml_fp16_t *)B, ldb,
+-                (float *)C, ldc};
+-            return tb.matmul(m, n);
++        tinyBLAS<8, __m256, __m256, ggml_fp16_t, ggml_fp16_t, float> tb{params, k, (const ggml_fp16_t *)A, lda,
++                                                                   (const ggml_fp16_t *)B, ldb, (float *)C, ldc};
++#if defined(__AVX2__) && defined(__FMA__)
++        const char * mode = std::getenv("GGML_CPU_EXPERIMENTAL_ATTN4");
++        if (!params->use_ref && mode != nullptr && std::strcmp(mode, "1") == 0 && n == 4 &&
++            ((k == 512 && m >= 32768) || (k >= 32768 && m == 512))) {
++            if (params->ith == 0 && std::getenv("GGML_CPU_ATTN4_TRACE") != nullptr) {
++                std::fprintf(stderr, "ATTN4_TILE m=%lld n=%lld k=%lld tile=2x4 threads=%d\n",
++                    (long long) m, (long long) n, (long long) k, params->nth);
++            }
++            return tb.matmul_attn4(m, n);
++        }
++#endif
++        return tb.matmul(m, n);
+         }
+ #elif defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(_MSC_VER)
+         if (n < 8)

@@ -1,0 +1,5 @@
+import{test,expect}from'bun:test';import{readFileSync}from'node:fs';
+const source=readFileSync(import.meta.dir+'/patch/sgemm.cpp','utf8');
+const eligible=(m:number,n:number,k:number,reference=false)=>!reference&&n===4&&m%16===0&&k%8===0&&((k===512&&m>=32768)||(k>=32768&&m===512));
+test('attention4 gates exclude reference, tails and other shapes',()=>{expect(eligible(65536,4,512)).toBe(true);expect(eligible(512,4,65536)).toBe(true);for(const a of [[65536,1,512],[512,8,65536],[32767,4,512],[512,4,32769],[2560,4,10240]] as number[][])expect(eligible(...a as [number,number,number])).toBe(false);expect(eligible(512,4,65536,true)).toBe(false);expect(source).toContain('gemm<2, 4, 8>(m, n, 1)');expect(source).toContain('!params->use_ref');});
+test('one querytile and eight two-row blocks exactly cover each sixteen-row job',()=>{for(const m of [512,32768,65536]){const writes=new Uint8Array(m*4);for(let job=0;job<m/16;job++)for(let bi=0;bi<16;bi+=2)for(let j=0;j<4;j++)for(let i=0;i<2;i++)writes[j*m+job*16+bi+i]++;expect(writes.every(n=>n===1)).toBe(true)}});

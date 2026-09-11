@@ -6,6 +6,8 @@ Opt-in loopback adapter for the tested Intel Gemma configuration. GPU cold text 
 
 The qualified `20260910-smallbatch` release adds the opt-in retained-ABI [small target-batch patch](patches/README.md). CPU Gemma target batches of at most four tokens use the8-thread decode pool; large prefill remains16-threaded and the assistant is unchanged. Eight counterbalanced64K runs measured16.52% faster generation, with finite KV, tool/cache and large-prefill checks passing. Configuration must pin the candidate `libllama` hash and set `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH=1`; the source patch alone does not activate it.
 
+The `20260911-attn4` release retains that change and adds the [four-query F16 attention tile](patches/attn4.md). Eight counterbalanced 64K runs measured a further 2.90% median decode gain, from 8.5536 to 8.8020 tok/s. Ranges overlap. The candidate passed native reference tests, finite-state/tools/cache checks and a guarded production SSE cutover. It pins the CPU backend and enables `GGML_CPU_EXPERIMENTAL_ATTN4=1`; GPU and adapter code are unchanged. The previous smallbatch release is the rollback target. An earlier GPU-startup cutover aborted with an unexplained swap peak, rolled back, and is retained in the [evidence report](../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md).
+
 ## Run
 
 ```

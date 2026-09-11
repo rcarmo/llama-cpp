@@ -1,0 +1,10 @@
+{
+  "reviewer": "github-copilot/gpt-5.4 delegated judge",
+  "scope": "Tile patch only; not whole backend review",
+  "findings": [
+    "m divisible16 covers RM2*BM8 exactly; n4 matches RN4, k aligned toKN",
+    "Reference execution excluded; opt-in F16 AVX2 branch only",
+    "Check BN=1 scheduling meaning"
+  ],
+  "resolution": "BN bounds column-tile grouping. n4/RN4 gives xtiles1; BN1 givesNB_BN1,SIZE_BN1,jj_BN1. Each ofm/16 jobs runs8 rowblocks of2rows,all4querycolumns exactlyonce. No tail branch. Finalmissing-header fixes preservelogic."
+}
