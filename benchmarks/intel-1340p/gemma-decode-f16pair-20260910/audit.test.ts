@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{audit}from'./audit-results';
+test('nativepass does not imply fourqueryoverride coverage or speedup',()=>{const r=audit(import.meta.dir);expect(r.audit_pass).toBe(true);expect(r.native.cases_per_mode).toBe(8);expect(r.native.traced_queries).toEqual([1]);expect(r.native.actual_n4_pair_dispatch).toBe(false);expect(r.decode_gain_pct).toBeCloseTo(-0.835941365,6);expect(r.restoration.pass).toBe(true)});
