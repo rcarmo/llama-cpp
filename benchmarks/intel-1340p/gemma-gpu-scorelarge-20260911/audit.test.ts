@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{audit}from'./audit-results';
+test('actual128scoretile is numericallyvalid but substantiallyslower',()=>{const r=audit(import.meta.dir);expect(r.audit_pass).toBe(true);expect(r.native_cases_per_mode).toBe(6);expect(r.rows).toHaveLength(4);expect(r.slowdown_pct).toBeCloseTo(313.881287738,7);expect(r.restoration.pass).toBe(true);expect(r.decision).toContain('No adoption')});

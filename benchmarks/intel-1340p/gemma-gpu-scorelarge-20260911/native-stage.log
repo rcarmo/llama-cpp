@@ -1,0 +1,15 @@
+PASS speech state
+true
+FINISHED build-gpu-scorelarge true
+Split-K build completed; numerical/task screen is a separate stage.
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"Check existing6FP32attention reference cases with score-large off/on and actual tile trace","kind":"mixed","weight":"heavy","role":"entrypoint"}
+3 | */
+4 | import{Trial,root}from'./campaign';import{openSync,readFileSync}from'node:fs';import{stopOwned}from'./guard-safety';
+5 | const t=new Trial('native-scorelarge',{maintenance:true}),rows:any[]=[];
+6 | try{await t.begin();for(const mode of ['0','1']){const fd=openSync(t.dir+'/mode'+mode+'.log','a');const p=Bun.spawn(['/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/bin/test-backend-ops','test','-b','Vulkan0','-o','MUL_MAT','--test-file',root+'/cases.txt','-j','1'],{stdout:fd,stderr:fd,env:{PATH:process.env.PATH,HOME:process.env.HOME,LD_LIBRARY_PATH:root+'/runtime-gpu/bin:'+root+'/runtime-gpu/runtime',GGML_VK_VISIBLE_DEVICES:'0',GGML_VK_EXPERIMENTAL_ATTN_MODE:'f32',GGML_VK_EXPERIMENTAL_SCORE_LARGE:mode,GGML_VK_SCORE_LARGE_TRACE:'1'}});t.servers.push({p,fd,device:'native'});const timer=setTimeout(()=>{t.error||='Native timeout';void stopOwned(p)},120000);const rc=await p.exited;clearTimeout(timer);await t.stop('native');const log=readFileSync(t.dir+'/mode'+mode+'.log','utf8');const r={mode,rc,pass:log.includes('6/6 tests passed'),trace:log.includes('SCORE_LARGE ')};rows.push(r);if(rc||!r.pass||(mode==='1'&&!r.trace))throw Error('Native gate')}}catch(e){t.error ||=String(e);console.err
+
+error: Native gate
+      at /var/home/agent/workspace/reports/gemma-gpu-scorelarge-20260911/native.ts:6:962
+
+FINISHED native-scorelarge false
