@@ -1,0 +1,10 @@
+reports/gemma-score-static-20260911/patch/sgemm.cpp:630:        static const bool trace_jobs = std::getenv("GGML_CPU_SCORE_STATIC_JOBS_TRACE") != nullptr;
+reports/gemma-score-static-20260911/patch/sgemm.cpp:631:        const auto jobs_started = trace_jobs ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
+reports/gemma-score-static-20260911/patch/sgemm.cpp:644:        if (trace_jobs && jobs_done > 0) {
+reports/gemma-score-static-20260911/patch/sgemm.cpp:645:            const auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - jobs_started).count();
+reports/gemma-score-static-20260911/patch/sgemm.cpp:646:            std::fprintf(stderr, "SCORE_STATIC_JOBS ith=%d nth=%d jobs=%lld total=%lld mode=%s elapsed_us=%lld cpu=%d\n", params->ith, params->nth, (long long) jobs_done, (long long) nb_job, schedule_static ? "static" : "dynamic", (long long) elapsed_us, sched_getcpu());
+reports/gemma-score-static-20260911/patch/static-jobs.patch:22:+        static const bool trace_jobs = std::getenv("GGML_CPU_SCORE_STATIC_JOBS_TRACE") != nullptr;
+reports/gemma-score-static-20260911/patch/static-jobs.patch:23:+        const auto jobs_started = trace_jobs ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
+reports/gemma-score-static-20260911/patch/static-jobs.patch:37:+        if (trace_jobs && jobs_done > 0) {
+reports/gemma-score-static-20260911/patch/static-jobs.patch:38:+            const auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - jobs_started).count();
+reports/gemma-score-static-20260911/patch/static-jobs.patch:39:+            std::fprintf(stderr, "SCORE_STATIC_JOBS ith=%d nth=%d jobs=%lld total=%lld mode=%s elapsed_us=%lld cpu=%d\n", params->ith, params->nth, (long long) jobs_done, (long long) nb_job, schedule_static ? "static" : "dynamic", (long long) elapsed_us, sched_getcpu());

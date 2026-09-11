@@ -1,0 +1,60 @@
+{
+  "decision": "REJECT",
+  "reason": "Static strided ownership exposed heterogeneous-core stragglers and lost the bounded saved64K screen.",
+  "dynamic": {
+    "n": 2,
+    "decode_tok_s": 9.278957625215746,
+    "decode_ms": 13794.6545,
+    "request_wall_ms": 15403.5357015,
+    "prompt_ms": 1542.5915,
+    "token_hashes": [
+      "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    ]
+  },
+  "static": {
+    "n": 2,
+    "decode_tok_s": 8.353747671508842,
+    "decode_ms": 15322.642,
+    "request_wall_ms": 16958.352328,
+    "prompt_ms": 1602.4435,
+    "token_hashes": [
+      "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    ]
+  },
+  "changes": {
+    "decode_pct": -9.971054843408577,
+    "decode_ms_pct": 11.076663790310937,
+    "request_wall_pct": 10.093894393016466
+  },
+  "work": {
+    "cache_n": [
+      64658
+    ],
+    "prompt_n": [
+      25
+    ],
+    "predicted_n": [
+      128
+    ],
+    "draft": [
+      "110/90"
+    ]
+  },
+  "safety": {
+    "all_ok": true,
+    "same_output": true,
+    "zero_swap": true,
+    "max_temp_c": 77,
+    "restorations": 4
+  },
+  "probe": {
+    "cpus": "0-15",
+    "max_elapsed_ratio": 5.980789754535753
+  },
+  "limits": [
+    "Two observations per arm: screen rejection, not a precise effect estimate.",
+    "Tracing was disabled during timing.",
+    "B1 query reuse combination not screened because isolated static scheduling failed its retention gate.",
+    "Production remained B0; no deployment or GPU work."
+  ]
+}
