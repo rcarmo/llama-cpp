@@ -1,0 +1,1 @@
+export function chunks(items,size){if(!Array.isArray(items)||!Number.isInteger(size)||size<1)throw Error('input');const out=[];for(let i=0;i<items.length;i+=size)out.push(items.slice(i,i+size));return out;}

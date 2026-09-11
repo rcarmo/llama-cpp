@@ -1,0 +1,566 @@
+{
+  "audit_pass": true,
+  "summary": {
+    "phase": "summary",
+    "groups": 3579,
+    "overflow": 0
+  },
+  "total": {
+    "kind": "total",
+    "graphs": 152,
+    "graph_us": 15918925,
+    "node_wall_us": 15873918,
+    "active_thread_us": 124246123,
+    "capacity_us": 136140440,
+    "idle_or_sync_us": 11894317,
+    "logical_read_bytes": 642370809544,
+    "logical_write_bytes": 184415433472
+  },
+  "matrix": {
+    "kind": "family",
+    "name": "matrix",
+    "calls": 20592,
+    "wall_us": 14327034,
+    "active_thread_us": 119932394,
+    "capacity_us": 123061640,
+    "idle_or_sync_us": 3129246,
+    "logical_read_bytes": 284780517888,
+    "logical_write_bytes": 4052152320
+  },
+  "categories": {
+    "q4_0 short n3": {
+      "wall_us": 111017,
+      "calls": 342
+    },
+    "F16-score long n3": {
+      "wall_us": 116025,
+      "calls": 7
+    },
+    "F16-score short n3": {
+      "wall_us": 3134,
+      "calls": 35
+    },
+    "F16-value short n3": {
+      "wall_us": 3213,
+      "calls": 35
+    },
+    "q6_K long n3": {
+      "wall_us": 17335,
+      "calls": 1
+    },
+    "F16-value long n3": {
+      "wall_us": 76358,
+      "calls": 7
+    },
+    "F16-value long n4": {
+      "wall_us": 3004129,
+      "calls": 259
+    },
+    "F16-score long n4": {
+      "wall_us": 4674939,
+      "calls": 259
+    },
+    "q6_K long n4": {
+      "wall_us": 777684,
+      "calls": 36
+    },
+    "q8_0 short n1": {
+      "wall_us": 72019,
+      "calls": 2446
+    },
+    "q8_0 long n1": {
+      "wall_us": 155541,
+      "calls": 112
+    },
+    "F16-value long n1": {
+      "wall_us": 503283,
+      "calls": 111
+    },
+    "F16-score long n1": {
+      "wall_us": 387925,
+      "calls": 111
+    },
+    "F16-value short n1": {
+      "wall_us": 14960,
+      "calls": 333
+    },
+    "F16-score short n1": {
+      "wall_us": 11126,
+      "calls": 333
+    },
+    "q4_0 short n4": {
+      "wall_us": 2889538,
+      "calls": 12654
+    },
+    "F16-score short n4": {
+      "wall_us": 158274,
+      "calls": 1295
+    },
+    "F16-value short n4": {
+      "wall_us": 140359,
+      "calls": 1295
+    },
+    "q4_0 short n21": {
+      "wall_us": 298502,
+      "calls": 342
+    },
+    "F16-value short n21": {
+      "wall_us": 22308,
+      "calls": 35
+    },
+    "q4_0 short n2": {
+      "wall_us": 77186,
+      "calls": 342
+    },
+    "F16-score short n21": {
+      "wall_us": 18424,
+      "calls": 35
+    },
+    "F16-other short n3": {
+      "wall_us": 1080,
+      "calls": 1
+    },
+    "q8_0 short n2": {
+      "wall_us": 1311,
+      "calls": 18
+    },
+    "F16-value short n2": {
+      "wall_us": 3303,
+      "calls": 46
+    },
+    "q6_K long n1": {
+      "wall_us": 23040,
+      "calls": 2
+    },
+    "F16-score short n2": {
+      "wall_us": 3388,
+      "calls": 46
+    },
+    "F16-value long n21": {
+      "wall_us": 429933,
+      "calls": 7
+    },
+    "F16-other short n4": {
+      "wall_us": 47928,
+      "calls": 37
+    },
+    "F16-score long n21": {
+      "wall_us": 278434,
+      "calls": 7
+    },
+    "F16-other short n2": {
+      "wall_us": 1183,
+      "calls": 1
+    },
+    "q6_K long n0": {
+      "wall_us": 2,
+      "calls": 1
+    },
+    "F16-other short n21": {
+      "wall_us": 4153,
+      "calls": 1
+    }
+  },
+  "speculative_phases": {
+    "draft_catchup": {
+      "us": 67,
+      "calls": 39
+    },
+    "hidden_extract": {
+      "us": 338,
+      "calls": 39
+    },
+    "process": {
+      "us": 832,
+      "calls": 39
+    },
+    "draft": {
+      "us": 1593154,
+      "calls": 37
+    },
+    "target_decode": {
+      "us": 12758150,
+      "calls": 37
+    },
+    "sample_accept": {
+      "us": 46623,
+      "calls": 37
+    }
+  },
+  "packing_thread_sums_us": {
+    "generic_pack_thread q6_K": 2038,
+    "repack_pack_thread q4_0": 85587,
+    "generic_pack_thread f16": 534413,
+    "generic_pack_thread q8_0": 5937
+  },
+  "top_nodes": [
+    {
+      "phase": "node_wall",
+      "name": "node_2077",
+      "a": "token_embd.weight",
+      "at": "q6_K",
+      "bt": "f32",
+      "k": 2560,
+      "m": 262144,
+      "n": 4,
+      "b2": 1,
+      "b3": 1,
+      "a2": 1,
+      "a3": 1,
+      "threads": 8,
+      "calls": 36,
+      "elapsed_us": 777684
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-5",
+      "a": "cache_k_l5",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 441931
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-17",
+      "a": "cache_k_l17",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 433344
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-11",
+      "a": "cache_k_l11",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 432954
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-41",
+      "a": "cache_k_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 431910
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-29",
+      "a": "cache_k_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 431882
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-35",
+      "a": "cache_k_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 431642
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-23",
+      "a": "cache_k_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 430427
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-3",
+      "a": "cache_v_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 1,
+      "b2": 4,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 72,
+      "elapsed_us": 325113
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-5",
+      "a": "cache_v_l5",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 293259
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-23",
+      "a": "cache_v_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 279716
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-11",
+      "a": "cache_v_l11",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 278477
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-35",
+      "a": "cache_v_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 278460
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-29",
+      "a": "cache_v_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 277614
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-41",
+      "a": "cache_v_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 273644
+    },
+    {
+      "phase": "node_wall",
+      "name": "kqv-17",
+      "a": "cache_v_l17",
+      "at": "f16",
+      "bt": "f32",
+      "k": 64768,
+      "m": 512,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 24,
+      "elapsed_us": 273355
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-3",
+      "a": "cache_k_l23",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 64768,
+      "n": 1,
+      "b2": 4,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 72,
+      "elapsed_us": 251396
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-5",
+      "a": "cache_k_l5",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 65024,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 13,
+      "elapsed_us": 238308
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-11",
+      "a": "cache_k_l11",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 65024,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 13,
+      "elapsed_us": 235962
+    },
+    {
+      "phase": "node_wall",
+      "name": "kq-17",
+      "a": "cache_k_l17",
+      "at": "f16",
+      "bt": "f32",
+      "k": 512,
+      "m": 65024,
+      "n": 4,
+      "b2": 8,
+      "b3": 1,
+      "a2": 2,
+      "a3": 1,
+      "threads": 8,
+      "calls": 13,
+      "elapsed_us": 234937
+    }
+  ],
+  "resources": {
+    "peak_trial_pss_kib": 11974619,
+    "peak_trial_rss_kib": 11977964,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24036572,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "thermal": {
+    "peak_c": 68,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "restoration": {
+    "pass": true,
+    "info": {
+      "pid": 697183,
+      "cpu_pid": 697200,
+      "port": 8091,
+      "started_at": "2026-09-11T07:19:58.088Z"
+    }
+  },
+  "limits": [
+    "Oneinstrumentedprofile;notnewthroughputcomparison",
+    "Shapesincludeprompttailandgeneration;threadpackingnotwalltime",
+    "Profilerworkeractualmapsnotcaptured;logs+configuredpaths+filehashesidentifybuild,notlive-mapattestation",
+    "Missing scheduler-internal/draft detail mustnotbe inferredfromnodesums"
+  ]
+}

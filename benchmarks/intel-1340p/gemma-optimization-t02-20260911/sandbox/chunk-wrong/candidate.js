@@ -1,0 +1,1 @@
+export function chunk(a,n){return [a]}

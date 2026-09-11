@@ -49,7 +49,7 @@ Use `B1-decode-<name>`, `B2-prefill-<name>` or the next unused ID; numeric order
 7. Refresh the next experiment's reference and restoration paths. Existing comparisons finish against their frozen parent; if changing that parent is necessary, close/amend the experiment and preserve its earlier results.
 8. If later evidence exposes an affected integration or safety regression, append a held/restricted/reference-revoked event. New experiments in that scope return to the last safe parent; unaffected validated improvements remain enabled. Fixes get new candidate identities and rerun only the invalidated gates plus necessary integration checks.
 
-No future B1/B2 baseline is marked validated yet. The only event currently in the machine ledger adopts the already deployed B0 stack.
+No future B1/B2 baseline is marked validated yet. The machine ledger records B0 adoption and its later profile/short-quality qualification event; no new optimisation baseline is implied.
 
 ## Retained opportunities and negative controls
 
@@ -71,3 +71,7 @@ No future B1/B2 baseline is marked validated yet. The only event currently in th
 - [Current production rollout](../gemma-score3-rollout-20260911/report.md)
 - [FP32 GPU attention](../gemma-gpu-attention-20260910/report.md)
 - [GPU batch-size trade-off](../gemma-f32-batch-20260910/report.md)
+
+## B0 qualification update, 11 September07:25UTC
+
+T01/D01 currentprofile and guardedharness evidence: [report](../gemma-optimization-t01-d01-20260911/report.md). Short baseline tasks now include passing normaliseTags/chunk, retrieval and four toolrounds perseed; originalmergeIntervals export failure retained. Oneprofile records longn4score4.675s/value3.004s/Q4n4 2.890s, without throughputclaim. IdleCPU110448KiBswapwasobservedbeforemaintenance;causeunknown,exactB0restoredzeroSwapafterwork. No B1 was created.

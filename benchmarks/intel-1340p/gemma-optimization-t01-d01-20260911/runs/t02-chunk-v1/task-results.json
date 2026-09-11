@@ -1,0 +1,87 @@
+{
+  "rows": [
+    {
+      "seed": 42,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789111185,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-JsCXPmG7VvGDpvNkiX6w73lrPtVoNnTi",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1554.076,
+          "prompt_per_token_ms": 16.892130434782608,
+          "prompt_per_second": 59.19916400484918,
+          "predicted_n": 154,
+          "predicted_ms": 5443.24,
+          "predicted_per_token_ms": 35.34571428571429,
+          "predicted_per_second": 28.291973163042602,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789111192,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-12RluEAR9mpwUDskbCl3xlcc870DzAYC",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1522.42,
+          "prompt_per_token_ms": 16.54804347826087,
+          "prompt_per_second": 60.43010470172488,
+          "predicted_n": 154,
+          "predicted_ms": 5342.731,
+          "predicted_per_token_ms": 34.69305844155844,
+          "predicted_per_second": 28.824209940571592,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      }
+    }
+  ],
+  "fixture": "coding-chunk-v1"
+}
