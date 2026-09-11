@@ -95,3 +95,7 @@ The actual128scoretile passed native tests but was313.881%slower at48K; [negativ
 ## Register-assigned score kernel, 11 September14:06UTC
 
 [Explicit AVX2 score report](../gemma-score-registers-20260911/report.md):12fixedYMMaccumulators removedinner-loopspills;7conversions/12FMAs verified,19nativecases/mode and9standalonebitexact/canarycases pass. Actualmodel2072traces. Four-runABBA9.2872->9.0536tok/s(-2.515%),request+2.251%; no finalist/confirmation/deployment. Calls/outputstores still exist and their cost is not isolated. B0 restored14:06:06UTC with exactidentity/tools/cache/zeroSwap.
+
+## Inline register kernel, 11 September14:29UTC
+
+[Inline AVX2 score report](../gemma-score-inline-20260911/report.md): exact prior ASM inlined into48-rowjob, eliminating tilehelpercall while retainingnoinnerloopspills.19nativecases/mode+9bitexactcanarytests pass;actualmodel2072traces.4runABBA9.2160->9.1371tok/s(-0.856%),request+0.928%;smallnegative screen,no usefulfinalist/confirmation/deployment. No matchednoinline/inline attribution. B0 restored14:29:47UTC with exactidentity/tools/cache/zeroSwap;12offline tests28assertions pass.

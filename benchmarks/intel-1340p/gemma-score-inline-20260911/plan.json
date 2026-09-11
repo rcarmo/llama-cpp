@@ -1,0 +1,12 @@
+{
+ "authorised_at":"2026-09-11T14:21:54.727Z",
+ "baseline":"B0-score3 / 20260911-score3-stopped",
+ "restore_target":"20260911-score3-stopped",
+ "previous_candidate":"gemma-score-registers-20260911/9c4735da0; spillfree helper lost2.515% versus matchedB0; no rerun of it",
+ "hypothesis":"Force exact spill-free3x4ASM helper into48-rowjob. Remove per-tilecall/return and separate prologue without changing assemblyloop, FMAorder, accumulators, outputstores/hsum,48rowjobs orfallbacktails. Inspect actualgeneratedcode before load.",
+ "candidate":"One variant, always_inline instead ofNOINLINE; separateGGML_CPU_EXPERIMENTAL_SCORE3_INLINEflag. ExistinglongF16score3eligibility k512/n4/m>=32768 maintained.",
+ "gates":"Disassembly loop7conversions/12FMAs,no stack/moves/no helpercalls;19nativecases/mode unchangedtolerances includingstride/tails/exclusions;9standalonebitexact/canarycases usinginlinehelper. Actualmodeltrace probe before uninstrumented4runABBA.",
+ "budget":"Build10min/native5min/probe3min/screen5min supervised.8runindependentconfirmation only useful screen, thenfinalist sustained/short/quality/state gates. No minimumpercentage threshold, no repeatlosers.",
+ "controls":"Samebinaryflag0/1 againstB0;smallbatch/ATTN4/score3 remain1;CPU8/prefill16/draft8/16MTP3,F16FAoff,1024/256,two131072slots,cacheRAM0. Frozen64658cache25eval128gen/seed42,temp0,topk1. Previouscandidate timings historicalonly.",
+ "safety":"Sequentialheavywork,stoppedspeechfailclosed;6GiBreserve/16MiBmaxworkerswap,95Cannotationonly. Verifiedownedcleanup andautomaticcurrentB0restoration aftereachstage; no productionfaults or implicitdeployment."
+}

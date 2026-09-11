@@ -1,0 +1,22 @@
+--- reports/gemma-score-inline-20260911/patch/sgemm-noinline.cpp	2026-09-11 15:24:29.827525494 +0100
++++ reports/gemma-score-inline-20260911/patch/sgemm.cpp	2026-09-11 15:25:22.969232354 +0100
+@@ -602,7 +602,7 @@
+ #if defined(__x86_64__) && defined(__AVX2__) && defined(__F16C__) && defined(__FMA__) && defined(__GNUC__)
+     // Twelve accumulators plus three A vectors and one B vector fill sixteen YMM registers.
+     // Exactly one FMA per eight elements per output; stores occur only after the K loop.
+-    NOINLINE void gemm_bloc_score_registers(int64_t ii) {
++    __attribute__((always_inline)) inline void gemm_bloc_score_registers(int64_t ii) {
+         alignas(32) float sums[12][8];
+         int64_t offset = 0;
+         const int64_t bytes = k * sizeof(ggml_fp16_t);
+@@ -667,8 +667,8 @@
+ #endif
+ 
+     NOINLINE void gemm_score3(int64_t m) {
+-        static const bool registers = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_REGISTERS") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_REGISTERS"), "1") == 0;
+-        if (registers && params->ith == 0 && std::getenv("GGML_CPU_SCORE3_REGISTERS_TRACE")) std::fprintf(stderr,"SCORE3_REGISTERS m=%lld k=%lld\n",(long long)m,(long long)k);
++        static const bool registers = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_INLINE") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_INLINE"), "1") == 0;
++        if (registers && params->ith == 0 && std::getenv("GGML_CPU_SCORE3_INLINE_TRACE")) std::fprintf(stderr,"SCORE3_INLINE m=%lld k=%lld\n",(long long)m,(long long)k);
+ 
+         const int64_t nb_job = (m + 47) / 48;
+         if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
