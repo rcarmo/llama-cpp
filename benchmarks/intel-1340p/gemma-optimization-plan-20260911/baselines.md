@@ -1,6 +1,6 @@
 # Baseline ledger
 
-**Current deployed and general experimental reference: B0-score3.** Each later baseline is append-only, scoped and linked to its comparison parent. Never overwrite an old measurement to make it look as though it used a newer runtime.
+**Current deployed and general experimental reference: B0-score3.** The bounded plan closed without a useful qualified successor. The final qualification update below adds recovery coverage and dual64K restored-slot capacity; dual128K and full prompt-cache pressure remain unqualified. Earlier observations are retained by date. Each later baseline is append-only, scoped and linked to its comparison parent.
 
 ## B0-score3: adopted at the planning reset
 
@@ -75,3 +75,15 @@ No future B1/B2 baseline is marked validated yet. The machine ledger records B0 
 ## B0 qualification update, 11 September07:25UTC
 
 T01/D01 currentprofile and guardedharness evidence: [report](../gemma-optimization-t01-d01-20260911/report.md). Short baseline tasks now include passing normaliseTags/chunk, retrieval and four toolrounds perseed; originalmergeIntervals export failure retained. Oneprofile records longn4score4.675s/value3.004s/Q4n4 2.890s, without throughputclaim. IdleCPU110448KiBswapwasobservedbeforemaintenance;causeunknown,exactB0restoredzeroSwapafterwork. No B1 was created.
+
+## No adoption after value and batch screens
+
+Value3no-unroll screen did not confirm: independent8runs+0.088%decode,request0.945%slower. Bothnative21case variants retained in69bb102de. Fixedallocation prefill1024 versus256:16K1.17%slower,32K13.26%slower,48K0.39%faster(neutral); no threshold,4e1523fde. NoB1/B2manufactured; B0 still currentreference. P05 scorelarge was subsequently rejected after actual-tile native tests and a 313.881% slower screen; see the final update below.
+
+## Final qualification update, 11 September 2026
+
+[Closeout manifest](baselines/B0-closeout.json) and [integration report](../gemma-integration-b0-20260911/report.md) record current native startup/prefill/save-request/restore/CPU-stream/queued cancellation, owner/partial cleanup and source-matched historical native restart coverage. Synchronous conversion is tested at its boundaries only; current tests use directRequest. The original failed fixture and stopping-PID monitor race remain in the evidence.
+
+Two CPU slots at16,384/32,768/64,663 tokens each passed slot0/1/0 reuse with one evaluated token and zero swap, with cacheRAM0. The near130,000-token attempt hit the20-minute request deadline after57,344 newly evaluated tokens of progress; no completed finite state, dualnear128 occupancy or fallback timing qualified. Production12GiB prompt-cache pressure and broad long quality remain unqualified.
+
+The actual128scoretile passed native tests but was313.881%slower at48K; [negative result](../gemma-gpu-scorelarge-20260911/report.md), d52dbc6a4. No new B1/B2 was created. Final B0 identity/tools/cache/zero-swap verification was09:33:52UTC; lightweight idle/no-orphan/stopped-speech observation09:38:24UTC. Supervisor/CPU746174/746192 are dated observations. Restore target remains B0 itself; operational fallback remains ATTN4. No safety finding revoked an unaffected B0 speed scope.

@@ -1,0 +1,115 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+warning: no usable GPU found, --gpu-layers-draft option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.717 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.869 I srv          init: The UI is disabled
+0.00.004.869 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.005.014 W srv  llama_server: -----------------
+0.00.005.016 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.005.017 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.005.017 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.005.017 W srv  llama_server: -----------------
+0.00.006.329 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.00.545.688 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+0.00.611.355 W srv    load_model: [spec] failed to measure draft model memory: failed to create llama_context from model
+0.01.617.902 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.618.447 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.649.900 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.521.018 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.907.778 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.942.336 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+0.04.397.622 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.398.157 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.399.815 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.04.430.358 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.04.506.127 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.506.135 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7f239ffff040, v = 0x7f23bffff040
+0.04.506.153 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.04.506.154 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7f22d7b7f040, v = 0x7f22d7cff040
+0.04.506.154 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7f22d7b7f040, v = 0x7f22d7cff040
+0.04.506.155 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7f22d7b7f040, v = 0x7f22d7cff040
+0.04.506.882 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.04.935.862 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.04.957.003 I srv  llama_server: model loaded
+0.04.957.017 I srv  llama_server: listening on http://127.0.0.1:18792
+0.07.727.968 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.07.728.015 I slot launch_slot_: id  0 | task 2 | processing task, is_child = 0
+0.07.728.034 W slot   operator(): id  0 | task 2 | need to evaluate at least 1 token for each active slot (n_past = 16384, task.n_tokens() = 16384)
+0.07.728.034 W slot   operator(): id  0 | task 2 | n_past was set to 16383
+0.07.847.005 I slot print_timing: id  0 | task 2 | prompt eval time =     118.95 ms /     1 tokens (  118.95 ms per token,     8.41 tokens per second)
+0.07.847.015 I slot print_timing: id  0 | task 2 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.07.847.016 I slot print_timing: id  0 | task 2 |       total time =     118.95 ms /     2 tokens
+0.07.847.018 I slot print_timing: id  0 | task 2 |    graphs reused =          0
+0.07.847.626 I slot      release: id  0 | task 2 | stop processing: n_tokens = 16384, truncated = 0
+0.07.969.606 I slot get_availabl: id  1 | task -1 | selected slot by id (1)
+0.07.969.666 I slot launch_slot_: id  1 | task 4 | processing task, is_child = 0
+0.07.969.693 W slot   operator(): id  1 | task 4 | need to evaluate at least 1 token for each active slot (n_past = 16384, task.n_tokens() = 16384)
+0.07.969.694 W slot   operator(): id  1 | task 4 | n_past was set to 16383
+0.08.082.954 I slot print_timing: id  1 | task 4 | prompt eval time =     113.26 ms /     1 tokens (  113.26 ms per token,     8.83 tokens per second)
+0.08.082.962 I slot print_timing: id  1 | task 4 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.08.082.963 I slot print_timing: id  1 | task 4 |       total time =     113.26 ms /     2 tokens
+0.08.082.964 I slot print_timing: id  1 | task 4 |    graphs reused =          0
+0.08.083.548 I slot      release: id  1 | task 4 | stop processing: n_tokens = 16384, truncated = 0
+0.08.204.502 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.08.204.571 I slot launch_slot_: id  0 | task 6 | processing task, is_child = 0
+0.08.204.596 W slot   operator(): id  0 | task 6 | need to evaluate at least 1 token for each active slot (n_past = 16384, task.n_tokens() = 16384)
+0.08.204.599 W slot   operator(): id  0 | task 6 | n_past was set to 16383
+0.08.318.838 I slot print_timing: id  0 | task 6 | prompt eval time =     114.24 ms /     1 tokens (  114.24 ms per token,     8.75 tokens per second)
+0.08.318.847 I slot print_timing: id  0 | task 6 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.08.318.848 I slot print_timing: id  0 | task 6 |       total time =     114.24 ms /     2 tokens
+0.08.318.849 I slot print_timing: id  0 | task 6 |    graphs reused =          0
+0.08.319.467 I slot      release: id  0 | task 6 | stop processing: n_tokens = 16384, truncated = 0
+0.10.522.933 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.10.523.051 I slot launch_slot_: id  0 | task 11 | processing task, is_child = 0
+0.10.523.087 W slot   operator(): id  0 | task 11 | need to evaluate at least 1 token for each active slot (n_past = 32768, task.n_tokens() = 32768)
+0.10.523.088 W slot   operator(): id  0 | task 11 | n_past was set to 32767
+0.10.670.825 I slot print_timing: id  0 | task 11 | prompt eval time =     147.74 ms /     1 tokens (  147.74 ms per token,     6.77 tokens per second)
+0.10.670.837 I slot print_timing: id  0 | task 11 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.10.670.838 I slot print_timing: id  0 | task 11 |       total time =     147.74 ms /     2 tokens
+0.10.670.839 I slot print_timing: id  0 | task 11 |    graphs reused =          0
+0.10.671.969 I slot      release: id  0 | task 11 | stop processing: n_tokens = 32768, truncated = 0
+0.10.852.658 I slot get_availabl: id  1 | task -1 | selected slot by id (1)
+0.10.852.749 I slot launch_slot_: id  1 | task 13 | processing task, is_child = 0
+0.10.852.787 W slot   operator(): id  1 | task 13 | need to evaluate at least 1 token for each active slot (n_past = 32768, task.n_tokens() = 32768)
+0.10.852.789 W slot   operator(): id  1 | task 13 | n_past was set to 32767
+0.10.982.674 I slot print_timing: id  1 | task 13 | prompt eval time =     129.90 ms /     1 tokens (  129.90 ms per token,     7.70 tokens per second)
+0.10.982.680 I slot print_timing: id  1 | task 13 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.10.982.681 I slot print_timing: id  1 | task 13 |       total time =     129.90 ms /     2 tokens
+0.10.982.682 I slot print_timing: id  1 | task 13 |    graphs reused =          0
+0.10.983.388 I slot      release: id  1 | task 13 | stop processing: n_tokens = 32768, truncated = 0
+0.11.109.167 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.11.109.246 I slot launch_slot_: id  0 | task 15 | processing task, is_child = 0
+0.11.109.277 W slot   operator(): id  0 | task 15 | need to evaluate at least 1 token for each active slot (n_past = 32768, task.n_tokens() = 32768)
+0.11.109.278 W slot   operator(): id  0 | task 15 | n_past was set to 32767
+0.11.245.160 I slot print_timing: id  0 | task 15 | prompt eval time =     135.89 ms /     1 tokens (  135.89 ms per token,     7.36 tokens per second)
+0.11.245.171 I slot print_timing: id  0 | task 15 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.11.245.172 I slot print_timing: id  0 | task 15 |       total time =     135.89 ms /     2 tokens
+0.11.245.173 I slot print_timing: id  0 | task 15 |    graphs reused =          0
+0.11.246.277 I slot      release: id  0 | task 15 | stop processing: n_tokens = 32768, truncated = 0
+0.12.855.234 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.12.855.410 I slot launch_slot_: id  0 | task 20 | processing task, is_child = 0
+0.13.050.866 I slot print_timing: id  0 | task 20 | prompt eval time =     195.43 ms /     1 tokens (  195.43 ms per token,     5.12 tokens per second)
+0.13.050.875 I slot print_timing: id  0 | task 20 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.13.050.876 I slot print_timing: id  0 | task 20 |       total time =     195.43 ms /     2 tokens
+0.13.050.877 I slot print_timing: id  0 | task 20 |    graphs reused =          0
+0.13.053.056 I slot      release: id  0 | task 20 | stop processing: n_tokens = 64663, truncated = 0
+0.13.215.749 I slot get_availabl: id  1 | task -1 | selected slot by id (1)
+0.13.215.902 I slot launch_slot_: id  1 | task 22 | processing task, is_child = 0
+0.13.388.289 I slot print_timing: id  1 | task 22 | prompt eval time =     172.36 ms /     1 tokens (  172.36 ms per token,     5.80 tokens per second)
+0.13.388.296 I slot print_timing: id  1 | task 22 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.13.388.297 I slot print_timing: id  1 | task 22 |       total time =     172.36 ms /     2 tokens
+0.13.388.298 I slot print_timing: id  1 | task 22 |    graphs reused =          0
+0.13.389.653 I slot      release: id  1 | task 22 | stop processing: n_tokens = 64663, truncated = 0
+0.13.526.709 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.13.526.858 I slot launch_slot_: id  0 | task 24 | processing task, is_child = 0
+0.13.526.903 W slot   operator(): id  0 | task 24 | need to evaluate at least 1 token for each active slot (n_past = 64663, task.n_tokens() = 64663)
+0.13.526.904 W slot   operator(): id  0 | task 24 | n_past was set to 64662
+0.13.720.462 I slot print_timing: id  0 | task 24 | prompt eval time =     193.57 ms /     1 tokens (  193.57 ms per token,     5.17 tokens per second)
+0.13.720.474 I slot print_timing: id  0 | task 24 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+0.13.720.475 I slot print_timing: id  0 | task 24 |       total time =     193.58 ms /     2 tokens
+0.13.720.476 I slot print_timing: id  0 | task 24 |    graphs reused =          0
+0.13.722.680 I slot      release: id  0 | task 24 | stop processing: n_tokens = 64663, truncated = 0
+0.13.976.117 I srv    operator(): operator(): cleaning up before exit...

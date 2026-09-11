@@ -1,0 +1,94 @@
+{
+  "audit_pass": true,
+  "baseline": "B0-score3",
+  "deployment_changed": false,
+  "recovery": {
+    "current_labels": [
+      "gpu-ready",
+      "prefill-inflight",
+      "after-save",
+      "after-convert",
+      "restore-inflight",
+      "queued-and-nativeCPUstream-cancel",
+      "owner-A",
+      "owner-B",
+      "owner-A",
+      "owner-C",
+      "owner-alternation-eviction",
+      "startup-partial-transfer-cleanup",
+      "CPU-SIGKILL-detected-new-controller",
+      "startup-inflight",
+      "save-inflight"
+    ],
+    "historical_labels": [
+      "fixture",
+      "native-prefill-cancel",
+      "native-gpu-kill-fallback",
+      "native-cpu-generation-restart",
+      "recovered",
+      "cold-after-recovery-slot1"
+    ],
+    "peak_swap_kib": 2616,
+    "peak_c": 97
+  },
+  "capacity": [
+    {
+      "tokens_per_slot": 16384,
+      "memory": {
+        "rss_kib": 11910340,
+        "pss_kib": 11906993,
+        "swap_kib": 0,
+        "available_kib": 24384156
+      }
+    },
+    {
+      "tokens_per_slot": 32768,
+      "memory": {
+        "rss_kib": 11913120,
+        "pss_kib": 11909773,
+        "swap_kib": 0,
+        "available_kib": 24235956
+      }
+    },
+    {
+      "tokens_per_slot": 64663,
+      "memory": {
+        "rss_kib": 11941376,
+        "pss_kib": 11938031,
+        "swap_kib": 0,
+        "available_kib": 24164232
+      }
+    }
+  ],
+  "near128": {
+    "qualified": false,
+    "terminal": "20-minute request timeout",
+    "last_progress": {
+      "evaluated": 57344,
+      "progress": 0.94,
+      "seconds": 1197.96
+    },
+    "resources": {
+      "peak_trial_pss_kib": 4826142,
+      "peak_trial_rss_kib": 3731668,
+      "peak_trial_swap_kib": 0,
+      "min_available_kib": 21980536,
+      "production_swap_initial_kib": 0,
+      "production_swap_final_kib": 0
+    }
+  },
+  "restored": {
+    "verified_at": "2026-09-11T09:33:52.250Z",
+    "cpu_pid": 746192,
+    "supervisor_pid": 746174,
+    "final_observed_at": "2026-09-11T09:38:24.286Z"
+  },
+  "limits": [
+    "Current recovery uses directRequest with real native workers; historical wire/supervisor coverage is reused by source identity",
+    "Startup health-wait and save/restore HTTP-pending boundaries do not instrument internal model-load/file-I/O progress",
+    "Synchronous conversion is cancellation-tested only at its boundaries",
+    "Recovery GPU process maps were not captured; Workers hashes pinned runtime files before spawn; capacity GPU maps were captured",
+    "CPU capacity uses cacheRAM0 and the same finite state in independent slots; full production12GiB cache pressure is unqualified",
+    "No completed near128 state, finite scan, CPU handoff, dual128 occupancy or fallback timing; no broad long-context task-quality claim"
+  ]
+}

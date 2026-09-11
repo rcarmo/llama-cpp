@@ -1,0 +1,391 @@
+{
+  "ok": true,
+  "rows": [
+    {
+      "tokens_per_slot": 16384,
+      "actual_slots": [
+        {
+          "id": 0,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 16384
+        },
+        {
+          "id": 1,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 16384
+        }
+      ],
+      "perSlot": [
+        {
+          "slot": 0,
+          "cache": 16383,
+          "evaluated": 1,
+          "content": "."
+        },
+        {
+          "slot": 1,
+          "cache": 16383,
+          "evaluated": 1,
+          "content": "."
+        },
+        {
+          "slot": 0,
+          "cache": 16383,
+          "evaluated": 1,
+          "content": "."
+        }
+      ],
+      "memory": {
+        "rss_kib": 11910340,
+        "pss_kib": 11906993,
+        "swap_kib": 0,
+        "available_kib": 24384156
+      }
+    },
+    {
+      "tokens_per_slot": 32768,
+      "actual_slots": [
+        {
+          "id": 0,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 32768
+        },
+        {
+          "id": 1,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 32768
+        }
+      ],
+      "perSlot": [
+        {
+          "slot": 0,
+          "cache": 32767,
+          "evaluated": 1,
+          "content": " reference"
+        },
+        {
+          "slot": 1,
+          "cache": 32767,
+          "evaluated": 1,
+          "content": " reference"
+        },
+        {
+          "slot": 0,
+          "cache": 32767,
+          "evaluated": 1,
+          "content": " reference"
+        }
+      ],
+      "memory": {
+        "rss_kib": 11913120,
+        "pss_kib": 11909773,
+        "swap_kib": 0,
+        "available_kib": 24235956
+      }
+    },
+    {
+      "tokens_per_slot": 64663,
+      "actual_slots": [
+        {
+          "id": 0,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 64663
+        },
+        {
+          "id": 1,
+          "n_ctx": 131072,
+          "n_prompt_tokens": 64663
+        }
+      ],
+      "perSlot": [
+        {
+          "slot": 0,
+          "cache": 64662,
+          "evaluated": 1,
+          "content": "CED"
+        },
+        {
+          "slot": 1,
+          "cache": 64662,
+          "evaluated": 1,
+          "content": "CED"
+        },
+        {
+          "slot": 0,
+          "cache": 64662,
+          "evaluated": 1,
+          "content": "CED"
+        }
+      ],
+      "memory": {
+        "rss_kib": 11941376,
+        "pss_kib": 11938031,
+        "swap_kib": 0,
+        "available_kib": 24164232
+      }
+    }
+  ],
+  "scope": "NativeCPUtwoactualrestoredstates/remapping/oneevalreuse;cacheRAMdisabled for isolation,productioncapacitywith12GiBcache may differ;notdual128K",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 256,
+    "batch": 1024,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime-cpu",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore-16384-slot0",
+      "device": "cpu",
+      "wall_ms": 84.6895399999994,
+      "package_j": 1.432858,
+      "timings": {
+        "restore_ms": 83.436
+      },
+      "n_read": 300164724,
+      "token_hash": null
+    },
+    {
+      "label": "restore-16384-slot1",
+      "device": "cpu",
+      "wall_ms": 82.34504399999969,
+      "package_j": 1.203488,
+      "timings": {
+        "restore_ms": 80.649
+      },
+      "n_read": 300164724,
+      "token_hash": null
+    },
+    {
+      "label": "reuse-16384-slot0-0",
+      "device": "cpu",
+      "wall_ms": 217.76794800000062,
+      "package_j": 5.269884,
+      "timings": {
+        "cache_n": 16383,
+        "prompt_n": 1,
+        "prompt_ms": 118.953,
+        "prompt_per_token_ms": 118.953,
+        "prompt_per_second": 8.40668163055997,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-16384-slot1-1",
+      "device": "cpu",
+      "wall_ms": 121.10816499999964,
+      "package_j": 4.457691,
+      "timings": {
+        "cache_n": 16383,
+        "prompt_n": 1,
+        "prompt_ms": 113.259,
+        "prompt_per_token_ms": 113.259,
+        "prompt_per_second": 8.829320407208257,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-16384-slot0-2",
+      "device": "cpu",
+      "wall_ms": 122.17170000000078,
+      "package_j": 4.575123,
+      "timings": {
+        "cache_n": 16383,
+        "prompt_n": 1,
+        "prompt_ms": 114.239,
+        "prompt_per_token_ms": 114.239,
+        "prompt_per_second": 8.753578025017726,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "restore-32768-slot0",
+      "device": "cpu",
+      "wall_ms": 150.7135019999987,
+      "package_j": 1.97967,
+      "timings": {
+        "restore_ms": 149.581
+      },
+      "n_read": 568862324,
+      "token_hash": null
+    },
+    {
+      "label": "restore-32768-slot1",
+      "device": "cpu",
+      "wall_ms": 146.48403999999937,
+      "package_j": 2.072261,
+      "timings": {
+        "restore_ms": 144.327
+      },
+      "n_read": 568862324,
+      "token_hash": null
+    },
+    {
+      "label": "reuse-32768-slot0-0",
+      "device": "cpu",
+      "wall_ms": 222.75095299999884,
+      "package_j": 6.330978,
+      "timings": {
+        "cache_n": 32767,
+        "prompt_n": 1,
+        "prompt_ms": 147.743,
+        "prompt_per_token_ms": 147.743,
+        "prompt_per_second": 6.768510183223571,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-32768-slot1-1",
+      "device": "cpu",
+      "wall_ms": 143.46393399999943,
+      "package_j": 5.313585,
+      "timings": {
+        "cache_n": 32767,
+        "prompt_n": 1,
+        "prompt_ms": 129.901,
+        "prompt_per_token_ms": 129.901,
+        "prompt_per_second": 7.698170144956543,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-32768-slot0-2",
+      "device": "cpu",
+      "wall_ms": 150.17726100000073,
+      "package_j": 5.374498,
+      "timings": {
+        "cache_n": 32767,
+        "prompt_n": 1,
+        "prompt_ms": 135.886,
+        "prompt_per_token_ms": 135.886,
+        "prompt_per_second": 7.359109842073503,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "restore-64663-slot0",
+      "device": "cpu",
+      "wall_ms": 607.2039670000013,
+      "package_j": 7.901103,
+      "timings": {
+        "restore_ms": 576.522
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "restore-64663-slot1",
+      "device": "cpu",
+      "wall_ms": 269.27303799999936,
+      "package_j": 3.433097,
+      "timings": {
+        "restore_ms": 268.111
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "reuse-64663-slot0-0",
+      "device": "cpu",
+      "wall_ms": 254.00052200000027,
+      "package_j": 7.845378,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 195.431,
+        "prompt_per_token_ms": 195.431,
+        "prompt_per_second": 5.1168954771760875,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-64663-slot1-1",
+      "device": "cpu",
+      "wall_ms": 195.40127399999983,
+      "package_j": 7.142376,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 172.361,
+        "prompt_per_token_ms": 172.361,
+        "prompt_per_second": 5.801776503965515,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "reuse-64663-slot0-2",
+      "device": "cpu",
+      "wall_ms": 323.4043169999986,
+      "package_j": 9.993566,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 193.574,
+        "prompt_per_token_ms": 193.574,
+        "prompt_per_second": 5.165983034911713,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0.001,
+        "predicted_per_second": 1000000
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 68,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12041137,
+    "peak_trial_rss_kib": 12044484,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24126912,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T09:07:37.482Z"
+}

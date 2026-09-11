@@ -1,0 +1,76 @@
+{
+  "input": "/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/prefix-checkpoints-16-32-48/slots/prefix-32768.slot",
+  "output": "/var/home/agent/workspace/reports/gemma-integration-b0-20260911/runs/dual-slot-capacity/slots/prefix-32768-v2.slot",
+  "parsed": {
+    "tokens": 32768,
+    "packed": 32772,
+    "serverWrapped": true,
+    "kv_offset": 131100,
+    "size": 568862340,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 32768,
+            "min": 0,
+            "max": 32767
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 32000,
+            "max": 32767
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 568862340,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "target": {
+    "tokens": 32768,
+    "packed": 32768,
+    "serverWrapped": false,
+    "kv_offset": 131084,
+    "size": 568862324,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 32768,
+            "min": 0,
+            "max": 32767
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 32000,
+            "max": 32767
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 568862324,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "kv_sha256": "0250208454b947e1310e19d907c4b5786621c6f36c37b4b9c0ecba1bedbd3c7d",
+  "scope": "Validate Gemma subset; unwrap text-only server tokens and translate v3 to v2. KV bytes and token IDs unchanged. Native loader guards retained; media/extensions rejected."
+}

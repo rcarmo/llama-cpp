@@ -1,0 +1,52 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-integration-b0-20260911/audit.test.ts:
+(pass) nativephases and populateddual slots retain original failures and exactreuse [0.65ms]
+
+reports/gemma-integration-b0-20260911/closeout.test.ts:
+(pass) closed bounded campaign preserves B0, passing capacity and failed near128 [15.66ms]
+(pass) reject invented near128 success [10.01ms]
+(pass) reject capacity rollup hiding raw cache loss [8.04ms]
+(pass) reject unsampled or swapped resource claim [9.84ms]
+(pass) reject phase label without actual cancellation response [0.20ms]
+(pass) reject changed library provenance [7.76ms]
+(pass) reject stale final restoration [9.94ms]
+
+reports/gemma-integration-b0-20260911/code/proxy.test.ts:
+(pass) cold text prefill excludes final token; warm continuation stays CPU [3.28ms]
+(pass) GPU failure before decode cleans slot and uses CPU without duplicate output [0.75ms]
+(pass) above64K and multimodal prompts bypass GPU [3.11ms]
+(pass) SSE bytes are forwarded and gate remains held until stream finishes [3.13ms]
+(pass) request disconnect cancels unconsumed upstream stream [5.58ms]
+(pass) cancelled stream invalidates its slot and releases after drain [0.47ms]
+(pass) mutating slot and configuration routes are not forwarded [0.10ms]
+(pass) two prefix owners stay independent and evict least recent [0.23ms]
+(pass) queue bounded and cancelled waiter does not release active owner [0.11ms]
+(pass) oversized body rejected without GPU work [3.84ms]
+
+reports/gemma-integration-b0-20260911/code/state.test.ts:
+(pass) validated subset emits v2 with byte-identical payload [134.18ms]
+(pass) rejects mismatched version and stream layout [30.99ms]
+(pass) rejects truncated and trailing content [92.88ms]
+(pass) rejects unexpected cell extension/schema and never overwrites source [60.80ms]
+(pass) unwraps newer text-only token envelope; rejects media [179.52ms]
+
+reports/gemma-integration-b0-20260911/code/stream.test.ts:
+(pass) chunked SSE validates native handoff timings and completion [0.10ms]
+(pass) SSE mismatch and missing completion rejected [0.07ms]
+(pass) native completion terminates with stop=true instead of OpenAI DONE [0.06ms]
+(pass) native signal termination is not a live process [0.03ms]
+(pass) converter uses the validated parsed token count [0.04ms]
+
+reports/gemma-integration-b0-20260911/code/speech.test.ts:
+(pass) explicit stopped mode accepts two inactive units and no sockets/native, without HTTP [0.42ms]
+(pass) active mode still requires available terminal job metadata [0.19ms]
+(pass) stopped mode rejects reactivation, missing/failed units and nonzero PID [0.16ms]
+(pass) stopped mode rejects listeners, connections, native work and command failure [0.26ms]
+(pass) stopped unit parsing rejects malformed/duplicate blocks and permits order swap [0.24ms]
+(pass) established sockets reject even with no listeners [0.08ms]
+
+ 34 pass
+ 0 fail
+ 99 expect() calls
+Ran 34 tests across 6 files. [897.00ms]

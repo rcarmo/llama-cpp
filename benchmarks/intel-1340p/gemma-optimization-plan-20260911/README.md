@@ -2,7 +2,7 @@
 
 Start from the deployed score3 stack and preserve each validated improvement. Optimise CPU decode and GPU prefill in separate, sequential experiments. Update the baseline ledger as soon as a candidate is validated; deployment is a separate recorded event.
 
-This plan replaces the old timeline checklist on 11 September 2026 at Rui's request. [previous-plan.md](previous-plan.md) archives all 38 old items and retains the incomplete capacity/recovery work. [baselines.md](baselines.md) records the starting stack, measured gains, known limitations and the append-only baseline procedure. Test steps below are **planned**, except the explicit B0 capture and already retained evidence.
+This plan replaces the old timeline checklist on 11 September 2026 at Rui's request. [previous-plan.md](previous-plan.md) archives all 38 old items and retains the incomplete capacity/recovery work. [baselines.md](baselines.md) records the starting stack, measured gains, known limitations and the append-only baseline procedure. The bounded plan is **closed**. [checklist.md](checklist.md) records executed and conditional-not-run decisions; the original test definitions below are retained. [Integration closeout](../gemma-integration-b0-20260911/report.md) records recovery coverage, dual64K capacity, the timed-out near128K attempt and final B0 restoration. No new optimisation qualified; closed checklist items do not imply every proposed acceptance gate passed.
 
 ## Starting point and operating rules
 
