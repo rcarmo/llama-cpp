@@ -1,0 +1,190 @@
+{
+  "ok": true,
+  "finite_state": true,
+  "total_nan": 0,
+  "total_inf": 0,
+  "recall": "CEDAR-481,MAPLE-726,BIRCH-953",
+  "tool_answer": "23",
+  "append": "MAPLE-726",
+  "append_cache": 64684,
+  "append_evaluated": 15,
+  "scope": "One64Krecall/save finite scan, independent short tool slot and preserved long append. Not crash/concurrency or broad quality qualification.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/runtime-cpu",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 495.6126319999994,
+      "package_j": 8.517495,
+      "timings": {
+        "restore_ms": 494.262
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "recall",
+      "device": "cpu",
+      "wall_ms": 2517.707291999999,
+      "package_j": 83.699127,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 185.661,
+        "prompt_per_token_ms": 185.661,
+        "prompt_per_second": 5.386160798444477,
+        "predicted_n": 21,
+        "predicted_ms": 2179.19,
+        "predicted_per_token_ms": 103.77095238095238,
+        "predicted_per_second": 9.636608097504118,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 21,
+        "prompt_tokens": 64663,
+        "total_tokens": 64684,
+        "prompt_tokens_details": {
+          "cached_tokens": 64662
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "save",
+      "device": "cpu",
+      "wall_ms": 490.8570099999997,
+      "package_j": 8.961219,
+      "timings": {
+        "save_ms": 461.252
+      },
+      "n_written": 1081795892,
+      "token_hash": null
+    },
+    {
+      "label": "tool-call",
+      "device": "cpu",
+      "wall_ms": 2065.019316,
+      "package_j": 81.450048,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 96,
+        "prompt_ms": 1448.081,
+        "prompt_per_token_ms": 15.084177083333332,
+        "prompt_per_second": 66.29463407088416,
+        "predicted_n": 18,
+        "predicted_ms": 607.383,
+        "predicted_per_token_ms": 33.743500000000004,
+        "predicted_per_second": 29.63533717604872,
+        "draft_n": 15,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 18,
+        "prompt_tokens": 96,
+        "total_tokens": 114,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-answer",
+      "device": "cpu",
+      "wall_ms": 978.3921580000006,
+      "package_j": 37.777613,
+      "timings": {
+        "cache_n": 91,
+        "prompt_n": 48,
+        "prompt_ms": 840.603,
+        "prompt_per_token_ms": 17.512562499999998,
+        "prompt_per_second": 57.10186616036346,
+        "predicted_n": 3,
+        "predicted_ms": 129.295,
+        "predicted_per_token_ms": 43.09833333333333,
+        "predicted_per_second": 23.202753393402684,
+        "draft_n": 3,
+        "draft_n_accepted": 3
+      },
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 139,
+        "total_tokens": 142,
+        "prompt_tokens_details": {
+          "cached_tokens": 91
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "long-append",
+      "device": "cpu",
+      "wall_ms": 2171.314316,
+      "package_j": 72.669797,
+      "timings": {
+        "cache_n": 64684,
+        "prompt_n": 15,
+        "prompt_ms": 1286.214,
+        "prompt_per_token_ms": 85.74759999999999,
+        "prompt_per_second": 11.662133983924914,
+        "predicted_n": 7,
+        "predicted_ms": 730.756,
+        "predicted_per_token_ms": 104.39371428571428,
+        "predicted_per_second": 9.579120800923974,
+        "draft_n": 6,
+        "draft_n_accepted": 5
+      },
+      "usage": {
+        "completion_tokens": 7,
+        "prompt_tokens": 64699,
+        "total_tokens": 64706,
+        "prompt_tokens_details": {
+          "cached_tokens": 64684
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "self-restore-after-append",
+      "device": "cpu",
+      "wall_ms": 279.47518599999967,
+      "package_j": 5.630296,
+      "timings": {
+        "restore_ms": 278.581
+      },
+      "n_read": 1081795892,
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 79,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12139936,
+    "peak_trial_rss_kib": 12143276,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24033804,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:08:04.148Z"
+}

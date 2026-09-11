@@ -1,0 +1,46 @@
+{
+  "parent": "abdbeadfb",
+  "shape": {
+    "n": 64768,
+    "queries": 4,
+    "qHeads": 8,
+    "kvHeads": 2,
+    "d": 512
+  },
+  "logical_bytes": {
+    "one_f32_score_tensor": 8290304,
+    "one_f16_key_cache": 132644864,
+    "key_plus_value_f16": 265289728
+  },
+  "profile": {
+    "total_node_wall_us": 15873918,
+    "all_attention_family_us": 856242,
+    "longscore_n4_us": 4674939,
+    "longvalue_n4_us": 3004129,
+    "limits": "InstrumentedB0parentdiagnostic;attentionfamilyincludesallheads/sizes,notpureintermediate-memorycost;logicalbytesnotDRAM"
+  },
+  "prior_FA": {
+    "confirmed_fused_tps": 4.738,
+    "reference_FA_tps": 4.301,
+    "smallquery_tile_active_tps": [
+      1.46,
+      1.67
+    ],
+    "scope": "HistoricalCPUFAcomparison,notnewmatchedB1comparison"
+  },
+  "design": {
+    "prototype": "Four-query online-softmax/FP32valueaccumulator, scoretile128positions, group-awarekeys andcausalmask;stagebeforeFAoffintermediatecreation",
+    "scratch_per_head": {
+      "score_tile_f32": 2048,
+      "output_f32": 8192,
+      "query_f32": 8192
+    },
+    "requires": [
+      "Explicitcaller-levelgraph/backenddispatch withmask/scale/softcap/sinks coverage",
+      "RetainFAoffKVlayout orseparatelyvalidateKVtranspose/handoff",
+      "No64querypadding; reducevalueswithoutfullrowtranspose",
+      "Reference/probability/tasktests foronline-reductionrounding"
+    ]
+  },
+  "decision": "Do not open F02/F03 in this bounded campaign. G not selected: countersnotKVattributed. F01quantifieslogicalintermediates anddesignrequirements butno measuredintermediatetrafficbottleneck or competitivekernel justified. RetainB1scopedgain;newfusionworkrequiresownchangedmechanism/feasibilityevidence,notpriorFArescreen."
+}

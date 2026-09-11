@@ -1,6 +1,6 @@
 # Baseline ledger
 
-**Current deployed and general experimental reference: B0-score3.** The bounded plan closed without a useful qualified successor. The final qualification update below adds recovery coverage and dual64K restored-slot capacity; dual128K and full prompt-cache pressure remain unqualified. Earlier observations are retained by date. Each later baseline is append-only, scoped and linked to its comparison parent.
+**Current production: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** B1 is not deployed. The original bounded plan closed without a successor; the later attention data-reuse plan qualified B1 with a small observed benefit and explicit lifecycle limits. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
 
 ## B0-score3: adopted at the planning reset
 
@@ -49,7 +49,7 @@ Use `B1-decode-<name>`, `B2-prefill-<name>` or the next unused ID; numeric order
 7. Refresh the next experiment's reference and restoration paths. Existing comparisons finish against their frozen parent; if changing that parent is necessary, close/amend the experiment and preserve its earlier results.
 8. If later evidence exposes an affected integration or safety regression, append a held/restricted/reference-revoked event. New experiments in that scope return to the last safe parent; unaffected validated improvements remain enabled. Fixes get new candidate identities and rerun only the invalidated gates plus necessary integration checks.
 
-No future B1/B2 baseline is marked validated yet. The machine ledger records B0 adoption and its later profile/short-quality qualification event; no new optimisation baseline is implied.
+At the original plan closeout no B1/B2 was qualified. The later [B1-query-reuse manifest](baselines/B1-query-reuse.json) records a qualified experimental saved64K decode scope; B0 remains production and B2 does not exist. The original manifests and events are unchanged.
 
 ## Retained opportunities and negative controls
 
@@ -99,3 +99,11 @@ The actual128scoretile passed native tests but was313.881%slower at48K; [negativ
 ## Inline register kernel, 11 September14:29UTC
 
 [Inline AVX2 score report](../gemma-score-inline-20260911/report.md): exact prior ASM inlined into48-rowjob, eliminating tilehelpercall while retainingnoinnerloopspills.19nativecases/mode+9bitexactcanarytests pass;actualmodel2072traces.4runABBA9.2160->9.1371tok/s(-0.856%),request+0.928%;smallnegative screen,no usefulfinalist/confirmation/deployment. No matchednoinline/inline attribution. B0 restored14:29:47UTC with exactidentity/tools/cache/zeroSwap;12offline tests28assertions pass.
+
+## B1 query reuse, later attention plan closeout
+
+[B1 manifest](baselines/B1-query-reuse.json) and [report](../gemma-query-reuse-20260911/report.md): already-roundedF16query expandedonce into8KiBthreadprivateFP32scratch/headcall;64KiBteam. Observed independent8runmedian9.2087->9.2734tok/s(+0.703%),request-1.027%,rangesoverlap;initialscreen+2.28% isnotconfirmedestimate.512fourruns+1.359%,finite/normalappend/separateselfrestore and28shorttaskrows pass.4K/32Kvariable,no6%/15%causalclaim.
+
+Status is qualified-experimental-not-deployed for saved64Kdecodeonly;B0 stays production. Originalselfrestore→append unexpectedly reevaluated and was abortedbyagentsequencingerror;partialfailure retained,originalsequenceunqualified. Reorderednormalappend andselfrestorepassedseparately. LatestpostPMUrestoration15:13:57UTC differsfromimmutablemanifest's earlierpostqualification15:11:19UTC;botharedatedobservations.
+
+TwoPMUprofilescapturedcore/atomusercounters;IMCpermissiondenied,noDRAMorKV-specificattribution. Headsharing andfusionprototypes conditional-not-run;logicalbuffers/designandpriorFAcosts retained. No forcedimplementationorautomaticdeployment.

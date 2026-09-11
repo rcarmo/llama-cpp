@@ -1,0 +1,66 @@
+{
+  "at": "2026-09-11T15:18:08.969Z",
+  "perf_event_paranoid": "2",
+  "pmus": [
+    {
+      "name": "cpu_core",
+      "type": "4",
+      "cpus": "0-7",
+      "events": {
+        "cache-misses": "event=0x2e,umask=0x41",
+        "cpu-cycles": "event=0x3c",
+        "instructions": "event=0xc0",
+        "cache-references": "event=0x2e,umask=0x4f"
+      },
+      "formats": {
+        "event": "config:0-7",
+        "pc": "config:19",
+        "edge": "config:18",
+        "offcore_rsp": "config1:0-63",
+        "ldlat": "config1:0-15",
+        "inv": "config:23",
+        "umask": "config:8-15",
+        "frontend": "config1:0-23",
+        "cmask": "config:24-31"
+      }
+    },
+    {
+      "name": "cpu_atom",
+      "type": "10",
+      "cpus": "8-15",
+      "events": {
+        "cache-misses": "event=0x2e,umask=0x41",
+        "cpu-cycles": "event=0x3c",
+        "instructions": "event=0xc0",
+        "cache-references": "event=0x2e,umask=0x4f"
+      },
+      "formats": {
+        "event": "config:0-7",
+        "pc": "config:19",
+        "edge": "config:18",
+        "offcore_rsp": "config1:0-63",
+        "ldlat": "config1:0-15",
+        "inv": "config:23",
+        "umask": "config:8-15",
+        "cmask": "config:24-31"
+      }
+    },
+    {
+      "name": "uncore_imc_free_running_0",
+      "type": "26",
+      "cpus": "0",
+      "events": {
+        "data_read": "event=0xff,umask=0x20",
+        "data_write": "event=0xff,umask=0x30",
+        "data_write.unit": "MiB",
+        "data_read.scale": "6.103515625e-5",
+        "data_write.scale": "6.103515625e-5",
+        "data_read.unit": "MiB"
+      },
+      "formats": {
+        "event": "config:0-7",
+        "umask": "config:8-15"
+      }
+    }
+  ]
+}

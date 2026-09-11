@@ -1,0 +1,88 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": false,
+    "seed": 42,
+    "messages": [
+      {
+        "role": "system",
+        "content": "Answer only from the provided source note. If a requested fact is missing, say \"not in source\". Keep the answer concise."
+      },
+      {
+        "role": "user",
+        "content": "Release note excerpt\n- Candidate release: cedar-17\n- Rollback approval owner: Mira Patel\n- Local index cache: 64 MiB\n- Validation window: 14 minutes\n- Data source: offline benchmark packet only\n\nUsing only the note, return a JSON object with keys shippedRelease, rollbackApprover, localIndexCache. If no shipped release is established, use the exact string not in source for shippedRelease. The other values are strings."
+      }
+    ]
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```json\n{\n  \"shippedRelease\": \"not in source\",\n  \"rollbackApprover\": \"Mira Patel\",\n  \"localIndexCache\": \"64 MiB\"\n}\n```"
+        }
+      }
+    ],
+    "created": 1789139315,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 45,
+      "prompt_tokens": 137,
+      "total_tokens": 182,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-boTeTR7EJ66LiMe7zqk8v2aaBloJOQ6P",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 137,
+      "prompt_ms": 2355.939,
+      "prompt_per_token_ms": 17.19663503649635,
+      "prompt_per_second": 58.1509113775866,
+      "predicted_n": 45,
+      "predicted_ms": 1450.898,
+      "predicted_per_token_ms": 32.242177777777776,
+      "predicted_per_second": 31.015274678164836,
+      "draft_n": 36,
+      "draft_n_accepted": 32
+    }
+  },
+  "measurement": {
+    "label": "retrieval-42",
+    "device": "cpu",
+    "wall_ms": 3810.8760330000005,
+    "package_j": 148.382311,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 137,
+      "prompt_ms": 2355.939,
+      "prompt_per_token_ms": 17.19663503649635,
+      "prompt_per_second": 58.1509113775866,
+      "predicted_n": 45,
+      "predicted_ms": 1450.898,
+      "predicted_per_token_ms": 32.242177777777776,
+      "predicted_per_second": 31.015274678164836,
+      "draft_n": 36,
+      "draft_n_accepted": 32
+    },
+    "usage": {
+      "completion_tokens": 45,
+      "prompt_tokens": 137,
+      "total_tokens": 182,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "token_hash": null
+  }
+}

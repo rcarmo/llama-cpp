@@ -1,0 +1,84 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": false,
+    "seed": 43,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write a JavaScript module. Return only one fenced js code block. Export exactly: export function chunk(items, size). items must be an array; size must be a positive integer; otherwise throw Error. Return a new array of consecutive slices of at most size elements. Preserve order, never mutate items, and return [] for an empty input. Slices must be new arrays. No imports, libraries or explanation."
+      }
+    ]
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+        }
+      }
+    ],
+    "created": 1789139436,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 154,
+      "prompt_tokens": 92,
+      "total_tokens": 246,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-PLnWt2nAa735gNHH7dZc8l0tG0Wt8aNL",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 92,
+      "prompt_ms": 1543.104,
+      "prompt_per_token_ms": 16.77286956521739,
+      "prompt_per_second": 59.620090415163205,
+      "predicted_n": 154,
+      "predicted_ms": 5297.674,
+      "predicted_per_token_ms": 34.40048051948052,
+      "predicted_per_second": 29.069361383882814,
+      "draft_n": 132,
+      "draft_n_accepted": 112
+    }
+  },
+  "measurement": {
+    "label": "coding-chunk-v1-43",
+    "device": "cpu",
+    "wall_ms": 6844.672595000004,
+    "package_j": 268.993269,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 92,
+      "prompt_ms": 1543.104,
+      "prompt_per_token_ms": 16.77286956521739,
+      "prompt_per_second": 59.620090415163205,
+      "predicted_n": 154,
+      "predicted_ms": 5297.674,
+      "predicted_per_token_ms": 34.40048051948052,
+      "predicted_per_second": 29.069361383882814,
+      "draft_n": 132,
+      "draft_n_accepted": 112
+    },
+    "usage": {
+      "completion_tokens": 154,
+      "prompt_tokens": 92,
+      "total_tokens": 246,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "token_hash": null
+  }
+}

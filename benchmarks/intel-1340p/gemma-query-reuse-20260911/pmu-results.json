@@ -1,0 +1,84 @@
+{
+  "diagnostic_only": true,
+  "profiles": [
+    {
+      "mode": 0,
+      "groups": [
+        {
+          "type": 4,
+          "cycles": 204618669189,
+          "instructions": 299709882284,
+          "ipc": 1.464724032620734,
+          "cache_references": 6920191509,
+          "cache_misses": 5741162113,
+          "running_ns": 67205475446,
+          "enabled_ns": 135304068980,
+          "running_enabled_ratio": 0.4966995889527461,
+          "active_tids": 15
+        },
+        {
+          "type": 10,
+          "cycles": 168528060531,
+          "instructions": 137966315889,
+          "ipc": 0.8186548605276431,
+          "cache_references": 3484182039,
+          "cache_misses": 2481787953,
+          "running_ns": 68098651938,
+          "enabled_ns": 135304213912,
+          "running_enabled_ratio": 0.5033003035832307,
+          "active_tids": 13
+        }
+      ],
+      "threads_unchanged": true,
+      "scope": "Processallthreads split core/atomPMUs, user-onlycycles/instructions/LLCreferences/misses. Intervalincludes25tail+128decode and HTTProundtrip,excludedkerneldrivertraffic;no causalspeed or DRAMbandwidthclaim."
+    },
+    {
+      "mode": 1,
+      "groups": [
+        {
+          "type": 4,
+          "cycles": 204042688546,
+          "instructions": 292279259589,
+          "ipc": 1.4324417192881072,
+          "cache_references": 6717109528,
+          "cache_misses": 5577371268,
+          "running_ns": 67311586003,
+          "enabled_ns": 134893740533,
+          "running_enabled_ratio": 0.49899710495857363,
+          "active_tids": 15
+        },
+        {
+          "type": 10,
+          "cycles": 167689055335,
+          "instructions": 140153628623,
+          "ipc": 0.8357947293758008,
+          "cache_references": 3603844512,
+          "cache_misses": 2603402196,
+          "running_ns": 67582211240,
+          "enabled_ns": 134893883366,
+          "running_enabled_ratio": 0.5010027849567721,
+          "active_tids": 11
+        }
+      ],
+      "threads_unchanged": true,
+      "scope": "Processallthreads split core/atomPMUs, user-onlycycles/instructions/LLCreferences/misses. Intervalincludes25tail+128decode and HTTProundtrip,excludedkerneldrivertraffic;no causalspeed or DRAMbandwidthclaim."
+    }
+  ],
+  "events": {
+    "core_type": 4,
+    "atom_type": 10,
+    "configs": {
+      "cycles": "0x3c",
+      "instructions": "0xc0",
+      "cache_references": "0x4f2e",
+      "cache_misses": "0x412e"
+    }
+  },
+  "limits": [
+    "User-only allprocess-thread groups;tasktimes include nativeprompttail+decode andHTTProundtrip",
+    "HybridPMUrunning/enabled ratios also reflect placement andoffcorePMUtime;do not blindlyscaleor infermultiplexing",
+    "Rawcore/atomcacheeventsemantics and requestwideaggregation do notattribute missestoKV orproveDRAMsaturation",
+    "UncoreIMC denied(EACCES);no policychange,noDRAMbandwidthmetric",
+    "Two diagnosticprofiles only; no performanceclaim or same-output-onlyacceptance"
+  ]
+}

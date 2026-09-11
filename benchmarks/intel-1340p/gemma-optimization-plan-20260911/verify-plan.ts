@@ -18,5 +18,5 @@ assert(events.length>=4&&events[0].baseline===b.id&&resolve(root,'baselines',eve
 const final=JSON.parse(read('baselines/B0-closeout.json'));assert(events.some(e=>e.event==='bounded_plan_closeout')&&final.baseline===b.id&&final.results.audit_pass&&!final.results.deployment_changed&&!final.results.near128.qualified,'Scoped closeout, no invented adoption');
 assert(final.results.capacity.map(x=>x.tokens_per_slot).join(',')==='16384,32768,64663'&&final.maintenance_restore_target===b.release.split('/').at(-1),'Capacity and current restore target');
 assert(plan.includes('do not change it mid-comparison')&&plan.includes('held/restricted/revoked-reference'),'Freeze and demotion');
-assert(ledger.includes('No future B1/B2 baseline is marked validated yet'),'No invented gains');
+const query=JSON.parse(read('baselines/B1-query-reuse.json'));assert(query.status==='qualified-experimental-not-deployed'&&query.comparison_parent===b.id&&query.production_at_test_start===b.id&&query.reference_eligible_for.length===1,'Scoped B1 not production');assert(events.some(e=>e.baseline===query.id&&e.event==='validated-for-scope')&&ledger.includes('B0 remains production'),'Append-only B1 qualification');
 console.log('PASS38archiveditems,20newsteps,alltestIDs/links,B0identity/rollback andappend-onlyledger; no inference');

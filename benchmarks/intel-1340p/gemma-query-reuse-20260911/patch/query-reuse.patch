@@ -1,0 +1,37 @@
+--- a/sgemm.cpp
++++ b/sgemm.cpp
+@@ -494,6 +494,23 @@
+         : params(params), A(A), B(B), C(C), k(k), lda(lda), ldb(ldb), ldc(ldc) {
+     }
+ 
++    // Internal entry for already prepared F32 queries. The caller supplies the existing score3 gate.
++    void matmul_score_prepared(int64_t m) { gemm_score3(m); }
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    NOINLINE bool matmul_score_query_reuse(int64_t m) {
++        alignas(64) float query[4 * 512];
++        for (int j = 0; j < 4; ++j)
++            for (int l = 0; l < 512; l += 8)
++                _mm256_store_ps(query + j * 512 + l, _mm256_cvtph_ps(_mm_loadu_si128((const __m128i *)(B + j * ldb + l))));
++        static const bool trace = std::getenv("GGML_CPU_SCORE_QUERY_REUSE_TRACE") != nullptr;
++        if (trace) std::fprintf(stderr,"SCORE_QUERY_REUSE enter ith=%d nth=%d m=%lld k=512 prepared=2048 bytes=8192 jobs=%lld tiles=%lld\n",params->ith,params->nth,(long long)m,(long long)((m+47)/48),(long long)(m/3));
++        tinyBLAS<8, __m256, __m256, ggml_fp16_t, float, float> prepared{params,512,(const ggml_fp16_t *)A,lda,query,512,(float *)C,ldc};
++        prepared.matmul_score_prepared(m);
++        if (trace) std::fprintf(stderr,"SCORE_QUERY_REUSE exit ith=%d\n",params->ith);
++        return true;
++    }
++#endif
++
+     bool matmul_attn4(int64_t m, int64_t n) {
+         if (n != 4 || m % 16 != 0 || k % KN != 0) return false;
+ #if defined(__AVX2__) && defined(__FMA__)
+@@ -503,6 +520,10 @@
+                 std::fprintf(stderr, "SCORE4_3ROW m=%lld n=%lld k=%lld tail=%lld threads=%d\n",
+                     (long long) m, (long long) n, (long long) k, (long long) (m % 3), params->nth);
+             }
++                if constexpr (std::is_same<TA, ggml_fp16_t>::value && std::is_same<TB, ggml_fp16_t>::value) {
++                    static const bool reuse = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE"), "1") == 0;
++                    if (reuse) return matmul_score_query_reuse(m);
++                }
+             gemm_score3(m);
+             return true;
+         }

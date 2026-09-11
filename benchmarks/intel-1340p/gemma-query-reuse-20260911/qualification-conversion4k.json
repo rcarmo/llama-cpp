@@ -1,0 +1,76 @@
+{
+  "input": "/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/cap256-probe4k/slots/probe.slot",
+  "output": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/qualification-states/4k-v2.slot",
+  "parsed": {
+    "tokens": 4096,
+    "packed": 4100,
+    "serverWrapped": true,
+    "kv_offset": 16412,
+    "size": 98641540,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 4096,
+            "min": 0,
+            "max": 4095
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 3328,
+            "max": 4095
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 98641540,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "target": {
+    "tokens": 4096,
+    "packed": 4096,
+    "serverWrapped": false,
+    "kv_offset": 16396,
+    "size": 98641524,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 4096,
+            "min": 0,
+            "max": 4095
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 3328,
+            "max": 4095
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 98641524,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "kv_sha256": "ac373fe10c9b76f41e27ca170da31c3af69ad8a35c4e6a0e6850f43dec5a5285",
+  "scope": "Validate Gemma subset; unwrap text-only server tokens and translate v3 to v2. KV bytes and token IDs unchanged. Native loader guards retained; media/extensions rejected."
+}

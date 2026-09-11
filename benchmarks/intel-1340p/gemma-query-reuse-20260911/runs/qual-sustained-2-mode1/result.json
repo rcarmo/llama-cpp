@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "scope": "sustained",
+  "order": 2,
+  "mode": 1,
+  "timings": {
+    "cache_n": 64658,
+    "prompt_n": 25,
+    "prompt_ms": 1550.39,
+    "prompt_per_token_ms": 62.015600000000006,
+    "prompt_per_second": 16.12497500628874,
+    "predicted_n": 512,
+    "predicted_ms": 51342.618,
+    "predicted_per_token_ms": 100.27855078125,
+    "predicted_per_second": 9.972222296884043,
+    "draft_n": 408,
+    "draft_n_accepted": 374
+  },
+  "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n31\n32\n33\n34\n35\n36\n37",
+  "limits": "Sustained/counting and shorterrestoredstate throughput controls;ignore_eos forceoutput counts,notbroadquality",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "targetBatchThreads": 16,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/runtime-cpu",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 505.28598299999976,
+      "package_j": 8.267252,
+      "timings": {
+        "restore_ms": 504.219
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 52922.408409,
+      "package_j": 1834.588199,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1550.39,
+        "prompt_per_token_ms": 62.015600000000006,
+        "prompt_per_second": 16.12497500628874,
+        "predicted_n": 512,
+        "predicted_ms": 51342.618,
+        "predicted_per_token_ms": 100.27855078125,
+        "predicted_per_second": 9.972222296884043,
+        "draft_n": 408,
+        "draft_n_accepted": 374
+      },
+      "token_hash": "92cd18e67ae34c0782ba7dc5b5ad07f1a44d1938c67a876986fc5096e5a334e1"
+    }
+  ],
+  "thermal": {
+    "peak_c": 84,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11974123,
+    "peak_trial_rss_kib": 11977436,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24113708,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:01:59.475Z"
+}

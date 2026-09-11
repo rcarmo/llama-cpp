@@ -1,0 +1,215 @@
+00000000000f5760 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)>:
+   f5760:	55                   	push   %rbp
+   f5761:	48 89 e5             	mov    %rsp,%rbp
+   f5764:	41 56                	push   %r14
+   f5766:	53                   	push   %rbx
+   f5767:	48 83 e4 c0          	and    $0xffffffffffffffc0,%rsp
+   f576b:	48 81 ec c0 20 00 00 	sub    $0x20c0,%rsp
+   f5772:	48 89 fb             	mov    %rdi,%rbx
+   f5775:	48 8b 47 10          	mov    0x10(%rdi),%rax
+   f5779:	48 8b 4f 30          	mov    0x30(%rdi),%rcx
+   f577d:	48 c7 c2 f8 ff ff ff 	mov    $0xfffffffffffffff8,%rdx
+   f5784:	66 66 66 2e 0f 1f 84 	data16 data16 cs nopw 0x0(%rax,%rax,1)
+   f578b:	00 00 00 00 00 
+   f5790:	c4 e2 7d 13 44 50 10 	vcvtph2ps 0x10(%rax,%rdx,2),%ymm0
+   f5797:	c5 fc 29 84 94 a0 00 	vmovaps %ymm0,0xa0(%rsp,%rdx,4)
+   f579e:	00 00 
+   f57a0:	c4 e2 7d 13 44 50 20 	vcvtph2ps 0x20(%rax,%rdx,2),%ymm0
+   f57a7:	c5 fc 29 84 94 c0 00 	vmovaps %ymm0,0xc0(%rsp,%rdx,4)
+   f57ae:	00 00 
+   f57b0:	c4 e2 7d 13 44 50 30 	vcvtph2ps 0x30(%rax,%rdx,2),%ymm0
+   f57b7:	c5 fc 29 84 94 e0 00 	vmovaps %ymm0,0xe0(%rsp,%rdx,4)
+   f57be:	00 00 
+   f57c0:	c4 e2 7d 13 44 50 40 	vcvtph2ps 0x40(%rax,%rdx,2),%ymm0
+   f57c7:	c5 fc 29 84 94 00 01 	vmovaps %ymm0,0x100(%rsp,%rdx,4)
+   f57ce:	00 00 
+   f57d0:	c4 e2 7d 13 44 50 50 	vcvtph2ps 0x50(%rax,%rdx,2),%ymm0
+   f57d7:	c5 fc 29 84 94 20 01 	vmovaps %ymm0,0x120(%rsp,%rdx,4)
+   f57de:	00 00 
+   f57e0:	c4 e2 7d 13 44 50 60 	vcvtph2ps 0x60(%rax,%rdx,2),%ymm0
+   f57e7:	c5 fc 29 84 94 40 01 	vmovaps %ymm0,0x140(%rsp,%rdx,4)
+   f57ee:	00 00 
+   f57f0:	c4 e2 7d 13 44 50 70 	vcvtph2ps 0x70(%rax,%rdx,2),%ymm0
+   f57f7:	c5 fc 29 84 94 60 01 	vmovaps %ymm0,0x160(%rsp,%rdx,4)
+   f57fe:	00 00 
+   f5800:	c4 e2 7d 13 84 50 80 	vcvtph2ps 0x80(%rax,%rdx,2),%ymm0
+   f5807:	00 00 00 
+   f580a:	c5 fc 29 84 94 80 01 	vmovaps %ymm0,0x180(%rsp,%rdx,4)
+   f5811:	00 00 
+   f5813:	48 83 c2 40          	add    $0x40,%rdx
+   f5817:	48 81 fa f8 01 00 00 	cmp    $0x1f8,%rdx
+   f581e:	0f 82 6c ff ff ff    	jb     f5790 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x30>
+   f5824:	48 8d 14 48          	lea    (%rax,%rcx,2),%rdx
+   f5828:	48 83 c2 70          	add    $0x70,%rdx
+   f582c:	48 c7 c7 f8 ff ff ff 	mov    $0xfffffffffffffff8,%rdi
+   f5833:	66 66 66 66 2e 0f 1f 	data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+   f583a:	84 00 00 00 00 00 
+   f5840:	c4 e2 7d 13 44 7a a0 	vcvtph2ps -0x60(%rdx,%rdi,2),%ymm0
+   f5847:	c5 fc 29 84 bc a0 08 	vmovaps %ymm0,0x8a0(%rsp,%rdi,4)
+   f584e:	00 00 
+   f5850:	c4 e2 7d 13 44 7a b0 	vcvtph2ps -0x50(%rdx,%rdi,2),%ymm0
+   f5857:	c5 fc 29 84 bc c0 08 	vmovaps %ymm0,0x8c0(%rsp,%rdi,4)
+   f585e:	00 00 
+   f5860:	c4 e2 7d 13 44 7a c0 	vcvtph2ps -0x40(%rdx,%rdi,2),%ymm0
+   f5867:	c5 fc 29 84 bc e0 08 	vmovaps %ymm0,0x8e0(%rsp,%rdi,4)
+   f586e:	00 00 
+   f5870:	c4 e2 7d 13 44 7a d0 	vcvtph2ps -0x30(%rdx,%rdi,2),%ymm0
+   f5877:	c5 fc 29 84 bc 00 09 	vmovaps %ymm0,0x900(%rsp,%rdi,4)
+   f587e:	00 00 
+   f5880:	c4 e2 7d 13 44 7a e0 	vcvtph2ps -0x20(%rdx,%rdi,2),%ymm0
+   f5887:	c5 fc 29 84 bc 20 09 	vmovaps %ymm0,0x920(%rsp,%rdi,4)
+   f588e:	00 00 
+   f5890:	c4 e2 7d 13 44 7a f0 	vcvtph2ps -0x10(%rdx,%rdi,2),%ymm0
+   f5897:	c5 fc 29 84 bc 40 09 	vmovaps %ymm0,0x940(%rsp,%rdi,4)
+   f589e:	00 00 
+   f58a0:	c4 e2 7d 13 04 7a    	vcvtph2ps (%rdx,%rdi,2),%ymm0
+   f58a6:	c5 fc 29 84 bc 60 09 	vmovaps %ymm0,0x960(%rsp,%rdi,4)
+   f58ad:	00 00 
+   f58af:	c4 e2 7d 13 44 7a 10 	vcvtph2ps 0x10(%rdx,%rdi,2),%ymm0
+   f58b6:	c5 fc 29 84 bc 80 09 	vmovaps %ymm0,0x980(%rsp,%rdi,4)
+   f58bd:	00 00 
+   f58bf:	48 83 c7 40          	add    $0x40,%rdi
+   f58c3:	48 81 ff f8 01 00 00 	cmp    $0x1f8,%rdi
+   f58ca:	0f 82 70 ff ff ff    	jb     f5840 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0xe0>
+   f58d0:	48 8d 14 88          	lea    (%rax,%rcx,4),%rdx
+   f58d4:	48 83 c2 70          	add    $0x70,%rdx
+   f58d8:	48 c7 c7 f8 ff ff ff 	mov    $0xfffffffffffffff8,%rdi
+   f58df:	90                   	nop
+   f58e0:	c4 e2 7d 13 44 7a a0 	vcvtph2ps -0x60(%rdx,%rdi,2),%ymm0
+   f58e7:	c5 fc 29 84 bc a0 10 	vmovaps %ymm0,0x10a0(%rsp,%rdi,4)
+   f58ee:	00 00 
+   f58f0:	c4 e2 7d 13 44 7a b0 	vcvtph2ps -0x50(%rdx,%rdi,2),%ymm0
+   f58f7:	c5 fc 29 84 bc c0 10 	vmovaps %ymm0,0x10c0(%rsp,%rdi,4)
+   f58fe:	00 00 
+   f5900:	c4 e2 7d 13 44 7a c0 	vcvtph2ps -0x40(%rdx,%rdi,2),%ymm0
+   f5907:	c5 fc 29 84 bc e0 10 	vmovaps %ymm0,0x10e0(%rsp,%rdi,4)
+   f590e:	00 00 
+   f5910:	c4 e2 7d 13 44 7a d0 	vcvtph2ps -0x30(%rdx,%rdi,2),%ymm0
+   f5917:	c5 fc 29 84 bc 00 11 	vmovaps %ymm0,0x1100(%rsp,%rdi,4)
+   f591e:	00 00 
+   f5920:	c4 e2 7d 13 44 7a e0 	vcvtph2ps -0x20(%rdx,%rdi,2),%ymm0
+   f5927:	c5 fc 29 84 bc 20 11 	vmovaps %ymm0,0x1120(%rsp,%rdi,4)
+   f592e:	00 00 
+   f5930:	c4 e2 7d 13 44 7a f0 	vcvtph2ps -0x10(%rdx,%rdi,2),%ymm0
+   f5937:	c5 fc 29 84 bc 40 11 	vmovaps %ymm0,0x1140(%rsp,%rdi,4)
+   f593e:	00 00 
+   f5940:	c4 e2 7d 13 04 7a    	vcvtph2ps (%rdx,%rdi,2),%ymm0
+   f5946:	c5 fc 29 84 bc 60 11 	vmovaps %ymm0,0x1160(%rsp,%rdi,4)
+   f594d:	00 00 
+   f594f:	c4 e2 7d 13 44 7a 10 	vcvtph2ps 0x10(%rdx,%rdi,2),%ymm0
+   f5956:	c5 fc 29 84 bc 80 11 	vmovaps %ymm0,0x1180(%rsp,%rdi,4)
+   f595d:	00 00 
+   f595f:	48 83 c7 40          	add    $0x40,%rdi
+   f5963:	48 81 ff f8 01 00 00 	cmp    $0x1f8,%rdi
+   f596a:	0f 82 70 ff ff ff    	jb     f58e0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x180>
+   f5970:	48 8d 0c 49          	lea    (%rcx,%rcx,2),%rcx
+   f5974:	48 8d 04 48          	lea    (%rax,%rcx,2),%rax
+   f5978:	48 83 c0 70          	add    $0x70,%rax
+   f597c:	48 c7 c1 f8 ff ff ff 	mov    $0xfffffffffffffff8,%rcx
+   f5983:	66 66 66 66 2e 0f 1f 	data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+   f598a:	84 00 00 00 00 00 
+   f5990:	c4 e2 7d 13 44 48 a0 	vcvtph2ps -0x60(%rax,%rcx,2),%ymm0
+   f5997:	c5 fc 29 84 8c a0 18 	vmovaps %ymm0,0x18a0(%rsp,%rcx,4)
+   f599e:	00 00 
+   f59a0:	c4 e2 7d 13 44 48 b0 	vcvtph2ps -0x50(%rax,%rcx,2),%ymm0
+   f59a7:	c5 fc 29 84 8c c0 18 	vmovaps %ymm0,0x18c0(%rsp,%rcx,4)
+   f59ae:	00 00 
+   f59b0:	c4 e2 7d 13 44 48 c0 	vcvtph2ps -0x40(%rax,%rcx,2),%ymm0
+   f59b7:	c5 fc 29 84 8c e0 18 	vmovaps %ymm0,0x18e0(%rsp,%rcx,4)
+   f59be:	00 00 
+   f59c0:	c4 e2 7d 13 44 48 d0 	vcvtph2ps -0x30(%rax,%rcx,2),%ymm0
+   f59c7:	c5 fc 29 84 8c 00 19 	vmovaps %ymm0,0x1900(%rsp,%rcx,4)
+   f59ce:	00 00 
+   f59d0:	c4 e2 7d 13 44 48 e0 	vcvtph2ps -0x20(%rax,%rcx,2),%ymm0
+   f59d7:	c5 fc 29 84 8c 20 19 	vmovaps %ymm0,0x1920(%rsp,%rcx,4)
+   f59de:	00 00 
+   f59e0:	c4 e2 7d 13 44 48 f0 	vcvtph2ps -0x10(%rax,%rcx,2),%ymm0
+   f59e7:	c5 fc 29 84 8c 40 19 	vmovaps %ymm0,0x1940(%rsp,%rcx,4)
+   f59ee:	00 00 
+   f59f0:	c4 e2 7d 13 04 48    	vcvtph2ps (%rax,%rcx,2),%ymm0
+   f59f6:	c5 fc 29 84 8c 60 19 	vmovaps %ymm0,0x1960(%rsp,%rcx,4)
+   f59fd:	00 00 
+   f59ff:	c4 e2 7d 13 44 48 10 	vcvtph2ps 0x10(%rax,%rcx,2),%ymm0
+   f5a06:	c5 fc 29 84 8c 80 19 	vmovaps %ymm0,0x1980(%rsp,%rcx,4)
+   f5a0d:	00 00 
+   f5a0f:	48 83 c1 40          	add    $0x40,%rcx
+   f5a13:	48 81 f9 f8 01 00 00 	cmp    $0x1f8,%rcx
+   f5a1a:	0f 82 70 ff ff ff    	jb     f5990 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x230>
+   f5a20:	0f b6 05 f1 cc 0e 00 	movzbl 0xeccf1(%rip),%eax        # 1e2718 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5a27:	84 c0                	test   %al,%al
+   f5a29:	0f 84 ea 00 00 00    	je     f5b19 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x3b9>
+   f5a2f:	80 3d da cc 0e 00 01 	cmpb   $0x1,0xeccda(%rip)        # 1e2710 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5a36:	74 63                	je     f5a9b <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x33b>
+   f5a38:	48 8b 43 28          	mov    0x28(%rbx),%rax
+   f5a3c:	48 8b 4b 18          	mov    0x18(%rbx),%rcx
+   f5a40:	48 8b 53 38          	mov    0x38(%rbx),%rdx
+   f5a44:	c5 f8 10 03          	vmovups (%rbx),%xmm0
+   f5a48:	c5 f8 29 44 24 40    	vmovaps %xmm0,0x40(%rsp)
+   f5a4e:	48 8d bc 24 80 00 00 	lea    0x80(%rsp),%rdi
+   f5a55:	00 
+   f5a56:	48 89 7c 24 50       	mov    %rdi,0x50(%rsp)
+   f5a5b:	48 89 4c 24 58       	mov    %rcx,0x58(%rsp)
+   f5a60:	48 c7 44 24 60 00 02 	movq   $0x200,0x60(%rsp)
+   f5a67:	00 00 
+   f5a69:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+   f5a6e:	48 c7 44 24 70 00 02 	movq   $0x200,0x70(%rsp)
+   f5a75:	00 00 
+   f5a77:	48 89 54 24 78       	mov    %rdx,0x78(%rsp)
+   f5a7c:	48 8d 7c 24 40       	lea    0x40(%rsp),%rdi
+   f5a81:	c5 f8 77             	vzeroupper
+   f5a84:	e8 e7 17 00 00       	call   f7270 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, float, float>::gemm_score3(long)>
+   f5a89:	80 3d 80 cc 0e 00 01 	cmpb   $0x1,0xecc80(%rip)        # 1e2710 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5a90:	74 65                	je     f5af7 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x397>
+   f5a92:	48 8d 65 f0          	lea    -0x10(%rbp),%rsp
+   f5a96:	5b                   	pop    %rbx
+   f5a97:	41 5e                	pop    %r14
+   f5a99:	5d                   	pop    %rbp
+   f5a9a:	c3                   	ret
+   f5a9b:	48 8b 05 e6 34 06 00 	mov    0x634e6(%rip),%rax        # 158f88 <stderr@GLIBC_2.2.5>
+   f5aa2:	48 8b 38             	mov    (%rax),%rdi
+   f5aa5:	48 8b 0b             	mov    (%rbx),%rcx
+   f5aa8:	8b 01                	mov    (%rcx),%eax
+   f5aaa:	8b 49 04             	mov    0x4(%rcx),%ecx
+   f5aad:	48 8d 56 2f          	lea    0x2f(%rsi),%rdx
+   f5ab1:	49 b8 ab aa aa aa aa 	movabs $0xaaaaaaaaaaaaaaab,%r8
+   f5ab8:	aa aa aa 
+   f5abb:	c4 42 b3 f6 c8       	mulx   %r8,%r9,%r9
+   f5ac0:	49 c1 e9 05          	shr    $0x5,%r9
+   f5ac4:	48 89 f2             	mov    %rsi,%rdx
+   f5ac7:	c4 c2 eb f6 d0       	mulx   %r8,%rdx,%rdx
+   f5acc:	48 d1 ea             	shr    $1,%rdx
+   f5acf:	48 89 14 24          	mov    %rdx,(%rsp)
+   f5ad3:	48 8d 15 16 2a 04 00 	lea    0x42a16(%rip),%rdx        # 1384f0 <kvalues_fp4+0x5700>
+   f5ada:	49 89 f6             	mov    %rsi,%r14
+   f5add:	48 89 d6             	mov    %rdx,%rsi
+   f5ae0:	89 c2                	mov    %eax,%edx
+   f5ae2:	4d 89 f0             	mov    %r14,%r8
+   f5ae5:	31 c0                	xor    %eax,%eax
+   f5ae7:	c5 f8 77             	vzeroupper
+   f5aea:	e8 61 bb f0 ff       	call   1650 <fprintf@plt>
+   f5aef:	4c 89 f6             	mov    %r14,%rsi
+   f5af2:	e9 41 ff ff ff       	jmp    f5a38 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x2d8>
+   f5af7:	48 8b 05 8a 34 06 00 	mov    0x6348a(%rip),%rax        # 158f88 <stderr@GLIBC_2.2.5>
+   f5afe:	48 8b 38             	mov    (%rax),%rdi
+   f5b01:	48 8b 03             	mov    (%rbx),%rax
+   f5b04:	8b 10                	mov    (%rax),%edx
+   f5b06:	48 8d 35 45 2a 04 00 	lea    0x42a45(%rip),%rsi        # 138552 <kvalues_fp4+0x5762>
+   f5b0d:	31 c0                	xor    %eax,%eax
+   f5b0f:	e8 3c bb f0 ff       	call   1650 <fprintf@plt>
+   f5b14:	e9 79 ff ff ff       	jmp    f5a92 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x332>
+   f5b19:	48 8d 3d f8 cb 0e 00 	lea    0xecbf8(%rip),%rdi        # 1e2718 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5b20:	49 89 f6             	mov    %rsi,%r14
+   f5b23:	c5 f8 77             	vzeroupper
+   f5b26:	e8 f5 c0 f0 ff       	call   1c20 <__cxa_guard_acquire@plt>
+   f5b2b:	4c 89 f6             	mov    %r14,%rsi
+   f5b2e:	85 c0                	test   %eax,%eax
+   f5b30:	0f 84 f9 fe ff ff    	je     f5a2f <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x2cf>
+   f5b36:	48 8d 3d 92 29 04 00 	lea    0x42992(%rip),%rdi        # 1384cf <kvalues_fp4+0x56df>
+   f5b3d:	e8 0e b8 f0 ff       	call   1350 <getenv@plt>
+   f5b42:	48 85 c0             	test   %rax,%rax
+   f5b45:	0f 95 05 c4 cb 0e 00 	setne  0xecbc4(%rip)        # 1e2710 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5b4c:	48 8d 3d c5 cb 0e 00 	lea    0xecbc5(%rip),%rdi        # 1e2718 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)::trace>
+   f5b53:	e8 08 af f0 ff       	call   a60 <__cxa_guard_release@plt>
+   f5b58:	4c 89 f6             	mov    %r14,%rsi
+   f5b5b:	e9 cf fe ff ff       	jmp    f5a2f <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::matmul_score_query_reuse(long)+0x2cf>
+

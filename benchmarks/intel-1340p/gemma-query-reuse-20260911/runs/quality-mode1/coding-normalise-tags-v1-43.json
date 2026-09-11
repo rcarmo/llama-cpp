@@ -1,0 +1,84 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": false,
+    "seed": 43,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write a JavaScript module. Return only one fenced ```js code block.\nExport exactly:\nexport function normaliseTags(tags)\nRequirements:\n- tags must be an array and every item must be a string; otherwise throw Error.\n- Never mutate the input array.\n- For each tag: trim outer whitespace, lowercase it, replace runs of spaces or underscores with '-', collapse repeated '-', then remove leading and trailing '-'.\n- Drop empty results.\n- Deduplicate while preserving first occurrence order.\n- Return a new array.\n- No imports, no external libraries, no explanation."
+      }
+    ]
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```js\nexport function normaliseTags(tags) {\n  if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {\n    throw new Error('Input must be an array of strings.');\n  }\n\n  const result = [];\n  const seen = new Set();\n\n  for (const tag of tags) {\n    // 1. Trim, lowercase\n    let normalized = tag.trim().toLowerCase();\n\n    // 2. Replace runs of spaces or underscores with '-'\n    normalized = normalized.replace(/[\\s_]+/g, '-');\n\n    // 3. Collapse repeated '-'\n    normalized = normalized.replace(/-+/g, '-');\n\n    // 4. Remove leading and trailing '-'\n    normalized = normalized.replace(/^-|-$/g, '');\n\n    // 5. Drop empty results\n    if (normalized.length === 0) {\n      continue;\n    }\n\n    // 6. Deduplicate while preserving first occurrence order\n    if (!seen.has(normalized)) {\n      result.push(normalized);\n      seen.add(normalized);\n    }\n  }\n\n  return result;\n}\n```"
+        }
+      }
+    ],
+    "created": 1789139429,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 259,
+      "prompt_tokens": 132,
+      "total_tokens": 391,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-Zo57guyCVNPv8hQB3m3Bb2b2tbWVfwlx",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 132,
+      "prompt_ms": 1942.153,
+      "prompt_per_token_ms": 14.713280303030302,
+      "prompt_per_second": 67.96580907889337,
+      "predicted_n": 259,
+      "predicted_ms": 10066.066,
+      "predicted_per_token_ms": 38.865119691119695,
+      "predicted_per_second": 25.73001210204662,
+      "draft_n": 246,
+      "draft_n_accepted": 177
+    }
+  },
+  "measurement": {
+    "label": "coding-normalise-tags-v1-43",
+    "device": "cpu",
+    "wall_ms": 12012.772324999998,
+    "package_j": 472.039624,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 132,
+      "prompt_ms": 1942.153,
+      "prompt_per_token_ms": 14.713280303030302,
+      "prompt_per_second": 67.96580907889337,
+      "predicted_n": 259,
+      "predicted_ms": 10066.066,
+      "predicted_per_token_ms": 38.865119691119695,
+      "predicted_per_second": 25.73001210204662,
+      "draft_n": 246,
+      "draft_n_accepted": 177
+    },
+    "usage": {
+      "completion_tokens": 259,
+      "prompt_tokens": 132,
+      "total_tokens": 391,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "token_hash": null
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": true,
+    "seed": 43,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookupTicket",
+          "description": "Return fixture ticket record",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookupTicket when requested. Reuse prior tool results for follow-ups. Return the requested JSON only after tool results. No prose."
+      },
+      {
+        "role": "user",
+        "content": "Check ticket OPS-17. Return JSON with keys id, owner, severity."
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "tool_calls",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "function": {
+                "name": "lookupTicket",
+                "arguments": "{\"id\":\"OPS-17\"}"
+              },
+              "id": "v7t8jLSjXxamlFOSubPzopCTH4i52bEI"
+            }
+          ]
+        }
+      }
+    ],
+    "created": 1789139356,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 98,
+      "total_tokens": 115,
+      "prompt_tokens_details": {
+        "cached_tokens": 1
+      }
+    },
+    "id": "chatcmpl-7xEE1U8apVQ2d1jbl2QhuWPBtA2vS96j",
+    "timings": {
+      "cache_n": 1,
+      "prompt_n": 97,
+      "prompt_ms": 1558.644,
+      "prompt_per_token_ms": 16.068494845360824,
+      "prompt_per_second": 62.23358252429676,
+      "predicted_n": 17,
+      "predicted_ms": 532.983,
+      "predicted_per_token_ms": 31.351941176470586,
+      "predicted_per_second": 31.89595165324223,
+      "draft_n": 12,
+      "draft_n_accepted": 12
+    }
+  },
+  "measurement": {
+    "label": "tool-43-r1",
+    "device": "cpu",
+    "wall_ms": 2099.1213350000035,
+    "package_j": 83.848967,
+    "timings": {
+      "cache_n": 1,
+      "prompt_n": 97,
+      "prompt_ms": 1558.644,
+      "prompt_per_token_ms": 16.068494845360824,
+      "prompt_per_second": 62.23358252429676,
+      "predicted_n": 17,
+      "predicted_ms": 532.983,
+      "predicted_per_token_ms": 31.351941176470586,
+      "predicted_per_second": 31.89595165324223,
+      "draft_n": 12,
+      "draft_n_accepted": 12
+    },
+    "usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 98,
+      "total_tokens": 115,
+      "prompt_tokens_details": {
+        "cached_tokens": 1
+      }
+    },
+    "token_hash": null
+  }
+}
