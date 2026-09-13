@@ -68,3 +68,9 @@ bun tools/pi/benchmarks/gsq-context.ts results/context.json
 ```
 
 The context runner requires64K. Evaluation records failed assertions in its summary rather than suppressing them. Raw request/response files, launch scripts, logs and the diagnostic probes accompany this report in the downloadable archive. The campaign remains open specifically for a proven root cause of plain/MTP divergence; this report does not mark that failure resolved.
+
+## Target-logit diagnosis
+
+Temporary raw-logit instrumentation at sampling confirms a target-ranking change at the first divergent token in the q8 probe. Plain evaluation: token561 (` The`) logit22.2424011 versus token357 (` A`)22.2401543, margin0.00224686. Speculative target verification: token357 logit22.3276176 versus token56122.2993927, margin0.02822495. MTP emits its target's top token. This observed divergence is therefore not a draft acceptance mismatch: target evaluation itself differs under speculative execution. It does not establish whether the underlying difference is purely floating-point accumulation or an erroneous state update. That lower-level distinction remains unresolved. Instrumentation was removed and the standard binary rebuilt.
+
+The divergence also persists with f16 KV and Flash Attention disabled. Neither q4 KV nor Flash Attention alone explains it. Exact parity must not be promised for this tested model/configuration.
