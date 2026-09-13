@@ -282,7 +282,17 @@ bool ggml_cuda_should_use_mmq(enum ggml_type type, int cc, int64_t ne11, int64_t
     return false;
 #endif // GGML_CUDA_FORCE_CUBLAS
 
-    if (type == GGML_TYPE_IQ1_M) return cc == 860 && getenv("GGML_CUDA_IQ1M_MMQ") != nullptr;
+    if (type == GGML_TYPE_IQ1_M) {
+        // Only the Ampere 8.6 dense prefill path has been validated.
+        const char * enabled = getenv("GGML_CUDA_IQ1M_MMQ");
+        if (cc != 860 || ne11 < 128 || n_experts > 0 || (enabled && strcmp(enabled, "0") == 0)) {
+            return false;
+        }
+        int id;
+        CUDA_CHECK(cudaGetDevice(&id));
+        return ggml_cuda_info().devices[id].smpbo >= 48 * 1024 &&
+               ggml_cuda_highest_compiled_arch(cc) >= GGML_CUDA_CC_TURING;
+    }
 
     bool mmq_supported;
 
