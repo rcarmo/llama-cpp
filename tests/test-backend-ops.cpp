@@ -10072,6 +10072,11 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
         test_cases.emplace_back(new test_mul_mat(GGML_TYPE_IQ1_M, GGML_TYPE_F32, 257, n, 5120, {1, 1}, {1, 1}));
     }
 
+    // Multi-tile IQ2_S prefill, including a partial final tile.
+    for (int64_t n : {128, 256, 336}) {
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_IQ2_S, GGML_TYPE_F32, 513, n, 5120, {1, 1}, {1, 1}));
+    }
+
     // IQ1_M full and partial conversion chunks.
     for (int64_t m : {2048, 2051, 4096, 4099}) {
         for (int64_t n : {9, 12, 16, 32, 64, 128}) {
