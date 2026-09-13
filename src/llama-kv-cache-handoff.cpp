@@ -3,6 +3,7 @@
 #include "llama-impl.h"
 #include <cstring>
 #include <limits>
+#include <map>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -94,19 +95,41 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
     auto result = std::make_unique<handoff>(*this,*src);
     size_t n_shared=0,n_copied=0;
     std::vector<uint8_t> scratch;
+    // One visibility acquisition per allocation; null entries also cache unsupported allocations.
+    // result owns the acquired buffers, while every tensor keeps its checked allocation-relative offset.
+    std::map<ggml_backend_buffer_t, ggml_backend_buffer_t> allocations;
     for (size_t i=0;i<layers.size();++i) for (int v=0;v<2;++v) {
         auto s=v?src->layers[i].v:src->layers[i].k;
         auto d=v?layers[i].v:layers[i].k;
         if (!s) continue;
         const size_t n=ggml_nbytes(s);
+        if (!s->buffer) return nullptr;
         const uintptr_t base=(uintptr_t)ggml_backend_buffer_get_base(s->buffer);
         if ((uintptr_t)s->data<base) return nullptr;
         const size_t offset=(uintptr_t)s->data-base;
-        ggml_backend_buffer_ptr buffer(view(s->buffer,offset,n));
-        if (buffer) {
-            if (!ggml_backend_buffer_is_host(buffer.get()) || ggml_backend_buffer_get_size(buffer.get())<n) return nullptr;
+        const size_t allocation_size=ggml_backend_buffer_get_size(s->buffer);
+        if (offset>allocation_size || n>allocation_size-offset) return nullptr;
+        auto entry=allocations.find(s->buffer);
+        if (entry==allocations.end()) {
+            ggml_backend_buffer_ptr acquired(view(s->buffer,0,allocation_size));
+            if (acquired && (!ggml_backend_buffer_is_host(acquired.get()) ||
+                ggml_backend_buffer_get_size(acquired.get())<allocation_size ||
+                !ggml_backend_buffer_get_base(acquired.get()))) return nullptr;
+            auto retained=acquired.get();
+            if (acquired) {
+                ggml_backend_buffer_set_usage(acquired.get(), GGML_BACKEND_BUFFER_USAGE_ANY);
+                result->buffers.push_back(std::move(acquired));
+            }
+            entry=allocations.emplace(s->buffer,retained).first;
+        }
+        ggml_backend_buffer_t binding_buffer=entry->second;
+        uint8_t * ptr=nullptr;
+        if (binding_buffer) {
+            ptr=(uint8_t *)ggml_backend_buffer_get_base(binding_buffer)+offset;
+            if ((uintptr_t)ptr % ggml_backend_buft_get_alignment(ggml_backend_cpu_buffer_type())!=0) return nullptr;
             add_bytes(n_shared,n);
         } else {
+            ggml_backend_buffer_ptr buffer;
             if (!allow_copy) return nullptr;
             buffer.reset(ggml_backend_buft_alloc_buffer(ggml_backend_cpu_buffer_type(),n));
             if (!buffer) throw std::bad_alloc();
@@ -119,15 +142,16 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
                 pos+=len;
             }
             add_bytes(n_copied,n);
+            ggml_backend_buffer_set_usage(buffer.get(), GGML_BACKEND_BUFFER_USAGE_ANY);
+            binding_buffer=buffer.get();
+            ptr=(uint8_t *)ggml_backend_buffer_get_base(buffer.get());
+            result->buffers.push_back(std::move(buffer));
         }
-        ggml_backend_buffer_set_usage(buffer.get(), GGML_BACKEND_BUFFER_USAGE_ANY);
-        auto ptr=(uint8_t *)ggml_backend_buffer_get_base(buffer.get());
-        result->bindings.push_back({d,buffer.get(),ptr});
+        result->bindings.push_back({d,binding_buffer,ptr});
         for (auto t : v?layers[i].v_stream:layers[i].k_stream) {
             if (t->view_src!=d || t->view_offs>n || ggml_nbytes(t)>n-t->view_offs) return nullptr;
-            result->bindings.push_back({t,buffer.get(),ptr+t->view_offs});
+            result->bindings.push_back({t,binding_buffer,ptr+t->view_offs});
         }
-        result->buffers.push_back(std::move(buffer));
     }
     add_bytes(shared,n_shared); add_bytes(copied,n_copied);
     return result;

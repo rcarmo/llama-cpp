@@ -47,7 +47,9 @@ On success, **source is consumed; only free it**. Do not reuse any previously ob
 
 On rejection, return is false, result is zeroed and neither KV owner changes. Preparation allocates all views/copies and metadata first. Abandoning the transaction releases prepared buffers. ISWA prepares both caches before committing either. Existing graphs are drained and invalidated before the nonthrowing commit. Destination graph reservation occurs on its next decode.
 
-`allow_copy=false` requires every tensor to have a retained CPU view; unsupported tensors reject the entire move. `allow_copy=true` permits per-tensor CPU allocation and at most 1 MiB scratch while copying payload chunks. It can therefore report mixed shared/copied bytes. These counters count logical K/V tensor bytes, not physical allocation residency or padding.
+Handoff acquires host visibility once per unique source KV allocation and retains one complete CPU view of that allocation. Tensor and stream metadata bind checked offsets inside it; padding and the original allocation lifetime remain retained, as with the earlier per-tensor Vulkan views. Unsupported allocation results are cached during preparation so they do not cause repeated capability probes. `memory_breakdown()` counts each retained allocation once.
+
+`allow_copy=false` requires every tensor's source allocation to have a retained CPU view; unsupported allocations reject the entire move. `allow_copy=true` permits per-tensor CPU allocation and at most 1 MiB scratch while copying payload chunks. It can therefore report mixed shared/copied bytes. These counters count logical K/V tensor bytes, not physical allocation residency or padding.
 
 ## Token state, outputs and MTP
 

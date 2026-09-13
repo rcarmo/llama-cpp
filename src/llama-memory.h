@@ -17,6 +17,7 @@ class llama_io_read_i;
 using llama_memory_alloc_cb = std::function<ggml_backend_buffer_t(ggml_backend_buffer_type_t, size_t)>;
 // A non-null view must independently retain the source allocation until the returned buffer is freed.
 // Caller has drained all source work; callback must establish host visibility. Null requests copied fallback.
+// Handoff requests each complete source allocation once, then binds checked tensor ranges within that view.
 using llama_memory_view_cb = std::function<ggml_backend_buffer_t(ggml_backend_buffer_t, size_t, size_t)>;
 
 struct llama_memory_transfer_i {

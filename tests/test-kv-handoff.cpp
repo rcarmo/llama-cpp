@@ -59,8 +59,10 @@ int main() {
         size_t shared=0,copied=0;
         GGML_ASSERT(!dst->prepare_handoff(*src,no_view,false,shared,copied));
         GGML_ASSERT(state(*dst)==empty && shared==0 && copied==0);
-        auto tx=dst->prepare_handoff(*src,no_view,true,shared,copied);
-        GGML_ASSERT(tx && copied>0 && shared==0 && state(*dst)==empty);
+        int rejected_allocations=0;
+        llama_memory_view_cb unsupported=[&](ggml_backend_buffer_t b,size_t off,size_t n){++rejected_allocations;GGML_ASSERT(off==0 && n==ggml_backend_buffer_get_size(b));return (ggml_backend_buffer_t)nullptr;};
+        auto tx=dst->prepare_handoff(*src,unsupported,true,shared,copied);
+        GGML_ASSERT(tx && rejected_allocations==1 && copied>0 && shared==0 && state(*dst)==empty);
         tx->commit(); tx.reset(); src.reset();
         GGML_ASSERT(state(*dst)==expected);
         dst->init_cpu_shared([](ggml_backend_buffer_type_t,size_t)->ggml_backend_buffer_t { GGML_ABORT("unexpected allocation after transfer"); });
@@ -73,9 +75,9 @@ int main() {
     {
         auto src=cache(model),dst=cache(model);populate(*src);const auto empty=state(*dst),original=state(*src);
         size_t shared=0,copied=0;int calls=0;
-        llama_memory_view_cb fail=[&](ggml_backend_buffer_t,size_t,size_t)->ggml_backend_buffer_t {if(++calls==3)throw std::runtime_error("injected preparation failure");return nullptr;};
+        llama_memory_view_cb fail=[&](ggml_backend_buffer_t,size_t,size_t)->ggml_backend_buffer_t {++calls;throw std::runtime_error("injected preparation failure");};
         bool threw=false;try {dst->prepare_handoff(*src,fail,true,shared,copied);}catch(const std::runtime_error &){threw=true;}
-        GGML_ASSERT(threw && shared==0 && copied==0 && state(*dst)==empty && state(*src)==original);
+        GGML_ASSERT(threw && calls==1 && shared==0 && copied==0 && state(*dst)==empty && state(*src)==original);
         auto wrong=cache(model,512);GGML_ASSERT(!wrong->prepare_handoff(*src,no_view,true,shared,copied));
         auto dropped=dst->prepare_handoff(*src,no_view,true,shared,copied);GGML_ASSERT(dropped);dropped.reset();GGML_ASSERT(state(*dst)==empty && state(*src)==original);
         shared=0;copied=0;
@@ -89,7 +91,9 @@ int main() {
         struct retained { std::shared_ptr<llama_kv_cache> owner; ggml_backend_buffer_ptr host; };
         std::shared_ptr<llama_kv_cache> owner(src.release());
         std::weak_ptr<llama_kv_cache> lifetime=owner;
-        llama_memory_view_cb view=[owner](ggml_backend_buffer_t b,size_t off,size_t n) {
+        int acquisitions=0;size_t retained_bytes=0;
+        llama_memory_view_cb view=[owner,&acquisitions,&retained_bytes](ggml_backend_buffer_t b,size_t off,size_t n) {
+            ++acquisitions;retained_bytes+=n;GGML_ASSERT(off==0 && n==ggml_backend_buffer_get_size(b));
             auto ctx=new retained{owner,ggml_backend_buffer_ptr(ggml_backend_cpu_buffer_from_ptr((uint8_t *)ggml_backend_buffer_get_base(b)+off,n))};
             auto iface=ctx->host->iface;
             iface.get_base=[](ggml_backend_buffer_t b){return ggml_backend_buffer_get_base(((retained *)b->context)->host.get());};
@@ -97,9 +101,13 @@ int main() {
             iface.free_buffer=[](ggml_backend_buffer_t b){delete (retained *)b->context;};
             return ggml_backend_buffer_init(ctx->host->buft,iface,ctx,n);
         };
-        auto tx=dst->prepare_handoff(*owner,view,false,shared,copied);GGML_ASSERT(tx && shared>0 && copied==0);
+        auto tx=dst->prepare_handoff(*owner,view,false,shared,copied);GGML_ASSERT(tx && acquisitions==1 && shared>0 && shared<=retained_bytes && copied==0);
         auto original=owner->get_k_storage(0)->data;tx->commit();tx.reset();owner.reset();view={};
         GGML_ASSERT(!lifetime.expired() && dst->get_k_storage(0)->data==original && state(*dst)==expected);
+        GGML_ASSERT(dst->get_k_storage(0)->buffer==dst->get_k_storage(1)->buffer);
+        size_t accounted=0;for(const auto & row:dst->memory_breakdown())accounted+=row.second;
+        GGML_ASSERT(accounted==retained_bytes);
+        dst->clear(true);GGML_ASSERT(dst->seq_pos_min(0)==-1);
         dst.reset();GGML_ASSERT(lifetime.expired());
     }
     {
@@ -118,6 +126,9 @@ int main() {
         const auto expected=state(*src),empty=state(*dst);size_t shared=0,copied=0;
         auto wrong=make(512);GGML_ASSERT(!wrong->prepare_handoff(*src,no_view,true,shared,copied));
         GGML_ASSERT(shared==0 && copied==0 && state(*dst)==empty);
+        int calls=0;llama_memory_view_cb partial_fail=[&](ggml_backend_buffer_t,size_t,size_t)->ggml_backend_buffer_t{if(++calls==2)throw std::runtime_error("second allocation failure");return nullptr;};
+        bool threw=false;try{dst->prepare_handoff(*src,partial_fail,true,shared,copied);}catch(const std::runtime_error &){threw=true;}
+        GGML_ASSERT(threw && calls==2 && shared==0 && copied==0 && state(*dst)==empty && state(*src)==expected);
         auto tx=dst->prepare_handoff(*src,no_view,true,shared,copied);GGML_ASSERT(tx && copied>0);tx->commit();tx.reset();src.reset();
         GGML_ASSERT(state(*dst)==expected);dst->clear(true);
     }
