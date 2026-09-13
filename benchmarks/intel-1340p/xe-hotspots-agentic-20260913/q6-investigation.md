@@ -14,4 +14,4 @@ Needed evidence before integration:
 - Keep the full output vocabulary and logits. No approximate projection, pruning or altered softcap.
 - Integrate only through an explicit Q6_K width-specific route after a retained matched diagnostic. Then measure combined Q4+Q6+handoff workflow cost, preserving small gains and regressions.
 
-No Q6 code candidate has been written or tested yet.
+A report-only two-query candidate is now compiled (`q6-pair.cpp`) but awaits admitted native testing. The initial assembly has an out-of-line `ggml_fp16_to_fp32` call plus stack spills; the original x86 code uses an inline table lookup via `GGML_CPU_FP16_TO_FP32`. If the first candidate is slow, a separately preserved inline-conversion version has a concrete hypothesis. Do not conflate it with the unmeasured full projection.
