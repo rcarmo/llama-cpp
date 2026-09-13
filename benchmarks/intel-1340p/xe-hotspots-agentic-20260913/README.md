@@ -2,7 +2,7 @@
 
 Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
 
-The persistent agentic harness has no successful repair/follow-up result yet. Seven attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
+The write-v2 whole-file tool pilot now passes repair and follow-up in the same persistent process. Comparative performance is not measured yet. The seven earlier edit-v1 attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
 ## Evidence
 
@@ -14,7 +14,8 @@ The persistent agentic harness has no successful repair/follow-up result yet. Se
 | Tool tests | Four pass, 25 assertions; path/symlink/edit/test-integrity restrictions |
 | Actual sandbox test (earlier checkpoint) | Buggy source rejected, fixed source independently graded successfully |
 | Corrected trained pilot | Ten uninterrupted rounds, 1,400 generated tokens, 134.599s, zero swap; exhausted task budget |
-| Trained task completion | Failed; independent post-run grading rejects the unchanged final source |
+| Edit-v1 trained task completion | Failed; independent post-run grading rejects the final sources |
+| Write-v2 trained task completion | Both repair and follow-up pass; 10 rounds, 57.562s, 7+10 independent assertions, zero swap |
 
 Run portable evidence checks with Bun:
 
@@ -40,7 +41,9 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `boundary-pilot.md`: corrected trained execution, failed task and next diagnostic controls.
 - `baseline-control.md`: pre-batching control failure and shutdown-sampling regression.
 - `cpu-control.md`: CPU-only diagnostic failure; the problem is not specific to handoff/batching.
-- `agentic-matrix-next.md`: next-series comparison controls; test-duration normalisation is unit-tested but not wired into historical runs.
+- `agentic-matrix-next.md`: comparison controls; historical traces remain unchanged.
+- `write-v2-plan.md`, `write-v2-pilot.md`, `write-v2-matrix.md`: explicit whole-file series, passed pilot and frozen six-run screen.
+- `verify-agentic-run.ts`: per-run guards/cache/tool/grade verifier.
 - `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 

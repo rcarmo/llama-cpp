@@ -4,6 +4,7 @@
 import{readFileSync}from'node:fs';import{createHash}from'node:crypto';import{strict as assert}from'node:assert';
 const root=import.meta.dir,read=(p:string)=>readFileSync(root+'/'+p,'utf8'),json=(p:string)=>JSON.parse(read(p));
 await import('./verify-render');
+const {verifyRun}=await import('./verify-agentic-run');verifyRun('writev2-clamp-candidate-pilot');
 const native=json('batched-native/result.json');assert.equal(native.rc,0);assert.equal(native.abort,'');assert.equal(native.services_unchanged,true);assert.ok(read('batched-native/stderr.log').includes('BATCHED views=2'));assert.ok(read('batched-native/stdout.log').includes('exact CPU continuation against same-state copied reference'));
 for(const sample of native.samples){assert.ok(sample.available>=6*1048576);assert.equal(sample.contention.length,0);for(const p of sample.own)assert.equal(p.swap,0);}
 const names=['pilot','corrected','retry','exclusive'];let interrupted=0;
@@ -34,4 +35,4 @@ const cpu=json('agentic-runs/clamp-cpu-control/result.json');assert.equal(cpu.ar
 for(const x of cpu.rounds){assert.equal(x.shared_bytes+x.copied_bytes,0);assert.equal(x.kv_pos_max+1,x.history_tokens);}
 assert.ok(cpu.samples.every((x:any)=>x.swap_kib===0&&x.competitors.length===0&&x.available_kib>=6*1048576));
 console.log('PASS CPU-only control: six rounds, output-budget task failure, zero transfer/swap and clean native shutdown');
-console.log('PASS checkpoint: native 2-view continuation, 7 retained attempts, 2 contention exclusions; no task-success claim');
+console.log('PASS checkpoint: native 2-view continuation, 8 retained attempts, 2 contention exclusions; write-v2 pilot passed, no comparative speedup claim');
