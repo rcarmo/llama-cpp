@@ -10068,7 +10068,7 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
     }
 
     // IQ1_M full and partial conversion chunks.
-    for (int64_t m : {2048, 2051}) {
+    for (int64_t m : {2048, 2051, 4096, 4099}) {
         test_cases.emplace_back(new test_mul_mat(GGML_TYPE_IQ1_M, GGML_TYPE_F32, m, 128, 256, {1, 1}, {1, 1}));
     }
 
