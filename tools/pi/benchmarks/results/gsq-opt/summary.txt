@@ -1,0 +1,15 @@
+GSQ IQ2_S 64K optimisation checkpoint
+
+Retained: automatic IQ1_M conversion chunking under GPU memory pressure, including short batches. Accounts for reusable VMM pool bytes; optional override retained for comparison. This avoids the full 178257920-byte FP16 expansion of blk.0.ffn_up.weight. It enables MTP depth4 on RTX3060 12GB without changing the GGUF format.
+
+Selected tested profile: 64K, full GPU offload, q4_0 K/V, batch2048/ubatch256, four threads, MTP4, async off, normal CUDA dispatch. No forced-MMQ or chunking flag required. Launcher: tools/pi/bin/run-qwen38-gsq-cuda.sh. Build directory is historically named build-mmq but FORCE_MMQ is OFF.
+
+Matched reverse-depth runs: MTP1 task27.58/27.16s, MTP3 task23.94/24.36s. Subsequent MTP4 repeats22.29/24.14s; normal-build repeats21.43/23.26s. Final-turn MTP4 decode30.9--36.1tok/s vs MTP1 approximately24.5tok/s. Sequential timing drift and different generated lengths limit precision; do not claim identical outputs or a universal percentage speedup.
+
+Prefill remains approximately360--430tok/s in repeated tool-result runs; no repeatable isolated prefill gain established. Always chunking slows normal256 batches; use automatic pressure fallback. MTP5 and MTP4/ubatch512 hit memory limits. Smaller chunks and eager module loading do not resolve them. Two/six CPU threads and ubatch128 did not beat selected defaults.
+
+Rejected kernels: eight-warps GDN: no32-head gain, approximately9% slower at4 heads. MMQ64-column tiles approximately31% slower than128-column at representative IQ2_S shape. Forced stream-K1-block/SM improves512-token synthetic kernels1--5%, but has no meaningful256-token gain and no demonstrated task gain. All reverted; raw results stored alongside this file.
+
+Final checks:8/8 regression tests,16/16 IQ1_M backend cases,36/36 GDN cases pass. Rebuilt normal profile retrieves correct code from60388 tokens in205.06s, rejects doubled prompt with400, then recovers. Earlier MTP4 cancellation and repeated tools passed. Quality remains9/10; known comprehension error changes32->16 with deeper draft. Existing target-logit plain/MTP divergence remains unresolved; no parity guarantee.
+
+This is a bounded optimisation checkpoint, not proof of maximum attainable speed. Prefill throughput work remains open. Source is on perf/gsq-prefill, not merged into master or deployed as a service. Candidate launched manually on localhost:19450; previous service stays stopped as requested.
