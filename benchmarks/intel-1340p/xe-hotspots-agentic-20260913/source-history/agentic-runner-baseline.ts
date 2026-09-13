@@ -3,7 +3,7 @@
 */
 import{readFileSync,writeFileSync,mkdirSync,existsSync,readdirSync,realpathSync}from'node:fs';import{createHash}from'node:crypto';
 import{createFixture,ToolSandbox,grade,fixtures,type Kind}from'./agentic-tools';
-import{outcome,validAdmission,closeNative}from'./agentic-outcome';
+import{outcome,validAdmission}from'./agentic-outcome';
 const root=import.meta.dir,id=process.argv[2],kind=process.argv[3]as Kind,arm=process.argv[4];
 if(!/^[a-z0-9-]{1,40}$/.test(id)||!fixtures[kind]||!['baseline','candidate','cpu'].includes(arm))throw Error('Args: id fixture baseline|candidate|cpu');
 const admission=JSON.parse(readFileSync(root+'/agentic-admission.json','utf8'));validAdmission(admission,id);
@@ -43,7 +43,7 @@ try{
  }
  // Grade the last artifact even when the model consumes its round budget. Never feed hidden results back.
  if(phases<2&&grades.length===phases){finalGrade=await grade(kind,fixture,phases===1);save('final-artifact-grade.json',{phase:phases,...finalGrade});}
- await closeNative(()=>clearInterval(timer),child,readLoop);
+ child.stdin.write(JSON.stringify({op:'close'})+'\n');child.stdin.end();const rc=await child.exited;await readLoop;if(rc!==0)throw Error('Native exit '+rc);
 }catch(e){stop(String(e));}finally{
  clearInterval(timer);clearTimeout(deadline);if(child&&child.exitCode===null)stop('cleanup');
  if(child)await child.exited;

@@ -10,6 +10,11 @@ export function outcome(r:{abort:string;phases:number;rounds:any[];grades:any[];
  else if(!r.tool_calls.some(x=>x.name==='edit_file'&&x.result?.ok)||!r.tool_calls.some(x=>x.name==='run_tests'&&x.result?.ok))failure='required_tools_missing';
  return{success:!failure,failure_reason:failure,exit_code:r.abort?1:failure?2:0};
 }
+export async function closeNative(stopSampling:()=>void,child:{stdin:{write:(s:string)=>unknown;end:()=>unknown};exited:Promise<number>},reader:Promise<unknown>){
+ // The cgroup and workflow deadline stay armed while process-exit sampling stops.
+ stopSampling();child.stdin.write(JSON.stringify({op:'close'})+'\n');child.stdin.end();
+ const rc=await child.exited;await reader;if(rc!==0)throw Error('Native exit '+rc);
+}
 export function validAdmission(a:{run_id?:string;expires?:string},id:string,now=Date.now()){
  const expiry=Date.parse(a.expires||'');
  if(a.run_id!==id||!Number.isFinite(expiry)||now>=expiry)throw Error('Admission ID mismatch or expired');
