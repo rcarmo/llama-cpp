@@ -1,0 +1,14 @@
+{
+  "scope": "Unprofiled Q6 opt-in ABBA confirmation; same CPU library, zero-copy batched handoff and write-v2 fixture",
+  "trace_pilot": "q6-trained-trace",
+  "fixture": "clamp",
+  "series": "write-v2",
+  "limits": {"rounds":10,"output_per_round":512,"runtime_s":600,"memory_gib":16,"swap_mib":16,"reserve_gib":6},
+  "runs": [
+    {"id":"q6-clamp-off0","arm":"q6off"},
+    {"id":"q6-clamp-on0","arm":"q6on"},
+    {"id":"q6-clamp-on1","arm":"q6on"},
+    {"id":"q6-clamp-off1","arm":"q6off"}
+  ],
+  "interpretation": "All task outcomes retained. No timing comparison without matching successful task work; no minimum percentage cutoff; native/synthetic gains are reported separately. Individual exact-ID admissions required."
+}
