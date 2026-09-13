@@ -2,7 +2,7 @@
 
 Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
 
-The write-v2 whole-file tool pilot now passes repair and follow-up in the same persistent process. Comparative performance is not measured yet. The seven earlier edit-v1 attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
+The write-v2 whole-file tool pilot now passes repair and follow-up in the same persistent process. The frozen six-run matrix is complete: clamp and median pass in both arms; defaults reaches the round cap in both despite passing final artifacts. Paired work is identical, but no whole-workflow speedup is established. The seven earlier edit-v1 attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
 ## Evidence
 
@@ -43,6 +43,8 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `cpu-control.md`: CPU-only diagnostic failure; the problem is not specific to handoff/batching.
 - `agentic-matrix-next.md`: comparison controls; historical traces remain unchanged.
 - `write-v2-plan.md`, `write-v2-pilot.md`, `write-v2-matrix.md`: explicit whole-file series, passed pilot and frozen six-run screen.
+- `write-v2-results.md`, `write-v2-matrix-summary.json`: matched task/timing results, all outcomes and limits.
+- `compare-write-v2.ts`: frozen-source/prompt/work checks and paired calculations.
 - `verify-agentic-run.ts`: per-run guards/cache/tool/grade verifier.
 - `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.

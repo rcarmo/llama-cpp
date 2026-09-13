@@ -12,7 +12,8 @@ export function verifyRun(id:string,root=import.meta.dir){
   if(i){assert.equal(x.cold,false);assert.ok(x.cached_tokens>0);assert.equal(x.shared_bytes+x.copied_bytes,0);assert.equal(x.evaluated_prompt_tokens,x.prompt_tokens-x.cached_tokens);}else{assert.equal(x.cold,true);assert.equal(x.evaluated_prompt_tokens,x.prompt_tokens+1);assert.equal(x.copied_bytes,0);if(r.arm==='cpu')assert.equal(x.shared_bytes,0);else assert.ok(x.shared_bytes>0);}
  }
  assert.equal(r.success,outcome(r).success);assert.equal(r.failure_reason,outcome(r).failure_reason);
- if(r.success){assert.equal(r.phases,2);assert.equal(r.grades.length,2);for(let i=0;i<2;i++){assert.equal(r.grades[i].ok,true);assert.deepEqual(load(`grade-${i}.json`),r.grades[i]);}assert.ok(r.rounds.some(x=>x.phase===1&&x.cached_tokens>0));assert.equal(r.tool_calls.filter(x=>x.result?.ok===false).length,0);}
+ if(r.success){assert.equal(r.phases,2);assert.equal(r.grades.length,2);for(let i=0;i<2;i++){assert.equal(r.grades[i].ok,true);assert.deepEqual(load(`grade-${i}.json`),r.grades[i]);}assert.ok(r.rounds.some(x=>x.phase===1&&x.cached_tokens>0));// Recovered tool errors are retained, not an automatic task failure.
+ assert.ok(r.tool_calls.some(x=>x.name===r.edit_tool&&x.result?.ok));assert.ok(r.tool_calls.some(x=>x.name==='run_tests'&&x.result?.ok));}
  assert.equal(createHash('sha256').update(readFileSync(dir+'/fixture/visible.test.ts')).digest('hex'),m.test_hash);
  console.log(`PASS ${id}: ${r.rounds.length} persistent rounds, success=${r.success}, phases=${r.phases}, all guards and grades checked`);return r;
 }

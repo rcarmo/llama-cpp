@@ -1,6 +1,6 @@
 # Frozen write-v2 comparison
 
-The candidate clamp pilot passed; do not count it as a balanced timing repetition. Keep this new matrix separate from edit-v1 failures.
+The candidate clamp pilot passed; do not count it as a balanced timing repetition. Keep this new matrix separate from edit-v1 failures. Before the first matrix run, normalisation was extended from the final elapsed total to the fixture's `(pass|fail) contract [duration]` line. Raw outputs stay unchanged. `write-v2-matrix-freeze.json` records the exact harness hashes used for all six runs; the pilot uses the earlier formatter.
 
 Factors held constant: current native binary, target/assistant models, write-v2 tools/system prompt, stable model-visible test durations, raw result capture, all three fixtures/hidden grades, 10 rounds x512 tokens, MTP3, context8192, batch256, threads8/16, unchanged initial GPU->CPU path. Baseline uses prior allocation library; candidate uses batched allocation library. No Q4 candidate kernel is integrated.
 

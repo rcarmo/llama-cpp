@@ -11,4 +11,6 @@ Device log: Intel Iris Xe RPL-P, subgroup32, 49,152-byte shared memory, integer 
 
 Next diagnostic-only change: log effective input quantisation type, selected pipeline name, workgroup denominators, split_k, alignment and dispatch dimensions for the two measured FFN shapes. Aggregate once per shape rather than per operation. Preserve the original plugin, keep profiling separate from timing, and require a short explicitly admitted synthetic GPU test before trained profiling.
 
+Additional source finding: `ggml_vk_intel_shader_core_count` at line19604 does not list this host's 0xa7a0 device and returns zero. The ordinary matmul split heuristic therefore returns split_k=1 for this source, unless a different built plugin changes that table. Do not guess an Xe-core count; a synthetic split experiment needs explicit dispatch evidence and measured alternatives. Large FFN grids may already fill the device, so enabling split-K is not automatically beneficial.
+
 Candidate selection follows that evidence. No broad shader rebuild or tile changes yet. Any small repeatable stage gain stays in the opportunity register and is measured in combination after native numerical and workload tests.
