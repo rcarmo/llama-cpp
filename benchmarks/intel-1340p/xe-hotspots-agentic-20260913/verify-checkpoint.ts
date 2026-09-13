@@ -21,5 +21,10 @@ for(const name of names){
  console.log(`PASS retained ${name}: ${good.length} completed rounds; ${competing?'contention excluded':'harness failure retained'}`);
 }
 assert.equal(interrupted,2);
+const boundary=json('agentic-runs/clamp-candidate-boundary/result.json');assert.equal(boundary.abort,'');assert.equal(boundary.success,false);assert.equal(boundary.rounds.length,10);assert.equal(boundary.phases,0);assert.equal(boundary.services_unchanged,true);
+for(const s of boundary.samples){assert.equal(s.competitors.length,0);assert.equal(s.swap_kib,0);assert.ok(s.available_kib>=6*1048576);}
+for(const [i,x] of boundary.rounds.entries()){assert.equal(x.stop,'eog');assert.equal(x.kv_pos_max+1,x.history_tokens);if(i){assert.ok(x.cached_tokens>0);assert.equal(x.shared_bytes+x.copied_bytes,0);assert.equal(x.evaluated_prompt_tokens,x.prompt_tokens-x.cached_tokens);}}
+const grade=json('evidence/boundary-final-grade.json');assert.equal(grade.result.ok,false);assert.equal(grade.immutable_original,true);assert.equal(grade.source_sha256,createHash('sha256').update(read('agentic-runs/clamp-candidate-boundary/fixture/src/main.ts')).digest('hex'));assert.ok(grade.result.stderr.includes('Unexpected export'));
+console.log('PASS corrected boundary pilot: 10 uninterrupted rounds, task failed, immutable artifact rejected independently');
 assert.ok(read('evidence/tools-render-fixed.log').includes('4 pass'));assert.ok(read('evidence/tools-render-fixed.log').includes('25 expect() calls'));
-console.log('PASS checkpoint: native 2-view continuation, 4 failed attempts, 2 contention exclusions; no task-success claim');
+console.log('PASS checkpoint: native 2-view continuation, 5 retained attempts, 2 contention exclusions; no task-success claim');

@@ -2,7 +2,7 @@
 
 Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
 
-The persistent agentic harness has no successful repair/follow-up result yet. Four attempts are retained: two harness failures and two contention interruptions. A narrow Gemma renderer-boundary correction now passes vocabulary-only regressions; it has not completed a trained workflow.
+The persistent agentic harness has no successful repair/follow-up result yet. Five attempts are retained: two harness failures, two contention interruptions and one valid ten-round execution that failed the task budget. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
 ## Evidence
 
@@ -13,13 +13,14 @@ The persistent agentic harness has no successful repair/follow-up result yet. Fo
 | Corrected renderer | 21 prompt-prefix transitions across three traces, including a later user requirement; 12 message/tool mutation rejections |
 | Tool tests | Four pass, 25 assertions; path/symlink/edit/test-integrity restrictions |
 | Actual sandbox test (earlier checkpoint) | Buggy source rejected, fixed source independently graded successfully |
-| Trained task completion | Not qualified; no independent task grade reached |
+| Corrected trained pilot | Ten uninterrupted rounds, 1,400 generated tokens, 134.599s, zero swap; exhausted task budget |
+| Trained task completion | Failed; independent post-run grading rejects the unchanged final source |
 
 Run portable evidence checks with Bun:
 
 ```sh
 bun verify-checkpoint.ts
-bun test agentic-tools.test.ts
+bun test agentic-tools.test.ts agentic-outcome.test.ts
 sha256sum -c SHA256SUMS
 ```
 
@@ -36,6 +37,8 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `agentic-runner.ts`, `agentic-tools.ts`, `launch-agentic.sh`, `agentic-stop.sh`: bounded real-tool workflow and owned-container cleanup.
 - `agentic-protocol.md`: task, state, metrics and resource contract.
 - `agentic-pilot-findings.md`: failures, diagnosis and corrected offline checks.
+- `boundary-pilot.md`: corrected trained execution, failed task and next diagnostic controls.
+- `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 
 No services were deployed or changed. The follow-on `q4-screen.md` records a compiled, bitwise-tested isolated Q4 tile candidate with exploratory two-thread timings and retained regressions. It has no trained or resource-monitored timing qualification. Q6_K and Vulkan FFN optimisation still need candidate implementations.
