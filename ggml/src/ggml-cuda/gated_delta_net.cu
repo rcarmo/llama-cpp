@@ -28,11 +28,16 @@ gated_delta_net_cuda(const float * q,
                                      float         scale,
                                      int64_t       state_slot_stride,
                                      int           K) {
-    const uint32_t h_idx    = H >= 32 ? blockIdx.z : blockIdx.x;
+#if defined(GGML_USE_HIP) || defined(GGML_USE_MUSA)
+    const bool grouped_columns = false;
+#else
+    const bool grouped_columns = H >= 32;
+#endif
+    const uint32_t h_idx    = grouped_columns ? blockIdx.z : blockIdx.x;
     const uint32_t sequence = blockIdx.y;
     // each warp owns one column, using warp-level primitives to reduce across rows
     const int      lane     = threadIdx.x;
-    const int      col      = (H >= 32 ? blockIdx.x : blockIdx.z) * blockDim.y + threadIdx.y;
+    const int      col      = (grouped_columns ? blockIdx.x : blockIdx.z) * blockDim.y + threadIdx.y;
 
     const uint32_t iq1 = fastmodulo(h_idx, neqk1_magic);
     const uint32_t iq3 = fastdiv(sequence, rq3_magic);
@@ -202,7 +207,12 @@ static void launch_gated_delta_net(
     //TODO: Add chunked kernel for even faster pre-fill
     const int warp_size = ggml_cuda_info().devices[ggml_cuda_get_device()].warp_size;
     const int num_warps = 4;
-    dim3      grid_dims = H >= 32
+#if defined(GGML_USE_HIP) || defined(GGML_USE_MUSA)
+    const bool grouped_columns = false;
+#else
+    const bool grouped_columns = H >= 32;
+#endif
+    dim3      grid_dims = grouped_columns
         ? dim3((S_v + num_warps - 1) / num_warps, n_seqs, H)
         : dim3(H, n_seqs, (S_v + num_warps - 1) / num_warps);
     dim3      block_dims(warp_size <= S_v ? warp_size : S_v, num_warps, 1);
