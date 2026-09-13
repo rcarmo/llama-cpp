@@ -38,4 +38,4 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `agentic-pilot-findings.md`: failures, diagnosis and corrected offline checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 
-No services were deployed or changed. Q4 tiling, Q6_K and Vulkan FFN optimisation remain experiments to qualify; unbuilt candidate sources are not part of this tested checkpoint.
+No services were deployed or changed. The follow-on `q4-screen.md` records a compiled, bitwise-tested isolated Q4 tile candidate with exploratory two-thread timings and retained regressions. It has no trained or resource-monitored timing qualification. Q6_K and Vulkan FFN optimisation still need candidate implementations.
