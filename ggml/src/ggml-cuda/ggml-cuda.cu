@@ -1410,6 +1410,33 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
     using traits = batched_mul_mat_traits<compute_type>;
     using cuda_t = typename traits::cuda_type;
 
+    // Bound conversion scratch for IQ1_M, which has no direct MMQ kernel.
+    constexpr int64_t chunk_rows = 1024;
+    if (getenv("GGML_CUDA_IQ1M_CHUNKED") && src0->type == GGML_TYPE_IQ1_M &&
+            src1->ne[1] >= 128 && src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
+            src1->ne[2] == 1 && src1->ne[3] == 1 && ggml_is_contiguous(src0) &&
+            ggml_is_contiguous(src1) && ggml_is_contiguous(dst)) {
+        ggml_cuda_pool_alloc<float> output(ctx.pool(), chunk_rows * dst->ne[1]);
+        for (int64_t row = 0; row < src0->ne[1]; row += chunk_rows) {
+            const int64_t rows = std::min(chunk_rows, src0->ne[1] - row);
+            ggml_tensor weights = *src0;
+            weights.ne[1] = rows;
+            weights.nb[2] = weights.nb[1] * rows;
+            weights.nb[3] = weights.nb[2];
+            weights.data = static_cast<char *>(src0->data) + row * src0->nb[1];
+            ggml_tensor result = *dst;
+            result.ne[0] = rows;
+            result.nb[1] = rows * sizeof(float);
+            result.nb[2] = result.nb[1] * result.ne[1];
+            result.nb[3] = result.nb[2];
+            result.data = output.get();
+            ggml_cuda_mul_mat_cublas_impl<compute_type>(ctx, &weights, src1, &result);
+            CUDA_CHECK(cudaMemcpy2DAsync(static_cast<char *>(dst->data) + row * sizeof(float), dst->nb[1],
+                    output.get(), result.nb[1], rows * sizeof(float), dst->ne[1], cudaMemcpyDeviceToDevice, ctx.stream()));
+        }
+        return;
+    }
+
     GGML_ASSERT(ggml_is_contiguous(dst));
 
     // Byte offsets and tensor dimensions are currently used in an inconsistent way for dst.
