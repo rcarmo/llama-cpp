@@ -1412,13 +1412,19 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
     using traits = batched_mul_mat_traits<compute_type>;
     using cuda_t = typename traits::cuda_type;
 
-    // Bound conversion scratch for IQ1_M, which has no direct MMQ kernel.
+    // Bound IQ1_M conversion scratch when direct MMQ is unavailable.
     constexpr int64_t chunk_rows = 2048;
     bool chunk_conversion = false;
     if (src0->type == GGML_TYPE_IQ1_M) {
         size_t free_bytes = 0, total_bytes = 0;
         CUDA_CHECK(cudaMemGetInfo(&free_bytes, &total_bytes));
-        const size_t scratch = (ggml_nelements(src0) + ggml_nelements(src1) + ggml_nelements(dst)) * sizeof(cuda_t);
+        size_t scratch = 0;
+        const ggml_tensor * tensors[] = {src0, src1, dst};
+        for (const ggml_tensor * tensor : tensors) {
+            const int64_t elements = ggml_nelements(tensor);
+            GGML_ASSERT(elements >= 0 && uint64_t(elements) <= (SIZE_MAX - scratch) / sizeof(cuda_t));
+            scratch += size_t(elements) * sizeof(cuda_t);
+        }
         const size_t reserve = 32 * 1024 * 1024;
         const size_t reusable = ctx.pool().available();
         chunk_conversion = scratch > reusable && scratch - reusable > (free_bytes > reserve ? free_bytes - reserve : 0);
