@@ -285,7 +285,7 @@ bool ggml_cuda_should_use_mmq(enum ggml_type type, int cc, int64_t ne11, int64_t
     if (type == GGML_TYPE_IQ1_M) {
         // Only the Ampere 8.6 dense prefill path has been validated.
         const char * enabled = getenv("GGML_CUDA_IQ1M_MMQ");
-        if (cc != 860 || ne11 < 16 || n_experts > 0 || (enabled && strcmp(enabled, "0") == 0)) {
+        if (cc != 860 || ne11 < 9 || n_experts > 0 || (enabled && strcmp(enabled, "0") == 0)) {
             return false;
         }
         int id;
