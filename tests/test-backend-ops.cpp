@@ -11042,6 +11042,11 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
     test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 4, 32,   8, 1, 1, false, false, /*K=*/3));
     test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 4, 64,  16, 2, 1, false, false, /*K=*/4));
 
+    for (bool permuted : {false, true}) {
+        test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 12, 128, 65, 2, 4, permuted, false, 5));
+        test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 4, 128, 65, 2, 1, permuted, true, 5));
+    }
+
     // Model-sized recurrent heads and partially populated snapshot tails.
     for (int64_t tokens : {2, 5, 65, 256}) {
         test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 48, 128, tokens, 1, 1, false, false, 5));
