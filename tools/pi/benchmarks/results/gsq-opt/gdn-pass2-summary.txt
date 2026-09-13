@@ -1,0 +1,11 @@
+GDN hotspot optimisation pass, baseline b595a741f
+
+Retained changes: group column blocks for CUDA head counts >=32; use contiguous four-value per-lane state layout for128-wide state on32-lane CUDA warps; vector-load aligned query/key values. Hoist pointer/stride alignment decision outside the recurrence; use scalar loads for misalignment. HIP/MUSA retain original grouping and lane layout. Arithmetic reduction order changes; bitwise token parity is not claimed.
+
+Kernel result at48 heads,128 state width,256 tokens,K=5: original approximately1.53ms, retained1.209ms (about21% lower).45/45 CUDA-versus-CPU GDN cases pass existing1e-7 NMSE threshold, including grouped heads, permuted inputs, snapshot tails and deliberately unaligned query/key views. These tests bound numerical error, not broad model quality.
+
+Whole-model order-reversed fixed workloads: decode approximately28.0tok/s retained versus27.2tok/s published baseline (~3% gain). Prefill remains order/thermal sensitive and overlaps after warming; no isolated whole-model prefill speedup established. 60388-token retrieval, oversized request rejection, cancellation and tool recovery pass. Exact-answer smoke checks9/10; the known comprehension failure persists and changes answer with reduction ordering. Not a model-quality equivalence score.
+
+Rejected and removed: parallel chunked prefix, alternative warp counts/occupancy, explicit fast exp, read-only/L1-bypass/streaming cache hints, pairwise/factored arithmetic, shared output buffering, alternate interleaving, and smaller IQ2_S block/tile geometry. The initially promising128-thread IQ2_S result was invalid incomplete work; expanded tests caught it and corrected geometry was slower.
+
+Scope: this pass reduces a measured GDN hotspot and adds a repeatable small decode gain. It does not prove globally maximal performance or claim all hotspots eliminated. Retained code diff is limited to gated_delta_net.cu plus existing backend-test extensions. Measurements and rejected trials are preserved alongside this summary. Merge main/master only after final validation and goal decision.
