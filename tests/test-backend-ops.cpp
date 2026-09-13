@@ -10067,6 +10067,11 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
         }
     }
 
+    // Multi-block IQ1_M rows at the model's input width.
+    for (int64_t n : {16, 256}) {
+        test_cases.emplace_back(new test_mul_mat(GGML_TYPE_IQ1_M, GGML_TYPE_F32, 257, n, 5120, {1, 1}, {1, 1}));
+    }
+
     // IQ1_M full and partial conversion chunks.
     for (int64_t m : {2048, 2051, 4096, 4099}) {
         for (int64_t n : {16, 32, 64, 128}) {
