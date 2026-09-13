@@ -60,6 +60,8 @@ gated_delta_net_cuda(const float * q,
         s_shard[r]  = curr_state[i];
     }
 
+    const bool aligned_qk = ((uintptr_t(q) | uintptr_t(k)) & 15) == 0 &&
+            (sq1 % 4 == 0) && (sq2 % 4 == 0) && (sq3 % 4 == 0);
     for (int t = 0; t < n_tokens; t++) {
         const float * q_t = q + iq3 * sq3 + t * sq2 + iq1 * sq1;
         const float * k_t = k + iq3 * sq3 + t * sq2 + iq1 * sq1;
@@ -75,7 +77,7 @@ gated_delta_net_cuda(const float * q,
         float k_reg[rows_per_lane];
         float q_reg[rows_per_lane];
         if constexpr (S_v == 128 && warp_size == 32) {
-            if (((uintptr_t(k_t) | uintptr_t(q_t)) & 15) == 0) {
+            if (aligned_qk) {
                 const float4 kv = reinterpret_cast<const float4 *>(k_t)[lane];
                 const float4 qv = reinterpret_cast<const float4 *>(q_t)[lane];
                 k_reg[0]=kv.x; k_reg[1]=kv.y; k_reg[2]=kv.z; k_reg[3]=kv.w;
