@@ -1413,7 +1413,7 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
     using cuda_t = typename traits::cuda_type;
 
     // Bound conversion scratch for IQ1_M, which has no direct MMQ kernel.
-    constexpr int64_t chunk_rows = 1024;
+    constexpr int64_t chunk_rows = 2048;
     bool chunk_conversion = false;
     if (src0->type == GGML_TYPE_IQ1_M) {
         size_t free_bytes = 0, total_bytes = 0;
