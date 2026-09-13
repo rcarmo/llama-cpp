@@ -30,4 +30,8 @@ assert.ok(read('evidence/tools-render-fixed.log').includes('4 pass'));assert.ok(
 const base=json('agentic-runs/clamp-baseline-control/result.json');assert.equal(base.abort,'worker swap guard');assert.equal(base.success,false);assert.equal(base.rounds.length,5);assert.equal(base.rounds.at(-1).stop,'length');assert.equal(base.final_artifact_grade.ok,false);assert.equal(base.samples.at(-1).swap_kib,null);assert.ok(base.samples.slice(0,-1).every((x:any)=>x.swap_kib===0));assert.ok(base.samples.every((x:any)=>x.competitors.length===0));assert.equal(base.services_unchanged,true);
 const bm=json('agentic-runs/clamp-baseline-control/manifest.json');assert.equal(bm.harness_hashes['agentic-runner.ts'],createHash('sha256').update(read('source-history/agentic-runner-baseline.ts')).digest('hex'));
 console.log('PASS baseline control: output cap/artifact failure and terminal sampling race retained separately');
-console.log('PASS checkpoint: native 2-view continuation, 6 retained attempts, 2 contention exclusions; no task-success claim');
+const cpu=json('agentic-runs/clamp-cpu-control/result.json');assert.equal(cpu.arm,'cpu');assert.equal(cpu.abort,'');assert.equal(cpu.failure_reason,'output_budget_exhausted');assert.equal(cpu.exit_code,2);assert.equal(cpu.success,false);assert.equal(cpu.rounds.length,6);assert.equal(cpu.final_artifact_grade.ok,false);assert.equal(cpu.services_unchanged,true);
+for(const x of cpu.rounds){assert.equal(x.shared_bytes+x.copied_bytes,0);assert.equal(x.kv_pos_max+1,x.history_tokens);}
+assert.ok(cpu.samples.every((x:any)=>x.swap_kib===0&&x.competitors.length===0&&x.available_kib>=6*1048576));
+console.log('PASS CPU-only control: six rounds, output-budget task failure, zero transfer/swap and clean native shutdown');
+console.log('PASS checkpoint: native 2-view continuation, 7 retained attempts, 2 contention exclusions; no task-success claim');

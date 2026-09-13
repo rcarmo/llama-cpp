@@ -1,0 +1,7 @@
+{
+  "phase": 0,
+  "ok": false,
+  "code": 1,
+  "stdout": "bun test v1.4.1 (4661e494f)\n",
+  "stderr": "\nvisible.test.ts:\n1 | import{test,expect}from'bun:test';import{clamp}from'./src/main';test('contract',()=>{expect(clamp(5,1,10)).toBe(5);expect(clamp(-2,1,10)).toBe(1);expect(clamp(15,1,10)).toBe(10);expect(clamp(5,10,1)).toBe(5);expect(clamp(0,-3,3)).toBe(0);expect(clamp(9,4,-2)).toBe(4);expect(clamp(-8,4,-2)).toBe(-2);});\n                                                                                                               ^\nerror: expect(received).toBe(expected)\n\nExpected: 5\nReceived: 1\n\n      at <anonymous> (/fixture/visible.test.ts:1:108)\n(fail) contract [0.83ms]\n\n 0 pass\n 1 fail\n 1 expect() calls\nRan 1 test across 1 file. [6.00ms]\n"
+}

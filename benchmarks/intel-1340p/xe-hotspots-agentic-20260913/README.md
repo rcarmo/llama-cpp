@@ -2,7 +2,7 @@
 
 Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
 
-The persistent agentic harness has no successful repair/follow-up result yet. Six attempts are retained: two early harness failures, two contention interruptions, one valid ten-round execution that failed the task budget, and a baseline output-budget failure additionally affected by a shutdown-sampling race. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
+The persistent agentic harness has no successful repair/follow-up result yet. Seven attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
 ## Evidence
 
@@ -39,6 +39,8 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `agentic-pilot-findings.md`: failures, diagnosis and corrected offline checks.
 - `boundary-pilot.md`: corrected trained execution, failed task and next diagnostic controls.
 - `baseline-control.md`: pre-batching control failure and shutdown-sampling regression.
+- `cpu-control.md`: CPU-only diagnostic failure; the problem is not specific to handoff/batching.
+- `agentic-matrix-next.md`: next-series comparison controls; test-duration normalisation is unit-tested but not wired into historical runs.
 - `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 
