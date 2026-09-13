@@ -1429,6 +1429,20 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
             src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
             src1->ne[2] == 1 && src1->ne[3] == 1 && ggml_is_contiguous(src0) &&
             ggml_is_contiguous(src1) && ggml_is_contiguous(dst)) {
+        ggml_cuda_pool_alloc<cuda_t> activation(ctx.pool());
+        ggml_tensor input = *src1;
+        if (src1->type != compute_type) {
+            activation.alloc(ggml_nelements(src1));
+            auto convert = traits::convert(src1->type);
+            GGML_ASSERT(convert != nullptr);
+            convert(src1->data, activation.get(), ggml_nelements(src1), ctx.stream());
+            input.type = compute_type;
+            input.data = activation.get();
+            input.nb[0] = sizeof(cuda_t);
+            input.nb[1] = input.ne[0] * input.nb[0];
+            input.nb[2] = input.ne[1] * input.nb[1];
+            input.nb[3] = input.nb[2];
+        }
         ggml_cuda_pool_alloc<float> output(ctx.pool(), chunk_rows * dst->ne[1]);
         for (int64_t row = 0; row < src0->ne[1]; row += chunk_rows) {
             const int64_t rows = std::min(chunk_rows, src0->ne[1] - row);
@@ -1443,7 +1457,7 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
             result.nb[2] = result.nb[1] * result.ne[1];
             result.nb[3] = result.nb[2];
             result.data = output.get();
-            ggml_cuda_mul_mat_cublas_impl<compute_type>(ctx, &weights, src1, &result);
+            ggml_cuda_mul_mat_cublas_impl<compute_type>(ctx, &weights, &input, &result);
             CUDA_CHECK(cudaMemcpy2DAsync(static_cast<char *>(dst->data) + row * sizeof(float), dst->nb[1],
                     output.get(), result.nb[1], rows * sizeof(float), dst->ne[1], cudaMemcpyDeviceToDevice, ctx.stream()));
         }
