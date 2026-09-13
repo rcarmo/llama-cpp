@@ -1415,7 +1415,7 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
     // Bound conversion scratch for IQ1_M, which has no direct MMQ kernel.
     constexpr int64_t chunk_rows = 1024;
     bool chunk_conversion = false;
-    if (src0->type == GGML_TYPE_IQ1_M && src1->ne[1] >= 128) {
+    if (src0->type == GGML_TYPE_IQ1_M) {
         size_t free_bytes = 0, total_bytes = 0;
         CUDA_CHECK(cudaMemGetInfo(&free_bytes, &total_bytes));
         const size_t scratch = (ggml_nelements(src0) + ggml_nelements(src1) + ggml_nelements(dst)) * sizeof(cuda_t);
@@ -1426,7 +1426,7 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
         if (override) chunk_conversion = strcmp(override, "0") != 0;
     }
     if (chunk_conversion && src0->type == GGML_TYPE_IQ1_M &&
-            src1->ne[1] >= 128 && src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
+            src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
             src1->ne[2] == 1 && src1->ne[3] == 1 && ggml_is_contiguous(src0) &&
             ggml_is_contiguous(src1) && ggml_is_contiguous(dst)) {
         ggml_cuda_pool_alloc<float> output(ctx.pool(), chunk_rows * dst->ne[1]);
