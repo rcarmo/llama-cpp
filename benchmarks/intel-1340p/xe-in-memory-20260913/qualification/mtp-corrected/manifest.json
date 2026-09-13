@@ -1,0 +1,27 @@
+{
+  "at": "2026-09-13T18:09:11.581Z",
+  "clearance": "@whisper admitted one corrected <=180s E4B MTP16-token smoke, source GPU owner released before assistant load <=14GiB,>=6GiB reserve,swap<=16MiB",
+  "argv": [
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/llama-gemma-in-memory",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "<bos><start_of_turn>user\nCount from one to ten, using words separated by commas.<end_of_turn>\n<start_of_turn>model\n",
+    "16",
+    "--mtp",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/var/home/agent",
+    "XDG_RUNTIME_DIR": "/run/user/1001",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus",
+    "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime",
+    "GGML_BACKEND_PATH": "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-vulkan/libggml-vulkan.so.0.23.0"
+  },
+  "hashes": {
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/llama-gemma-in-memory": "4a03d0c4c103a3ad4b56c4378b6ae8966f23c24e03c8e66bdb61d3bfea666895",
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-vulkan/libggml-vulkan.so.0.23.0": "7b130153d2459ee5a25cb490aafc7f3304201914156ff15dd9981a35014f53d4",
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/libllama.so.0": "85ca0578ac349fb83155235524fc233e35fef20b3b3924af0567385ae4fb0e40"
+  },
+  "model": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+  "services": "Id=llama-gemma-local-provider.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt-diarizer.service\nActiveState=inactive\nMainPID=0\n"
+}

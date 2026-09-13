@@ -1,0 +1,360 @@
+-- The C compiler identification is Clang 22.1.8
+-- The CXX compiler identification is Clang 22.1.8
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/sbin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/sbin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- llama.cpp version: 0.4.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Found Git: /usr/sbin/git (found version "2.55.0")
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /usr/sbin/clang
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP_CXX: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP: TRUE (found version "5.1")
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.23.0
+-- ggml commit:  61edd155e-dirty
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release
+[1/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/273] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[3/273] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[8/273] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-turbo-quant.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-turbo-quant.c:28:14: warning: 'extern' variable has an initializer [-Wextern-initializer]
+   28 | GGML_API int turbo3_cpu_wht_group_size = 0;
+      |              ^
+1 warning generated.
+[9/273] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[10/273] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[11/273] Linking CXX shared library bin/libggml-base.so.0.23.0
+[12/273] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[13/273] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[14/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[15/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/iqp.cpp.o
+[16/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[17/273] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[18/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[19/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[20/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[21/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[22/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[23/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:55: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                       ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:112: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                                ^
+10 warnings generated.
+[24/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[25/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/recurrent-profile.cpp.o
+[26/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-plan.cpp.o
+[27/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-advice.cpp.o
+[28/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/whole-token-profile.cpp.o
+[29/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
+[30/273] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[31/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[32/273] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[33/273] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:5913:13: warning: 5 enumeration values not handled in switch: 'GGML_TYPE_TURBO2_0', 'GGML_TYPE_TURBO3_0', 'GGML_TYPE_TURBO4_0'... [-Wswitch]
+ 5913 |     switch (src0->type) {
+      |             ^~~~~~~~~~
+1 warning generated.
+[34/273] Linking CXX shared library bin/libggml-cpu.so.0.23.0
+[35/273] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[36/273] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[37/273] Linking CXX shared library bin/libggml.so.0.23.0
+[38/273] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[39/273] Building CXX object src/CMakeFiles/llama.dir/llama.cpp.o
+[40/273] Building CXX object src/CMakeFiles/llama.dir/llama-arch.cpp.o
+[41/273] Building CXX object src/CMakeFiles/llama.dir/llama-adapter.cpp.o
+[42/273] Building CXX object src/CMakeFiles/llama.dir/llama-chat.cpp.o
+[43/273] Building CXX object src/CMakeFiles/llama.dir/llama-batch.cpp.o
+[44/273] Building CXX object src/CMakeFiles/llama.dir/llama-context-handoff.cpp.o
+[45/273] Building CXX object src/CMakeFiles/llama.dir/llama-cparams.cpp.o
+[46/273] Building CXX object src/CMakeFiles/llama.dir/llama-context.cpp.o
+[47/273] Building CXX object src/CMakeFiles/llama.dir/llama-grammar.cpp.o
+[48/273] Building CXX object src/CMakeFiles/llama.dir/llama-hparams.cpp.o
+[49/273] Building CXX object src/CMakeFiles/llama.dir/llama-graph.cpp.o
+[50/273] Building CXX object src/CMakeFiles/llama.dir/llama-io.cpp.o
+[51/273] Building CXX object src/CMakeFiles/llama.dir/llama-impl.cpp.o
+[52/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-handoff.cpp.o
+[53/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-iswa.cpp.o
+[54/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa.cpp.o
+[55/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa-iswa.cpp.o
+[56/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-msa.cpp.o
+[57/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o
+[58/273] Building CXX object src/CMakeFiles/llama.dir/llama-memory.cpp.o
+[59/273] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o
+[60/273] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsv4.cpp.o
+[61/273] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-iswa.cpp.o
+[62/273] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-idx.cpp.o
+[63/273] Building CXX object src/CMakeFiles/llama.dir/llama-memory-recurrent.cpp.o
+[64/273] Building CXX object src/CMakeFiles/llama.dir/llama-mmap.cpp.o
+[65/273] Building CXX object src/CMakeFiles/llama.dir/llama-model-saver.cpp.o
+[66/273] Building CXX object src/CMakeFiles/llama.dir/llama-model-loader.cpp.o
+[67/273] Building CXX object src/CMakeFiles/llama.dir/llama-model.cpp.o
+[68/273] Building CXX object src/CMakeFiles/llama.dir/llama-quant.cpp.o
+[69/273] Building CXX object src/CMakeFiles/llama.dir/llama-sampler.cpp.o
+[70/273] Building CXX object src/CMakeFiles/llama.dir/llama-vocab.cpp.o
+[71/273] Building CXX object src/CMakeFiles/llama.dir/unicode-data.cpp.o
+[72/273] Building CXX object src/CMakeFiles/llama.dir/models/afmoe.cpp.o
+[73/273] Building CXX object src/CMakeFiles/llama.dir/models/apertus.cpp.o
+[74/273] Building CXX object src/CMakeFiles/llama.dir/models/arcee.cpp.o
+[75/273] Building CXX object src/CMakeFiles/llama.dir/models/arctic.cpp.o
+[76/273] Building CXX object src/CMakeFiles/llama.dir/models/arwkv7.cpp.o
+[77/273] Building CXX object src/CMakeFiles/llama.dir/models/baichuan.cpp.o
+[78/273] Building CXX object src/CMakeFiles/llama.dir/unicode.cpp.o
+[79/273] Building CXX object src/CMakeFiles/llama.dir/models/bailingmoe.cpp.o
+[80/273] Building CXX object src/CMakeFiles/llama.dir/models/bailingmoe2.cpp.o
+[81/273] Building CXX object src/CMakeFiles/llama.dir/models/bailingmoe3.cpp.o
+[82/273] Building CXX object src/CMakeFiles/llama.dir/models/bert.cpp.o
+[83/273] Building CXX object src/CMakeFiles/llama.dir/models/bitnet.cpp.o
+[84/273] Building CXX object src/CMakeFiles/llama.dir/models/bloom.cpp.o
+[85/273] Building CXX object src/CMakeFiles/llama.dir/models/chameleon.cpp.o
+[86/273] Building CXX object src/CMakeFiles/llama.dir/models/chatglm.cpp.o
+[87/273] Building CXX object src/CMakeFiles/llama.dir/models/clip.cpp.o
+[88/273] Building CXX object src/CMakeFiles/llama.dir/models/codeshell.cpp.o
+[89/273] Building CXX object src/CMakeFiles/llama.dir/models/cogvlm.cpp.o
+[90/273] Building CXX object src/CMakeFiles/llama.dir/models/cohere2.cpp.o
+[91/273] Building CXX object src/CMakeFiles/llama.dir/models/cohere2moe.cpp.o
+[92/273] Building CXX object src/CMakeFiles/llama.dir/models/command-r.cpp.o
+[93/273] Building CXX object src/CMakeFiles/llama.dir/models/dbrx.cpp.o
+[94/273] Building CXX object src/CMakeFiles/llama.dir/models/deci.cpp.o
+[95/273] Building CXX object src/CMakeFiles/llama.dir/models/deepseek.cpp.o
+[96/273] Building CXX object src/CMakeFiles/llama.dir/models/deepseek2.cpp.o
+[97/273] Building CXX object src/CMakeFiles/llama.dir/models/deepseek2ocr.cpp.o
+[98/273] Building CXX object src/CMakeFiles/llama.dir/models/deepseek32.cpp.o
+[99/273] Building CXX object src/CMakeFiles/llama.dir/models/deepseek4.cpp.o
+[100/273] Building CXX object src/CMakeFiles/llama.dir/models/delta-net-base.cpp.o
+[101/273] Building CXX object src/CMakeFiles/llama.dir/models/dots1.cpp.o
+[102/273] Building CXX object src/CMakeFiles/llama.dir/models/dflash.cpp.o
+[103/273] Building CXX object src/CMakeFiles/llama.dir/models/dream.cpp.o
+[104/273] Building CXX object src/CMakeFiles/llama.dir/models/dots3note.cpp.o
+[105/273] Building CXX object src/CMakeFiles/llama.dir/models/eagle3.cpp.o
+[106/273] Building CXX object src/CMakeFiles/llama.dir/models/ernie4-5-moe.cpp.o
+[107/273] Building CXX object src/CMakeFiles/llama.dir/models/ernie4-5.cpp.o
+[108/273] Building CXX object src/CMakeFiles/llama.dir/models/eurobert.cpp.o
+[109/273] Building CXX object src/CMakeFiles/llama.dir/models/exaone-moe.cpp.o
+[110/273] Building CXX object src/CMakeFiles/llama.dir/models/exaone.cpp.o
+[111/273] Building CXX object src/CMakeFiles/llama.dir/models/falcon-h1.cpp.o
+[112/273] Building CXX object src/CMakeFiles/llama.dir/models/exaone4.cpp.o
+[113/273] Building CXX object src/CMakeFiles/llama.dir/models/falcon.cpp.o
+[114/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma-embedding.cpp.o
+[115/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma.cpp.o
+[116/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma2.cpp.o
+[117/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma3.cpp.o
+[118/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma3n.cpp.o
+[119/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma4-assistant.cpp.o
+[120/273] Building CXX object src/CMakeFiles/llama.dir/models/gemma4.cpp.o
+[121/273] Building CXX object src/CMakeFiles/llama.dir/models/glm4-moe.cpp.o
+[122/273] Building CXX object src/CMakeFiles/llama.dir/models/glm-dsa.cpp.o
+[123/273] Building CXX object src/CMakeFiles/llama.dir/models/gpt2.cpp.o
+[124/273] Building CXX object src/CMakeFiles/llama.dir/models/glm4.cpp.o
+[125/273] Building CXX object src/CMakeFiles/llama.dir/models/gptneox.cpp.o
+[126/273] Building CXX object src/CMakeFiles/llama.dir/models/granite-hybrid.cpp.o
+[127/273] Building CXX object src/CMakeFiles/llama.dir/models/granite-moe.cpp.o
+[128/273] Building CXX object src/CMakeFiles/llama.dir/models/granite-swa.cpp.o
+[129/273] Building CXX object src/CMakeFiles/llama.dir/models/granite-switch.cpp.o
+[130/273] Building CXX object src/CMakeFiles/llama.dir/models/granite.cpp.o
+[131/273] Building CXX object src/CMakeFiles/llama.dir/models/grok.cpp.o
+[132/273] Building CXX object src/CMakeFiles/llama.dir/models/grovemoe.cpp.o
+[133/273] Building CXX object src/CMakeFiles/llama.dir/models/hunyuan-dense.cpp.o
+[134/273] Building CXX object src/CMakeFiles/llama.dir/models/hunyuan-moe.cpp.o
+[135/273] Building CXX object src/CMakeFiles/llama.dir/models/hunyuan-vl.cpp.o
+[136/273] Building CXX object src/CMakeFiles/llama.dir/models/hy-v3.cpp.o
+[137/273] Building CXX object src/CMakeFiles/llama.dir/models/hy-v4.cpp.o
+[138/273] Building CXX object src/CMakeFiles/llama.dir/models/internlm2.cpp.o
+[139/273] Building CXX object src/CMakeFiles/llama.dir/models/jais.cpp.o
+[140/273] Building CXX object src/CMakeFiles/llama.dir/models/jais2.cpp.o
+[141/273] Building CXX object src/CMakeFiles/llama.dir/models/jamba.cpp.o
+[142/273] Building CXX object src/CMakeFiles/llama.dir/models/jina-bert-v2.cpp.o
+[143/273] Building CXX object src/CMakeFiles/llama.dir/models/jina-bert-v3.cpp.o
+[144/273] Building CXX object src/CMakeFiles/llama.dir/models/kimi-k3.cpp.o
+[145/273] Building CXX object src/CMakeFiles/llama.dir/models/kimi-linear.cpp.o
+[146/273] Building CXX object src/CMakeFiles/llama.dir/models/laguna.cpp.o
+[147/273] Building CXX object src/CMakeFiles/llama.dir/models/lfm2.cpp.o
+[148/273] Building CXX object src/CMakeFiles/llama.dir/models/lfm2moe.cpp.o
+[149/273] Building CXX object src/CMakeFiles/llama.dir/models/llada-moe.cpp.o
+[150/273] Building CXX object src/CMakeFiles/llama.dir/models/llada.cpp.o
+[151/273] Building CXX object src/CMakeFiles/llama.dir/models/llama-embed.cpp.o
+[152/273] Building CXX object src/CMakeFiles/llama.dir/models/llama.cpp.o
+[153/273] Building CXX object src/CMakeFiles/llama.dir/models/llama4.cpp.o
+[154/273] Building CXX object src/CMakeFiles/llama.dir/models/maincoder.cpp.o
+[155/273] Building CXX object src/CMakeFiles/llama.dir/models/mamba-base.cpp.o
+[156/273] Building CXX object src/CMakeFiles/llama.dir/models/mamba.cpp.o
+[157/273] Building CXX object src/CMakeFiles/llama.dir/models/mamba2.cpp.o
+[158/273] Building CXX object src/CMakeFiles/llama.dir/models/maple.cpp.o
+[159/273] Building CXX object src/CMakeFiles/llama.dir/models/mellum.cpp.o
+[160/273] Building CXX object src/CMakeFiles/llama.dir/models/mimo2.cpp.o
+[161/273] Building CXX object src/CMakeFiles/llama.dir/models/minicpm.cpp.o
+[162/273] Building CXX object src/CMakeFiles/llama.dir/models/minicpm3.cpp.o
+[163/273] Building CXX object src/CMakeFiles/llama.dir/models/minimax-m2.cpp.o
+[164/273] Building CXX object src/CMakeFiles/llama.dir/models/minimax-01.cpp.o
+[165/273] Building CXX object src/CMakeFiles/llama.dir/models/mistral3.cpp.o
+[166/273] Building CXX object src/CMakeFiles/llama.dir/models/minimax-m3.cpp.o
+[167/273] Building CXX object src/CMakeFiles/llama.dir/models/mistral4.cpp.o
+[168/273] Building CXX object src/CMakeFiles/llama.dir/models/modern-bert.cpp.o
+[169/273] Building CXX object src/CMakeFiles/llama.dir/models/mpt.cpp.o
+[170/273] Building CXX object src/CMakeFiles/llama.dir/models/muse-glimmer.cpp.o
+[171/273] Building CXX object src/CMakeFiles/llama.dir/models/nanbeige.cpp.o
+[172/273] Building CXX object src/CMakeFiles/llama.dir/models/nemotron-h-moe.cpp.o
+[173/273] Building CXX object src/CMakeFiles/llama.dir/models/nemotron-h.cpp.o
+[174/273] Building CXX object src/CMakeFiles/llama.dir/models/nemotron.cpp.o
+[175/273] Building CXX object src/CMakeFiles/llama.dir/models/neo-bert.cpp.o
+[176/273] Building CXX object src/CMakeFiles/llama.dir/models/nomic-bert-moe.cpp.o
+[177/273] Building CXX object src/CMakeFiles/llama.dir/models/nomic-bert.cpp.o
+[178/273] Building CXX object src/CMakeFiles/llama.dir/models/olmo.cpp.o
+[179/273] Building CXX object src/CMakeFiles/llama.dir/models/olmo2.cpp.o
+[180/273] Building CXX object src/CMakeFiles/llama.dir/models/olmoe.cpp.o
+[181/273] Building CXX object src/CMakeFiles/llama.dir/models/openai-moe.cpp.o
+[182/273] Building CXX object src/CMakeFiles/llama.dir/models/openelm.cpp.o
+[183/273] Building CXX object src/CMakeFiles/llama.dir/models/orion.cpp.o
+[184/273] Building CXX object src/CMakeFiles/llama.dir/models/paddleocr.cpp.o
+[185/273] Building CXX object src/CMakeFiles/llama.dir/models/pangu-embed.cpp.o
+[186/273] Building CXX object src/CMakeFiles/llama.dir/models/phi2.cpp.o
+[187/273] Building CXX object src/CMakeFiles/llama.dir/models/phi3.cpp.o
+[188/273] Building CXX object src/CMakeFiles/llama.dir/models/phimoe.cpp.o
+[189/273] Building CXX object src/CMakeFiles/llama.dir/models/plamo.cpp.o
+[190/273] Building CXX object src/CMakeFiles/llama.dir/models/plamo2.cpp.o
+[191/273] Building CXX object src/CMakeFiles/llama.dir/models/plamo3.cpp.o
+[192/273] Building CXX object src/CMakeFiles/llama.dir/models/plm.cpp.o
+[193/273] Building CXX object src/CMakeFiles/llama.dir/models/pockettts.cpp.o
+[194/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen.cpp.o
+[195/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen2.cpp.o
+[196/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen2moe.cpp.o
+[197/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen2vl.cpp.o
+[198/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3.cpp.o
+[199/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen35.cpp.o
+[200/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen35moe.cpp.o
+[201/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3moe.cpp.o
+[202/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3next.cpp.o
+[203/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3tts.cpp.o
+[204/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3vl.cpp.o
+[205/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen3vlmoe.cpp.o
+[206/273] Building CXX object src/CMakeFiles/llama.dir/models/refact.cpp.o
+[207/273] Building CXX object src/CMakeFiles/llama.dir/models/qwen4exp.cpp.o
+[208/273] Building CXX object src/CMakeFiles/llama.dir/models/rnd1.cpp.o
+[209/273] Building CXX object src/CMakeFiles/llama.dir/models/rwkv6-base.cpp.o
+[210/273] Building CXX object src/CMakeFiles/llama.dir/models/rwkv6.cpp.o
+[211/273] Building CXX object src/CMakeFiles/llama.dir/models/rwkv6qwen2.cpp.o
+[212/273] Building CXX object src/CMakeFiles/llama.dir/models/rwkv7-base.cpp.o
+[213/273] Building CXX object src/CMakeFiles/llama.dir/models/rwkv7.cpp.o
+[214/273] Building CXX object src/CMakeFiles/llama.dir/models/seed-oss.cpp.o
+[215/273] Building CXX object src/CMakeFiles/llama.dir/models/smallthinker.cpp.o
+[216/273] Building CXX object src/CMakeFiles/llama.dir/models/smollm3.cpp.o
+[217/273] Building CXX object src/CMakeFiles/llama.dir/models/stablelm.cpp.o
+[218/273] Building CXX object src/CMakeFiles/llama.dir/models/starcoder.cpp.o
+[219/273] Building CXX object src/CMakeFiles/llama.dir/models/starcoder2.cpp.o
+[220/273] Building CXX object src/CMakeFiles/llama.dir/models/step35.cpp.o
+[221/273] Building CXX object src/CMakeFiles/llama.dir/models/t5.cpp.o
+[222/273] Building CXX object src/CMakeFiles/llama.dir/models/t5encoder.cpp.o
+[223/273] Building CXX object src/CMakeFiles/llama.dir/models/talkie.cpp.o
+[224/273] Building CXX object src/CMakeFiles/llama.dir/models/wavtokenizer-dec.cpp.o
+[225/273] Building CXX object src/CMakeFiles/llama.dir/models/xverse.cpp.o
+[226/273] Linking CXX shared library bin/libllama.so.0.4.0
+[227/273] Building CXX object common/CMakeFiles/llama-common-base.dir/build-info.cpp.o
+[228/273] Creating library symlink bin/libllama.so.0 bin/libllama.so
+[229/273] Linking CXX static library common/libllama-common-base.a
+[230/273] Building CXX object vendor/cpp-httplib/CMakeFiles/cpp-httplib.dir/httplib.cpp.o
+[231/273] Linking CXX static library vendor/cpp-httplib/libcpp-httplib.a
+[232/273] Building CXX object common/CMakeFiles/llama-common.dir/arg.cpp.o
+[233/273] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-generator.cpp.o
+[234/273] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-helpers.cpp.o
+[235/273] Building CXX object common/CMakeFiles/llama-common.dir/chat-peg-parser.cpp.o
+[236/273] Building CXX object common/CMakeFiles/llama-common.dir/chat-diff-analyzer.cpp.o
+[237/273] Building CXX object common/CMakeFiles/llama-common.dir/common.cpp.o
+[238/273] Building CXX object common/CMakeFiles/llama-common.dir/console.cpp.o
+[239/273] Building CXX object common/CMakeFiles/llama-common.dir/debug.cpp.o
+[240/273] Building CXX object common/CMakeFiles/llama-common.dir/chat.cpp.o
+[241/273] Building CXX object common/CMakeFiles/llama-common.dir/fit.cpp.o
+[242/273] Building CXX object common/CMakeFiles/llama-common.dir/hf-cache.cpp.o
+[243/273] Building CXX object common/CMakeFiles/llama-common.dir/download.cpp.o
+[244/273] Building CXX object common/CMakeFiles/llama-common.dir/imatrix-loader.cpp.o
+[245/273] Building CXX object common/CMakeFiles/llama-common.dir/json.cpp.o
+[246/273] Building CXX object common/CMakeFiles/llama-common.dir/llguidance.cpp.o
+[247/273] Building CXX object common/CMakeFiles/llama-common.dir/json-schema-to-grammar.cpp.o
+[248/273] Building CXX object common/CMakeFiles/llama-common.dir/log.cpp.o
+[249/273] Building CXX object common/CMakeFiles/llama-common.dir/ngram-cache.cpp.o
+[250/273] Building CXX object common/CMakeFiles/llama-common.dir/ngram-map.cpp.o
+[251/273] Building CXX object common/CMakeFiles/llama-common.dir/ngram-mod.cpp.o
+[252/273] Building CXX object common/CMakeFiles/llama-common.dir/preset.cpp.o
+[253/273] Building CXX object common/CMakeFiles/llama-common.dir/reasoning-budget.cpp.o
+[254/273] Building CXX object common/CMakeFiles/llama-common.dir/sampling.cpp.o
+[255/273] Building CXX object common/CMakeFiles/llama-common.dir/peg-parser.cpp.o
+[256/273] Building CXX object common/CMakeFiles/llama-common.dir/subproc.cpp.o
+[257/273] Building CXX object common/CMakeFiles/llama-common.dir/trie.cpp.o
+[258/273] Building CXX object common/CMakeFiles/llama-common.dir/unicode.cpp.o
+[259/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/lexer.cpp.o
+[260/273] Building CXX object common/CMakeFiles/llama-common.dir/speculative.cpp.o
+[261/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/parser.cpp.o
+[262/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/runtime.cpp.o
+[263/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/string.cpp.o
+[264/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/caps.cpp.o
+[265/273] Building CXX object common/CMakeFiles/llama-common.dir/jinja/value.cpp.o
+[266/273] Linking CXX shared library bin/libllama-common.so.0.4.0
+[267/273] Creating library symlink bin/libllama-common.so.0 bin/libllama-common.so
+[268/273] Building CXX object tests/CMakeFiles/test-kv-handoff.dir/test-kv-handoff.cpp.o
+[269/273] Building CXX object tests/CMakeFiles/test-context-handoff.dir/test-context-handoff.cpp.o
+[270/273] Linking CXX executable bin/test-kv-handoff
+[271/273] Linking CXX executable bin/test-context-handoff
+[272/273] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-in-memory.dir/in-memory.cpp.o
+[273/273] Linking CXX executable bin/llama-gemma-in-memory
+Test project /var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release
+    Start 47: test-kv-handoff
+1/3 Test #47: test-kv-handoff ..................   Passed    0.01 sec
+    Start 48: test-context-handoff
+2/3 Test #48: test-context-handoff .............   Passed    0.04 sec
+    Start 49: test-context-handoff-gemma
+3/3 Test #49: test-context-handoff-gemma .......   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+main    =   0.07 sec*proc (3 tests)
+
+Total Test time (real) =   0.07 sec
+PASS: O3 caller/library/plugin and CPU CTests built

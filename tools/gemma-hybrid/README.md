@@ -1,5 +1,7 @@
 # Gemma hybrid adapter
 
+For the separate opt-in same-process native KV path, see [in-memory KV handoff](../../docs/in-memory-kv-handoff.md). `llama-gemma-in-memory` keeps target history/sampling in RAM and reports shared/copied bytes. It does not replace or deploy the TypeScript adapter below.
+
 Opt-in loopback adapter for the tested Intel Gemma configuration. GPU cold text prefill uses the pinned Vulkan FP32 selector with microbatch256; generation and warm turns use the retained CPU8/prefill16, MTP3, F16 KV, FA-off worker.
 
 ## Deployed CPU decode refinement

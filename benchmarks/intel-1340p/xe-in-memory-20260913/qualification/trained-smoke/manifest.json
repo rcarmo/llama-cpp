@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-13T18:01:47.362Z",
+  "clearance": "@whisper admitted one <=180s E4B 4-token smoke <=14GiB,>=6GiB reserve,swap<=16MiB",
+  "argv": [
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/llama-gemma-in-memory",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "<bos><start_of_turn>user\nReply with the word Hello.<end_of_turn>\n<start_of_turn>model\n",
+    "4"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/var/home/agent",
+    "XDG_RUNTIME_DIR": "/run/user/1001",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus",
+    "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime",
+    "GGML_BACKEND_PATH": "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-vulkan/libggml-vulkan.so.0.23.0"
+  },
+  "hashes": {
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/llama-gemma-in-memory": "e0429371c3f08305f077ccd7d1aeb3cb04f120bdf9ab764a07b4cc0b67b30c5f",
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-vulkan/libggml-vulkan.so.0.23.0": "7b130153d2459ee5a25cb490aafc7f3304201914156ff15dd9981a35014f53d4",
+    "/var/home/agent/workspace/reports/xe-cpu-zero-copy-20260913/handoff-cpu/bin/libllama.so.0": "53870c4b646db8dd215046af92fd9153567e87d3c99e55d8539d3373393e78d5"
+  },
+  "model": "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+  "services": "Id=llama-gemma-local-provider.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt-diarizer.service\nActiveState=inactive\nMainPID=0\n"
+}

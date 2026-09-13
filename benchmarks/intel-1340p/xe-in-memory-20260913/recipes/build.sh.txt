@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+repo=/var/home/agent/workspace/projects/llama-cpp
+root=/var/home/agent/workspace/reports/xe-in-memory-perf-20260913
+cmake -S "$repo" -B "$root/release" -G Ninja -DCMAKE_C_COMPILER=/usr/sbin/clang -DCMAKE_CXX_COMPILER=/usr/sbin/clang++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGGML_VULKAN=OFF -DGGML_NATIVE=ON -DGGML_CCACHE=OFF -DLLAMA_BUILD_COMMON=ON -DLLAMA_BUILD_TESTS=ON -DLLAMA_BUILD_TOOLS=ON -DLLAMA_BUILD_SERVER=ON -DLLAMA_BUILD_APP=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_OPENSSL=OFF
+cmake --build "$root/release" --target llama-gemma-in-memory test-kv-handoff test-context-handoff -j2
+ctest --test-dir "$root/release" --output-on-failure -R '^test-(kv-handoff|context-handoff(-gemma)?)$'
+/usr/sbin/clang++ -std=c++17 -O3 -fno-builtin-fwrite -Wall -Wextra -I"$repo/include" -I"$repo/ggml/include" -I"$repo/common" "$root/perf-main.cpp" -L"$root/release/bin" -Wl,-rpath,"$root/release/bin" -Wl,--wrap=fwrite -lllama -lllama-common -lggml -lggml-base -lggml-cpu -o "$root/release/bin/handoff-perf"
+bash "$root/vulkan-o3.sh"
+echo 'PASS: O3 caller/library/plugin and CPU CTests built'

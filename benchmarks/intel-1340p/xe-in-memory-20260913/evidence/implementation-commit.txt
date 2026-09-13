@@ -1,0 +1,11 @@
+commit d2028882bd6bfb6d967f0538761639ca8c75599c
+Author:     Rui Carmo <rui.carmo@gmail.com>
+AuthorDate: Sun Sep 13 20:01:06 2026 +0100
+Commit:     Rui Carmo <rui.carmo@gmail.com>
+CommitDate: Sun Sep 13 20:01:06 2026 +0100
+
+    llama: add opt-in in-memory Vulkan CPU KV handoff
+    
+    Retain cached Intel UMA allocations across whole-context CPU handoff, with bounded RAM copy fallback and source ownership transfer. Preserve populated shared cells when recreating Gemma MTP borrowers. Add same-process target/MTP caller and ownership/continuation tests.
+    
+    Assisted-by: Panda
