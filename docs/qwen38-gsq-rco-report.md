@@ -25,7 +25,7 @@ MTP improves this workload. Generalised async scheduling provides no repeatable 
 
 IQ2_S full GPU at64K, q4 KV, ubatch256: median decode29.21 tok/s, tool task27.21s. IQ3_XXS at64K with61 GPU layers: decode15.34--15.75 tok/s. Smaller weights avoid the partial-offload penalty.
 
-IQ2_S at32K with ubatch512: q8 KV median25.07 tok/s and27.07s tool task; q4 KV median24.70 tok/s and26.95s task. These runs change context and microbatch together and cannot isolate either effect. Prefill remains around367--370 tok/s. No demonstrated benefit from this tuning; a controlled factorial comparison remains pending.
+IQ2_S at32K with ubatch512: q8 KV median25.07 tok/s and27.07s tool task; q4 KV median24.70 tok/s and26.95s task. These runs change context and microbatch together and cannot isolate either effect. Prefill remains around367--370 tok/s. No demonstrated benefit from this tuning; the same-context microbatch comparison is recorded below.
 
 ## Context and resilience
 
@@ -37,11 +37,11 @@ IQ2_S full GPU, q4 KV fits64K. An actual60,388-token beginning-of-context retrie
 
 Arithmetic, sorting, extraction and constrained JSON pass. The Python trace `sum(v*v for v in [2,4,6] if v>2)` should return52: IQ3_XXS returns28 in plain, sync MTP and async MTP; IQ2_S returns32. This rules out an MTP-only cause for that fixture, but does not distinguish base-model limitations from quantization effects.
 
-Three-turn repository tool tasks pass. Long-form256-token deterministic output is reproducible within each mode, and sync/async MTP outputs match for all three decode trials. Plain and MTP outputs differ. Their common introductory text diverges at the first section heading. Exact MTP/plain parity therefore FAILS; batch-shape numerical differences are a hypothesis, not an established root cause. Diagnosis remains pending.
+Three-turn repository tool tasks pass. Long-form256-token deterministic output is reproducible within each mode, and sync/async MTP outputs match for all three decode trials. Plain and MTP outputs differ. Their common introductory text diverges at the first section heading. Exact MTP/plain parity therefore FAILS; batch-shape numerical differences are a hypothesis, not an established root cause. The target-logit diagnosis below bounds this failure without claiming a fix.
 
-## Remaining work
+## Evaluation scope
 
-Resolve or bound the plain/MTP divergence, isolate KV precision and microbatch changes, expand quality tests beyond five fixtures, and publish the final suite/report. Current tests are useful local smoke and performance checks, not a comprehensive model-quality benchmark. No final deployment recommendation yet.
+The additional checks below complete the local capacity, speed and correctness evaluation. This is not a comprehensive model-quality benchmark. Exact plain/MTP parity failed and remains an unsupported property of the tested configuration; investigating the specific kernel or state-update cause is follow-up engineering, not a claimed fix.
 
 ## Additional completed checks
 
@@ -67,7 +67,7 @@ BENCH_URL=http://127.0.0.1:19450 bun tools/pi/benchmarks/qwen-agentic.ts results
 bun tools/pi/benchmarks/gsq-context.ts results/context.json
 ```
 
-The context runner requires64K. Evaluation records failed assertions in its summary rather than suppressing them. Raw request/response files, launch scripts, logs and the diagnostic probes accompany this report in the downloadable archive. The campaign remains open specifically for a proven root cause of plain/MTP divergence; this report does not mark that failure resolved.
+The context runner requires64K. Evaluation records failed assertions in its summary rather than suppressing them. Raw request/response files, launch scripts, logs and the diagnostic probes accompany this report in the downloadable archive. The evaluation is complete with an explicit limitation: plain/MTP parity is unsupported. No root-cause fix or unconditional correctness guarantee is claimed.
 
 ## Target-logit diagnosis
 
