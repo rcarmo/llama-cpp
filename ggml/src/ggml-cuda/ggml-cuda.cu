@@ -545,6 +545,8 @@ struct ggml_cuda_pool_vmm : public ggml_cuda_pool {
     std::vector<std::pair<CUdeviceptr, size_t>> mappings;
 #endif
 
+    size_t available() const override { return pool_size - pool_used; }
+
     explicit ggml_cuda_pool_vmm(int device) :
         device(device),
         physical_device(ggml_cuda_get_physical_device(device)),
@@ -1412,7 +1414,18 @@ static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const
 
     // Bound conversion scratch for IQ1_M, which has no direct MMQ kernel.
     constexpr int64_t chunk_rows = 1024;
-    if (getenv("GGML_CUDA_IQ1M_CHUNKED") && src0->type == GGML_TYPE_IQ1_M &&
+    bool chunk_conversion = false;
+    if (src0->type == GGML_TYPE_IQ1_M && src1->ne[1] >= 128) {
+        size_t free_bytes = 0, total_bytes = 0;
+        CUDA_CHECK(cudaMemGetInfo(&free_bytes, &total_bytes));
+        const size_t scratch = (ggml_nelements(src0) + ggml_nelements(src1) + ggml_nelements(dst)) * sizeof(cuda_t);
+        const size_t reserve = 32 * 1024 * 1024;
+        const size_t reusable = ctx.pool().available();
+        chunk_conversion = scratch > reusable && scratch - reusable > (free_bytes > reserve ? free_bytes - reserve : 0);
+        const char * override = getenv("GGML_CUDA_IQ1M_CHUNKED");
+        if (override) chunk_conversion = strcmp(override, "0") != 0;
+    }
+    if (chunk_conversion && src0->type == GGML_TYPE_IQ1_M &&
             src1->ne[1] >= 128 && src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
             src1->ne[2] == 1 && src1->ne[3] == 1 && ggml_is_contiguous(src0) &&
             ggml_is_contiguous(src1) && ggml_is_contiguous(dst)) {
