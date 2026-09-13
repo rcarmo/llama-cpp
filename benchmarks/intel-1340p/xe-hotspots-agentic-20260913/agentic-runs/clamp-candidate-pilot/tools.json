@@ -1,0 +1,52 @@
+[
+  {
+    "name": "read_file",
+    "args": {
+      "path": "src/main.ts"
+    },
+    "result": {
+      "content": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}\n"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "visible.test.ts"
+    },
+    "result": {
+      "content": "import{test,expect}from'bun:test';import{clamp}from'./src/main';test('contract',()=>{expect(clamp(5,1,10)).toBe(5);expect(clamp(-2,1,10)).toBe(1);expect(clamp(15,1,10)).toBe(10);expect(clamp(5,10,1)).toBe(5);});\n"
+    }
+  },
+  {
+    "name": "edit_file",
+    "args": {
+      "after": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}",
+      "before": "return Math.min(lo,Math.max(hi,value));",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  },
+  {
+    "name": "run_tests",
+    "args": {},
+    "result": {
+      "ok": false,
+      "code": 1,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n\n# Unhandled error between tests\n-------------------------------\n1 | clamp(value:number,lo:number,hi:number){export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.\n                                                            ^\nerror: Unexpected export\n    at /fixture/src/main.ts:1:57\n-------------------------------\n\n\n 0 pass\n 1 fail\n 1 error\nRan 1 test across 1 file. [4.00ms]\n"
+    }
+  },
+  {
+    "name": "edit_file",
+    "args": {
+      "after": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}",
+      "before": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  }
+]

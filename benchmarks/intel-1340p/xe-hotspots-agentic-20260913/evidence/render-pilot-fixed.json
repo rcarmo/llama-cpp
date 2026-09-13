@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "append_mutations_rejected": 4,
+  "rows": [
+    {
+      "messages": 2,
+      "tokens": 324,
+      "lcp": 0,
+      "prior_protected": 0,
+      "protected": 319,
+      "legacy_protected": 321,
+      "generation_prompt": "<|turn>model\n",
+      "ok": true,
+      "old_mismatch": "",
+      "new_mismatch": "<bos><|turn>system\nYou are fixing a TypeScript project using tools. Work only with"
+    },
+    {
+      "messages": 4,
+      "tokens": 392,
+      "lcp": 324,
+      "prior_protected": 319,
+      "protected": 392,
+      "legacy_protected": 392,
+      "generation_prompt": "",
+      "ok": true,
+      "old_mismatch": ".<turn|>\n<|turn>model\n",
+      "new_mismatch": ".<turn|>\n<|turn>model\n<|tool_call>call:read_file{path:<|\"|>src/main.ts<|\"|>"
+    },
+    {
+      "messages": 6,
+      "tokens": 519,
+      "lcp": 392,
+      "prior_protected": 392,
+      "protected": 519,
+      "legacy_protected": 519,
+      "generation_prompt": "",
+      "ok": true,
+      "old_mismatch": "}\\n\"}<|\"|>}<tool_response|>",
+      "new_mismatch": "}\\n\"}<|\"|>}<tool_response|><|tool_call>call:read_file{path:<|\"|>visible.test.ts<|\"|>"
+    },
+    {
+      "messages": 8,
+      "tokens": 612,
+      "lcp": 519,
+      "prior_protected": 519,
+      "protected": 612,
+      "legacy_protected": 612,
+      "generation_prompt": "",
+      "ok": true,
+      "old_mismatch": "\\n\"}<|\"|>}<tool_response|>",
+      "new_mismatch": "\\n\"}<|\"|>}<tool_response|><|tool_call>call:edit_file{after:<|\"|>export function clamp(value:"
+    },
+    {
+      "messages": 10,
+      "tokens": 800,
+      "lcp": 612,
+      "prior_protected": 612,
+      "protected": 800,
+      "legacy_protected": 800,
+      "generation_prompt": "",
+      "ok": true,
+      "old_mismatch": "\":true}<|\"|>}<tool_response|>",
+      "new_mismatch": "\":true}<|\"|>}<tool_response|><|tool_call>call:run_tests{}<tool_call|><|tool_response>response:run_tests{value"
+    },
+    {
+      "messages": 12,
+      "tokens": 1151,
+      "lcp": 800,
+      "prior_protected": 800,
+      "protected": 1146,
+      "legacy_protected": 1148,
+      "generation_prompt": "<|turn>model\n",
+      "ok": true,
+      "old_mismatch": "]\\n\"}<|\"|>}<tool_response|>",
+      "new_mismatch": "]\\n\"}<|\"|>}<tool_response|><|tool_call>call:edit_file{after:<|\"|>export function clamp(value:"
+    }
+  ]
+}
