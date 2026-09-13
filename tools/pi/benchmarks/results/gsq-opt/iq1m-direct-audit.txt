@@ -1,0 +1,10 @@
+Direct IQ1_M MMQ audit
+
+CPU reference: ggml/src/ggml-quants.c dequantize_row_iq1_m.
+Each256-value block reconstructs the FP16 base scale from high nibbles of four scale words. Each32-value subgroup has two independently selected odd multipliers, one per16 values. Four8-value grid indices each carry a signed IQ1S_DELTA offset. A tile loader must preserve both the16-value scales and8-value offset signs.
+
+Existing IQ1_S MMQ loader instead stores a32-value scale/offset pair and uses the q8_1 dot path. Existing IQ2_S tile loader uses16-value scales but no corresponding per8-value offset correction. Neither can simply be relabelled as IQ1_M. vec_dot_iq1_m_q8_1 exists for vector execution, but its MMQ-labelled VDR constant is not evidence of matrix tile-loader support.
+
+Implementation gate: derive a layout and matching dot correction preserving all four offsets; compare CPU reference on randomized scales/signs, partial rows and model shapes; evaluate numerical error against existing backend tolerances; measure thermally matched kernel and whole-request throughput. Do not replace bounded conversion until that path passes. No direct MMQ implementation delivered by this audit.
+
+Exact integer representation found: store q=8*grid+sign, where sign is +/-1 from the8-value offset bit. Multiply by d*odd_scale/8 for each16-value group. Exhaustive check over all16384 CPU grid values and both signs yields integer range-9..9 and exact reconstruction. This removes the need for a separate offset correction and makes the existing q8_0_16 MMQ dot layout a candidate. The earlier requirement for an additional correction sum is superseded by this representation. Tile layout/indexing and activation-quantization error still require backend tests; no CUDA loader implemented yet.

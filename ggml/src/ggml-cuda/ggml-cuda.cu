@@ -545,6 +545,8 @@ struct ggml_cuda_pool_vmm : public ggml_cuda_pool {
     std::vector<std::pair<CUdeviceptr, size_t>> mappings;
 #endif
 
+    size_t available() const override { return pool_size - pool_used; }
+
     explicit ggml_cuda_pool_vmm(int device) :
         device(device),
         physical_device(ggml_cuda_get_physical_device(device)),
@@ -1409,6 +1411,64 @@ template<ggml_type compute_type>
 static void ggml_cuda_mul_mat_cublas_impl(ggml_backend_cuda_context & ctx, const ggml_tensor * src0, const ggml_tensor * src1, ggml_tensor * dst) {
     using traits = batched_mul_mat_traits<compute_type>;
     using cuda_t = typename traits::cuda_type;
+
+    // Bound IQ1_M conversion scratch when direct MMQ is unavailable.
+    constexpr int64_t chunk_rows = 2048;
+    bool chunk_conversion = false;
+    if (src0->type == GGML_TYPE_IQ1_M) {
+        size_t free_bytes = 0, total_bytes = 0;
+        CUDA_CHECK(cudaMemGetInfo(&free_bytes, &total_bytes));
+        size_t scratch = 0;
+        const ggml_tensor * tensors[] = {src0, src1, dst};
+        for (const ggml_tensor * tensor : tensors) {
+            const int64_t elements = ggml_nelements(tensor);
+            GGML_ASSERT(elements >= 0 && uint64_t(elements) <= (SIZE_MAX - scratch) / sizeof(cuda_t));
+            scratch += size_t(elements) * sizeof(cuda_t);
+        }
+        const size_t reserve = 32 * 1024 * 1024;
+        const size_t reusable = ctx.pool().available();
+        chunk_conversion = scratch > reusable && scratch - reusable > (free_bytes > reserve ? free_bytes - reserve : 0);
+        const char * override = getenv("GGML_CUDA_IQ1M_CHUNKED");
+        if (override) chunk_conversion = strcmp(override, "0") != 0;
+    }
+    if (chunk_conversion && src0->type == GGML_TYPE_IQ1_M &&
+            src0->ne[1] > chunk_rows && src0->ne[2] == 1 && src0->ne[3] == 1 &&
+            src1->ne[2] == 1 && src1->ne[3] == 1 && ggml_is_contiguous(src0) &&
+            ggml_is_contiguous(src1) && ggml_is_contiguous(dst)) {
+        ggml_cuda_pool_alloc<cuda_t> activation(ctx.pool());
+        ggml_tensor input = *src1;
+        if (src1->type != compute_type) {
+            activation.alloc(ggml_nelements(src1));
+            auto convert = traits::convert(src1->type);
+            GGML_ASSERT(convert != nullptr);
+            convert(src1->data, activation.get(), ggml_nelements(src1), ctx.stream());
+            input.type = compute_type;
+            input.data = activation.get();
+            input.nb[0] = sizeof(cuda_t);
+            input.nb[1] = input.ne[0] * input.nb[0];
+            input.nb[2] = input.ne[1] * input.nb[1];
+            input.nb[3] = input.nb[2];
+        }
+        ggml_cuda_pool_alloc<float> output(ctx.pool(), chunk_rows * dst->ne[1]);
+        for (int64_t row = 0; row < src0->ne[1]; row += chunk_rows) {
+            const int64_t rows = std::min(chunk_rows, src0->ne[1] - row);
+            ggml_tensor weights = *src0;
+            weights.ne[1] = rows;
+            weights.nb[2] = weights.nb[1] * rows;
+            weights.nb[3] = weights.nb[2];
+            weights.data = static_cast<char *>(src0->data) + row * src0->nb[1];
+            ggml_tensor result = *dst;
+            result.ne[0] = rows;
+            result.nb[1] = rows * sizeof(float);
+            result.nb[2] = result.nb[1] * result.ne[1];
+            result.nb[3] = result.nb[2];
+            result.data = output.get();
+            ggml_cuda_mul_mat_cublas_impl<compute_type>(ctx, &weights, &input, &result);
+            CUDA_CHECK(cudaMemcpy2DAsync(static_cast<char *>(dst->data) + row * sizeof(float), dst->nb[1],
+                    output.get(), result.nb[1], rows * sizeof(float), dst->ne[1], cudaMemcpyDeviceToDevice, ctx.stream()));
+        }
+        return;
+    }
 
     GGML_ASSERT(ggml_is_contiguous(dst));
 

@@ -1201,6 +1201,7 @@ int ggml_cuda_get_device();
 struct ggml_cuda_pool {
     virtual ~ggml_cuda_pool() = default;
 
+    virtual size_t available() const { return 0; }
     virtual void * alloc(size_t size, size_t * actual_size) = 0;
     virtual void free(void * ptr, size_t size) = 0;
 };
