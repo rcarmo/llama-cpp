@@ -4594,17 +4594,18 @@ struct test_gated_delta_net : public test_case {
     const int     v_repeat;
     const bool    permuted;
     const bool    kda;
+    const bool unaligned;
     const int64_t K; // snapshot slot count: 1 = final-only, >1 = last K states
 
     std::string vars() override {
-        return VARS_TO_STR9(type, head_count, head_size, n_seq_tokens, n_seqs, v_repeat, permuted, kda, K);
+        return VARS_TO_STR9(type, head_count, head_size, n_seq_tokens, n_seqs, v_repeat, permuted, kda, K) + ",unaligned=" + std::to_string(unaligned);
     }
 
     test_gated_delta_net(ggml_type type = GGML_TYPE_F32,
             int64_t head_count = 4, int64_t head_size = 16, int64_t n_seq_tokens = 1, int64_t n_seqs = 1,
-            int v_repeat = 1, bool permuted = false, bool kda = false, int64_t K = 1)
+            int v_repeat = 1, bool permuted = false, bool kda = false, int64_t K = 1, bool unaligned = false)
         : type(type), head_count(head_count), head_size(head_size), n_seq_tokens(n_seq_tokens), n_seqs(n_seqs),
-          v_repeat(v_repeat), permuted(permuted), kda(kda), K(K) {}
+          v_repeat(v_repeat), permuted(permuted), kda(kda), unaligned(unaligned), K(K) {}
 
     ggml_tensor * build_graph(ggml_context * ctx) override {
         ggml_tensor * q;
@@ -4633,6 +4634,16 @@ struct test_gated_delta_net : public test_case {
         // q/k are L2-normalised in qwen35/kimi-linear before delta_net
         q = ggml_l2_norm(ctx, q, 1e-6f);
         k = ggml_l2_norm(ctx, k, 1e-6f);
+        if (unaligned) {
+            auto offset_copy = [&](ggml_tensor * src) {
+                ggml_tensor * storage = ggml_new_tensor_1d(ctx, type, ggml_nelements(src) + 1);
+                ggml_tensor * view = ggml_view_4d(ctx, storage, src->ne[0], src->ne[1], src->ne[2], src->ne[3],
+                        src->nb[1], src->nb[2], src->nb[3], sizeof(float));
+                return ggml_cpy(ctx, src, view);
+            };
+            q = offset_copy(q);
+            k = offset_copy(k);
+        }
         ggml_tensor * out   = ggml_gated_delta_net(ctx, q, k, v, g, beta, state, K);
         return out;
     }
@@ -11046,6 +11057,8 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
         test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 12, 128, 65, 2, 4, permuted, false, 5));
         test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 4, 128, 65, 2, 1, permuted, true, 5));
     }
+
+    test_cases.emplace_back(new test_gated_delta_net(GGML_TYPE_F32, 48, 128, 65, 1, 1, false, false, 5, true));
 
     // Model-sized recurrent heads and partially populated snapshot tails.
     for (int64_t tokens : {2, 5, 65, 256}) {
