@@ -139,9 +139,18 @@ llama_kv_cache::llama_kv_cache(
         v_heads[s] = 0;
     }
 
-    v_cells.resize(n_stream);
-    for (uint32_t s = 0; s < n_stream; ++s) {
-        v_cells[s].resize(kv_size);
+    if (other) {
+        if (v_cells.size() != n_stream || other->v_cells.size() != n_stream) {
+            throw std::runtime_error("shared KV stream count mismatch");
+        }
+        for (const auto & cells : v_cells) {
+            if (cells.size() != kv_size) throw std::runtime_error("shared KV cell count mismatch");
+        }
+    } else {
+        v_cells.resize(n_stream);
+        for (uint32_t s = 0; s < n_stream; ++s) {
+            v_cells[s].resize(kv_size);
+        }
     }
 
     // by default, all sequence ids are mapped to the 0th stream
@@ -374,8 +383,9 @@ void llama_kv_cache::clear(bool data) {
 
     if (data) {
         for (auto & [_, buf] : ctxs_bufs) {
-            ggml_backend_buffer_clear(buf.get(), 0);
+            if (buf) ggml_backend_buffer_clear(buf.get(), 0);
         }
+        for (auto & buffer : handoff_buffers) ggml_backend_buffer_clear(buffer.get(), 0);
     }
 }
 
@@ -684,7 +694,11 @@ llama_pos llama_kv_cache::seq_pos_max(llama_seq_id seq_id) const {
 
 std::map<ggml_backend_buffer_type_t, size_t> llama_kv_cache::memory_breakdown() const {
     std::map<ggml_backend_buffer_type_t, size_t> ret;
+    for (const auto & buffer : handoff_buffers) {
+        ret[ggml_backend_buffer_get_type(buffer.get())] += ggml_backend_buffer_get_size(buffer.get());
+    }
     for (const auto & [ctx, buf] : ctxs_bufs) {
+        if (!buf) continue;
         ggml_backend_buffer_type_t buft = ggml_backend_buffer_get_type(buf.get());
 
         if (hparams.no_alloc) {
@@ -1893,8 +1907,9 @@ size_t llama_kv_cache::total_size() const {
     size_t size = 0;
 
     for (const auto & [_, buf] : ctxs_bufs) {
-        size += ggml_backend_buffer_get_size(buf.get());
+        if (buf) size += ggml_backend_buffer_get_size(buf.get());
     }
+    for (const auto & buffer : handoff_buffers) size += ggml_backend_buffer_get_size(buffer.get());
 
     return size;
 }

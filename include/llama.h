@@ -405,6 +405,7 @@ extern "C" {
         bool no_perf;     // measure performance timings
         bool op_offload;  // offload host tensor operations to device
         bool sched_async_cpu; // run CPU graph splits on a worker thread so independent GPU splits overlap them
+        bool kv_cpu_shared; // opt-in cached coherent Vulkan KV allocation for in-process CPU handoff
         bool swa_full;    // use full-size SWA cache (https://github.com/ggml-org/llama.cpp/pull/13194#issuecomment-2868343055)
                           // NOTE: setting to false when n_seq_max > 1 can cause bad performance in some cases
                           //       ref: https://github.com/ggml-org/llama.cpp/pull/13845#issuecomment-2924800573
@@ -817,6 +818,18 @@ extern "C" {
     // (logits, embedding and memory)
     // Only use when saving the state, not when restoring it, otherwise the size may be too small.
     LLAMA_API size_t llama_state_get_size(struct llama_context * ctx);
+
+    struct llama_kv_handoff_result {
+        size_t shared_bytes;
+        size_t copied_bytes;
+    };
+    // Experimental whole-context KV move to an empty CPU context of the same immutable model/layout.
+    // Caller serializes both contexts and all memory handles. On success src is consumed: only free it.
+    // Destroy MTP borrowers before transfer and recreate them against dst afterward. No logits/sampler transfer.
+    // Return false without changing KV ownership on rejection; allow_copy permits bounded RAM-only fallback.
+    // Caller retains token history and must evaluate a token on dst before sampling its outputs.
+    LLAMA_API bool llama_kv_handoff_cpu(struct llama_context * dst, struct llama_context * src,
+                                      bool allow_copy, struct llama_kv_handoff_result * result);
     LLAMA_API DEPRECATED(size_t llama_get_state_size(struct llama_context * ctx),
         "use llama_state_get_size instead");
 

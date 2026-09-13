@@ -50,6 +50,9 @@ public:
 
     ~llama_kv_cache_iswa() = default;
 
+    void init_cpu_shared(const llama_memory_alloc_cb & alloc) override;
+    llama_memory_transfer_ptr prepare_handoff(llama_memory_i & source, const llama_memory_view_cb & view, bool allow_copy, size_t & shared, size_t & copied) override;
+
     //
     // llama_memory_i
     //

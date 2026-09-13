@@ -40,6 +40,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 
 static llama_model * llama_model_mapping(llm_arch arch, const llama_model_params & params) {
     switch (arch) {
@@ -1489,6 +1490,22 @@ void llama_model_base::load_vocab(llama_model_loader & ml) {
 }
 
 bool llama_model_base::load_tensors(llama_model_loader & ml) {
+    // Independent loads must identify the same immutable local file snapshot.
+    kv_handoff_identity.clear();
+#ifndef _WIN32
+    std::ostringstream identity;
+    bool identified = !ml.files.empty() && params.kv_overrides == nullptr;
+    for (const auto & file : ml.files) {
+        struct stat st;
+        if (fstat(file->file_id(), &st) != 0 || !S_ISREG(st.st_mode)) { identified = false; break; }
+        identity << st.st_dev << ':' << st.st_ino << ':' << st.st_size << ':' << st.st_mtime << ':' << st.st_ctime;
+#if defined(__linux__)
+        identity << ':' << st.st_mtim.tv_nsec << ':' << st.st_ctim.tv_nsec;
+#endif
+        identity << ';';
+    }
+    if (identified) kv_handoff_identity = identity.str();
+#endif
     const auto & split_mode   = params.split_mode;
     const bool use_mlock      = params.load_mode == LLAMA_LOAD_MODE_MLOCK || params.load_mode == LLAMA_LOAD_MODE_MMAP_MLOCK;
     const auto & tensor_split = params.tensor_split;

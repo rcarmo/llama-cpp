@@ -1,0 +1,7 @@
+set(TARGET llama-gemma-in-memory)
+add_executable(${TARGET} in-memory.cpp)
+target_link_libraries(${TARGET} PRIVATE llama llama-common ggml)
+target_compile_features(${TARGET} PRIVATE cxx_std_17)
+if (LLAMA_TOOLS_INSTALL)
+    install(TARGETS ${TARGET} RUNTIME)
+endif()
