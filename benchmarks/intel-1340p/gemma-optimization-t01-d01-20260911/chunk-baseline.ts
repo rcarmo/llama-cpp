@@ -1,0 +1,7 @@
+/** SCRIPT_JDOC:
+{"summary":"Establish newly versioned chunk fixture baseline without changing retained merge failure","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,save}from'./campaign';import{chunkFixture as f}from'../gemma-optimization-t02-20260911/chunk-fixture';import{readFileSync}from'node:fs';import{createHash}from'node:crypto';
+const freeze=JSON.parse(readFileSync(import.meta.dir+'/../gemma-optimization-t02-20260911/chunk-freeze.json','utf8'));if(createHash('sha256').update(readFileSync(import.meta.dir+'/../gemma-optimization-t02-20260911/chunk-fixture.ts')).digest('hex')!==freeze.sha256)throw Error('Changedfixture');
+const t=new Trial('t02-chunk-v1',{maintenance:true,build:'baseline',cpuBuild:'/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime-cpu',format:'f16',fa:false,full:false,cpuCtx:262144,parallel:2,cache:0,extraEnv:{LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH:'1',GGML_CPU_EXPERIMENTAL_ATTN4:'1',GGML_CPU_EXPERIMENTAL_SCORE4_3ROW:'1'}});let rows:any[]=[];
+try{await t.begin();await t.start('cpu');for(const seed of[42,43]){const r=await t.req('cpu',`chunk-${seed}`,{messages:[{role:'user',content:f.prompt}],temperature:0,seed,max_tokens:512,cache_prompt:false,id_slot:0,chat_template_kwargs:{enable_thinking:false}});rows.push({seed,response:r})}}catch(e){t.error ||=String(e);console.error(e)}finally{save(t.dir+'/task-results.json',{rows,fixture:f.id});const r=await t.finish({ok:!t.error,rows});if(!r.ok)process.exitCode=1}

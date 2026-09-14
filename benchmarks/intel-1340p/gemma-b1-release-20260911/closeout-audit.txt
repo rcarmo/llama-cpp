@@ -1,0 +1,133 @@
+{
+  "repair": {
+    "cause": "CPU full sequence writer removes valid masked SWA rollback history; shared B0/B1",
+    "original_cells": 512,
+    "repaired_cells": 766,
+    "cached": 64684,
+    "evaluated": 15,
+    "finite_states": 4,
+    "common_tensor_comparisons": 96,
+    "bytes_added": 10406888,
+    "scope": "Opt-in standard SWA full save only; partial/checkpoint path unchanged. Empty/foreign cell filtering unchanged. Native v2 schema unchanged."
+  },
+  "guard_swap": 352516,
+  "profiles": [
+    {
+      "order": 0,
+      "families": [
+        {
+          "family": 1,
+          "samples": 72,
+          "share": 0.4542455391497305,
+          "ratio": 0.9999946637069734,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.5255003552001465
+            },
+            {
+              "pmu": 10,
+              "residency": 0.47449736388930747
+            }
+          ]
+        },
+        {
+          "family": 2,
+          "samples": 72,
+          "share": 0.29092831446436357,
+          "ratio": 1.0000000785650471,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.5334435598598632
+            },
+            {
+              "pmu": 10,
+              "residency": 0.4665416607590857
+            }
+          ]
+        },
+        {
+          "family": 3,
+          "samples": 3168,
+          "share": 0.25482614638590595,
+          "ratio": 0.9949926549801928,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.4917694875417907
+            },
+            {
+              "pmu": 10,
+              "residency": 0.5079100624846559
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 1,
+      "families": [
+        {
+          "family": 1,
+          "samples": 64,
+          "share": 0.44994341677519173,
+          "ratio": 0.9999922258823017,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.4837597830196038
+            },
+            {
+              "pmu": 10,
+              "residency": 0.5162380218888216
+            }
+          ]
+        },
+        {
+          "family": 2,
+          "samples": 64,
+          "share": 0.2917284862615329,
+          "ratio": 1.0000005781924501,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.4997750658972301
+            },
+            {
+              "pmu": 10,
+              "residency": 0.5002145982088357
+            }
+          ]
+        },
+        {
+          "family": 3,
+          "samples": 3160,
+          "share": 0.25832809696327536,
+          "ratio": 0.9942711235823636,
+          "pmus": [
+            {
+              "pmu": 4,
+              "residency": 0.4815482858719541
+            },
+            {
+              "pmu": 10,
+              "residency": 0.5182478006740661
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "decision": {
+    "candidate": null,
+    "reason": "Boundary PMU samples include operator barriers and preparation, sparse phase selection is layer-correlated, and cache events cannot attribute KV/DRAM traffic or separate conversion from compute. No new mechanism justified beyond prior completed B1 and rejected kernel tests.",
+    "not_run": [
+      "P04 new implementation",
+      "P05 screen/confirm",
+      "D03 cutover",
+      "D04 postcutover"
+    ],
+    "next_discriminating_measurement": "Separately approved targeted repeated-KV/preparation accounting with actual pointer/byte counts and sampling-overhead control; privileged IMC counters only if separately authorised and useful. No immediate sweep or model rerun."
+  }
+}

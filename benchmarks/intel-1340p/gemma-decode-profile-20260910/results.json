@@ -1,0 +1,291 @@
+{
+  "audit_pass": true,
+  "profile": [
+    {
+      "mode": "mtp3",
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1646.069,
+        "prompt_per_token_ms": 65.84276,
+        "prompt_per_second": 15.187698693068153,
+        "predicted_n": 128,
+        "predicted_ms": 18248.493,
+        "predicted_per_token_ms": 142.5663515625,
+        "predicted_per_second": 7.014277836531488,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "total": {
+        "kind": "total",
+        "graphs": 152,
+        "graph_us": 19713668,
+        "node_wall_us": 19685945,
+        "active_thread_us": 237489345,
+        "capacity_us": 302147344,
+        "idle_or_sync_us": 64657999,
+        "logical_read_bytes": 642370809544,
+        "logical_write_bytes": 184415433472
+      },
+      "families": [
+        {
+          "kind": "family",
+          "name": "matrix",
+          "calls": 20592,
+          "wall_us": 16923004,
+          "active_thread_us": 232583665,
+          "capacity_us": 260517840,
+          "idle_or_sync_us": 27934175,
+          "logical_read_bytes": 284780517888,
+          "logical_write_bytes": 4052152320,
+          "wall_pct": 85.96490541856132
+        },
+        {
+          "kind": "family",
+          "name": "attention",
+          "calls": 5216,
+          "wall_us": 1178368,
+          "active_thread_us": 2956702,
+          "capacity_us": 18168824,
+          "idle_or_sync_us": 15212122,
+          "logical_read_bytes": 3209958016,
+          "logical_write_bytes": 2848620544,
+          "wall_pct": 5.985834055718432
+        },
+        {
+          "kind": "family",
+          "name": "copy",
+          "calls": 4088,
+          "wall_us": 123238,
+          "active_thread_us": 276784,
+          "capacity_us": 1928104,
+          "idle_or_sync_us": 1651320,
+          "logical_read_bytes": 175714534016,
+          "logical_write_bytes": 175653208064,
+          "wall_pct": 0.6260202393128702
+        },
+        {
+          "kind": "family",
+          "name": "other",
+          "calls": 30120,
+          "wall_us": 1461335,
+          "active_thread_us": 1672194,
+          "capacity_us": 21532576,
+          "idle_or_sync_us": 19860382,
+          "logical_read_bytes": 178665799624,
+          "logical_write_bytes": 1861452544,
+          "wall_pct": 7.423240286407384
+        }
+      ],
+      "phases": {
+        "draft_catchup": {
+          "calls": 39,
+          "us": 52,
+          "rows": 172,
+          "tokens": 0
+        },
+        "hidden_extract": {
+          "calls": 39,
+          "us": 302,
+          "rows": 172,
+          "tokens": 0
+        },
+        "process": {
+          "calls": 39,
+          "us": 5894,
+          "rows": 172,
+          "tokens": 0
+        },
+        "draft": {
+          "calls": 37,
+          "us": 1719653,
+          "rows": 0,
+          "tokens": 111
+        },
+        "target_decode": {
+          "calls": 37,
+          "us": 16455073,
+          "rows": 147,
+          "tokens": 0
+        },
+        "sample_accept": {
+          "calls": 37,
+          "us": 47201,
+          "rows": 147,
+          "tokens": 0
+        }
+      },
+      "resources": {
+        "peak_trial_pss_kib": 11973755,
+        "peak_trial_rss_kib": 11977124,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23541452,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      }
+    },
+    {
+      "mode": "target",
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1815.504,
+        "prompt_per_token_ms": 72.62016,
+        "prompt_per_second": 13.770280869664845,
+        "predicted_n": 128,
+        "predicted_ms": 22105.325,
+        "predicted_per_token_ms": 172.6978515625,
+        "predicted_per_second": 5.790459990975025
+      },
+      "total": {
+        "kind": "total",
+        "graphs": 130,
+        "graph_us": 23802666,
+        "node_wall_us": 23774550,
+        "active_thread_us": 167292134,
+        "capacity_us": 204959808,
+        "idle_or_sync_us": 37667674,
+        "logical_read_bytes": 1688987003508,
+        "logical_write_bytes": 577867614208
+      },
+      "families": [
+        {
+          "kind": "family",
+          "name": "matrix",
+          "calls": 55640,
+          "wall_us": 20173772,
+          "active_thread_us": 162815539,
+          "capacity_us": 174463760,
+          "idle_or_sync_us": 11648221,
+          "logical_read_bytes": 741526383616,
+          "logical_write_bytes": 3357425664,
+          "wall_pct": 84.8544851532416
+        },
+        {
+          "kind": "family",
+          "name": "attention",
+          "calls": 14040,
+          "wall_us": 2251589,
+          "active_thread_us": 2836825,
+          "capacity_us": 18739312,
+          "idle_or_sync_us": 15902487,
+          "logical_read_bytes": 2703597264,
+          "logical_write_bytes": 2409709568,
+          "wall_pct": 9.47058514251584
+        },
+        {
+          "kind": "family",
+          "name": "copy",
+          "calls": 11830,
+          "wall_us": 51097,
+          "active_thread_us": 170065,
+          "capacity_us": 505112,
+          "idle_or_sync_us": 335047,
+          "logical_read_bytes": 570736804736,
+          "logical_write_bytes": 570682527744,
+          "wall_pct": 0.21492310054238672
+        },
+        {
+          "kind": "family",
+          "name": "other",
+          "calls": 81510,
+          "wall_us": 1298092,
+          "active_thread_us": 1469705,
+          "capacity_us": 11251624,
+          "idle_or_sync_us": 9781919,
+          "logical_read_bytes": 374020217892,
+          "logical_write_bytes": 1417951232,
+          "wall_pct": 5.460006603700175
+        }
+      ],
+      "phases": {},
+      "resources": {
+        "peak_trial_pss_kib": 11751365,
+        "peak_trial_rss_kib": 11754744,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23659504,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      }
+    }
+  ],
+  "rows": [
+    {
+      "order": 0,
+      "threads": 16,
+      "decode_tps": 7.24145160781158,
+      "request_ms": 19250.157292999997,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 1,
+      "threads": 8,
+      "decode_tps": 8.38928758759678,
+      "request_ms": 16744.319735,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 2,
+      "threads": 8,
+      "decode_tps": 8.710462326842134,
+      "request_ms": 16222.003866000001,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 3,
+      "threads": 16,
+      "decode_tps": 6.98183849262107,
+      "request_ms": 20017.717988999997,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 4,
+      "threads": 8,
+      "decode_tps": 8.715685817230025,
+      "request_ms": 16228.954579000001,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 5,
+      "threads": 16,
+      "decode_tps": 7.1925701649267575,
+      "request_ms": 19499.385311000002,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 6,
+      "threads": 16,
+      "decode_tps": 7.107631530608459,
+      "request_ms": 19764.769874999998,
+      "drafted": 110,
+      "accepted": 90
+    },
+    {
+      "order": 7,
+      "threads": 8,
+      "decode_tps": 8.564032535294855,
+      "request_ms": 16439.115063999998,
+      "drafted": 110,
+      "accepted": 90
+    }
+  ],
+  "groups": {
+    "8": {
+      "decode_tps": 8.637247431068495,
+      "request_ms": 16334.0348215
+    },
+    "16": {
+      "decode_tps": 7.150100847767608,
+      "request_ms": 19632.077593
+    }
+  },
+  "decode_gain_pct": 20.79895955265023,
+  "request_reduction_pct": 16.79925497378816,
+  "scope": "Profileisattributeddiagnosticonly;uninstrumentedtargetbatch8/16screenisanindependentcomparison,notthesubsequentsmallbatchpatchresult"
+}

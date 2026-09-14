@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "order": 1,
+  "sampling_phase": 16,
+  "diagnostic": true,
+  "timings": {
+    "cache_n": 64658,
+    "prompt_n": 25,
+    "prompt_ms": 1536.694,
+    "prompt_per_token_ms": 61.46776,
+    "prompt_per_second": 16.268691099203874,
+    "predicted_n": 128,
+    "predicted_ms": 14690.49,
+    "predicted_per_token_ms": 114.769453125,
+    "predicted_per_second": 8.713119848282801,
+    "draft_n": 110,
+    "draft_n_accepted": 90
+  },
+  "scope": "B0 score3 + operator instrumentation only. n4 long F16 score/value and Q4 projection op boundaries. Includes operator barriers/preparation; not per-kernel DRAM attribution, not benchmark. PMU residency separate per type.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "targetBatchThreads": 16,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-b1-release-20260911/runtime-profile",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_OPERATOR_METER": "1",
+      "GGML_OPERATOR_METER_PHASE": "16"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 531.3875150000003,
+      "package_j": 7.860026,
+      "timings": {
+        "restore_ms": 529.637
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 16254.599641,
+      "package_j": 549.214841,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1536.694,
+        "prompt_per_token_ms": 61.46776,
+        "prompt_per_second": 16.268691099203874,
+        "predicted_n": 128,
+        "predicted_ms": 14690.49,
+        "predicted_per_token_ms": 114.769453125,
+        "predicted_per_second": 8.713119848282801,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 68,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11974162,
+    "peak_trial_rss_kib": 11977512,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23906076,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T16:14:44.137Z"
+}

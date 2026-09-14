@@ -1,0 +1,87 @@
+{
+  "ok": true,
+  "scope": "4k",
+  "order": 0,
+  "mode": 0,
+  "timings": {
+    "cache_n": 4095,
+    "prompt_n": 1,
+    "prompt_ms": 102.016,
+    "prompt_per_token_ms": 102.016,
+    "prompt_per_second": 9.802383939774153,
+    "predicted_n": 128,
+    "predicted_ms": 8889.088,
+    "predicted_per_token_ms": 69.446,
+    "predicted_per_second": 14.399677447225182,
+    "draft_n": 157,
+    "draft_n_accepted": 74
+  },
+  "content": "1. **Queue Concurrency:** Measures the maximum number of concurrent requests that can be processed by the system's queue without degradation in performance or correctness.\n2. **Cache Hit Ratio:** Quantifies the percentage of requests that are served directly from the cache versus those that require fetching data from the backend.\n3. **Request Latency (P95/P99):** Measures the time taken to fulfill a request, focusing on the 95th or 99th percentile to capture tail latency experienced by a significant portion of users.\n4. **Throughput (Requests/Second):** Measures the total",
+  "limits": "Sustained/counting and shorterrestoredstate throughput controls;ignore_eos forceoutput counts,notbroadquality",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "targetBatchThreads": 16,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/runtime-cpu",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "0"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 51.83450400000038,
+      "package_j": 1.654476,
+      "timings": {
+        "restore_ms": 50.879
+      },
+      "n_read": 98641524,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 8996.060745,
+      "package_j": 346.811612,
+      "timings": {
+        "cache_n": 4095,
+        "prompt_n": 1,
+        "prompt_ms": 102.016,
+        "prompt_per_token_ms": 102.016,
+        "prompt_per_second": 9.802383939774153,
+        "predicted_n": 128,
+        "predicted_ms": 8889.088,
+        "predicted_per_token_ms": 69.446,
+        "predicted_per_second": 14.399677447225182,
+        "draft_n": 157,
+        "draft_n_accepted": 74
+      },
+      "token_hash": "4c758d032ae49ae4952d7b38625cb109588de2d21c67a203edeb27806af0af67"
+    }
+  ],
+  "thermal": {
+    "peak_c": 89,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11870973,
+    "peak_trial_rss_kib": 11874312,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23868644,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:03:18.629Z"
+}

@@ -1,0 +1,14 @@
+PASS speech state
+true
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"Current B0 native-worker cancellation, ownership and cleanup in isolated adapter objects","kind":"mixed","weight":"heavy","role":"entrypoint"}
+3 | */
+4 | import{Workers}from'./code/workers';import{HybridProxy}from'./code/proxy';import{Trial,root,save,sleep}from'./campaign';import{readFileSync,readdirSync,writeFileSync,existsSync}from'node:fs';import{capture}from'./capture';
+5 | const cfg=JSON.parse(readFileSync(root+'/staging.json','utf8')),t=new Trial('native-recovery',{maintenance:true}),rows:any[]=[];let abort:AbortController|null=null,phase='',phaseSeen=false,fatal:any[]=[];
+6 | const assert=(v:unknown,s:string)=>{if(!v)throw Error(s)};
+                                                    ^
+error: Phase not reached gpu-ready
+      at assert (/var/home/agent/workspace/reports/gemma-integration-b0-20260911/recovery.ts:6:49)
+      at /var/home/agent/workspace/reports/gemma-integration-b0-20260911/recovery.ts:23:240
+
+FINISHED native-recovery false

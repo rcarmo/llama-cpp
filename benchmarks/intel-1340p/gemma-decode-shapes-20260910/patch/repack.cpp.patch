@@ -1,0 +1,28 @@
+--- a/ggml/src/ggml-cpu/repack.cpp
++++ b/ggml/src/ggml-cpu/repack.cpp
+@@ -5,6 +5,7 @@
+ 
+ #include "ggml-impl.h"
+ #include "ggml-cpu.h"
++#include "whole-token-profile.h"
+ #include "ggml-cpu-impl.h"
+ #include "simd-mappings.h"
+ #include "traits.h"
+@@ -4290,6 +4291,8 @@
+ 
+         const ggml_from_float_t from_float = ggml_get_type_traits_cpu(PARAM_TYPE)->from_float;
+ 
++        const bool shape_profile = ggml_cpu_shape_profile_enabled();
++        const int64_t pack_started = shape_profile ? ggml_cpu_whole_token_profile_time_us() : 0;
+         // INFO: Quantization is done in planes to avoid extra complexity in chunking.
+         // Flattening dimensions not multiple of INTER_SIZE would require extra handling depending on how
+         // the planes are broadcast.
+@@ -4308,6 +4311,8 @@
+             }
+         }
+ 
++        if (shape_profile) ggml_cpu_shape_profile_pack(dst, nth, ggml_cpu_whole_token_profile_time_us() - pack_started, "repack_pack_thread");
++
+         // disable for NUMA
+         const bool disable_chunking = ggml_is_numa();
+ 

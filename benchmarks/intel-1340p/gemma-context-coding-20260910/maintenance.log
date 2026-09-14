@@ -1,0 +1,27 @@
+true
+true
+ 9 |  const args=['podman','--root','/var/home/agent/workspace/projects/.podman-llama-storage','--runroot','/var/home/agent/workspace/projects/.podman-llama-run','--storage-driver','vfs','--cgroup-manager=cgroupfs','run','--rm','--name','gemma-context-swa-build','--network=none','--security-opt','label=disable','--userns=keep-id','-v','/var/home/agent/workspace:/var/home/agent/workspace','-v',process.execPath+':/tmp/host-bun:ro','localhost/llama-intel-vulkan-validation:fedora44','/tmp/host-bun',root+'/build/prepare.ts'];
+10 |  const fd=openSync(root+'/build/build.log','a');
+11 |  const p=Bun.spawn(args,{stdout:fd,stderr:fd});t.servers.push({p,fd,device:'build'});
+12 |  const rc=await p.exited;t.servers=[];closeSync(fd);
+13 |  const cleanup=Bun.spawn(args.slice(0,args.indexOf('run')).concat(['rm','-f','gemma-context-swa-build']),{stdout:'ignore',stderr:'ignore'});await cleanup.exited;
+14 |  if(rc!==0||t.error)throw Error(t.error||'Build exit'+rc);
+                               ^
+error: Build exit1
+      at /var/home/agent/workspace/reports/gemma-context-coding-20260910/maintenance.ts:14:27
+
+FINISHED build-guard false
+true
+true
+FINISHED build-guard-retry1 true
+52 |   const env={...process.env,LD_LIBRARY_PATH:base+'/bin:'+base+'/runtime',GGML_CPU_EXPERT_IO_PROFILE:'0',GGML_CPU_EXPERT_IO_ADVISE_MODE:'off',GGML_VK_VISIBLE_DEVICES:'0'};
+53 |   for(const k of ['GGML_SCHED_ASYNC_CPU_PROFILE','GGML_SCHED_ASYNC_CPU_TRACE','GGML_CPU_WHOLE_TOKEN_PROFILE','GGML_SPECULATIVE_PROFILE','LD_PRELOAD','OMP_PROC_BIND','OMP_PLACES','KMP_AFFINITY'])delete env[k];
+54 |   if(device==='vulkan'&&cfg.vulkanF32)env.GGML_VK_DISABLE_F16='1';
+55 |   if(cfg.preserveSwaPadding)env.LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING='1';else delete env.LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING;
+56 |   const p=Bun.spawn(['taskset','-c','0-15',...argv],{stdout:fd,stderr:fd,env});const s={p,fd,device,port,argv};this.servers.push(s);save(this.dir+`/${device}-argv.json`,argv);
+57 |   for(let i=0;i<120;i++){if(this.error)throw Error(this.error);if(p.exitCode!==null)throw Error(`${device} startup exit ${p.exitCode}`);try{await api(`http://127.0.0.1:${port}/health`,undefined,1000);save(this.dir+`/${device}-startup.json`,{wall_ms:performance.now()-before,process:ps(p.pid),props:await api(`http://127.0.0.1:${port}/props`).then(({chat_template,...x})=>x)});return s}catch{}await sleep(1000)}throw Error('Startup timeout')
+                                                                                               ^
+error: cpu startup exit 127
+      at start (/var/home/agent/workspace/reports/gemma-context-coding-20260910/campaign.ts:57:91)
+
+FINISHED compact4-cpu-off false

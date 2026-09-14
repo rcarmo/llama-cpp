@@ -1,0 +1,159 @@
+{
+  "pass": true,
+  "rows": [
+    {
+      "label": "fixture",
+      "tokens": 4751
+    },
+    {
+      "label": "native-prefill-cancel",
+      "pid": 631803,
+      "pass": true
+    },
+    {
+      "label": "native-gpu-kill-fallback",
+      "pid": 631832,
+      "status": 200,
+      "route": "cpu-fallback",
+      "result": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "FALLBACK-42"
+            }
+          }
+        ],
+        "created": 1789078604,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 4751,
+          "total_tokens": 4757,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-fACIkbx1s5MC3orexI8yF3EksEWxCxOu",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 4751,
+          "prompt_ms": 65644.578,
+          "prompt_per_token_ms": 13.817002315302041,
+          "prompt_per_second": 72.37459885872067,
+          "predicted_n": 6,
+          "predicted_ms": 258.024,
+          "predicted_per_token_ms": 43.004,
+          "predicted_per_second": 23.25365082317924,
+          "draft_n": 6,
+          "draft_n_accepted": 6
+        }
+      }
+    },
+    {
+      "label": "native-cpu-generation-restart",
+      "before": {
+        "pid": 631731,
+        "cpu_pid": 631750,
+        "port": 18091,
+        "started_at": "2026-09-10T22:15:30.359Z"
+      },
+      "after": {
+        "pid": 631926,
+        "cpu_pid": 631941,
+        "port": 18091,
+        "started_at": "2026-09-10T22:16:52.553Z"
+      },
+      "pass": true
+    },
+    {
+      "label": "recovered",
+      "status": 200,
+      "answer": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "RECOVERED"
+            }
+          }
+        ],
+        "created": 1789078613,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 14,
+          "total_tokens": 18,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-IuOQQVJe7GAl5Ao7zydvJApfQcpDPbjx",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 14,
+          "prompt_ms": 319.397,
+          "prompt_per_token_ms": 22.814071428571427,
+          "prompt_per_second": 43.83259705006622,
+          "predicted_n": 4,
+          "predicted_ms": 211.34,
+          "predicted_per_token_ms": 52.835,
+          "predicted_per_second": 18.926847733509984,
+          "draft_n": 3,
+          "draft_n_accepted": 3
+        }
+      }
+    },
+    {
+      "label": "cold-after-recovery-slot1",
+      "route": "gpu-cold",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "FALLBACK-42"
+            }
+          }
+        ],
+        "created": 1789078653,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 6,
+          "prompt_tokens": 4751,
+          "total_tokens": 4757,
+          "prompt_tokens_details": {
+            "cached_tokens": 4750
+          }
+        },
+        "id": "chatcmpl-Jz0W68oPCG7oZxgfj0JdbcP8V2tCQ8xq",
+        "timings": {
+          "cache_n": 4750,
+          "prompt_n": 1,
+          "prompt_ms": 96.256,
+          "prompt_per_token_ms": 96.256,
+          "prompt_per_second": 10.388962765957446,
+          "predicted_n": 6,
+          "predicted_ms": 263.256,
+          "predicted_per_token_ms": 43.876,
+          "predicted_per_second": 22.79150332755949,
+          "draft_n": 6,
+          "draft_n_accepted": 6
+        }
+      }
+    }
+  ],
+  "finished_at": "2026-09-10T22:17:33.014Z"
+}

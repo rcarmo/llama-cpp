@@ -1,0 +1,42 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.316 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.808 W srv  llama_server: -----------------
+0.00.004.811 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.811 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.811 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.811 W srv  llama_server: -----------------
+0.00.006.097 I srv    load_model: loading model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.8-27b/Qwen3.8-27B-UD-Q4_K_XL.gguf'
+0.00.809.019 W model has unused tensor blk.64.attn_norm.weight (size = 20480 bytes) -- ignoring
+0.00.809.035 W model has unused tensor blk.64.post_attention_norm.weight (size = 20480 bytes) -- ignoring
+0.00.809.039 W model has unused tensor blk.64.attn_q.weight (size = 51609600 bytes) -- ignoring
+0.00.809.042 W model has unused tensor blk.64.attn_k.weight (size = 5570560 bytes) -- ignoring
+0.00.809.044 W model has unused tensor blk.64.attn_v.weight (size = 5570560 bytes) -- ignoring
+0.00.809.052 W model has unused tensor blk.64.attn_output.weight (size = 25804800 bytes) -- ignoring
+0.00.809.055 W model has unused tensor blk.64.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.809.057 W model has unused tensor blk.64.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.809.059 W model has unused tensor blk.64.ffn_gate.weight (size = 73113600 bytes) -- ignoring
+0.00.809.062 W model has unused tensor blk.64.ffn_down.weight (size = 73113600 bytes) -- ignoring
+0.00.809.064 W model has unused tensor blk.64.ffn_up.weight (size = 73113600 bytes) -- ignoring
+0.00.809.068 W model has unused tensor blk.64.nextn.eh_proj.weight (size = 43008000 bytes) -- ignoring
+0.00.809.070 W model has unused tensor blk.64.nextn.enorm.weight (size = 20480 bytes) -- ignoring
+0.00.809.073 W model has unused tensor blk.64.nextn.hnorm.weight (size = 20480 bytes) -- ignoring
+0.00.809.079 W model has unused tensor blk.64.nextn.shared_head_norm.weight (size = 20480 bytes) -- ignoring
+0.03.054.919 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.03.068.469 I srv  llama_server: model loaded
+0.03.068.478 I srv  llama_server: listening on http://127.0.0.1:8094
+0.03.371.785 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.03.371.835 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.45.784.908 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    252, progress = 0.49, t =  42.41 s / 5.94 tokens per second
+1.29.328.515 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    508, progress = 0.99, t =  85.96 s / 5.91 tokens per second
+1.30.239.982 I slot print_timing: id  0 | task 1 | prompt eval time =   86868.09 ms /   512 tokens (  169.66 ms per token,     5.89 tokens per second)
+1.30.239.991 I slot print_timing: id  0 | task 1 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token, 1000000.00 tokens per second)
+1.30.239.992 I slot print_timing: id  0 | task 1 |       total time =   86868.09 ms /   513 tokens
+1.30.239.995 I slot print_timing: id  0 | task 1 |    graphs reused =          0
+1.30.240.056 I slot      release: id  0 | task 1 | stop processing: n_tokens = 512, truncated = 0
+3.06.256.467 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.125 (> 0.100 thold), f_keep = 1.000
+3.06.256.506 I slot launch_slot_: id  0 | task 5 | processing task, is_child = 0
+6.02.016.348 I slot print_timing: id  0 | task 5 | prompt processing, n_tokens =   1024, progress = 0.25, t = 175.76 s / 5.83 tokens per second
+7.23.294.064 W srv          stop: cancel task, id_task = 5
+9.10.380.373 I srv    operator(): operator(): cleaning up before exit...

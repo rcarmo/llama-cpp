@@ -1,0 +1,13 @@
+true
+true
+Running as unit: gemma-hybrid-staging.service; invocation ID: 7d7629e245864a7ea1bdfe4395751bc1
+18 | async function idle(){for(let i=0;i<120;i++){const x=await fetch(base+'/hybrid/status').then(r=>r.json());if(!x.active)return;await Bun.sleep(250)}throw Error('Adapterdidnotdrain')}
+19 | async function post(label:string,body:any,signal?:AbortSignal){if(stopped)throw Error(stopped);await guard();const t=performance.now(),r=await fetch(base+'/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:signal??AbortSignal.timeout(180000),timeout:false});const route=r.headers.get('x-hybrid-route');if(!r.ok)throw Error(label+' HTTP'+r.status+' '+await r.text());const response=await r.json();rows.push({label,route,ms:performance.now()-t,response});save('native-results-progress',rows);return {response,route}}
+20 | const tools=[{type:'function',function:{name:'lookup_stock',description:'Read fixture inventory',parameters:{type:'object',properties:{sku:{type:'string'}},required:['sku'],additionalProperties:false}}}];
+21 | const messages:any[]=[{role:'system',content:'Use lookup_stock exactly once. After its result, answer with the quantity only.'},{role:'user',content:Array.from({length:250},(_,i)=>`Inventory record ${i}: preserve the supplied stock identifier and quantity in all follow-ups.`).join('\n')+'\nHow many items of SKU PANDA-RESTORE are in stock? Look it up, then reply with the quantity only.'}];
+22 | const defaults={temperature:0,seed:42,max_tokens:96,cache_prompt:true,chat_template_kwargs:{enable_thinking:false}};
+23 | async function pid(port:number){for(let i=0;i<80;i++){for(const p of readdirSync('/proc').filter(p=>/^\d+$/.test(p))){const argv=text('/proc/'+p+'/cmdline');if(text('/proc/'+p+'/comm').trim()==='llama-server'&&argv.includes('--port\x00'+port+'\x00')&&argv.includes(root+'/state/'))return +p}await Bun.sleep(100)}throw Error('StagedPIDnotfound '+port)}
+                                                                                                                                                                                                                                                                                                                                   ^
+error: StagedPIDnotfound 18093
+      at pid (/var/home/agent/workspace/reports/gemma-production-acceleration-20260910/native-test.ts:23:319)
+

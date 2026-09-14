@@ -1,0 +1,7 @@
+{
+ "hypothesis":"Iris Xe shader_core_count lookup returns0, disabling automatic split-K; profiler shows long F16 attention value reductions dominate. Explicit split can expose more parallel reduction work.",
+ "guarded_override":"Non-coopmat Intel only; src0 F16, K>=32768, M<=1024, N>=64; native disable_split_k wins. Values2,4,8 only; unset/1 preserves original selection. Native aligned split allocation and reduction remain.",
+ "tests":"Offline shape/flag bounds and nonempty256-aligned tails. Native synthetic F16 long-matmul vs CPU controls, then same finite64K saved-state1022-token tail and recall. Winners need counterbalanced confirm and fresh64K state/task check before retention.",
+ "limits":"Reduction order may change close argmax; task quality/state finite are gates, exact token equality diagnostic. No production change. Existing shader objects include verified softmax fix; only host dispatch source rebuilt in scratch.",
+ "rejections":"CPU thread/MTP screens slower, FA-on tail slower+invalid output, GPUubatch1024 modest tail benefit but fresh64K total3.33% slower. Keep ubatch256 for split-K trials. Bounded768-cell export repair retained separately."
+}

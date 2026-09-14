@@ -1,0 +1,125 @@
+{
+  "ok": true,
+  "fa": false,
+  "rows": [
+    {
+      "rep": 0,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29854.033,
+        "prompt_per_token_ms": 29.211382583170256,
+        "prompt_per_second": 34.23323073301353,
+        "predicted_n": 21,
+        "predicted_ms": 6523.086,
+        "predicted_per_token_ms": 326.15430000000003,
+        "predicted_per_second": 3.066033469434559
+      },
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true
+    },
+    {
+      "rep": 1,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29742.755,
+        "prompt_per_token_ms": 29.102500000000003,
+        "prompt_per_second": 34.36130916587922,
+        "predicted_n": 21,
+        "predicted_ms": 6568.718,
+        "predicted_per_token_ms": 328.4359,
+        "predicted_per_second": 3.0447341475155425
+      },
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true
+    }
+  ],
+  "limits": "Two unprofiled tail requests from identical retained FA-off64K state, lossless V transpose only. Not a fresh full64K FA prefill speedup or final quality gate.",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "build": "baseline",
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+    "preserveSwaPadding": true
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "vulkan",
+      "wall_ms": 506.75383299999976,
+      "package_j": 7.514446,
+      "timings": {
+        "restore_ms": 504.803
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-0",
+      "device": "vulkan",
+      "wall_ms": 36402.668435,
+      "package_j": 918.185332,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29854.033,
+        "prompt_per_token_ms": 29.211382583170256,
+        "prompt_per_second": 34.23323073301353,
+        "predicted_n": 21,
+        "predicted_ms": 6523.086,
+        "predicted_per_token_ms": 326.15430000000003,
+        "predicted_per_second": 3.066033469434559
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "restore-1",
+      "device": "vulkan",
+      "wall_ms": 296.53726799999276,
+      "package_j": 4.394215,
+      "timings": {
+        "restore_ms": 295.244
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-1",
+      "device": "vulkan",
+      "wall_ms": 36340.54358499999,
+      "package_j": 925.724742,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29742.755,
+        "prompt_per_token_ms": 29.102500000000003,
+        "prompt_per_second": 34.36130916587922,
+        "predicted_n": 21,
+        "predicted_ms": 6568.718,
+        "predicted_per_token_ms": 328.4359,
+        "predicted_per_second": 3.0447341475155425
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 88,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5240224,
+    "peak_trial_rss_kib": 5243832,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23729232,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T17:23:17.117Z"
+}

@@ -1,0 +1,10 @@
+{
+ "before_full64_finalist":true,
+ "decode_outcome":"Original8-thread/MTP3 screen best among4P,16threads,OMP-bound8,MTP1,MTP5. Retain baseline; no broad thread optimum claim.",
+ "attention_profile":"64K tail GPU per-op logging is instrumented. F16 attention products dominate; full request dominated by GPU prefill. Profile not a benchmark.",
+ "fa_attempt":"Lossless V transpose validated by offline tests and exact1.09GB state roundtrip. Native FA tail is~4.9x slower prefill and outputs unused tokens; reject candidate, cause not isolated, do not infer state corruption solely from output.",
+ "ubatch_confirmation":"ABBA/BAAB8 tail runs,4per256/1024,all recall/cache checks pass. Median1022-token tail prefill29.9166->28.2651s (-5.5204%). Independent full64K finalist justified.",
+ "state_fix":"GPU1024 expands SWA ring1536 vs CPU256 ring768. Updated isolated export caps standard-SWA to window512+CPU padding256; exclude empty/foreign cells and preserve partial-checkpoint behavior. Exact CPU restore coverage check unchanged. Fresh4K native test before full64K.",
+ "full64_trial":"Reuse exact64,663-token fixture; GPU1024 and CPU256, retained CPU build, two GPU73728/CPU131072 contexts. Same residency as earlier64K run, compare startup-excluded whole including save/format conversion/restore. One temporal control pair only; not fresh64K balanced speedup.",
+ "retained_limits":"No deployment/source commit/push; broader coding quality, fully loaded dual128K, native crash recovery still unqualified. Model-specific restricted format converter and experimental export only."
+}

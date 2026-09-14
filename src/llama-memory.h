@@ -14,6 +14,18 @@ class llama_batch_allocr;
 class llama_io_write_i;
 class llama_io_read_i;
 
+using llama_memory_alloc_cb = std::function<ggml_backend_buffer_t(ggml_backend_buffer_type_t, size_t)>;
+// A non-null view must independently retain the source allocation until the returned buffer is freed.
+// Caller has drained all source work; callback must establish host visibility. Null requests copied fallback.
+// Handoff requests each complete source allocation once, then binds checked tensor ranges within that view.
+using llama_memory_view_cb = std::function<ggml_backend_buffer_t(ggml_backend_buffer_t, size_t, size_t)>;
+
+struct llama_memory_transfer_i {
+    virtual ~llama_memory_transfer_i() = default;
+    virtual void commit() noexcept = 0;
+};
+using llama_memory_transfer_ptr = std::unique_ptr<llama_memory_transfer_i>;
+
 struct llama_memory_params {
     // kv cache
     ggml_type type_k;
@@ -81,6 +93,11 @@ struct llama_memory_i {
     using layer_share_cb = std::function<int32_t(int32_t il)>;
 
     virtual ~llama_memory_i() = default;
+
+    // Only before first use; unsupported allocations retain their normal buffers.
+    virtual void init_cpu_shared(const llama_memory_alloc_cb &) {}
+    // Prepare without changing either cache. Caller consumes the source after commit.
+    virtual llama_memory_transfer_ptr prepare_handoff(llama_memory_i &, const llama_memory_view_cb &, bool, size_t &, size_t &) { return nullptr; }
 
     // split the input batch into a set of ubatches and verify that they can fit into the cache
     // return a context object containing the ubatches and memory state required to process them

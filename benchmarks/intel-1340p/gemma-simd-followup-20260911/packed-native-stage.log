@@ -1,0 +1,13 @@
+PASS speech state
+true
+3 | */
+4 | import{Trial,root,save}from'./campaign';import{readFileSync,writeFileSync}from'node:fs';import{capture}from'./capture';
+5 | const t=new Trial('native-packed-q4',{maintenance:true}),rows:any[]=[];
+6 | try{await t.begin();for(const target of['q4'])for(const mode of[0,1]){
+7 | await t.check();const expected=16,env={PATH:process.env.PATH??'',HOME:process.env.HOME??'',LANG:'C.UTF-8',LD_LIBRARY_PATH:root+'/runtime-packed/bin:'+root+'/runtime-packed/runtime',GGML_CPU_EXPERIMENTAL_ATTN4:'1',GGML_CPU_EXPERIMENTAL_SCORE4_3ROW:'1',GGML_CPU_EXPERIMENTAL_SCORE3_NOUNROLL:target==='score'?String(mode):'0',GGML_CPU_EXPERIMENTAL_Q4_PACK_STREAM:String(mode),GGML_CPU_SCORE3_NOUNROLL_TRACE:'1',GGML_CPU_Q4_PACK_TRACE:'1'};
+8 | const p=Bun.spawn([root+'/packed-build/test-packed'],{stdout:'pipe',stderr:'pipe',env});t.servers.push({p,fd:-1,device:'native'});try{capture(t.dir,p.pid)}catch{}const timer=setTimeout(()=>p.kill('SIGTERM'),120000);const[rc,out,err]=await Promise.all([p.exited,new Response(p.stdout).text(),new Response(p.stderr).text()]);clearTimeout(timer);t.servers=t.servers.filter(s=>s.p!==p);writeFileSync(t.dir+`/${target}-${mode}.log`,out+'\n'+err);const trace=(out+err).includes(target==='score'?'SCORE3_NOUNROLL ':'Q4_PACK_STREAM ');rows.push({target,mode,rc,pass:rc===0&&(out+err).includes(`${expected}/${expected} packed cases passed`),trace});save(t.dir+'/progress.json',{rows});if(!rows.at(-1).pass||trace!==Boolean(mode))throw Error('Native/actual trace gate '+target+' '+mode);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ^
+error: Native/actual trace gate q4 0
+      at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/packed-native.ts:8:727
+
+FINISHED native-packed-q4 false

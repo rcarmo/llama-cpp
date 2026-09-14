@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{audit}from'./audit-profile';
+test('B0profile is exact work and reconciled non-overflowing diagnostic evidence',()=>{const r=audit(import.meta.dir);expect(r.audit_pass).toBe(true);expect(r.summary.groups).toBe(3579);expect(r.summary.overflow).toBe(0);expect(r.categories['F16-score long n4'].wall_us).toBe(4674939);expect(r.categories['F16-value long n4'].wall_us).toBe(3004129);expect(r.speculative_phases.target_decode.us).toBe(12758150);expect(r.speculative_phases.draft.us).toBe(1593154);expect(r.restoration.pass).toBe(true)});

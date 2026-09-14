@@ -1,0 +1,22 @@
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/soft_max_large2.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/soft_max_large2.comp
+@@ -36,7 +36,7 @@
+     barrier();
+     [[unroll]] for (uint s = BLOCK_SIZE / 2; s > 0; s >>= 1) {
+         if (tid < s) {
+-            vals[tid] = max(max_val, vals[tid + s]);
++            vals[tid] = max(vals[tid], vals[tid + s]);
+         }
+         barrier();
+     }
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/soft_max_large3.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/soft_max_large3.comp
+@@ -38,7 +38,7 @@
+     barrier();
+     [[unroll]] for (uint s = BLOCK_SIZE / 2; s > 0; s >>= 1) {
+         if (tid < s) {
+-            vals[tid] = max(max_val, vals[tid + s]);
++            vals[tid] = max(vals[tid], vals[tid + s]);
+             sumsh[tid] += sumsh[tid + s];
+         }
+         barrier();

@@ -1,0 +1,19 @@
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -9380,7 +9380,15 @@
+     const uint64_t y_ne = padded_n * ne10 * ne12 * ne13;
+     const uint64_t d_ne = ggml_nelements(dst);
+ 
+-    const uint32_t split_k = ggml_vk_guess_split_k(ctx, ne01, ne11, ne10, disable_split_k, pipeline);
++    uint32_t split_k = ggml_vk_guess_split_k(ctx, ne01, ne11, ne10, disable_split_k, pipeline);
++    if (!disable_split_k && ctx->device->vendor_id == VK_VENDOR_ID_INTEL &&
++            !ctx->device->coopmat_support && src0->type == GGML_TYPE_F16 &&
++            ne10 >= 32768 && ne01 <= 1024 && ne11 >= 64) {
++        const char * setting = getenv("GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K");
++        if (setting && (strcmp(setting, "2") == 0 || strcmp(setting, "4") == 0 || strcmp(setting, "8") == 0)) {
++            split_k = static_cast<uint32_t>(atoi(setting));
++        }
++    }
+ 
+     const uint64_t qx_sz = ggml_type_size(src0->type) * x_ne / ggml_blck_size(src0->type);
+     const uint64_t qy_sz = ggml_type_size(src1->type) * y_ne / ggml_blck_size(src1->type);

@@ -1,0 +1,140 @@
+0.00.030.069 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.030.191 I srv          init: The UI is disabled
+0.00.030.191 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.030.244 W srv  llama_server: -----------------
+0.00.030.245 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.030.245 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.030.245 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.030.246 W srv  llama_server: -----------------
+0.00.031.592 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.01.118.477 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.119.015 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.150.634 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.01.938.275 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.02.377.555 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.02.415.005 I cmn          init: llama threadpool init, n_threads = 8
+0.02.415.054 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.03.058.371 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 73728, kv_unified = 'false'
+0.03.066.247 I srv  llama_server: model loaded
+0.03.066.253 I srv  llama_server: listening on http://127.0.0.1:18791
+0.04.914.606 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.04.914.722 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.18.945.946 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =    762, progress = 1.00, t =  14.03 s / 54.31 tokens per second
+0.28.504.094 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1018, progress = 1.00, t =  23.59 s / 43.16 tokens per second
+0.34.792.767 I slot print_timing: id  0 | task 1 | prompt eval time =   29878.00 ms /  1022 tokens (   29.23 ms per token,    34.21 tokens per second)
+0.34.792.774 I slot print_timing: id  0 | task 1 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+0.34.792.775 I slot print_timing: id  0 | task 1 |       total time =   29878.00 ms /  1023 tokens
+0.34.792.785 I slot print_timing: id  0 | task 1 |    graphs reused =          0
+0.34.795.366 I slot      release: id  0 | task 1 | stop processing: n_tokens = 65680, truncated = 0
+0.34.916.657 I srv    operator(): operator(): cleaning up before exit...
+----------------
+Vulkan Timings:
+ADD: 762 x 83.667 us = 63754.7 us
+CONT: 258 x 87.978 us = 22698.4 us
+GELU: 252 x 13.479 us = 3396.76 us
+GET_ROWS: 2 x 6.275 us = 12.551 us
+GLU: 252 x 485.141 us = 122256 us
+MUL: 648 x 49.936 us = 32358.6 us
+MUL_MAT f16 m=10752 n=250 k=2560: 1 x 25103.9 us = 25103.9 us (548.117 GFLOPS/s)
+MUL_MAT f16 m=10752 n=256 k=2560: 3 x 31514.3 us = 94542.8 us (447.103 GFLOPS/s)
+MUL_MAT f16 m=256 n=250 k=768 batch=8: 35 x 1699.53 us = 59483.7 us (462.433 GFLOPS/s)
+MUL_MAT f16 m=256 n=256 k=768 batch=8: 105 x 1713.01 us = 179866 us (469.807 GFLOPS/s)
+MUL_MAT f16 m=512 n=250 k=65536 batch=8: 7 x 267696 us = 1.87387e+06 us (501.377 GFLOPS/s)
+MUL_MAT f16 m=512 n=256 k=65024 batch=8: 7 x 246292 us = 1.72405e+06 us (553.668 GFLOPS/s)
+MUL_MAT f16 m=512 n=256 k=65280 batch=8: 7 x 263104 us = 1.84173e+06 us (520.331 GFLOPS/s)
+MUL_MAT f16 m=512 n=256 k=65792 batch=8: 7 x 249487 us = 1.74641e+06 us (553.033 GFLOPS/s)
+MUL_MAT f16 m=65024 n=256 k=512 batch=8: 7 x 172743 us = 1.2092e+06 us (788.639 GFLOPS/s)
+MUL_MAT f16 m=65280 n=256 k=512 batch=8: 7 x 172833 us = 1.20983e+06 us (791.331 GFLOPS/s)
+MUL_MAT f16 m=65536 n=250 k=512 batch=8: 7 x 169555 us = 1.18689e+06 us (790.814 GFLOPS/s)
+MUL_MAT f16 m=65792 n=256 k=512 batch=8: 7 x 166801 us = 1.16761e+06 us (826.379 GFLOPS/s)
+MUL_MAT f16 m=768 n=250 k=256 batch=8: 35 x 1224.01 us = 42840.4 us (641.249 GFLOPS/s)
+MUL_MAT f16 m=768 n=256 k=256 batch=8: 105 x 1278.99 us = 134294 us (628.413 GFLOPS/s)
+MUL_MAT q4_0 m=1024 n=250 k=2560: 8 x 632.896 us = 5063.17 us (2070.58 GFLOPS/s)
+MUL_MAT q4_0 m=1024 n=256 k=2560: 24 x 651.904 us = 15645.7 us (2058.45 GFLOPS/s)
+MUL_MAT q4_0 m=10240 n=250 k=2560: 84 x 5351.06 us = 449489 us (2448.98 GFLOPS/s)
+MUL_MAT q4_0 m=10240 n=256 k=2560: 252 x 5353.61 us = 1.34911e+06 us (2506.56 GFLOPS/s)
+MUL_MAT q4_0 m=2048 n=250 k=2560: 35 x 1156.27 us = 40469.5 us (2266.71 GFLOPS/s)
+MUL_MAT q4_0 m=2048 n=256 k=2560: 105 x 1212.74 us = 127338 us (2213.03 GFLOPS/s)
+MUL_MAT q4_0 m=256 n=250 k=2560: 42 x 263.511 us = 11067.5 us (1243.27 GFLOPS/s)
+MUL_MAT q4_0 m=256 n=256 k=2560: 126 x 267.988 us = 33766.5 us (1251.84 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=250 k=10240: 42 x 5810.87 us = 244056 us (2255.53 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=250 k=2048: 35 x 1155.02 us = 40425.6 us (2269.06 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=250 k=256: 42 x 191.511 us = 8043.47 us (1707.68 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=250 k=4096: 7 x 2250.88 us = 15756.1 us (2328.98 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=256 k=10240: 126 x 5779.57 us = 728226 us (2322.16 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=256 k=2048: 105 x 1171.54 us = 123012 us (2290.74 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=256 k=256: 126 x 187.117 us = 23576.8 us (1789.72 GFLOPS/s)
+MUL_MAT q4_0 m=2560 n=256 k=4096: 21 x 2243.04 us = 47103.8 us (2393.21 GFLOPS/s)
+MUL_MAT q4_0 m=4096 n=250 k=2560: 7 x 2178.14 us = 15247 us (2406.57 GFLOPS/s)
+MUL_MAT q4_0 m=4096 n=256 k=2560: 21 x 2197.39 us = 46145.1 us (2442.75 GFLOPS/s)
+MUL_MAT q4_0 m=512 n=250 k=2560: 40 x 437.648 us = 17505.9 us (1497.17 GFLOPS/s)
+MUL_MAT q4_0 m=512 n=256 k=2560: 120 x 470.764 us = 56491.7 us (1425.25 GFLOPS/s)
+MUL_MAT_VEC f16 m=10752 n=2 k=2560: 1 x 2368.39 us = 2368.39 us (46.4785 GFLOPS/s)
+MUL_MAT_VEC f16 m=10752 n=4 k=2560: 1 x 5165.16 us = 5165.16 us (42.6237 GFLOPS/s)
+MUL_MAT_VEC f16 m=256 n=2 k=256 batch=8: 70 x 556.534 us = 38957.4 us (3.76087 GFLOPS/s)
+MUL_MAT_VEC f16 m=256 n=2 k=512 batch=8: 7 x 898.318 us = 6288.23 us (4.6645 GFLOPS/s)
+MUL_MAT_VEC f16 m=256 n=4 k=768 batch=8: 35 x 700.782 us = 24527.4 us (17.9438 GFLOPS/s)
+MUL_MAT_VEC f16 m=512 n=2 k=256 batch=8: 7 x 955.81 us = 6690.67 us (4.37965 GFLOPS/s)
+MUL_MAT_VEC f16 m=512 n=4 k=65792 batch=8: 7 x 81627.5 us = 571393 us (26.4109 GFLOPS/s)
+MUL_MAT_VEC f16 m=65792 n=4 k=512 batch=8: 7 x 70218.4 us = 491529 us (30.6724 GFLOPS/s)
+MUL_MAT_VEC f16 m=768 n=4 k=256 batch=8: 35 x 588.931 us = 20612.6 us (21.324 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=1024 n=2 k=2560: 8 x 316.444 us = 2531.56 us (33.1297 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=1024 n=4 k=2560: 8 x 227.564 us = 1820.52 us (92.1384 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=10240 n=2 k=2560: 84 x 1938.29 us = 162816 us (54.0874 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=10240 n=4 k=2560: 84 x 1462.95 us = 122888 us (143.323 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2048 n=2 k=2560: 35 x 514.209 us = 17997.3 us (40.776 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2048 n=4 k=2560: 35 x 355.036 us = 12426.3 us (118.114 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=256 n=2 k=2560: 42 x 88.508 us = 3717.37 us (29.612 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=256 n=4 k=2560: 42 x 67.413 us = 2831.39 us (77.7562 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=2 k=10240: 42 x 1801.95 us = 75681.9 us (58.1884 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=2 k=2048: 35 x 429.71 us = 15039.9 us (48.7919 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=2 k=256: 42 x 114.987 us = 4829.46 us (22.7532 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=2 k=4096: 7 x 764.374 us = 5350.62 us (54.8657 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=4 k=10240: 42 x 1279.88 us = 53755 us (163.847 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=4 k=2048: 35 x 363.054 us = 12706.9 us (115.5 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=4 k=256: 42 x 97.866 us = 4110.4 us (53.4671 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=2560 n=4 k=4096: 7 x 392.767 us = 2749.37 us (213.551 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=4096 n=2 k=2560: 7 x 805.624 us = 5639.37 us (52.0526 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=4096 n=4 k=2560: 7 x 610.393 us = 4272.76 us (137.403 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=512 n=2 k=2560: 40 x 185.765 us = 7430.61 us (28.2176 GFLOPS/s)
+MUL_MAT_VEC q4_0 m=512 n=4 k=2560: 40 x 143.8 us = 5752.01 us (72.9047 GFLOPS/s)
+MUL_MAT_VEC q6_K m=262144 n=1 k=2560: 2 x 31580.3 us = 63160.6 us (42.4922 GFLOPS/s)
+PAD: 120 x 36.5 us = 4380.06 us
+RMS_NORM(256,2,2,1): 20 x 24.775 us = 495.51 us
+RMS_NORM(256,2,250,1): 20 x 99.038 us = 1980.77 us
+RMS_NORM(256,2,256,1): 60 x 108.187 us = 6491.27 us
+RMS_NORM(256,2,4,1): 20 x 13.687 us = 273.74 us
+RMS_NORM(512,2,2,1): 4 x 26.327 us = 105.311 us
+RMS_NORM(512,2,250,1): 4 x 115.442 us = 461.769 us
+RMS_NORM(512,2,256,1): 12 x 115.338 us = 1384.06 us
+RMS_NORM(512,2,4,1): 4 x 12.838 us = 51.353 us
+RMS_NORM_MUL RMS_NORM(256,42,2,1): 1 x 230.781 us = 230.781 us
+RMS_NORM_MUL RMS_NORM(256,42,250,1): 1 x 6018.59 us = 6018.59 us
+RMS_NORM_MUL RMS_NORM(256,42,256,1): 3 x 6851.13 us = 20553.4 us
+RMS_NORM_MUL RMS_NORM(256,42,4,1): 1 x 492.239 us = 492.239 us
+RMS_NORM_MUL RMS_NORM(2560,2,1,1): 211 x 39.545 us = 8344.18 us
+RMS_NORM_MUL RMS_NORM(2560,250,1,1): 211 x 279.717 us = 59020.4 us
+RMS_NORM_MUL RMS_NORM(2560,256,1,1): 633 x 289.047 us = 182967 us
+RMS_NORM_MUL RMS_NORM(2560,4,1,1): 211 x 31.729 us = 6694.9 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,2,1): 35 x 68.422 us = 2394.78 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,250,1): 35 x 1280.72 us = 44825.4 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,256,1): 105 x 1366.35 us = 143466 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,4,1): 35 x 53.057 us = 1857.02 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,2,1): 7 x 67.596 us = 473.174 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,250,1): 7 x 1412.46 us = 9887.24 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,256,1): 21 x 1454.07 us = 30535.6 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,4,1): 7 x 53.571 us = 374.997 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,2,1): 20 x 34.624 us = 692.492 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,250,1): 20 x 105.582 us = 2111.66 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,256,1): 60 x 115.233 us = 6914.04 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,4,1): 20 x 21.739 us = 434.782 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,2,1): 4 x 41.64 us = 166.561 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,250,1): 4 x 121.262 us = 485.05 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,256,1): 12 x 124.938 us = 1499.26 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,4,1): 4 x 21.419 us = 85.676 us
+ROPE_VIEW_SET_ROWS ROPE: 144 x 19.479 us = 2804.98 us
+SCALE: 28 x 195.531 us = 5474.88 us
+SET_ROWS: 288 x 62.319 us = 17948 us
+SOFT_MAX: 252 x 7215.98 us = 1.81843e+06 us
+TANH: 2 x 44.14 us = 88.281 us
+Total time: 2.02837e+07 us.

@@ -1,0 +1,83 @@
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -8,6 +8,7 @@
+ #include "ggml.h"
+ #include "unary-ops.h"
+ #include "vec.h"
++#include "fa-f16-f32-mad.h"
+ 
+ #include <algorithm>
+ #include <cfloat>
+@@ -8560,6 +8561,14 @@
+     GGML_ASSERT((                            q_to_vec_dot) && "fattn: unsupported K-type");
+     GGML_ASSERT((v->type == GGML_TYPE_F32 || v_to_float  ) && "fattn: unsupported V-type");
+ 
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    static const bool fused_f16_setting = getenv("GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE") != nullptr;
++    const bool fused_f16_value = fused_f16_setting && !params->use_ref;
++#else
++    const bool fused_f16_value = false;
++#endif
++    const bool use_f16_accumulator = v->type == GGML_TYPE_F16 && !fused_f16_value;
++
+     int ith = params->ith;
+ 
+     for (int ir = ir0; ir < ir1; ++ir) {
+@@ -8579,7 +8588,7 @@
+         ggml_fp16_t * VKQ16 = (ggml_fp16_t *) (VKQ32 + 1*DV); // (temporary) FP16 VKQ accumulator
+         ggml_fp16_t * Q_q   = (ggml_fp16_t *) (VKQ32 + 2*DV); // (temporary) buffer for Q converted to quantized/FP16
+ 
+-        if (v->type == GGML_TYPE_F16) {
++        if (use_f16_accumulator) {
+             memset(VKQ16, 0, DV*sizeof(ggml_fp16_t));
+         } else {
+             memset(VKQ32, 0, DV*sizeof(float));
+@@ -8628,7 +8637,7 @@
+ 
+             const char * v_data = ((const char *) v->data + (ic*nbv1 + iv2*nbv2 + iv3*nbv3));
+ 
+-            if (v->type == GGML_TYPE_F16) {
++            if (use_f16_accumulator) {
+                 if (s > M) {
+                     // s is new maximum, ms < 1.0f, vs == expf(s - s) == 1.0f
+                     M = s;
+@@ -8657,6 +8666,11 @@
+                 }
+ 
+                 // V += v*expf(s - M)
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++                if (fused_f16_value && v->type == GGML_TYPE_F16) {
++                    fa_f16_f32_mad(DV, VKQ32, (const ggml_fp16_t *)v_data, vs);
++                } else
++#endif
+                 if (v_to_float) {
+                     v_to_float(v_data, V32, DV);
+                     ggml_vec_mad_f32(DV, VKQ32, V32, vs);
+@@ -8669,7 +8683,7 @@
+             S = S*ms + vs; // scale and increment sum with partial sum
+         }
+ 
+-        if (v->type == GGML_TYPE_F16) {
++        if (use_f16_accumulator) {
+             for (int64_t d = 0; d < DV; ++d) {
+                 VKQ32[d] = GGML_CPU_FP16_TO_FP32(VKQ16[d]);
+             }
+--- /dev/null
++++ b/ggml/src/ggml-cpu/fa-f16-f32-mad.h
+@@ -0,0 +1,16 @@
++#pragma once
++#include "ggml.h"
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++#include <immintrin.h>
++static inline void fa_f16_f32_mad(int64_t n, float * y, const ggml_fp16_t * x, float weight) {
++    const __m256 w = _mm256_set1_ps(weight);
++    int64_t i = 0;
++    for (; i + 8 <= n; i += 8) {
++        const __m128i h = _mm_loadu_si128((const __m128i *)(x + i));
++        const __m256 v = _mm256_cvtph_ps(h);
++        const __m256 a = _mm256_loadu_ps(y + i);
++        _mm256_storeu_ps(y + i, _mm256_fmadd_ps(v, w, a));
++    }
++    for (; i < n; ++i) y[i] += GGML_FP16_TO_FP32(x[i]) * weight;
++}
++#endif

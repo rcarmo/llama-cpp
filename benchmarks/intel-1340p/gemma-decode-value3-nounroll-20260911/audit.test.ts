@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{audit}from'./audit-results';
+test('independent confirmation is neutral and requests slightly worse; retain B0',()=>{const r=audit(import.meta.dir);expect(r.audit_pass).toBe(true);expect(r.native.cases_per_mode).toBe(21);expect(r.confirmation.rows).toHaveLength(8);expect(r.screen.rows).toHaveLength(4);expect(r.confirmation.gain_pct).toBeCloseTo(0.087652714,7);expect(r.confirmation.wall_reduction_pct).toBeCloseTo(-0.945250398,7);expect(r.restoration.pass).toBe(true);expect(r.decision).toContain('No promotion')});

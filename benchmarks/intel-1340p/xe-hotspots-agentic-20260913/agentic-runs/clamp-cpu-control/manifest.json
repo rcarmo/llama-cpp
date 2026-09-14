@@ -1,0 +1,35 @@
+{
+  "at": "2026-09-13T21:48:36.593Z",
+  "kind": "clamp",
+  "arm": "cpu",
+  "admission": {
+    "at": "2026-09-13T21:48:36.540Z",
+    "expires": "2026-09-13T22:00:36.540Z",
+    "run_id": "clamp-cpu-control",
+    "scope": "Fresh renewed exactID threeway @whisper ADMIT/@go-264 HOLD; one CPU-onlyE4BMTP3 diagnostic600s16GiB16MiBswap6GiBreserve10x512tokens,NO GPU/no services"
+  },
+  "argv": [
+    "/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/build-cpu/bin/agentic-session",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+    "--cpu"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/var/home/agent",
+    "XDG_RUNTIME_DIR": "/run/user/1001",
+    "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/build-cpu/bin:/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime",
+    "GGML_BACKEND_PATH": "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/vulkan/libggml-vulkan.so.0.23.0"
+  },
+  "source_hash": "9fa1080d1c5382a412ceda5c474b5e6fa9fa67dfbf36ba2886892df0d92a2c81",
+  "binary_hash": "85b4e6eae2397cebc2a7f5bf075e785555975c696401d5aad4ebedb547b571a2",
+  "library_hash": "44bc43e1dae25d127dea164323385017df9e5b85fc62e1fa95a17fd402bb6ce0",
+  "test_hash": "79535c76707bb4c689bce64b35fc4fcda9bffd75b3bafe266610a4335a29b9bd",
+  "harness_hashes": {
+    "agentic-runner.ts": "8de0d6a830875fdf306b00dac00e9f43bdb5b10d544fb15cef12789ab5ee3a0e",
+    "agentic-tools.ts": "6c67d591490a26adec60caef71d66fd544013ee7053ee6cb7a829b909a2ecf9c",
+    "agentic-outcome.ts": "c990d0e2971c43505b97a7258316e6c07fdf4686594ab8cd6c9638a92d9eef0b",
+    "launch-agentic.sh": "2882d39cdc44aa3e2785beba3c50a6f685ca507404372e65b24449986ae74f33",
+    "agentic-stop.sh": "1a5841974576e1aad61e0a7fb8686014484ef7133e4c54f8382d9f9e68202ef6"
+  }
+}

@@ -1,0 +1,22 @@
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -8904,7 +8904,9 @@
+                 }
+             }
+             memset(KQ, 0, Q_TILE_SZ * KV_TILE_SZ * sizeof(float));
+-            simd_gemm(KQ, (const float *)Q_q, K_f32, Q_TILE_SZ, DK, KV_TILE_SZ);
++            static const bool active_query_rows = getenv("GGML_CPU_EXPERIMENTAL_FA_ACTIVE_ROWS") != nullptr;
++            const int gemm_rows = active_query_rows ? static_cast<int>(tile_rows) : Q_TILE_SZ;
++            simd_gemm(KQ, (const float *)Q_q, K_f32, gemm_rows, DK, KV_TILE_SZ);
+             ggml_vec_scale_f32(Q_TILE_SZ * KV_TILE_SZ, KQ, scale);
+ 
+             // Set padded KQ entries to -inf so softmax gives them zero weight
+@@ -8967,7 +8969,7 @@
+                     memset(KQ + tq * KV_TILE_SZ, 0, KV_TILE_SZ * sizeof(float));
+                 }
+             }
+-            simd_gemm(VKQ32, KQ, V32, Q_TILE_SZ, KV_TILE_SZ, DV);
++            simd_gemm(VKQ32, KQ, V32, gemm_rows, KV_TILE_SZ, DV);
+         }
+ 
+         // sinks (apply only to valid rows in the tile)

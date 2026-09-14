@@ -1,0 +1,8 @@
+/** SCRIPT_JDOC:
+{"summary":"Native CPU flash-attention controls with masked32K/64K query shapes for fused accumulator","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root}from'./campaign';import{openSync}from'node:fs';
+const t=new Trial('cpu-fa-native-standalone',{maintenance:true});const results:any[]=[];
+try{await t.begin();for(const mode of ['default','fused']){await t.check();const fd=openSync(t.dir+'/'+mode+'.log','a');const env={...process.env,LD_LIBRARY_PATH:root+'/runtime-cpu/bin:'+root+'/runtime-cpu/runtime'};delete env.GGML_CPU_EXPERIMENTAL_FA_F32_VALUE;delete env.GGML_CPU_EXPERIMENTAL_FA_SMALL_QUERY;delete env.GGML_CPU_EXPERIMENTAL_FA_ACTIVE_ROWS;delete env.GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE;if(mode==='fused')env.GGML_CPU_EXPERIMENTAL_FA_FUSED_VALUE='1';
+ const p=Bun.spawn(['/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/test-backend-ops','test','-b','CPU','-o','FLASH_ATTN_EXT','--test-file',root+'/attention-cases.txt','-j','1','-t','8'],{stdout:fd,stderr:fd,env});t.servers.push({p,fd,device:'kernel'});const timer=setTimeout(()=>{t.error='Kernel timeout';p.kill('SIGTERM')},180000);const rc=await p.exited;clearTimeout(timer);results.push({mode,rc});await t.stop('kernel');if(t.error)throw Error(t.error);if(rc!==0&&rc!==1)throw Error('Unexpected native test exit'+rc)}
+}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish({ok:!t.error,results,scope:'Completed diagnostic only; check per-case errors/pass and unchanged reference. Random masked32K/64K FA vs CPU reference, not broad model quality.'});if(!r.ok)process.exitCode=1}

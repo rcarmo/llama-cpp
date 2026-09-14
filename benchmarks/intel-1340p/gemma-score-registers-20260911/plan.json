@@ -1,0 +1,11 @@
+{
+ "authorised_at":"2026-09-11T13:55:44.523Z",
+ "baseline":"B0-score3 / 20260911-score3-stopped",
+ "restore_target":"20260911-score3-stopped",
+ "hypothesis":"Fixed-register AVX2 assembly eliminates compiler inner-loop accumulator spills observed in score3. Twelve accumulators+threeA+oneB exactly occupy16YMMregisters. FMA/reduction order,3x4tile,48rowjobs andfallbacktails unchanged. No-inline helper adds call/store overhead; net benefit must be measured.",
+ "scope":"One new score candidate, longF16k512/n4/m>=32768 underexistingeligibility, x86_64 AVX2/F16C/FMA only. No value/Q4/thread/MTP/FA retest.",
+ "gates":"Strictnumericcaseparser;native unchangedtolerance, legal scoretails/strides/headbroadcast/reference andbelowgate controls. Standalone asm helper canaries and bit-exact comparison against sameFMA-order intrinsics. Inspect actual loop disassembly:7conversions12FMAs,no stackreads/writes,12YMMaccumulators. Realmodeltrace before timing.",
+ "budget":"Build/native10minmax supervised; probe3min;4runABBA saved64K/128 output. Independent8runconfirmation only useful screen, then scopedqualification/sustained/short/quality/state gates. No arbitrary3%minimum or repeatedlosers.",
+ "controls":"Samecandidatebinaryflag0/1, B0smallbatch/ATTN4/score3 remain1;CPU8/prefill16/draft8/16MTP3,F16FAoff,1024/256,two131072slots,cacheRAM0. Frozen64658cache25eval128gen/seed42,temp0,topk1,90of110draft diagnostic.",
+ "safety":"Sequentialheavywork; explicitstoppedspeech failclosed,6GiBreserve/16MiBworkerswap,95Cannotation. Onlyverifiedownedtrialchildren cleanup andautomaticcurrentB0restore. No productionfaults or implicitdeployment."
+}

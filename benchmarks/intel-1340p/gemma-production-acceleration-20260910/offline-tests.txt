@@ -1,0 +1,32 @@
+bun test v1.4.1 (4661e494f)
+
+projects/llama-cpp/tools/gemma-hybrid/state.test.ts:
+(pass) validated subset emits v2 with byte-identical payload [137.43ms]
+(pass) rejects mismatched version and stream layout [22.63ms]
+(pass) rejects truncated and trailing content [95.71ms]
+(pass) rejects unexpected cell extension/schema and never overwrites source [58.99ms]
+(pass) unwraps newer text-only token envelope; rejects media [189.09ms]
+
+projects/llama-cpp/tools/gemma-hybrid/proxy.test.ts:
+(pass) cold text prefill excludes final token; warm continuation stays CPU [3.65ms]
+(pass) GPU failure before decode cleans slot and uses CPU without duplicate output [0.80ms]
+(pass) above64K and multimodal prompts bypass GPU [2.38ms]
+(pass) SSE bytes are forwarded and gate remains held until stream finishes [3.16ms]
+(pass) request disconnect cancels unconsumed upstream stream [5.48ms]
+(pass) cancelled stream invalidates its slot and releases after drain [0.42ms]
+(pass) mutating slot and configuration routes are not forwarded [0.09ms]
+(pass) two prefix owners stay independent and evict least recent [0.09ms]
+(pass) queue bounded and cancelled waiter does not release active owner [0.08ms]
+(pass) oversized body rejected without GPU work [1.21ms]
+
+projects/llama-cpp/tools/gemma-hybrid/stream.test.ts:
+(pass) chunked SSE validates native handoff timings and completion [0.07ms]
+(pass) SSE mismatch and missing completion rejected [0.05ms]
+(pass) native completion terminates with stop=true instead of OpenAI DONE [0.05ms]
+(pass) native signal termination is not a live process [0.04ms]
+(pass) converter uses the validated parsed token count [0.03ms]
+
+ 20 pass
+ 0 fail
+ 58 expect() calls
+Ran 20 tests across 3 files. [852.00ms]

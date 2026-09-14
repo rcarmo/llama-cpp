@@ -1,0 +1,28 @@
+bun test v1.4.1 (4661e494f)
+
+projects/llama-cpp/benchmarks/intel-1340p/gemma-optimization-t01-d01-20260911/preflight.test.ts:
+(pass) resources fail closed on missing counters, reserve and worker swap [0.62ms]
+(pass) numeric native cases have exact count, matrix dimensions and EOF [1.86ms]
+(pass) retained locks are never silently stolen; owned cleanup works [1.37ms]
+
+projects/llama-cpp/benchmarks/intel-1340p/gemma-optimization-t01-d01-20260911/profile.test.ts:
+(pass) B0profile is exact work and reconciled non-overflowing diagnostic evidence [22.44ms]
+
+projects/llama-cpp/benchmarks/intel-1340p/gemma-optimization-t01-d01-20260911/guard-safety.test.ts:
+(pass) guard aborts work before TERM and escalates only owned handles [5.75ms]
+(pass) already signal-killed workers are not signalled again [0.09ms]
+(pass) native child ignoring TERM is killed promptly without inference [37.87ms]
+
+projects/llama-cpp/benchmarks/intel-1340p/gemma-optimization-t01-d01-20260911/speech.test.ts:
+(pass) explicit stopped mode accepts two inactive units and no sockets/native, without HTTP [1.08ms]
+(pass) active mode still requires available terminal job metadata [0.48ms]
+(pass) stopped mode rejects reactivation, missing/failed units and nonzero PID [0.38ms]
+(pass) stopped mode rejects listeners, connections, native work and command failure [0.59ms]
+(pass) stopped unit parsing rejects malformed/duplicate blocks and permits order swap [0.47ms]
+(pass) established sockets reject even with no listeners [0.16ms]
+
+ 13 pass
+ 0 fail
+ 49 expect() calls
+Ran 13 tests across 4 files. [88.00ms]
+PASS B0 frozen inputs metadata, guards, saved profile and current restoration evidence

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+root=/var/home/agent/workspace/reports/xe-in-memory-perf-20260913
+export XDG_RUNTIME_DIR=/run/user/1001 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus
+orders=(share copy copy share copy share share copy)
+first=${1:?first index};last=${2:?last index}
+for ((i=first;i<=last;i++)); do
+  unit="xe-perf-r$i"
+  systemd-run --user --wait --collect --unit="$unit" --property=RuntimeMaxSec=180 --property=TimeoutStopSec=3 --property=KillMode=control-group --property=MemoryMax=16G --property=MemorySwapMax=16M --property=TasksMax=256 --working-directory=/var/home/agent/workspace /usr/bin/env -i PATH=/usr/bin:/bin HOME="$HOME" XDG_RUNTIME_DIR=/run/user/1001 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1001/bus /opt/piclaw/current/bun/bin/bun "$root/run.ts" "r$i" "${orders[$i]}" > "$root/evidence/unit-r$i.log" 2>&1
+  tail -6 "$root/evidence/unit-r$i.log"
+  sleep 3
+done

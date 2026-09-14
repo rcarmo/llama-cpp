@@ -1,0 +1,11 @@
+# Q6 two-query candidate screen
+
+Hypothesis: one Q6_K weight-block unpack and scale-vector construction can serve two Q8_K query columns, reducing repeat work in the measured width4 output projection. Preserve each output's integer accumulation, correction, FMA and horizontal-reduction order. The original AVX2 vec_dot remains the reference and production path.
+
+Report-only candidate `q6-pair.cpp`; harness `q6-native.cpp`. First gate:20 deterministic vector cases across lengths256,512,768,2560,10240 and four input families (zero, sine, mixed-sign PRNG and mixed magnitudes), output-stride canaries, finite values and exact reference bits. Then4096 weight rows x4 query columns at actual k2560, exact whole-matrix comparison. This smaller screening weight matrix is about6% of the full262144-row output projection; its timing cannot establish full-projection performance.
+
+Build only under fresh <=60s/1CPU/1GiB admission. Native screen requires a separate fresh CPU8thread/90s/1GiB window with the same monitor as Q4 (quota/throttle/memory/swap/reserve/placement). No models/GPU/services or public API change. Inspect disassembly for stack spills and repeated fp16 helper calls before deciding on another candidate. Keep unsuccessful results.
+
+If exact arithmetic passes and a benefit is plausible, validate the full projection shape in a <=1GiB prepared-quantised fixture (avoid an unnecessary multi-GiB float source allocation), then test an explicit narrow CPU dispatch route plus end-to-end MTP/logit/task behaviour. No vocabulary pruning, approximate softcap or relaxed tests. Small gains are retained, but integration needs evidence at the actual workload/thread count.
+
+Current status: source compiled successfully in the admitted build-only window; corrected caller now passes20 vector cases and4096-row matrix exactness; reduced-row8-thread screen shows-12.90% across8/8pairs. Fullprojection/model remains unqualified. Initial assembly has a0x178-byte stack frame and an out-of-line fp16 conversion call inside the block loop, causing accumulator spills. Preserve this first candidate as the baseline for a possible F16C-inline supplement; do not hide its cost. Independent read-only review timed out90s; it is not a review pass.

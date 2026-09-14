@@ -1,0 +1,11 @@
+# Query-reuse source and ownership
+
+The candidate keeps the existing GGML F32-to-F16 query conversion and its worker barrier. F16-key/F32-query direct llamafile dispatch is not supported on this AVX2 branch; the generic matmul code prepares F16 `wdata`, then retries per-head SGEMM with F16 queries. The existing reference bypass, n4 and long-k512 gates remain intact.
+
+Each native worker expands four already-rounded F16 query rows into `alignas(64) float query[2048]` once on entry to one head call. Its local scratch remains valid until the existing score3 final barrier returns. No pointer is retained; each subsequent call overwrites all2048 elements. Packed scratch has ldb512 elements independently of the source stride. Eight workers consume at most64KiB of scratch concurrently; this deliberately duplicates small preparation work instead of adding a shared producer barrier.
+
+The prepared `tinyBLAS` instantiation changes TB from F16 to F32 and reuses the parent's3x4/48-row job loop,1/2-row tails and FMA order. Its unrolled2 inner score loop contains6 F16 key conversions,8 F32 query loads and24 FMAs. Query expansion has256 vector conversions per worker/head call; it is outside the key jobs. Actual64K probe:16576 balanced worker enters/exits,2072 calls per worker,2072 head groups;8KiB per worker and64KiB maximum team scratch. These are diagnostics, not physical DRAM measurements or throughput claims.
+
+Read-only delegated review identified uniform barrier participation, byte-versus-element strides and stack lifetime as the correctness requirements. The implementation preserves uniform process flag/shape selection, passes packedldb512 and returns only after all existing barriers. Standalone tests use exact extracted preparation and parent tile loops, with18 changed-query rounds across parallel groups and scratch/output canaries.
+
+Two source-generator replacements initially rejected mismatched indentation/text before any build. The exact matched source was then read and corrected. No native/benchmark result was accepted from those authoring failures. Prior assembly/tile/packedQ4 losses remain separate experiments; this candidate is based on deployed B0, not those losing branches.

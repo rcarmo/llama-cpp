@@ -1,0 +1,28 @@
+0.00.033.527 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.033.619 I srv          init: The UI is disabled
+0.00.033.619 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.033.660 W srv  llama_server: -----------------
+0.00.033.660 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.033.660 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.033.660 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.033.661 W srv  llama_server: -----------------
+0.00.034.877 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.01.110.038 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.110.581 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.142.210 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.02.023.476 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.02.497.249 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.02.554.349 I cmn          init: llama threadpool init, n_threads = 8
+0.02.554.396 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.03.289.966 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 73728, kv_unified = 'false'
+0.03.298.581 I srv  llama_server: model loaded
+0.03.298.587 I srv  llama_server: listening on http://127.0.0.1:18791
+0.04.555.890 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.04.555.993 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.13.916.293 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1018, progress = 1.00, t =   9.36 s / 108.76 tokens per second
+0.21.085.304 I slot print_timing: id  0 | task 1 | prompt eval time =   16529.26 ms /  1022 tokens (   16.17 ms per token,    61.83 tokens per second)
+0.21.085.309 I slot print_timing: id  0 | task 1 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+0.21.085.309 I slot print_timing: id  0 | task 1 |       total time =   16529.26 ms /  1023 tokens
+0.21.085.311 I slot print_timing: id  0 | task 1 |    graphs reused =          0
+0.21.085.852 I slot      release: id  0 | task 1 | stop processing: n_tokens = 17406, truncated = 0
+0.27.010.169 I srv    operator(): operator(): cleaning up before exit...

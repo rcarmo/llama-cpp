@@ -1,0 +1,198 @@
+{
+  "ok": true,
+  "mode": 0,
+  "cache_loss": false,
+  "append": {
+    "cache_n": 64684,
+    "prompt_n": 15,
+    "prompt_ms": 1262.488,
+    "prompt_per_token_ms": 84.16586666666667,
+    "prompt_per_second": 11.881301049990178,
+    "predicted_n": 7,
+    "predicted_ms": 765.896,
+    "predicted_per_token_ms": 109.41371428571428,
+    "predicted_per_second": 9.139622089683195,
+    "draft_n": 6,
+    "draft_n_accepted": 5
+  },
+  "answer": "MAPLE-726",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-b1-release-20260911/runtime-repair",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "0",
+      "LLAMA_EXPERIMENTAL_CPU_SWA_SAVE_PADDING": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 674.7767170000006,
+      "package_j": 10.08341,
+      "timings": {
+        "restore_ms": 643.846
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "recall",
+      "device": "cpu",
+      "wall_ms": 2654.8035709999995,
+      "package_j": 86.85018,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 224.964,
+        "prompt_per_token_ms": 224.964,
+        "prompt_per_second": 4.445155669351541,
+        "predicted_n": 21,
+        "predicted_ms": 2305.762,
+        "predicted_per_token_ms": 109.79819047619048,
+        "predicted_per_second": 9.107618219052963,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 21,
+        "prompt_tokens": 64663,
+        "total_tokens": 64684,
+        "prompt_tokens_details": {
+          "cached_tokens": 64662
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "save",
+      "device": "cpu",
+      "wall_ms": 448.5861789999999,
+      "package_j": 7.258344,
+      "timings": {
+        "save_ms": 447.667
+      },
+      "n_written": 1092202780,
+      "token_hash": null
+    },
+    {
+      "label": "self-restore",
+      "device": "cpu",
+      "wall_ms": 284.6162750000003,
+      "package_j": 4.107412,
+      "timings": {
+        "restore_ms": 283.794
+      },
+      "n_read": 1092202780,
+      "token_hash": null
+    },
+    {
+      "label": "tool-call",
+      "device": "cpu",
+      "wall_ms": 2341.1767439999985,
+      "package_j": 87.576008,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 96,
+        "prompt_ms": 1634.061,
+        "prompt_per_token_ms": 17.02146875,
+        "prompt_per_second": 58.749336775065316,
+        "predicted_n": 18,
+        "predicted_ms": 696.848,
+        "predicted_per_token_ms": 38.71377777777778,
+        "predicted_per_second": 25.830597203407343,
+        "draft_n": 15,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 18,
+        "prompt_tokens": 96,
+        "total_tokens": 114,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-answer",
+      "device": "cpu",
+      "wall_ms": 1118.012863,
+      "package_j": 41.699539,
+      "timings": {
+        "cache_n": 91,
+        "prompt_n": 48,
+        "prompt_ms": 971.749,
+        "prompt_per_token_ms": 20.244770833333334,
+        "prompt_per_second": 49.395471464339046,
+        "predicted_n": 3,
+        "predicted_ms": 138.832,
+        "predicted_per_token_ms": 46.27733333333333,
+        "predicted_per_second": 21.608850985363606,
+        "draft_n": 3,
+        "draft_n_accepted": 3
+      },
+      "usage": {
+        "completion_tokens": 3,
+        "prompt_tokens": 139,
+        "total_tokens": 142,
+        "prompt_tokens_details": {
+          "cached_tokens": 91
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "long-append",
+      "device": "cpu",
+      "wall_ms": 2182.9068389999975,
+      "package_j": 72.684384,
+      "timings": {
+        "cache_n": 64684,
+        "prompt_n": 15,
+        "prompt_ms": 1262.488,
+        "prompt_per_token_ms": 84.16586666666667,
+        "prompt_per_second": 11.881301049990178,
+        "predicted_n": 7,
+        "predicted_ms": 765.896,
+        "predicted_per_token_ms": 109.41371428571428,
+        "predicted_per_second": 9.139622089683195,
+        "draft_n": 6,
+        "draft_n_accepted": 5
+      },
+      "usage": {
+        "completion_tokens": 7,
+        "prompt_tokens": 64699,
+        "total_tokens": 64706,
+        "prompt_tokens_details": {
+          "cached_tokens": 64684
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 70,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11990189,
+    "peak_trial_rss_kib": 11993532,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24179388,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:52:35.573Z"
+}

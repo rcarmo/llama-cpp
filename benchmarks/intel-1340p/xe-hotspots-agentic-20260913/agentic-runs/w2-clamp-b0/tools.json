@@ -1,0 +1,78 @@
+[
+  {
+    "name": "read_file",
+    "args": {
+      "path": "src/main.ts"
+    },
+    "result": {
+      "content": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}\n"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "visible.test.ts"
+    },
+    "result": {
+      "content": "import{test,expect}from'bun:test';import{clamp}from'./src/main';test('contract',()=>{expect(clamp(5,1,10)).toBe(5);expect(clamp(-2,1,10)).toBe(1);expect(clamp(15,1,10)).toBe(10);expect(clamp(5,10,1)).toBe(5);});\n"
+    }
+  },
+  {
+    "name": "write_file",
+    "args": {
+      "content": "export function clamp(value:number,lo:number,hi:number){const min = Math.min(lo, hi);const max = Math.max(lo, hi);return Math.min(max, Math.max(min, value));}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  },
+  {
+    "name": "run_tests",
+    "args": {},
+    "result": {
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) contract [0.16ms]\n\n 1 pass\n 0 fail\n 4 expect() calls\nRan 1 test across 1 file. [4.00ms]\n"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "src/main.ts"
+    },
+    "result": {
+      "content": "export function clamp(value:number,lo:number,hi:number){const min = Math.min(lo, hi);const max = Math.max(lo, hi);return Math.min(max, Math.max(min, value));}"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "visible.test.ts"
+    },
+    "result": {
+      "content": "import{test,expect}from'bun:test';import{clamp}from'./src/main';test('contract',()=>{expect(clamp(5,1,10)).toBe(5);expect(clamp(-2,1,10)).toBe(1);expect(clamp(15,1,10)).toBe(10);expect(clamp(5,10,1)).toBe(5);});\n"
+    }
+  },
+  {
+    "name": "write_file",
+    "args": {
+      "content": "export function clamp(value:number,lo:number,hi:number){if (isNaN(value) || isNaN(lo) || isNaN(hi)) {throw new RangeError('NaN argument provided to clamp');}const min = Math.min(lo, hi);const max = Math.max(lo, hi);return Math.min(max, Math.max(min, value));}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  },
+  {
+    "name": "run_tests",
+    "args": {},
+    "result": {
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) contract [0.19ms]\n\n 1 pass\n 0 fail\n 4 expect() calls\nRan 1 test across 1 file. [5.00ms]\n"
+    }
+  }
+]

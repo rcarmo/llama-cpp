@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "split": 4,
+  "ubatch": 256,
+  "rows": [
+    {
+      "rep": 0,
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29692.449,
+        "prompt_per_token_ms": 29.053276908023484,
+        "prompt_per_second": 34.4195253143316,
+        "predicted_n": 21,
+        "predicted_ms": 6471.221,
+        "predicted_per_token_ms": 323.56104999999997,
+        "predicted_per_second": 3.0906068576548384
+      }
+    }
+  ],
+  "limits": "One request in ABBA/BAAB block, saved64K state reused; native answer and cache checked. Does not measure full fresh prefill.",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 256,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/runtime-splitk",
+    "preserveSwaPadding": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_SPLIT_K": "4"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "vulkan",
+      "wall_ms": 546.0754140000008,
+      "package_j": 7.838481,
+      "timings": {
+        "restore_ms": 517.195
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-0",
+      "device": "vulkan",
+      "wall_ms": 36199.780770000005,
+      "package_j": 928.597171,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29692.449,
+        "prompt_per_token_ms": 29.053276908023484,
+        "prompt_per_second": 34.4195253143316,
+        "predicted_n": 21,
+        "predicted_ms": 6471.221,
+        "predicted_per_token_ms": 323.56104999999997,
+        "predicted_per_second": 3.0906068576548384
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 90,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5240564,
+    "peak_trial_rss_kib": 5244104,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23685424,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T18:22:02.621Z"
+}

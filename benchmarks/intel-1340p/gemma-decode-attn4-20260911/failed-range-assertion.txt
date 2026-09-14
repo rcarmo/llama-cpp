@@ -1,0 +1,27 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-decode-attn4-20260911/dispatch.test.ts:
+(pass) attention4 gates exclude reference, tails and other shapes [0.18ms]
+(pass) one querytile and eight two-row blocks exactly cover each sixteen-row job [5.00ms]
+
+reports/gemma-decode-attn4-20260911/audit.test.ts:
+ 6 |  const r=audit(import.meta.dir);
+ 7 |  expect(r.audit_pass).toBe(true);
+ 8 |  expect(r.rows.map(x=>x.mode)).toEqual([0,1,1,0,1,0,0,1]);
+ 9 |  expect(r.decode_gain_pct).toBeCloseTo(2.903504689,7);
+10 |  expect(r.request_reduction_pct).toBeCloseTo(2.467564861,7);
+11 |  expect(r.all_candidates_faster).toBe(true);
+                                      ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/var/home/agent/workspace/reports/gemma-decode-attn4-20260911/audit.test.ts:11:34)
+(fail) eight saved runs isolate the four-query tile and preserve measured work [19.03ms]
+(pass) promotion has live identity, tool/cache and continuous resource evidence; first failure retained [0.47ms]
+
+ 3 pass
+ 1 fail
+ 28 expect() calls
+Ran 4 tests across 2 files. [443.00ms]

@@ -1,0 +1,923 @@
+00000000000f56e0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)>:
+   f56e0:	55                   	push   %rbp
+   f56e1:	48 89 e5             	mov    %rsp,%rbp
+   f56e4:	41 57                	push   %r15
+   f56e6:	41 56                	push   %r14
+   f56e8:	41 55                	push   %r13
+   f56ea:	41 54                	push   %r12
+   f56ec:	53                   	push   %rbx
+   f56ed:	48 83 e4 e0          	and    $0xffffffffffffffe0,%rsp
+   f56f1:	48 81 ec 40 02 00 00 	sub    $0x240,%rsp
+   f56f8:	48 89 74 24 10       	mov    %rsi,0x10(%rsp)
+   f56fd:	49 89 fc             	mov    %rdi,%r12
+   f5700:	0f b6 05 01 c0 0e 00 	movzbl 0xec001(%rip),%eax        # 1e1708 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f5707:	84 c0                	test   %al,%al
+   f5709:	48 89 7c 24 20       	mov    %rdi,0x20(%rsp)
+   f570e:	0f 84 f8 0f 00 00    	je     f670c <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x102c>
+   f5714:	49 8b 1c 24          	mov    (%r12),%rbx
+   f5718:	80 3d e1 bf 0e 00 01 	cmpb   $0x1,0xebfe1(%rip)        # 1e1700 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f571f:	75 7b                	jne    f579c <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xbc>
+   f5721:	83 3b 00             	cmpl   $0x0,(%rbx)
+   f5724:	74 21                	je     f5747 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x67>
+   f5726:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
+   f572b:	48 8d 50 2f          	lea    0x2f(%rax),%rdx
+   f572f:	48 b8 ab aa aa aa aa 	movabs $0xaaaaaaaaaaaaaaab,%rax
+   f5736:	aa aa aa 
+   f5739:	c4 62 8b f6 f0       	mulx   %rax,%r14,%r14
+   f573e:	49 c1 ee 05          	shr    $0x5,%r14
+   f5742:	e9 86 00 00 00       	jmp    f57cd <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xed>
+   f5747:	48 8d 3d 7e 1d 04 00 	lea    0x41d7e(%rip),%rdi        # 1374cc <kvalues_fp4+0x56dc>
+   f574e:	e8 fd bb f0 ff       	call   1350 <getenv@plt>
+   f5753:	48 85 c0             	test   %rax,%rax
+   f5756:	75 1e                	jne    f5776 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x96>
+   f5758:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
+   f575d:	48 8d 50 2f          	lea    0x2f(%rax),%rdx
+   f5761:	48 b8 ab aa aa aa aa 	movabs $0xaaaaaaaaaaaaaaab,%rax
+   f5768:	aa aa aa 
+   f576b:	c4 62 8b f6 f0       	mulx   %rax,%r14,%r14
+   f5770:	49 c1 ee 05          	shr    $0x5,%r14
+   f5774:	eb 47                	jmp    f57bd <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xdd>
+   f5776:	48 8b 05 0b 28 06 00 	mov    0x6280b(%rip),%rax        # 157f88 <stderr@GLIBC_2.2.5>
+   f577d:	48 8b 38             	mov    (%rax),%rdi
+   f5780:	49 8b 4c 24 20       	mov    0x20(%r12),%rcx
+   f5785:	48 8d 35 5d 1d 04 00 	lea    0x41d5d(%rip),%rsi        # 1374e9 <kvalues_fp4+0x56f9>
+   f578c:	48 8b 54 24 10       	mov    0x10(%rsp),%rdx
+   f5791:	31 c0                	xor    %eax,%eax
+   f5793:	e8 b8 be f0 ff       	call   1650 <fprintf@plt>
+   f5798:	49 8b 1c 24          	mov    (%r12),%rbx
+   f579c:	48 8b 44 24 10       	mov    0x10(%rsp),%rax
+   f57a1:	48 8d 50 2f          	lea    0x2f(%rax),%rdx
+   f57a5:	48 b8 ab aa aa aa aa 	movabs $0xaaaaaaaaaaaaaaab,%rax
+   f57ac:	aa aa aa 
+   f57af:	c4 62 8b f6 f0       	mulx   %rax,%r14,%r14
+   f57b4:	49 c1 ee 05          	shr    $0x5,%r14
+   f57b8:	83 3b 00             	cmpl   $0x0,(%rbx)
+   f57bb:	75 10                	jne    f57cd <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xed>
+   f57bd:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   f57c1:	8b 73 04             	mov    0x4(%rbx),%esi
+   f57c4:	e8 b7 bf f0 ff       	call   1780 <ggml_threadpool_chunk_set@plt>
+   f57c9:	49 8b 1c 24          	mov    (%r12),%rbx
+   f57cd:	48 8b 7b 18          	mov    0x18(%rbx),%rdi
+   f57d1:	e8 ca aa f0 ff       	call   2a0 <ggml_barrier@plt>
+   f57d6:	49 8b 0c 24          	mov    (%r12),%rcx
+   f57da:	48 63 01             	movslq (%rcx),%rax
+   f57dd:	49 39 c6             	cmp    %rax,%r14
+   f57e0:	0f 8e 0e 0f 00 00    	jle    f66f4 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x1014>
+   f57e6:	4c 89 74 24 60       	mov    %r14,0x60(%rsp)
+   f57eb:	e9 28 01 00 00       	jmp    f5918 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x238>
+   f57f0:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f57f4:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f57f8:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f57fc:	c5 d0 57 ed          	vxorps %xmm5,%xmm5,%xmm5
+   f5800:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f5804:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f5808:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f580c:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f5810:	49 8b 54 24 18       	mov    0x18(%r12),%rdx
+   f5815:	49 8b 44 24 38       	mov    0x38(%r12),%rax
+   f581a:	c4 c3 7d 19 f8 01    	vextractf128 $0x1,%ymm7,%xmm8
+   f5820:	c5 b8 58 ff          	vaddps %xmm7,%xmm8,%xmm7
+   f5824:	c5 41 c6 c7 01       	vshufpd $0x1,%xmm7,%xmm7,%xmm8
+   f5829:	c5 b8 58 ff          	vaddps %xmm7,%xmm8,%xmm7
+   f582d:	c4 c3 7d 19 f0 01    	vextractf128 $0x1,%ymm6,%xmm8
+   f5833:	c5 b8 58 f6          	vaddps %xmm6,%xmm8,%xmm6
+   f5837:	c5 49 c6 c6 01       	vshufpd $0x1,%xmm6,%xmm6,%xmm8
+   f583c:	c5 b8 58 f6          	vaddps %xmm6,%xmm8,%xmm6
+   f5840:	c5 c3 7c f6          	vhaddps %xmm6,%xmm7,%xmm6
+   f5844:	4a 8d 0c ba          	lea    (%rdx,%r15,4),%rcx
+   f5848:	c5 c8 c6 f6 e8       	vshufps $0xe8,%xmm6,%xmm6,%xmm6
+   f584d:	c4 a1 78 13 34 ba    	vmovlps %xmm6,(%rdx,%r15,4)
+   f5853:	c4 e3 7d 19 ee 01    	vextractf128 $0x1,%ymm5,%xmm6
+   f5859:	c5 c8 58 ed          	vaddps %xmm5,%xmm6,%xmm5
+   f585d:	c5 d1 c6 f5 01       	vshufpd $0x1,%xmm5,%xmm5,%xmm6
+   f5862:	c5 d0 58 ee          	vaddps %xmm6,%xmm5,%xmm5
+   f5866:	c4 e3 7d 19 e6 01    	vextractf128 $0x1,%ymm4,%xmm6
+   f586c:	c5 c8 58 e4          	vaddps %xmm4,%xmm6,%xmm4
+   f5870:	c5 d9 c6 f4 01       	vshufpd $0x1,%xmm4,%xmm4,%xmm6
+   f5875:	c5 d8 58 e6          	vaddps %xmm6,%xmm4,%xmm4
+   f5879:	c5 d3 7c e4          	vhaddps %xmm4,%xmm5,%xmm4
+   f587d:	c5 d8 c6 e4 e8       	vshufps $0xe8,%xmm4,%xmm4,%xmm4
+   f5882:	c5 f8 13 24 81       	vmovlps %xmm4,(%rcx,%rax,4)
+   f5887:	c4 e3 7d 19 d4 01    	vextractf128 $0x1,%ymm2,%xmm4
+   f588d:	c5 d8 58 d2          	vaddps %xmm2,%xmm4,%xmm2
+   f5891:	c5 e9 c6 e2 01       	vshufpd $0x1,%xmm2,%xmm2,%xmm4
+   f5896:	c5 e8 58 d4          	vaddps %xmm4,%xmm2,%xmm2
+   f589a:	c4 e3 7d 19 c4 01    	vextractf128 $0x1,%ymm0,%xmm4
+   f58a0:	c5 d8 58 c0          	vaddps %xmm0,%xmm4,%xmm0
+   f58a4:	c5 f9 c6 e0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm4
+   f58a9:	c5 f8 58 c4          	vaddps %xmm4,%xmm0,%xmm0
+   f58ad:	c5 eb 7c c0          	vhaddps %xmm0,%xmm2,%xmm0
+   f58b1:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f58b6:	c5 f8 13 04 c1       	vmovlps %xmm0,(%rcx,%rax,8)
+   f58bb:	48 8d 04 40          	lea    (%rax,%rax,2),%rax
+   f58bf:	c4 e3 7d 19 d8 01    	vextractf128 $0x1,%ymm3,%xmm0
+   f58c5:	c5 f8 58 c3          	vaddps %xmm3,%xmm0,%xmm0
+   f58c9:	c5 f9 c6 d0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm2
+   f58ce:	c5 f8 58 c2          	vaddps %xmm2,%xmm0,%xmm0
+   f58d2:	c4 e3 7d 19 ca 01    	vextractf128 $0x1,%ymm1,%xmm2
+   f58d8:	c5 e8 58 c9          	vaddps %xmm1,%xmm2,%xmm1
+   f58dc:	c5 f1 c6 d1 01       	vshufpd $0x1,%xmm1,%xmm1,%xmm2
+   f58e1:	c5 f0 58 ca          	vaddps %xmm2,%xmm1,%xmm1
+   f58e5:	c5 fb 7c c1          	vhaddps %xmm1,%xmm0,%xmm0
+   f58e9:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f58ee:	c5 f8 13 04 81       	vmovlps %xmm0,(%rcx,%rax,4)
+   f58f3:	49 8b 04 24          	mov    (%r12),%rax
+   f58f7:	48 8b 78 18          	mov    0x18(%rax),%rdi
+   f58fb:	be 01 00 00 00       	mov    $0x1,%esi
+   f5900:	c5 f8 77             	vzeroupper
+   f5903:	e8 68 ae f0 ff       	call   770 <ggml_threadpool_chunk_add@plt>
+   f5908:	48 98                	cltq
+   f590a:	4c 8b 74 24 60       	mov    0x60(%rsp),%r14
+   f590f:	49 39 c6             	cmp    %rax,%r14
+   f5912:	0f 8e d8 0d 00 00    	jle    f66f0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x1010>
+   f5918:	48 89 c1             	mov    %rax,%rcx
+   f591b:	48 c1 e1 04          	shl    $0x4,%rcx
+   f591f:	4c 8d 1c 49          	lea    (%rcx,%rcx,2),%r11
+   f5923:	48 8d 34 49          	lea    (%rcx,%rcx,2),%rsi
+   f5927:	48 83 c6 30          	add    $0x30,%rsi
+   f592b:	48 8b 54 24 10       	mov    0x10(%rsp),%rdx
+   f5930:	48 39 d6             	cmp    %rdx,%rsi
+   f5933:	48 0f 4d f2          	cmovge %rdx,%rsi
+   f5937:	48 8d 0c 49          	lea    (%rcx,%rcx,2),%rcx
+   f593b:	48 83 c1 03          	add    $0x3,%rcx
+   f593f:	48 89 74 24 30       	mov    %rsi,0x30(%rsp)
+   f5944:	48 39 f1             	cmp    %rsi,%rcx
+   f5947:	0f 8e a3 01 00 00    	jle    f5af0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x410>
+   f594d:	4d 89 df             	mov    %r11,%r15
+   f5950:	48 8b 4c 24 30       	mov    0x30(%rsp),%rcx
+   f5955:	4c 29 f9             	sub    %r15,%rcx
+   f5958:	48 83 f9 01          	cmp    $0x1,%rcx
+   f595c:	0f 84 4e 0a 00 00    	je     f63b0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xcd0>
+   f5962:	48 83 f9 02          	cmp    $0x2,%rcx
+   f5966:	75 8b                	jne    f58f3 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x213>
+   f5968:	49 8b 44 24 20       	mov    0x20(%r12),%rax
+   f596d:	48 85 c0             	test   %rax,%rax
+   f5970:	0f 8e 7a fe ff ff    	jle    f57f0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x110>
+   f5976:	49 8b 7c 24 08       	mov    0x8(%r12),%rdi
+   f597b:	49 8b 74 24 10       	mov    0x10(%r12),%rsi
+   f5980:	4d 8b 4c 24 28       	mov    0x28(%r12),%r9
+   f5985:	49 8b 4c 24 30       	mov    0x30(%r12),%rcx
+   f598a:	4d 8d 47 01          	lea    0x1(%r15),%r8
+   f598e:	4d 0f af c1          	imul   %r9,%r8
+   f5992:	4d 0f af cf          	imul   %r15,%r9
+   f5996:	48 8d 14 09          	lea    (%rcx,%rcx,1),%rdx
+   f599a:	4c 8d 2c 52          	lea    (%rdx,%rdx,2),%r13
+   f599e:	48 ff c8             	dec    %rax
+   f59a1:	48 c1 e8 03          	shr    $0x3,%rax
+   f59a5:	0f 84 c8 0c 00 00    	je     f6673 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xf93>
+   f59ab:	4c 89 7c 24 18       	mov    %r15,0x18(%rsp)
+   f59b0:	48 8d 14 8d 00 00 00 	lea    0x0(,%rcx,4),%rdx
+   f59b7:	00 
+   f59b8:	48 ff c0             	inc    %rax
+   f59bb:	49 89 c3             	mov    %rax,%r11
+   f59be:	49 ba fe ff ff ff ff 	movabs $0x3ffffffffffffffe,%r10
+   f59c5:	ff ff 3f 
+   f59c8:	4d 21 d3             	and    %r10,%r11
+   f59cb:	4a 8d 1c 47          	lea    (%rdi,%r8,2),%rbx
+   f59cf:	48 83 c3 10          	add    $0x10,%rbx
+   f59d3:	4e 8d 74 4f 10       	lea    0x10(%rdi,%r9,2),%r14
+   f59d8:	4c 8d 7e 10          	lea    0x10(%rsi),%r15
+   f59dc:	4c 89 6c 24 40       	mov    %r13,0x40(%rsp)
+   f59e1:	4e 8d 64 2e 10       	lea    0x10(%rsi,%r13,1),%r12
+   f59e6:	4c 8d 6c 16 10       	lea    0x10(%rsi,%rdx,1),%r13
+   f59eb:	48 8d 54 4e 10       	lea    0x10(%rsi,%rcx,2),%rdx
+   f59f0:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f59f4:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f59f8:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f59fc:	c5 d0 57 ed          	vxorps %xmm5,%xmm5,%xmm5
+   f5a00:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f5a04:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f5a08:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f5a0c:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f5a10:	45 31 d2             	xor    %r10d,%r10d
+   f5a13:	66 66 66 66 2e 0f 1f 	data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+   f5a1a:	84 00 00 00 00 00 
+   f5a20:	c4 02 7d 13 44 56 f0 	vcvtph2ps -0x10(%r14,%r10,2),%ymm8
+   f5a27:	c4 22 7d 13 4c 53 f0 	vcvtph2ps -0x10(%rbx,%r10,2),%ymm9
+   f5a2e:	c4 02 7d 13 54 57 f0 	vcvtph2ps -0x10(%r15,%r10,2),%ymm10
+   f5a35:	c4 c2 3d b8 fa       	vfmadd231ps %ymm10,%ymm8,%ymm7
+   f5a3a:	c4 c2 35 b8 f2       	vfmadd231ps %ymm10,%ymm9,%ymm6
+   f5a3f:	c4 22 7d 13 54 52 f0 	vcvtph2ps -0x10(%rdx,%r10,2),%ymm10
+   f5a46:	c4 c2 3d b8 ea       	vfmadd231ps %ymm10,%ymm8,%ymm5
+   f5a4b:	c4 c2 35 b8 e2       	vfmadd231ps %ymm10,%ymm9,%ymm4
+   f5a50:	c4 02 7d 13 54 55 f0 	vcvtph2ps -0x10(%r13,%r10,2),%ymm10
+   f5a57:	c4 c2 3d b8 d2       	vfmadd231ps %ymm10,%ymm8,%ymm2
+   f5a5c:	c4 c2 35 b8 c2       	vfmadd231ps %ymm10,%ymm9,%ymm0
+   f5a61:	c4 02 7d 13 54 54 f0 	vcvtph2ps -0x10(%r12,%r10,2),%ymm10
+   f5a68:	c4 c2 2d b8 d8       	vfmadd231ps %ymm8,%ymm10,%ymm3
+   f5a6d:	c4 c2 35 b8 ca       	vfmadd231ps %ymm10,%ymm9,%ymm1
+   f5a72:	c4 02 7d 13 04 56    	vcvtph2ps (%r14,%r10,2),%ymm8
+   f5a78:	c4 22 7d 13 0c 53    	vcvtph2ps (%rbx,%r10,2),%ymm9
+   f5a7e:	c4 02 7d 13 14 57    	vcvtph2ps (%r15,%r10,2),%ymm10
+   f5a84:	c4 c2 3d b8 fa       	vfmadd231ps %ymm10,%ymm8,%ymm7
+   f5a89:	c4 c2 35 b8 f2       	vfmadd231ps %ymm10,%ymm9,%ymm6
+   f5a8e:	c4 22 7d 13 14 52    	vcvtph2ps (%rdx,%r10,2),%ymm10
+   f5a94:	c4 c2 3d b8 ea       	vfmadd231ps %ymm10,%ymm8,%ymm5
+   f5a99:	c4 c2 35 b8 e2       	vfmadd231ps %ymm10,%ymm9,%ymm4
+   f5a9e:	c4 02 7d 13 54 55 00 	vcvtph2ps 0x0(%r13,%r10,2),%ymm10
+   f5aa5:	c4 c2 3d b8 d2       	vfmadd231ps %ymm10,%ymm8,%ymm2
+   f5aaa:	c4 c2 35 b8 c2       	vfmadd231ps %ymm10,%ymm9,%ymm0
+   f5aaf:	c4 02 7d 13 14 54    	vcvtph2ps (%r12,%r10,2),%ymm10
+   f5ab5:	c4 c2 2d b8 d8       	vfmadd231ps %ymm8,%ymm10,%ymm3
+   f5aba:	c4 c2 35 b8 ca       	vfmadd231ps %ymm10,%ymm9,%ymm1
+   f5abf:	49 83 c2 10          	add    $0x10,%r10
+   f5ac3:	49 83 c3 fe          	add    $0xfffffffffffffffe,%r11
+   f5ac7:	0f 85 53 ff ff ff    	jne    f5a20 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x340>
+   f5acd:	a8 01                	test   $0x1,%al
+   f5acf:	4c 8b 64 24 20       	mov    0x20(%rsp),%r12
+   f5ad4:	4c 8b 7c 24 18       	mov    0x18(%rsp),%r15
+   f5ad9:	4c 8b 6c 24 40       	mov    0x40(%rsp),%r13
+   f5ade:	0f 84 2c fd ff ff    	je     f5810 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x130>
+   f5ae4:	e9 ad 0b 00 00       	jmp    f6696 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xfb6>
+   f5ae9:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   f5af0:	48 c1 e0 05          	shl    $0x5,%rax
+   f5af4:	48 8d 34 40          	lea    (%rax,%rax,2),%rsi
+   f5af8:	48 8d 14 40          	lea    (%rax,%rax,2),%rdx
+   f5afc:	48 83 c2 04          	add    $0x4,%rdx
+   f5b00:	48 89 54 24 38       	mov    %rdx,0x38(%rsp)
+   f5b05:	4c 8d 04 40          	lea    (%rax,%rax,2),%r8
+   f5b09:	49 83 c0 02          	add    $0x2,%r8
+   f5b0d:	e9 c8 03 00 00       	jmp    f5eda <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x7fa>
+   f5b12:	66 66 66 66 66 2e 0f 	data16 data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+   f5b19:	1f 84 00 00 00 00 00 
+   f5b20:	49 8b 44 24 20       	mov    0x20(%r12),%rax
+   f5b25:	48 01 c0             	add    %rax,%rax
+   f5b28:	49 8b 4c 24 28       	mov    0x28(%r12),%rcx
+   f5b2d:	4d 8d 4b 01          	lea    0x1(%r11),%r9
+   f5b31:	4c 0f af c9          	imul   %rcx,%r9
+   f5b35:	4d 8d 53 02          	lea    0x2(%r11),%r10
+   f5b39:	4c 0f af d1          	imul   %rcx,%r10
+   f5b3d:	49 0f af cb          	imul   %r11,%rcx
+   f5b41:	4c 89 da             	mov    %r11,%rdx
+   f5b44:	4d 8b 5c 24 08       	mov    0x8(%r12),%r11
+   f5b49:	49 8b 5c 24 10       	mov    0x10(%r12),%rbx
+   f5b4e:	49 8d 0c 4b          	lea    (%r11,%rcx,2),%rcx
+   f5b52:	48 89 8c 24 80 00 00 	mov    %rcx,0x80(%rsp)
+   f5b59:	00 
+   f5b5a:	4b 8d 3c 4b          	lea    (%r11,%r9,2),%rdi
+   f5b5e:	48 89 7c 24 40       	mov    %rdi,0x40(%rsp)
+   f5b63:	4b 8d 0c 53          	lea    (%r11,%r10,2),%rcx
+   f5b67:	48 89 4c 24 28       	mov    %rcx,0x28(%rsp)
+   f5b6c:	4d 8b 5c 24 30       	mov    0x30(%r12),%r11
+   f5b71:	4e 8d 34 5b          	lea    (%rbx,%r11,2),%r14
+   f5b75:	4c 89 44 24 18       	mov    %r8,0x18(%rsp)
+   f5b7a:	49 89 f0             	mov    %rsi,%r8
+   f5b7d:	4c 89 ff             	mov    %r15,%rdi
+   f5b80:	4e 8d 3c 9b          	lea    (%rbx,%r11,4),%r15
+   f5b84:	4f 8d 1c 5b          	lea    (%r11,%r11,2),%r11
+   f5b88:	4e 8d 1c 5b          	lea    (%rbx,%r11,2),%r11
+   f5b8c:	4c 89 e6             	mov    %r12,%rsi
+   f5b8f:	45 31 e4             	xor    %r12d,%r12d
+   f5b92:	4c 8d ac 24 a0 00 00 	lea    0xa0(%rsp),%r13
+   f5b99:	00 
+   f5b9a:	48 8b 4c 24 40       	mov    0x40(%rsp),%rcx
+   f5b9f:	4c 8b 94 24 80 00 00 	mov    0x80(%rsp),%r10
+   f5ba6:	00 
+   f5ba7:	4c 8b 4c 24 28       	mov    0x28(%rsp),%r9
+   f5bac:	c5 fc 57 c0          	vxorps %ymm0,%ymm0,%ymm0
+   f5bb0:	c5 f4 57 c9          	vxorps %ymm1,%ymm1,%ymm1
+   f5bb4:	c5 ec 57 d2          	vxorps %ymm2,%ymm2,%ymm2
+   f5bb8:	c5 e4 57 db          	vxorps %ymm3,%ymm3,%ymm3
+   f5bbc:	c5 dc 57 e4          	vxorps %ymm4,%ymm4,%ymm4
+   f5bc0:	c5 d4 57 ed          	vxorps %ymm5,%ymm5,%ymm5
+   f5bc4:	c5 cc 57 f6          	vxorps %ymm6,%ymm6,%ymm6
+   f5bc8:	c5 c4 57 ff          	vxorps %ymm7,%ymm7,%ymm7
+   f5bcc:	c4 41 3c 57 c0       	vxorps %ymm8,%ymm8,%ymm8
+   f5bd1:	c4 41 34 57 c9       	vxorps %ymm9,%ymm9,%ymm9
+   f5bd6:	c4 41 2c 57 d2       	vxorps %ymm10,%ymm10,%ymm10
+   f5bdb:	c4 41 24 57 db       	vxorps %ymm11,%ymm11,%ymm11
+   f5be0:	c4 02 7d 13 24 22    	vcvtph2ps (%r10,%r12,1),%ymm12
+   f5be6:	c4 22 7d 13 2c 21    	vcvtph2ps (%rcx,%r12,1),%ymm13
+   f5bec:	c4 02 7d 13 34 21    	vcvtph2ps (%r9,%r12,1),%ymm14
+   f5bf2:	c4 22 7d 13 3c 23    	vcvtph2ps (%rbx,%r12,1),%ymm15
+   f5bf8:	c4 c2 1d b8 c7       	vfmadd231ps %ymm15,%ymm12,%ymm0
+   f5bfd:	c4 c2 15 b8 cf       	vfmadd231ps %ymm15,%ymm13,%ymm1
+   f5c02:	c4 c2 0d b8 d7       	vfmadd231ps %ymm15,%ymm14,%ymm2
+   f5c07:	c4 02 7d 13 3c 26    	vcvtph2ps (%r14,%r12,1),%ymm15
+   f5c0d:	c4 c2 1d b8 df       	vfmadd231ps %ymm15,%ymm12,%ymm3
+   f5c12:	c4 c2 15 b8 e7       	vfmadd231ps %ymm15,%ymm13,%ymm4
+   f5c17:	c4 c2 0d b8 ef       	vfmadd231ps %ymm15,%ymm14,%ymm5
+   f5c1c:	c4 02 7d 13 3c 27    	vcvtph2ps (%r15,%r12,1),%ymm15
+   f5c22:	c4 c2 1d b8 f7       	vfmadd231ps %ymm15,%ymm12,%ymm6
+   f5c27:	c4 c2 15 b8 ff       	vfmadd231ps %ymm15,%ymm13,%ymm7
+   f5c2c:	c4 42 0d b8 c7       	vfmadd231ps %ymm15,%ymm14,%ymm8
+   f5c31:	c4 02 7d 13 3c 23    	vcvtph2ps (%r11,%r12,1),%ymm15
+   f5c37:	c4 42 1d b8 cf       	vfmadd231ps %ymm15,%ymm12,%ymm9
+   f5c3c:	c4 42 15 b8 d7       	vfmadd231ps %ymm15,%ymm13,%ymm10
+   f5c41:	c4 42 0d b8 df       	vfmadd231ps %ymm15,%ymm14,%ymm11
+   f5c46:	49 83 c4 10          	add    $0x10,%r12
+   f5c4a:	49 39 c4             	cmp    %rax,%r12
+   f5c4d:	72 91                	jb     f5be0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x500>
+   f5c4f:	c4 c1 7c 11 45 00    	vmovups %ymm0,0x0(%r13)
+   f5c55:	c4 c1 7c 11 4d 20    	vmovups %ymm1,0x20(%r13)
+   f5c5b:	c4 c1 7c 11 55 40    	vmovups %ymm2,0x40(%r13)
+   f5c61:	c4 c1 7c 11 5d 60    	vmovups %ymm3,0x60(%r13)
+   f5c67:	c4 c1 7c 11 a5 80 00 	vmovups %ymm4,0x80(%r13)
+   f5c6e:	00 00 
+   f5c70:	c4 c1 7c 11 ad a0 00 	vmovups %ymm5,0xa0(%r13)
+   f5c77:	00 00 
+   f5c79:	c4 c1 7c 11 b5 c0 00 	vmovups %ymm6,0xc0(%r13)
+   f5c80:	00 00 
+   f5c82:	c4 c1 7c 11 bd e0 00 	vmovups %ymm7,0xe0(%r13)
+   f5c89:	00 00 
+   f5c8b:	c4 41 7c 11 85 00 01 	vmovups %ymm8,0x100(%r13)
+   f5c92:	00 00 
+   f5c94:	c4 41 7c 11 8d 20 01 	vmovups %ymm9,0x120(%r13)
+   f5c9b:	00 00 
+   f5c9d:	c4 41 7c 11 95 40 01 	vmovups %ymm10,0x140(%r13)
+   f5ca4:	00 00 
+   f5ca6:	c4 41 7c 11 9d 60 01 	vmovups %ymm11,0x160(%r13)
+   f5cad:	00 00 
+   f5caf:	49 89 f4             	mov    %rsi,%r12
+   f5cb2:	49 89 ff             	mov    %rdi,%r15
+   f5cb5:	4c 89 c6             	mov    %r8,%rsi
+   f5cb8:	4c 8b 44 24 18       	mov    0x18(%rsp),%r8
+   f5cbd:	4d 8b 4c 24 18       	mov    0x18(%r12),%r9
+   f5cc2:	49 8b 4c 24 38       	mov    0x38(%r12),%rcx
+   f5cc7:	49 8d 04 91          	lea    (%r9,%rdx,4),%rax
+   f5ccb:	c5 f8 28 84 24 b0 00 	vmovaps 0xb0(%rsp),%xmm0
+   f5cd2:	00 00 
+   f5cd4:	c5 f8 58 84 24 a0 00 	vaddps 0xa0(%rsp),%xmm0,%xmm0
+   f5cdb:	00 00 
+   f5cdd:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5ce2:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5ce6:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5cea:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5cee:	c4 c1 7a 11 04 91    	vmovss %xmm0,(%r9,%rdx,4)
+   f5cf4:	c5 f8 28 84 24 d0 00 	vmovaps 0xd0(%rsp),%xmm0
+   f5cfb:	00 00 
+   f5cfd:	c5 f8 58 84 24 c0 00 	vaddps 0xc0(%rsp),%xmm0,%xmm0
+   f5d04:	00 00 
+   f5d06:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5d0b:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5d0f:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5d13:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5d17:	c4 c1 7a 11 44 91 04 	vmovss %xmm0,0x4(%r9,%rdx,4)
+   f5d1e:	c5 f8 28 84 24 f0 00 	vmovaps 0xf0(%rsp),%xmm0
+   f5d25:	00 00 
+   f5d27:	c5 f8 58 84 24 e0 00 	vaddps 0xe0(%rsp),%xmm0,%xmm0
+   f5d2e:	00 00 
+   f5d30:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5d35:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5d39:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5d3d:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5d41:	c4 c1 7a 11 44 91 08 	vmovss %xmm0,0x8(%r9,%rdx,4)
+   f5d48:	c5 f8 28 84 24 10 01 	vmovaps 0x110(%rsp),%xmm0
+   f5d4f:	00 00 
+   f5d51:	c5 f8 58 84 24 00 01 	vaddps 0x100(%rsp),%xmm0,%xmm0
+   f5d58:	00 00 
+   f5d5a:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5d5f:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5d63:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5d67:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5d6b:	c5 fa 11 04 88       	vmovss %xmm0,(%rax,%rcx,4)
+   f5d70:	c5 f8 28 84 24 30 01 	vmovaps 0x130(%rsp),%xmm0
+   f5d77:	00 00 
+   f5d79:	c5 f8 58 84 24 20 01 	vaddps 0x120(%rsp),%xmm0,%xmm0
+   f5d80:	00 00 
+   f5d82:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5d87:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5d8b:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5d8f:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5d93:	c5 fa 11 44 88 04    	vmovss %xmm0,0x4(%rax,%rcx,4)
+   f5d99:	c5 f8 28 84 24 50 01 	vmovaps 0x150(%rsp),%xmm0
+   f5da0:	00 00 
+   f5da2:	c5 f8 58 84 24 40 01 	vaddps 0x140(%rsp),%xmm0,%xmm0
+   f5da9:	00 00 
+   f5dab:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5db0:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5db4:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5db8:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5dbc:	c5 fa 11 44 88 08    	vmovss %xmm0,0x8(%rax,%rcx,4)
+   f5dc2:	c5 f8 28 84 24 70 01 	vmovaps 0x170(%rsp),%xmm0
+   f5dc9:	00 00 
+   f5dcb:	c5 f8 58 84 24 60 01 	vaddps 0x160(%rsp),%xmm0,%xmm0
+   f5dd2:	00 00 
+   f5dd4:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5dd9:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5ddd:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5de1:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5de5:	c5 fa 11 04 c8       	vmovss %xmm0,(%rax,%rcx,8)
+   f5dea:	c5 f8 28 84 24 90 01 	vmovaps 0x190(%rsp),%xmm0
+   f5df1:	00 00 
+   f5df3:	c5 f8 58 84 24 80 01 	vaddps 0x180(%rsp),%xmm0,%xmm0
+   f5dfa:	00 00 
+   f5dfc:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5e01:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5e05:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5e09:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5e0d:	c5 fa 11 44 c8 04    	vmovss %xmm0,0x4(%rax,%rcx,8)
+   f5e13:	c5 f8 28 84 24 b0 01 	vmovaps 0x1b0(%rsp),%xmm0
+   f5e1a:	00 00 
+   f5e1c:	c5 f8 58 84 24 a0 01 	vaddps 0x1a0(%rsp),%xmm0,%xmm0
+   f5e23:	00 00 
+   f5e25:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5e2a:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5e2e:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5e32:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5e36:	c5 fa 11 44 c8 08    	vmovss %xmm0,0x8(%rax,%rcx,8)
+   f5e3c:	48 8d 0c 49          	lea    (%rcx,%rcx,2),%rcx
+   f5e40:	c5 f8 28 84 24 d0 01 	vmovaps 0x1d0(%rsp),%xmm0
+   f5e47:	00 00 
+   f5e49:	c5 f8 58 84 24 c0 01 	vaddps 0x1c0(%rsp),%xmm0,%xmm0
+   f5e50:	00 00 
+   f5e52:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5e57:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5e5b:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5e5f:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5e63:	c5 fa 11 04 88       	vmovss %xmm0,(%rax,%rcx,4)
+   f5e68:	c5 f8 28 84 24 f0 01 	vmovaps 0x1f0(%rsp),%xmm0
+   f5e6f:	00 00 
+   f5e71:	c5 f8 58 84 24 e0 01 	vaddps 0x1e0(%rsp),%xmm0,%xmm0
+   f5e78:	00 00 
+   f5e7a:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5e7f:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5e83:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5e87:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5e8b:	c5 fa 11 44 88 04    	vmovss %xmm0,0x4(%rax,%rcx,4)
+   f5e91:	c5 f8 28 84 24 10 02 	vmovaps 0x210(%rsp),%xmm0
+   f5e98:	00 00 
+   f5e9a:	c5 f8 58 84 24 00 02 	vaddps 0x200(%rsp),%xmm0,%xmm0
+   f5ea1:	00 00 
+   f5ea3:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f5ea8:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f5eac:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f5eb0:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f5eb4:	c5 fa 11 44 88 08    	vmovss %xmm0,0x8(%rax,%rcx,4)
+   f5eba:	49 8d 4f 03          	lea    0x3(%r15),%rcx
+   f5ebe:	48 83 44 24 38 06    	addq   $0x6,0x38(%rsp)
+   f5ec4:	49 83 c0 06          	add    $0x6,%r8
+   f5ec8:	48 83 c6 06          	add    $0x6,%rsi
+   f5ecc:	4d 89 fb             	mov    %r15,%r11
+   f5ecf:	48 3b 4c 24 30       	cmp    0x30(%rsp),%rcx
+   f5ed4:	0f 8f 76 fa ff ff    	jg     f5950 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x270>
+   f5eda:	49 89 cf             	mov    %rcx,%r15
+   f5edd:	80 3d 1c b8 0e 00 01 	cmpb   $0x1,0xeb81c(%rip)        # 1e1700 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f5ee4:	0f 84 36 fc ff ff    	je     f5b20 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x440>
+   f5eea:	49 8b 4c 24 20       	mov    0x20(%r12),%rcx
+   f5eef:	48 85 c9             	test   %rcx,%rcx
+   f5ef2:	0f 8e 30 02 00 00    	jle    f6128 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xa48>
+   f5ef8:	4d 8b 54 24 08       	mov    0x8(%r12),%r10
+   f5efd:	4d 8b 74 24 10       	mov    0x10(%r12),%r14
+   f5f02:	49 8b 5c 24 28       	mov    0x28(%r12),%rbx
+   f5f07:	49 8b 7c 24 30       	mov    0x30(%r12),%rdi
+   f5f0c:	48 8d 04 3f          	lea    (%rdi,%rdi,1),%rax
+   f5f10:	48 8d 14 40          	lea    (%rax,%rax,2),%rdx
+   f5f14:	48 ff c9             	dec    %rcx
+   f5f17:	48 c1 e9 03          	shr    $0x3,%rcx
+   f5f1b:	4c 89 74 24 28       	mov    %r14,0x28(%rsp)
+   f5f20:	0f 84 3d 02 00 00    	je     f6163 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xa83>
+   f5f26:	4c 89 5c 24 78       	mov    %r11,0x78(%rsp)
+   f5f2b:	4c 89 7c 24 18       	mov    %r15,0x18(%rsp)
+   f5f30:	4c 8d 1c bd 00 00 00 	lea    0x0(,%rdi,4),%r11
+   f5f37:	00 
+   f5f38:	48 ff c1             	inc    %rcx
+   f5f3b:	49 89 cd             	mov    %rcx,%r13
+   f5f3e:	48 b8 fe ff ff ff ff 	movabs $0x3ffffffffffffffe,%rax
+   f5f45:	ff ff 3f 
+   f5f48:	49 21 c5             	and    %rax,%r13
+   f5f4b:	48 89 d8             	mov    %rbx,%rax
+   f5f4e:	48 0f af 44 24 38    	imul   0x38(%rsp),%rax
+   f5f54:	4d 8d 0c 02          	lea    (%r10,%rax,1),%r9
+   f5f58:	49 83 c1 10          	add    $0x10,%r9
+   f5f5c:	48 89 d8             	mov    %rbx,%rax
+   f5f5f:	49 0f af c0          	imul   %r8,%rax
+   f5f63:	4c 01 d0             	add    %r10,%rax
+   f5f66:	48 83 c0 10          	add    $0x10,%rax
+   f5f6a:	48 89 5c 24 70       	mov    %rbx,0x70(%rsp)
+   f5f6f:	4d 89 d7             	mov    %r10,%r15
+   f5f72:	49 89 da             	mov    %rbx,%r10
+   f5f75:	4c 0f af d6          	imul   %rsi,%r10
+   f5f79:	4c 89 7c 24 68       	mov    %r15,0x68(%rsp)
+   f5f7e:	4f 8d 24 17          	lea    (%r15,%r10,1),%r12
+   f5f82:	49 83 c4 10          	add    $0x10,%r12
+   f5f86:	49 8d 5e 10          	lea    0x10(%r14),%rbx
+   f5f8a:	4d 8d 54 16 10       	lea    0x10(%r14,%rdx,1),%r10
+   f5f8f:	4f 8d 5c 1e 10       	lea    0x10(%r14,%r11,1),%r11
+   f5f94:	4d 8d 7c 7e 10       	lea    0x10(%r14,%rdi,2),%r15
+   f5f99:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f5f9d:	c5 fc 29 44 24 40    	vmovaps %ymm0,0x40(%rsp)
+   f5fa3:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f5fa7:	c5 fc 29 84 24 80 00 	vmovaps %ymm0,0x80(%rsp)
+   f5fae:	00 00 
+   f5fb0:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f5fb4:	c5 d0 57 ed          	vxorps %xmm5,%xmm5,%xmm5
+   f5fb8:	c4 41 30 57 c9       	vxorps %xmm9,%xmm9,%xmm9
+   f5fbd:	c4 41 28 57 d2       	vxorps %xmm10,%xmm10,%xmm10
+   f5fc2:	c4 41 20 57 db       	vxorps %xmm11,%xmm11,%xmm11
+   f5fc7:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f5fcb:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f5fcf:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f5fd3:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f5fd7:	45 31 f6             	xor    %r14d,%r14d
+   f5fda:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+   f5fe0:	c4 02 7d 13 64 74 f0 	vcvtph2ps -0x10(%r12,%r14,2),%ymm12
+   f5fe7:	c4 22 7d 13 6c 70 f0 	vcvtph2ps -0x10(%rax,%r14,2),%ymm13
+   f5fee:	c4 02 7d 13 74 71 f0 	vcvtph2ps -0x10(%r9,%r14,2),%ymm14
+   f5ff5:	c4 22 7d 13 7c 73 f0 	vcvtph2ps -0x10(%rbx,%r14,2),%ymm15
+   f5ffc:	c4 c2 1d b8 ff       	vfmadd231ps %ymm15,%ymm12,%ymm7
+   f6001:	c4 42 15 b8 df       	vfmadd231ps %ymm15,%ymm13,%ymm11
+   f6006:	c4 82 7d 13 44 77 f0 	vcvtph2ps -0x10(%r15,%r14,2),%ymm0
+   f600d:	c4 42 0d b8 d7       	vfmadd231ps %ymm15,%ymm14,%ymm10
+   f6012:	c4 62 1d b8 c8       	vfmadd231ps %ymm0,%ymm12,%ymm9
+   f6017:	c4 e2 15 b8 e8       	vfmadd231ps %ymm0,%ymm13,%ymm5
+   f601c:	c4 e2 0d b8 f0       	vfmadd231ps %ymm0,%ymm14,%ymm6
+   f6021:	c4 82 7d 13 44 73 f0 	vcvtph2ps -0x10(%r11,%r14,2),%ymm0
+   f6028:	c5 7c 28 bc 24 80 00 	vmovaps 0x80(%rsp),%ymm15
+   f602f:	00 00 
+   f6031:	c4 62 1d b8 f8       	vfmadd231ps %ymm0,%ymm12,%ymm15
+   f6036:	c4 e2 15 b8 d0       	vfmadd231ps %ymm0,%ymm13,%ymm2
+   f603b:	c5 7c 28 44 24 40    	vmovaps 0x40(%rsp),%ymm8
+   f6041:	c4 62 0d b8 c0       	vfmadd231ps %ymm0,%ymm14,%ymm8
+   f6046:	c4 82 7d 13 44 72 f0 	vcvtph2ps -0x10(%r10,%r14,2),%ymm0
+   f604d:	c4 c2 7d b8 e4       	vfmadd231ps %ymm12,%ymm0,%ymm4
+   f6052:	c4 c2 7d b8 dd       	vfmadd231ps %ymm13,%ymm0,%ymm3
+   f6057:	c4 e2 0d b8 c8       	vfmadd231ps %ymm0,%ymm14,%ymm1
+   f605c:	c4 82 7d 13 04 74    	vcvtph2ps (%r12,%r14,2),%ymm0
+   f6062:	c4 22 7d 13 24 70    	vcvtph2ps (%rax,%r14,2),%ymm12
+   f6068:	c4 02 7d 13 2c 71    	vcvtph2ps (%r9,%r14,2),%ymm13
+   f606e:	c4 22 7d 13 34 73    	vcvtph2ps (%rbx,%r14,2),%ymm14
+   f6074:	c4 c2 7d b8 fe       	vfmadd231ps %ymm14,%ymm0,%ymm7
+   f6079:	c4 42 1d b8 de       	vfmadd231ps %ymm14,%ymm12,%ymm11
+   f607e:	c4 42 15 b8 d6       	vfmadd231ps %ymm14,%ymm13,%ymm10
+   f6083:	c4 02 7d 13 34 77    	vcvtph2ps (%r15,%r14,2),%ymm14
+   f6089:	c4 42 7d b8 ce       	vfmadd231ps %ymm14,%ymm0,%ymm9
+   f608e:	c4 c2 1d b8 ee       	vfmadd231ps %ymm14,%ymm12,%ymm5
+   f6093:	c4 c2 15 b8 f6       	vfmadd231ps %ymm14,%ymm13,%ymm6
+   f6098:	c4 02 7d 13 34 73    	vcvtph2ps (%r11,%r14,2),%ymm14
+   f609e:	c4 42 7d b8 fe       	vfmadd231ps %ymm14,%ymm0,%ymm15
+   f60a3:	c5 7c 29 bc 24 80 00 	vmovaps %ymm15,0x80(%rsp)
+   f60aa:	00 00 
+   f60ac:	c4 c2 1d b8 d6       	vfmadd231ps %ymm14,%ymm12,%ymm2
+   f60b1:	c4 02 7d 13 3c 72    	vcvtph2ps (%r10,%r14,2),%ymm15
+   f60b7:	c4 42 15 b8 c6       	vfmadd231ps %ymm14,%ymm13,%ymm8
+   f60bc:	c5 7c 29 44 24 40    	vmovaps %ymm8,0x40(%rsp)
+   f60c2:	c4 e2 05 b8 e0       	vfmadd231ps %ymm0,%ymm15,%ymm4
+   f60c7:	c4 c2 05 b8 dc       	vfmadd231ps %ymm12,%ymm15,%ymm3
+   f60cc:	c4 c2 15 b8 cf       	vfmadd231ps %ymm15,%ymm13,%ymm1
+   f60d1:	49 83 c6 10          	add    $0x10,%r14
+   f60d5:	49 83 c5 fe          	add    $0xfffffffffffffffe,%r13
+   f60d9:	0f 85 01 ff ff ff    	jne    f5fe0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x900>
+   f60df:	f6 c1 01             	test   $0x1,%cl
+   f60e2:	4c 8b 64 24 20       	mov    0x20(%rsp),%r12
+   f60e7:	4c 8b 7c 24 18       	mov    0x18(%rsp),%r15
+   f60ec:	4c 8b 5c 24 78       	mov    0x78(%rsp),%r11
+   f60f1:	c5 7c 28 64 24 40    	vmovaps 0x40(%rsp),%ymm12
+   f60f7:	c5 7c 28 e9          	vmovaps %ymm1,%ymm13
+   f60fb:	c5 fc 28 8c 24 80 00 	vmovaps 0x80(%rsp),%ymm1
+   f6102:	00 00 
+   f6104:	c5 7c 28 fd          	vmovaps %ymm5,%ymm15
+   f6108:	c4 41 7c 28 c1       	vmovaps %ymm9,%ymm8
+   f610d:	c4 41 7c 28 ca       	vmovaps %ymm10,%ymm9
+   f6112:	c4 41 7c 28 d3       	vmovaps %ymm11,%ymm10
+   f6117:	48 8b 5c 24 70       	mov    0x70(%rsp),%rbx
+   f611c:	4c 8b 54 24 68       	mov    0x68(%rsp),%r10
+   f6121:	75 79                	jne    f619c <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xabc>
+   f6123:	e9 10 01 00 00       	jmp    f6238 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xb58>
+   f6128:	c4 41 18 57 e4       	vxorps %xmm12,%xmm12,%xmm12
+   f612d:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f6131:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f6135:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f6139:	c4 41 00 57 ff       	vxorps %xmm15,%xmm15,%xmm15
+   f613e:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+   f6143:	c4 41 30 57 c9       	vxorps %xmm9,%xmm9,%xmm9
+   f6148:	c4 41 28 57 d2       	vxorps %xmm10,%xmm10,%xmm10
+   f614d:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f6151:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f6155:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f6159:	c4 41 10 57 ed       	vxorps %xmm13,%xmm13,%xmm13
+   f615e:	e9 d5 00 00 00       	jmp    f6238 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xb58>
+   f6163:	c4 41 18 57 e4       	vxorps %xmm12,%xmm12,%xmm12
+   f6168:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f616c:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f6170:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f6174:	c4 41 00 57 ff       	vxorps %xmm15,%xmm15,%xmm15
+   f6179:	c4 41 38 57 c0       	vxorps %xmm8,%xmm8,%xmm8
+   f617e:	c4 41 30 57 c9       	vxorps %xmm9,%xmm9,%xmm9
+   f6183:	c4 41 28 57 d2       	vxorps %xmm10,%xmm10,%xmm10
+   f6188:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f618c:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f6190:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f6194:	c4 41 10 57 ed       	vxorps %xmm13,%xmm13,%xmm13
+   f6199:	45 31 f6             	xor    %r14d,%r14d
+   f619c:	48 89 d8             	mov    %rbx,%rax
+   f619f:	49 0f af c3          	imul   %r11,%rax
+   f61a3:	49 8d 4b 01          	lea    0x1(%r11),%rcx
+   f61a7:	48 0f af cb          	imul   %rbx,%rcx
+   f61ab:	4d 8d 4b 02          	lea    0x2(%r11),%r9
+   f61af:	4f 8d 14 72          	lea    (%r10,%r14,2),%r10
+   f61b3:	c4 c2 7d 13 04 42    	vcvtph2ps (%r10,%rax,2),%ymm0
+   f61b9:	c4 41 7c 28 dc       	vmovaps %ymm12,%ymm11
+   f61be:	c4 42 7d 13 24 4a    	vcvtph2ps (%r10,%rcx,2),%ymm12
+   f61c4:	4c 0f af cb          	imul   %rbx,%r9
+   f61c8:	c5 7c 29 ed          	vmovaps %ymm13,%ymm5
+   f61cc:	c4 02 7d 13 2c 4a    	vcvtph2ps (%r10,%r9,2),%ymm13
+   f61d2:	48 8b 4c 24 28       	mov    0x28(%rsp),%rcx
+   f61d7:	4a 8d 04 71          	lea    (%rcx,%r14,2),%rax
+   f61db:	c4 22 7d 13 34 71    	vcvtph2ps (%rcx,%r14,2),%ymm14
+   f61e1:	c4 c2 7d b8 fe       	vfmadd231ps %ymm14,%ymm0,%ymm7
+   f61e6:	c4 42 1d b8 d6       	vfmadd231ps %ymm14,%ymm12,%ymm10
+   f61eb:	c4 42 15 b8 ce       	vfmadd231ps %ymm14,%ymm13,%ymm9
+   f61f0:	c4 62 7d 13 34 78    	vcvtph2ps (%rax,%rdi,2),%ymm14
+   f61f6:	c4 42 7d b8 c6       	vfmadd231ps %ymm14,%ymm0,%ymm8
+   f61fb:	c4 42 1d b8 fe       	vfmadd231ps %ymm14,%ymm12,%ymm15
+   f6200:	c4 c2 15 b8 f6       	vfmadd231ps %ymm14,%ymm13,%ymm6
+   f6205:	c4 62 7d 13 34 b8    	vcvtph2ps (%rax,%rdi,4),%ymm14
+   f620b:	c4 c2 7d b8 ce       	vfmadd231ps %ymm14,%ymm0,%ymm1
+   f6210:	c4 c2 1d b8 d6       	vfmadd231ps %ymm14,%ymm12,%ymm2
+   f6215:	c4 42 15 b8 de       	vfmadd231ps %ymm14,%ymm13,%ymm11
+   f621a:	c4 62 7d 13 34 02    	vcvtph2ps (%rdx,%rax,1),%ymm14
+   f6220:	c4 e2 0d b8 e0       	vfmadd231ps %ymm0,%ymm14,%ymm4
+   f6225:	c4 c2 0d b8 dc       	vfmadd231ps %ymm12,%ymm14,%ymm3
+   f622a:	c4 41 7c 28 e3       	vmovaps %ymm11,%ymm12
+   f622f:	c4 c2 15 b8 ee       	vfmadd231ps %ymm14,%ymm13,%ymm5
+   f6234:	c5 7c 28 ed          	vmovaps %ymm5,%ymm13
+   f6238:	49 8b 4c 24 18       	mov    0x18(%r12),%rcx
+   f623d:	c4 e3 7d 19 f8 01    	vextractf128 $0x1,%ymm7,%xmm0
+   f6243:	c5 f8 58 c7          	vaddps %xmm7,%xmm0,%xmm0
+   f6247:	c5 79 c6 d8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm11
+   f624c:	c5 a0 58 c0          	vaddps %xmm0,%xmm11,%xmm0
+   f6250:	c4 43 7d 19 d3 01    	vextractf128 $0x1,%ymm10,%xmm11
+   f6256:	c4 41 20 58 d2       	vaddps %xmm10,%xmm11,%xmm10
+   f625b:	c4 41 29 c6 da 01    	vshufpd $0x1,%xmm10,%xmm10,%xmm11
+   f6261:	c4 41 28 58 d3       	vaddps %xmm11,%xmm10,%xmm10
+   f6266:	c4 c1 7b 7c c2       	vhaddps %xmm10,%xmm0,%xmm0
+   f626b:	49 8b 44 24 38       	mov    0x38(%r12),%rax
+   f6270:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f6275:	c4 a1 78 13 04 99    	vmovlps %xmm0,(%rcx,%r11,4)
+   f627b:	c4 63 7d 19 c8 01    	vextractf128 $0x1,%ymm9,%xmm0
+   f6281:	c5 b0 58 c0          	vaddps %xmm0,%xmm9,%xmm0
+   f6285:	c5 79 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm9
+   f628a:	c5 b0 58 c0          	vaddps %xmm0,%xmm9,%xmm0
+   f628e:	c5 7a 16 c8          	vmovshdup %xmm0,%xmm9
+   f6292:	c5 b2 58 c0          	vaddss %xmm0,%xmm9,%xmm0
+   f6296:	c4 a1 7a 11 44 99 08 	vmovss %xmm0,0x8(%rcx,%r11,4)
+   f629d:	c4 63 7d 19 c0 01    	vextractf128 $0x1,%ymm8,%xmm0
+   f62a3:	c5 b8 58 c0          	vaddps %xmm0,%xmm8,%xmm0
+   f62a7:	c5 79 c6 c0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm8
+   f62ac:	c5 b8 58 c0          	vaddps %xmm0,%xmm8,%xmm0
+   f62b0:	c4 43 7d 19 f8 01    	vextractf128 $0x1,%ymm15,%xmm8
+   f62b6:	c4 c1 38 58 ff       	vaddps %xmm15,%xmm8,%xmm7
+   f62bb:	c5 41 c6 c7 01       	vshufpd $0x1,%xmm7,%xmm7,%xmm8
+   f62c0:	c5 b8 58 ff          	vaddps %xmm7,%xmm8,%xmm7
+   f62c4:	c5 fb 7c c7          	vhaddps %xmm7,%xmm0,%xmm0
+   f62c8:	4a 8d 0c 99          	lea    (%rcx,%r11,4),%rcx
+   f62cc:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f62d1:	c5 f8 13 04 81       	vmovlps %xmm0,(%rcx,%rax,4)
+   f62d6:	c4 e3 7d 19 f0 01    	vextractf128 $0x1,%ymm6,%xmm0
+   f62dc:	c5 f8 58 c6          	vaddps %xmm6,%xmm0,%xmm0
+   f62e0:	c5 f9 c6 f0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm6
+   f62e5:	c5 f8 58 c6          	vaddps %xmm6,%xmm0,%xmm0
+   f62e9:	c5 fa 16 f0          	vmovshdup %xmm0,%xmm6
+   f62ed:	c5 fa 58 c6          	vaddss %xmm6,%xmm0,%xmm0
+   f62f1:	c5 fa 11 44 81 08    	vmovss %xmm0,0x8(%rcx,%rax,4)
+   f62f7:	c4 e3 7d 19 c8 01    	vextractf128 $0x1,%ymm1,%xmm0
+   f62fd:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f6301:	c5 f9 c6 e8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm5
+   f6306:	c5 f8 58 c5          	vaddps %xmm5,%xmm0,%xmm0
+   f630a:	c4 e3 7d 19 d5 01    	vextractf128 $0x1,%ymm2,%xmm5
+   f6310:	c5 d0 58 d2          	vaddps %xmm2,%xmm5,%xmm2
+   f6314:	c5 e9 c6 ea 01       	vshufpd $0x1,%xmm2,%xmm2,%xmm5
+   f6319:	c5 e8 58 d5          	vaddps %xmm5,%xmm2,%xmm2
+   f631d:	c5 fb 7c c2          	vhaddps %xmm2,%xmm0,%xmm0
+   f6321:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f6326:	c5 f8 13 04 c1       	vmovlps %xmm0,(%rcx,%rax,8)
+   f632b:	c4 63 7d 19 e0 01    	vextractf128 $0x1,%ymm12,%xmm0
+   f6331:	c5 98 58 c0          	vaddps %xmm0,%xmm12,%xmm0
+   f6335:	c5 f9 c6 d0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm2
+   f633a:	c5 f8 58 c2          	vaddps %xmm2,%xmm0,%xmm0
+   f633e:	c5 fa 16 d0          	vmovshdup %xmm0,%xmm2
+   f6342:	c5 fa 58 c2          	vaddss %xmm2,%xmm0,%xmm0
+   f6346:	c5 fa 11 44 c1 08    	vmovss %xmm0,0x8(%rcx,%rax,8)
+   f634c:	c4 e3 7d 19 e0 01    	vextractf128 $0x1,%ymm4,%xmm0
+   f6352:	c5 f8 58 c4          	vaddps %xmm4,%xmm0,%xmm0
+   f6356:	c5 f9 c6 d0 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm2
+   f635b:	c5 f8 58 c2          	vaddps %xmm2,%xmm0,%xmm0
+   f635f:	c4 e3 7d 19 da 01    	vextractf128 $0x1,%ymm3,%xmm2
+   f6365:	c5 e8 58 d3          	vaddps %xmm3,%xmm2,%xmm2
+   f6369:	c5 e9 c6 da 01       	vshufpd $0x1,%xmm2,%xmm2,%xmm3
+   f636e:	c5 e8 58 d3          	vaddps %xmm3,%xmm2,%xmm2
+   f6372:	c5 fb 7c c2          	vhaddps %xmm2,%xmm0,%xmm0
+   f6376:	48 8d 04 40          	lea    (%rax,%rax,2),%rax
+   f637a:	c5 f8 c6 c0 e8       	vshufps $0xe8,%xmm0,%xmm0,%xmm0
+   f637f:	c5 f8 13 04 81       	vmovlps %xmm0,(%rcx,%rax,4)
+   f6384:	c4 63 7d 19 e8 01    	vextractf128 $0x1,%ymm13,%xmm0
+   f638a:	c5 90 58 c0          	vaddps %xmm0,%xmm13,%xmm0
+   f638e:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f6393:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f6397:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f639b:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f639f:	c5 fa 11 44 81 08    	vmovss %xmm0,0x8(%rcx,%rax,4)
+   f63a5:	e9 10 fb ff ff       	jmp    f5eba <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x7da>
+   f63aa:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+   f63b0:	49 8b 5c 24 20       	mov    0x20(%r12),%rbx
+   f63b5:	48 85 db             	test   %rbx,%rbx
+   f63b8:	7e 52                	jle    f640c <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xd2c>
+   f63ba:	49 8b 4c 24 08       	mov    0x8(%r12),%rcx
+   f63bf:	49 8b 7c 24 10       	mov    0x10(%r12),%rdi
+   f63c4:	49 8b 74 24 28       	mov    0x28(%r12),%rsi
+   f63c9:	49 8b 44 24 30       	mov    0x30(%r12),%rax
+   f63ce:	4c 8d 0c 85 00 00 00 	lea    0x0(,%rax,4),%r9
+   f63d5:	00 
+   f63d6:	4c 8d 04 00          	lea    (%rax,%rax,1),%r8
+   f63da:	4f 8d 2c 40          	lea    (%r8,%r8,2),%r13
+   f63de:	4c 8d 5b ff          	lea    -0x1(%rbx),%r11
+   f63e2:	49 c1 eb 03          	shr    $0x3,%r11
+   f63e6:	49 ff c3             	inc    %r11
+   f63e9:	44 89 da             	mov    %r11d,%edx
+   f63ec:	83 e2 03             	and    $0x3,%edx
+   f63ef:	48 83 fb 19          	cmp    $0x19,%rbx
+   f63f3:	73 2c                	jae    f6421 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xd41>
+   f63f5:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f63f9:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f63fd:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f6401:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f6405:	31 c0                	xor    %eax,%eax
+   f6407:	e9 5b 01 00 00       	jmp    f6567 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xe87>
+   f640c:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f6410:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f6414:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f6418:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f641c:	e9 ba 01 00 00       	jmp    f65db <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xefb>
+   f6421:	48 bb fe ff ff ff ff 	movabs $0x3ffffffffffffffe,%rbx
+   f6428:	ff ff 3f 
+   f642b:	48 83 c3 fe          	add    $0xfffffffffffffffe,%rbx
+   f642f:	49 21 db             	and    %rbx,%r11
+   f6432:	4d 89 fa             	mov    %r15,%r10
+   f6435:	4c 89 fb             	mov    %r15,%rbx
+   f6438:	48 0f af de          	imul   %rsi,%rbx
+   f643c:	48 8d 1c 59          	lea    (%rcx,%rbx,2),%rbx
+   f6440:	48 83 c3 30          	add    $0x30,%rbx
+   f6444:	4c 8d 77 30          	lea    0x30(%rdi),%r14
+   f6448:	4e 8d 7c 2f 30       	lea    0x30(%rdi,%r13,1),%r15
+   f644d:	4e 8d 64 0f 30       	lea    0x30(%rdi,%r9,1),%r12
+   f6452:	4c 8d 6c 47 30       	lea    0x30(%rdi,%rax,2),%r13
+   f6457:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f645b:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f645f:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f6463:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f6467:	31 c0                	xor    %eax,%eax
+   f6469:	0f 1f 80 00 00 00 00 	nopl   0x0(%rax)
+   f6470:	c4 e2 7d 13 64 43 d0 	vcvtph2ps -0x30(%rbx,%rax,2),%ymm4
+   f6477:	c4 c2 7d 13 6c 46 d0 	vcvtph2ps -0x30(%r14,%rax,2),%ymm5
+   f647e:	c4 e2 5d a8 eb       	vfmadd213ps %ymm3,%ymm4,%ymm5
+   f6483:	c4 c2 7d 13 5c 45 d0 	vcvtph2ps -0x30(%r13,%rax,2),%ymm3
+   f648a:	c4 e2 5d a8 da       	vfmadd213ps %ymm2,%ymm4,%ymm3
+   f648f:	c4 c2 7d 13 54 44 d0 	vcvtph2ps -0x30(%r12,%rax,2),%ymm2
+   f6496:	c4 e2 5d a8 d1       	vfmadd213ps %ymm1,%ymm4,%ymm2
+   f649b:	c4 c2 7d 13 4c 47 d0 	vcvtph2ps -0x30(%r15,%rax,2),%ymm1
+   f64a2:	c4 e2 5d a8 c8       	vfmadd213ps %ymm0,%ymm4,%ymm1
+   f64a7:	c4 e2 7d 13 44 43 e0 	vcvtph2ps -0x20(%rbx,%rax,2),%ymm0
+   f64ae:	c4 c2 7d 13 64 46 e0 	vcvtph2ps -0x20(%r14,%rax,2),%ymm4
+   f64b5:	c4 e2 7d a8 e5       	vfmadd213ps %ymm5,%ymm0,%ymm4
+   f64ba:	c4 c2 7d 13 6c 45 e0 	vcvtph2ps -0x20(%r13,%rax,2),%ymm5
+   f64c1:	c4 e2 7d a8 eb       	vfmadd213ps %ymm3,%ymm0,%ymm5
+   f64c6:	c4 c2 7d 13 5c 44 e0 	vcvtph2ps -0x20(%r12,%rax,2),%ymm3
+   f64cd:	c4 e2 7d a8 da       	vfmadd213ps %ymm2,%ymm0,%ymm3
+   f64d2:	c4 c2 7d 13 54 47 e0 	vcvtph2ps -0x20(%r15,%rax,2),%ymm2
+   f64d9:	c4 e2 7d a8 d1       	vfmadd213ps %ymm1,%ymm0,%ymm2
+   f64de:	c4 e2 7d 13 44 43 f0 	vcvtph2ps -0x10(%rbx,%rax,2),%ymm0
+   f64e5:	c4 c2 7d 13 4c 46 f0 	vcvtph2ps -0x10(%r14,%rax,2),%ymm1
+   f64ec:	c4 c2 7d 13 74 45 f0 	vcvtph2ps -0x10(%r13,%rax,2),%ymm6
+   f64f3:	c4 e2 7d a8 cc       	vfmadd213ps %ymm4,%ymm0,%ymm1
+   f64f8:	c4 e2 7d a8 f5       	vfmadd213ps %ymm5,%ymm0,%ymm6
+   f64fd:	c4 c2 7d 13 64 44 f0 	vcvtph2ps -0x10(%r12,%rax,2),%ymm4
+   f6504:	c4 c2 7d 13 6c 47 f0 	vcvtph2ps -0x10(%r15,%rax,2),%ymm5
+   f650b:	c4 e2 7d a8 e3       	vfmadd213ps %ymm3,%ymm0,%ymm4
+   f6510:	c4 e2 7d a8 ea       	vfmadd213ps %ymm2,%ymm0,%ymm5
+   f6515:	c4 e2 7d 13 3c 43    	vcvtph2ps (%rbx,%rax,2),%ymm7
+   f651b:	c4 c2 7d 13 1c 46    	vcvtph2ps (%r14,%rax,2),%ymm3
+   f6521:	c4 e2 45 a8 d9       	vfmadd213ps %ymm1,%ymm7,%ymm3
+   f6526:	c4 c2 7d 13 54 45 00 	vcvtph2ps 0x0(%r13,%rax,2),%ymm2
+   f652d:	c4 e2 45 a8 d6       	vfmadd213ps %ymm6,%ymm7,%ymm2
+   f6532:	c4 c2 7d 13 0c 44    	vcvtph2ps (%r12,%rax,2),%ymm1
+   f6538:	c4 e2 45 a8 cc       	vfmadd213ps %ymm4,%ymm7,%ymm1
+   f653d:	c4 c2 7d 13 04 47    	vcvtph2ps (%r15,%rax,2),%ymm0
+   f6543:	c4 e2 45 a8 c5       	vfmadd213ps %ymm5,%ymm7,%ymm0
+   f6548:	48 83 c0 20          	add    $0x20,%rax
+   f654c:	49 83 c3 fc          	add    $0xfffffffffffffffc,%r11
+   f6550:	0f 85 1a ff ff ff    	jne    f6470 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xd90>
+   f6556:	48 85 d2             	test   %rdx,%rdx
+   f6559:	4c 8b 64 24 20       	mov    0x20(%rsp),%r12
+   f655e:	4d 89 d7             	mov    %r10,%r15
+   f6561:	4f 8d 2c 40          	lea    (%r8,%r8,2),%r13
+   f6565:	74 74                	je     f65db <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xefb>
+   f6567:	4c 8d 1c 00          	lea    (%rax,%rax,1),%r11
+   f656b:	4c 8d 14 45 00 00 00 	lea    0x0(,%rax,2),%r10
+   f6572:	00 
+   f6573:	4d 01 ea             	add    %r13,%r10
+   f6576:	49 01 fa             	add    %rdi,%r10
+   f6579:	4d 8d 0c 41          	lea    (%r9,%rax,2),%r9
+   f657d:	49 01 f9             	add    %rdi,%r9
+   f6580:	4d 8d 04 40          	lea    (%r8,%rax,2),%r8
+   f6584:	49 01 f8             	add    %rdi,%r8
+   f6587:	48 8d 04 47          	lea    (%rdi,%rax,2),%rax
+   f658b:	49 0f af f7          	imul   %r15,%rsi
+   f658f:	49 8d 34 73          	lea    (%r11,%rsi,2),%rsi
+   f6593:	48 01 f1             	add    %rsi,%rcx
+   f6596:	c1 e2 04             	shl    $0x4,%edx
+   f6599:	31 f6                	xor    %esi,%esi
+   f659b:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+   f65a0:	c4 e2 7d 13 24 31    	vcvtph2ps (%rcx,%rsi,1),%ymm4
+   f65a6:	c4 e2 7d 13 2c 30    	vcvtph2ps (%rax,%rsi,1),%ymm5
+   f65ac:	c4 e2 5d b8 dd       	vfmadd231ps %ymm5,%ymm4,%ymm3
+   f65b1:	c4 c2 7d 13 2c 30    	vcvtph2ps (%r8,%rsi,1),%ymm5
+   f65b7:	c4 e2 5d b8 d5       	vfmadd231ps %ymm5,%ymm4,%ymm2
+   f65bc:	c4 c2 7d 13 2c 31    	vcvtph2ps (%r9,%rsi,1),%ymm5
+   f65c2:	c4 e2 5d b8 cd       	vfmadd231ps %ymm5,%ymm4,%ymm1
+   f65c7:	c4 c2 7d 13 2c 32    	vcvtph2ps (%r10,%rsi,1),%ymm5
+   f65cd:	c4 e2 5d b8 c5       	vfmadd231ps %ymm5,%ymm4,%ymm0
+   f65d2:	48 83 c6 10          	add    $0x10,%rsi
+   f65d6:	48 39 f2             	cmp    %rsi,%rdx
+   f65d9:	75 c5                	jne    f65a0 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0xec0>
+   f65db:	49 8b 54 24 18       	mov    0x18(%r12),%rdx
+   f65e0:	49 8b 44 24 38       	mov    0x38(%r12),%rax
+   f65e5:	4a 8d 0c ba          	lea    (%rdx,%r15,4),%rcx
+   f65e9:	c4 e3 7d 19 dc 01    	vextractf128 $0x1,%ymm3,%xmm4
+   f65ef:	c5 d8 58 db          	vaddps %xmm3,%xmm4,%xmm3
+   f65f3:	c5 e1 c6 e3 01       	vshufpd $0x1,%xmm3,%xmm3,%xmm4
+   f65f8:	c5 e0 58 dc          	vaddps %xmm4,%xmm3,%xmm3
+   f65fc:	c5 fa 16 e3          	vmovshdup %xmm3,%xmm4
+   f6600:	c5 e2 58 dc          	vaddss %xmm4,%xmm3,%xmm3
+   f6604:	c4 a1 7a 11 1c ba    	vmovss %xmm3,(%rdx,%r15,4)
+   f660a:	c4 e3 7d 19 d3 01    	vextractf128 $0x1,%ymm2,%xmm3
+   f6610:	c5 e0 58 d2          	vaddps %xmm2,%xmm3,%xmm2
+   f6614:	c5 e9 c6 da 01       	vshufpd $0x1,%xmm2,%xmm2,%xmm3
+   f6619:	c5 e8 58 d3          	vaddps %xmm3,%xmm2,%xmm2
+   f661d:	c5 fa 16 da          	vmovshdup %xmm2,%xmm3
+   f6621:	c5 ea 58 d3          	vaddss %xmm3,%xmm2,%xmm2
+   f6625:	c5 fa 11 14 81       	vmovss %xmm2,(%rcx,%rax,4)
+   f662a:	c4 e3 7d 19 ca 01    	vextractf128 $0x1,%ymm1,%xmm2
+   f6630:	c5 e8 58 c9          	vaddps %xmm1,%xmm2,%xmm1
+   f6634:	c5 f1 c6 d1 01       	vshufpd $0x1,%xmm1,%xmm1,%xmm2
+   f6639:	c5 f0 58 ca          	vaddps %xmm2,%xmm1,%xmm1
+   f663d:	c5 fa 16 d1          	vmovshdup %xmm1,%xmm2
+   f6641:	c5 f2 58 ca          	vaddss %xmm2,%xmm1,%xmm1
+   f6645:	c5 fa 11 0c c1       	vmovss %xmm1,(%rcx,%rax,8)
+   f664a:	c4 e3 7d 19 c1 01    	vextractf128 $0x1,%ymm0,%xmm1
+   f6650:	c5 f0 58 c0          	vaddps %xmm0,%xmm1,%xmm0
+   f6654:	c5 f9 c6 c8 01       	vshufpd $0x1,%xmm0,%xmm0,%xmm1
+   f6659:	c5 f8 58 c1          	vaddps %xmm1,%xmm0,%xmm0
+   f665d:	c5 fa 16 c8          	vmovshdup %xmm0,%xmm1
+   f6661:	c5 fa 58 c1          	vaddss %xmm1,%xmm0,%xmm0
+   f6665:	48 8d 04 40          	lea    (%rax,%rax,2),%rax
+   f6669:	c5 fa 11 04 81       	vmovss %xmm0,(%rcx,%rax,4)
+   f666e:	e9 80 f2 ff ff       	jmp    f58f3 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x213>
+   f6673:	c5 f8 57 c0          	vxorps %xmm0,%xmm0,%xmm0
+   f6677:	c5 e8 57 d2          	vxorps %xmm2,%xmm2,%xmm2
+   f667b:	c5 d8 57 e4          	vxorps %xmm4,%xmm4,%xmm4
+   f667f:	c5 d0 57 ed          	vxorps %xmm5,%xmm5,%xmm5
+   f6683:	c5 c8 57 f6          	vxorps %xmm6,%xmm6,%xmm6
+   f6687:	c5 c0 57 ff          	vxorps %xmm7,%xmm7,%xmm7
+   f668b:	c5 e0 57 db          	vxorps %xmm3,%xmm3,%xmm3
+   f668f:	c5 f0 57 c9          	vxorps %xmm1,%xmm1,%xmm1
+   f6693:	45 31 d2             	xor    %r10d,%r10d
+   f6696:	4a 8d 04 57          	lea    (%rdi,%r10,2),%rax
+   f669a:	c4 22 7d 13 04 48    	vcvtph2ps (%rax,%r9,2),%ymm8
+   f66a0:	c4 22 7d 13 0c 40    	vcvtph2ps (%rax,%r8,2),%ymm9
+   f66a6:	4a 8d 04 56          	lea    (%rsi,%r10,2),%rax
+   f66aa:	c4 22 7d 13 14 56    	vcvtph2ps (%rsi,%r10,2),%ymm10
+   f66b0:	c4 c2 3d b8 fa       	vfmadd231ps %ymm10,%ymm8,%ymm7
+   f66b5:	c4 c2 35 b8 f2       	vfmadd231ps %ymm10,%ymm9,%ymm6
+   f66ba:	c4 62 7d 13 14 48    	vcvtph2ps (%rax,%rcx,2),%ymm10
+   f66c0:	c4 c2 3d b8 ea       	vfmadd231ps %ymm10,%ymm8,%ymm5
+   f66c5:	c4 c2 35 b8 e2       	vfmadd231ps %ymm10,%ymm9,%ymm4
+   f66ca:	c4 62 7d 13 14 88    	vcvtph2ps (%rax,%rcx,4),%ymm10
+   f66d0:	c4 c2 3d b8 d2       	vfmadd231ps %ymm10,%ymm8,%ymm2
+   f66d5:	c4 c2 35 b8 c2       	vfmadd231ps %ymm10,%ymm9,%ymm0
+   f66da:	c4 42 7d 13 54 05 00 	vcvtph2ps 0x0(%r13,%rax,1),%ymm10
+   f66e1:	c4 c2 2d b8 d8       	vfmadd231ps %ymm8,%ymm10,%ymm3
+   f66e6:	c4 c2 35 b8 ca       	vfmadd231ps %ymm10,%ymm9,%ymm1
+   f66eb:	e9 20 f1 ff ff       	jmp    f5810 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x130>
+   f66f0:	49 8b 0c 24          	mov    (%r12),%rcx
+   f66f4:	48 8b 79 18          	mov    0x18(%rcx),%rdi
+   f66f8:	e8 a3 9b f0 ff       	call   2a0 <ggml_barrier@plt>
+   f66fd:	48 8d 65 d8          	lea    -0x28(%rbp),%rsp
+   f6701:	5b                   	pop    %rbx
+   f6702:	41 5c                	pop    %r12
+   f6704:	41 5d                	pop    %r13
+   f6706:	41 5e                	pop    %r14
+   f6708:	41 5f                	pop    %r15
+   f670a:	5d                   	pop    %rbp
+   f670b:	c3                   	ret
+   f670c:	48 8d 3d f5 af 0e 00 	lea    0xeaff5(%rip),%rdi        # 1e1708 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f6713:	e8 08 b5 f0 ff       	call   1c20 <__cxa_guard_acquire@plt>
+   f6718:	85 c0                	test   %eax,%eax
+   f671a:	0f 84 f4 ef ff ff    	je     f5714 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x34>
+   f6720:	48 8d 3d 81 0d 04 00 	lea    0x40d81(%rip),%rdi        # 1374a8 <kvalues_fp4+0x56b8>
+   f6727:	e8 24 ac f0 ff       	call   1350 <getenv@plt>
+   f672c:	48 85 c0             	test   %rax,%rax
+   f672f:	74 0e                	je     f673f <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x105f>
+   f6731:	80 38 31             	cmpb   $0x31,(%rax)
+   f6734:	75 09                	jne    f673f <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x105f>
+   f6736:	80 78 01 00          	cmpb   $0x0,0x1(%rax)
+   f673a:	0f 94 c0             	sete   %al
+   f673d:	eb 02                	jmp    f6741 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x1061>
+   f673f:	31 c0                	xor    %eax,%eax
+   f6741:	88 05 b9 af 0e 00    	mov    %al,0xeafb9(%rip)        # 1e1700 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f6747:	48 8d 3d ba af 0e 00 	lea    0xeafba(%rip),%rdi        # 1e1708 <guard variable for (anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)::registers>
+   f674e:	e8 0d a3 f0 ff       	call   a60 <__cxa_guard_release@plt>
+   f6753:	4c 8b 64 24 20       	mov    0x20(%rsp),%r12
+   f6758:	e9 b7 ef ff ff       	jmp    f5714 <(anonymous namespace)::tinyBLAS<8, float __vector(8), float __vector(8), unsigned short, unsigned short, float>::gemm_score3(long)+0x34>
+   f675d:	0f 1f 00             	nopl   (%rax)
+

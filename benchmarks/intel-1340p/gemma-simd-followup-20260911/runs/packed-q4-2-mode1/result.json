@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "target": "q4",
+  "order": 2,
+  "mode": 1,
+  "diagnostic": false,
+  "timings": {
+    "cache_n": 64658,
+    "prompt_n": 25,
+    "prompt_ms": 1670.203,
+    "prompt_per_token_ms": 66.80812,
+    "prompt_per_second": 14.968240387545706,
+    "predicted_n": 128,
+    "predicted_ms": 14610.966,
+    "predicted_per_token_ms": 114.148171875,
+    "predicted_per_second": 8.760543279616146,
+    "draft_n": 110,
+    "draft_n_accepted": 90
+  },
+  "answer": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+  "pass": true,
+  "scope": "One SIMD flag on/off versus B0; other flag0; exact128token64Kscreen,traceoff",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "mtp": true,
+    "targetBatchThreads": 16,
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-simd-followup-20260911/runtime-packed",
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE3_NOUNROLL": "0",
+      "GGML_CPU_EXPERIMENTAL_Q4_PACK_STREAM": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 526.0019860000002,
+      "package_j": 9.896276,
+      "timings": {
+        "restore_ms": 524.983
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 16313.066174,
+      "package_j": 572.437866,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1670.203,
+        "prompt_per_token_ms": 66.80812,
+        "prompt_per_second": 14.968240387545706,
+        "predicted_n": 128,
+        "predicted_ms": 14610.966,
+        "predicted_per_token_ms": 114.148171875,
+        "predicted_per_second": 8.760543279616146,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 75,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11974157,
+    "peak_trial_rss_kib": 11977604,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24182948,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T13:17:41.284Z"
+}

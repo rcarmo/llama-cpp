@@ -1,0 +1,164 @@
+{
+  "version": "t02-v1-reviewed",
+  "frozen_at": "2026-09-11T07:14:45.133Z",
+  "source_sha256": "ca48a7911d87dab907699007a385a262472e15232fe6015ef12f1952761058fc",
+  "coding": [
+    {
+      "id": "coding-normalise-tags-v1",
+      "exportName": "normaliseTags",
+      "prompt_sha256": "a9aca028619bffeb4117a39d7a39945e2256048a89a6a14f3d8ae9bd4e82f9a6",
+      "validator_sha256": "58064c262e42db5d7eb516ae85365c4d2724bcafeaf457517b7f810e829af5af",
+      "reference_sha256": "face2ed9eacc09ab623fc7be50c63d4488fee1fc186cfcfb345a0b4451eb6e2e",
+      "max_tokens": 512,
+      "seeds": [
+        42,
+        43
+      ]
+    },
+    {
+      "id": "coding-merge-intervals-v1",
+      "exportName": "mergeIntervals",
+      "prompt_sha256": "060cf590f2f91c6a8a291ca7408af4255d2421e6efa9fe123df41d10393cc8ea",
+      "validator_sha256": "6b1c569ddbc621789623d9cf5820c48aca181fb86fcee5da25ff1d7fe7ca304f",
+      "reference_sha256": "c77f8b93c16e5592e1ce856aaf2283642863499826befba7f5f5bf1660600a3d",
+      "max_tokens": 512,
+      "seeds": [
+        42,
+        43
+      ]
+    }
+  ],
+  "retrieval": {
+    "id": "grounded-retrieval-release-note-v1",
+    "kind": "grounded-retrieval",
+    "instructions": "Answer only from the provided source note. If a requested fact is missing, say \"not in source\". Keep the answer concise.",
+    "sourceTitle": "Release note excerpt",
+    "sourceText": "Release note excerpt\n- Candidate release: cedar-17\n- Rollback approval owner: Mira Patel\n- Local index cache: 64 MiB\n- Validation window: 14 minutes\n- Data source: offline benchmark packet only",
+    "question": "Using only the note, return a JSON object with keys shippedRelease, rollbackApprover, localIndexCache. If no shipped release is established, use the exact string not in source for shippedRelease. The other values are strings.",
+    "expectedAnswer": {
+      "shippedRelease": "not in source",
+      "rollbackApprover": "Mira Patel",
+      "localIndexCache": "64 MiB"
+    },
+    "requiredGroundingPhrases": [
+      "Mira Patel",
+      "64 MiB"
+    ],
+    "seeds": [
+      42,
+      43
+    ],
+    "maxGenerationTokens": 512,
+    "lockedPerCandidate": true
+  },
+  "tools": {
+    "id": "tool-cache-ticket-walk-v1",
+    "kind": "tool-cache",
+    "nonExecuting": true,
+    "description": "Four-round nonexecuting lookupTicket workflow. Rounds 2 and 4 must reuse cached tool results instead of re-calling the tool.",
+    "tools": [
+      "lookupTicket"
+    ],
+    "seeds": [
+      42,
+      43
+    ],
+    "maxGenerationTokens": 512,
+    "lockedPerCandidate": true,
+    "rounds": [
+      {
+        "round": 1,
+        "user": "Check ticket OPS-17. Return JSON with keys id, owner, severity.",
+        "expectedToolCalls": [
+          {
+            "name": "lookupTicket",
+            "arguments": {
+              "id": "OPS-17"
+            }
+          }
+        ],
+        "providedToolResults": [
+          {
+            "id": "OPS-17",
+            "owner": "Mira",
+            "severity": "medium",
+            "component": "cache warmer"
+          }
+        ],
+        "cacheKeysRead": [],
+        "expectedAssistantResult": {
+          "id": "OPS-17",
+          "owner": "Mira",
+          "severity": "medium"
+        }
+      },
+      {
+        "round": 2,
+        "user": "Using the previous tool result without calling the tool again, return JSON with keys id, component, usedCache (true).",
+        "expectedToolCalls": [],
+        "providedToolResults": [],
+        "cacheKeysRead": [
+          "OPS-17"
+        ],
+        "expectedAssistantResult": {
+          "id": "OPS-17",
+          "component": "cache warmer",
+          "usedCache": true
+        }
+      },
+      {
+        "round": 3,
+        "user": "Now check OPS-18. Return JSON with keys id, owner, severity, moreSevereThanOps17 (a boolean). Severity order is low, medium, high.",
+        "expectedToolCalls": [
+          {
+            "name": "lookupTicket",
+            "arguments": {
+              "id": "OPS-18"
+            }
+          }
+        ],
+        "providedToolResults": [
+          {
+            "id": "OPS-18",
+            "owner": "Jon",
+            "severity": "high",
+            "component": "restore path"
+          }
+        ],
+        "cacheKeysRead": [
+          "OPS-17"
+        ],
+        "expectedAssistantResult": {
+          "id": "OPS-18",
+          "owner": "Jon",
+          "severity": "high",
+          "moreSevereThanOps17": true
+        }
+      },
+      {
+        "round": 4,
+        "user": "Using the previous tool results without calling tools, return JSON with keys tickets (array of objects with id and owner in ascending ticket order), usedCache (true).",
+        "expectedToolCalls": [],
+        "providedToolResults": [],
+        "cacheKeysRead": [
+          "OPS-17",
+          "OPS-18"
+        ],
+        "expectedAssistantResult": {
+          "tickets": [
+            {
+              "id": "OPS-17",
+              "owner": "Mira"
+            },
+            {
+              "id": "OPS-18",
+              "owner": "Jon"
+            }
+          ],
+          "usedCache": true
+        }
+      }
+    ]
+  },
+  "contract": "Explicit JSON keys frozen before model runs; all output capped512; fixedretrievalnot-in-source for unestablishedshipment; no candidate-specificrepairs"
+}

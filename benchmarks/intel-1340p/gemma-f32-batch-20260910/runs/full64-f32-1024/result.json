@@ -1,0 +1,147 @@
+{
+  "ok": true,
+  "actual_tokens": 64663,
+  "total_ms": 715245.8902939999,
+  "state_bytes": 1091923940,
+  "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+  "pass": true,
+  "cache_n": 64662,
+  "prompt_n": 1,
+  "append": "MAPLE-726",
+  "append_pass": true,
+  "append_cache_n": 64684,
+  "append_prompt_n": 15,
+  "limits": "Onefresh64K FP32+GPU1024 versus retainedFP32+256control; temporalcomparison only. CPUargvfixed256 despite sharedconfigupdatedforGPU. SameGPUresidency,FAoff,CPU8/MTP3,compactstate. Startup/append/scanexcludedfromtotal.",
+  "state_finite": true,
+  "swa_max_cells": 768,
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 256,
+    "ubatch": 1024,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu",
+    "preserveSwaPadding": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32"
+    }
+  },
+  "calls": [
+    {
+      "label": "prefill",
+      "device": "vulkan",
+      "wall_ms": 700897.914563,
+      "package_j": 25303.832988,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 64662,
+        "prompt_ms": 700866.379,
+        "prompt_per_token_ms": 10.838922071695896,
+        "prompt_per_second": 92.26009684222562,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "save",
+      "device": "vulkan",
+      "wall_ms": 6943.884336999967,
+      "package_j": 74.747795,
+      "timings": {
+        "save_ms": 6942.643
+      },
+      "n_written": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "restore",
+      "device": "cpu",
+      "wall_ms": 382.66608999995515,
+      "package_j": 5.343615,
+      "timings": {
+        "restore_ms": 355.221
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode",
+      "device": "cpu",
+      "wall_ms": 3469.426754999906,
+      "package_j": 112.317218,
+      "timings": {
+        "cache_n": 64662,
+        "prompt_n": 1,
+        "prompt_ms": 244.809,
+        "prompt_per_token_ms": 244.809,
+        "prompt_per_second": 4.084817143160587,
+        "predicted_n": 21,
+        "predicted_ms": 3040.896,
+        "predicted_per_token_ms": 144.80457142857145,
+        "predicted_per_second": 6.9058593256724325,
+        "draft_n": 18,
+        "draft_n_accepted": 15
+      },
+      "usage": {
+        "completion_tokens": 21,
+        "prompt_tokens": 64663,
+        "total_tokens": 64684,
+        "prompt_tokens_details": {
+          "cached_tokens": 64662
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "append",
+      "device": "cpu",
+      "wall_ms": 2530.2965519999852,
+      "package_j": 85.262904,
+      "timings": {
+        "cache_n": 64684,
+        "prompt_n": 15,
+        "prompt_ms": 1337.072,
+        "prompt_per_token_ms": 89.13813333333333,
+        "prompt_per_second": 11.218543204853592,
+        "predicted_n": 7,
+        "predicted_ms": 982.722,
+        "predicted_per_token_ms": 140.38885714285715,
+        "predicted_per_second": 7.1230724457171,
+        "draft_n": 6,
+        "draft_n_accepted": 5
+      },
+      "usage": {
+        "completion_tokens": 7,
+        "prompt_tokens": 64699,
+        "total_tokens": 64706,
+        "prompt_tokens_details": {
+          "cached_tokens": 64684
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 100,
+    "hot": true,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12115649,
+    "peak_trial_rss_kib": 17075632,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 14694436,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T21:28:37.655Z"
+}

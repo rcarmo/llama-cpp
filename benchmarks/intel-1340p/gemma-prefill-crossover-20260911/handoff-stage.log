@@ -1,0 +1,19 @@
+PASS speech state
+true
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"Resume finite saved4K active256/max1024 GPU state into B0CPU without repeating GPU prefill","kind":"mixed","weight":"heavy","role":"entrypoint"}
+3 | */
+4 | import{Trial,root,fixture,save}from'./campaign';import{copyFileSync,readFileSync}from'node:fs';import{convertGemmaV3ToV2}from'./gemma-state-v2';
+5 | const t=new Trial('cap256-handoff-resume',{maintenance:true,build:'baseline',format:'f16',fa:false,full:false,cpuCtx:262144,parallel:2,cache:0,ubatch:256,batch:1024,cpuBuild:'/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime-cpu',extraEnv:{LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH:'1',GGML_CPU_EXPERIMENTAL_ATTN4:'1',GGML_CPU_EXPERIMENTAL_SCORE4_3ROW:'1'}});let result:any={};
+6 | try{await t.begin();const scan=JSON.parse(readFileSync(root+'/runs/cap256-probe4k-trace/finite-scan.json','utf8'));if(scan.total_nan||scan.total_inf)throw Error('Nonfinite');copyFileSync(root+'/runs/cap256-probe4k-trace/slots/probe.slot',t.dir+'/slots/probe.slot');const conversion=convertGemmaV3ToV2(t.dir+'/slots/probe.slot',t.dir+'/slots/probe-v2.slot');save(t.dir+'/conversion.json',conversion);await t.start('cpu');await t.req('cpu','restore',{filename:'probe-v2.slot'},'/slots/0?action=restore');const f=fixture(4096),c=await t.req('cpu','continue',{...f,n_predict:16,cache_prompt:true,id_slot:0});if(c.timings.prompt_n!==1||c.timings.cache_n!==4095)throw Error('Cachecoverage');result={ok:true,finite:true,cache:c.timings.cache_n,evaluated:c.timings.prompt_n,swa_cells:Math.max(...scan.layers.filter(l=>l.cache===1).map(l=>l.cells)),answer:c.content};}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}
+
+ENOENT: no such file or directory, copyfile '/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/cap256-probe4k-trace/slots/probe.slot' -> '/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/cap256-handoff-resume/slots/probe.slot'
+    path: "/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/cap256-probe4k-trace/slots/probe.slot",
+    dest: "/var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/runs/cap256-handoff-resume/slots/probe.slot",
+ syscall: "copyfile",
+   errno: -2,
+    code: "ENOENT"
+
+      at /var/home/agent/workspace/reports/gemma-prefill-crossover-20260911/handoff-resume.ts:6:175
+
+FINISHED cap256-handoff-resume false

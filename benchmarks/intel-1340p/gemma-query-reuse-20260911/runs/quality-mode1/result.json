@@ -1,0 +1,1167 @@
+{
+  "ok": true,
+  "mode": 1,
+  "rows": [
+    {
+      "kind": "coding",
+      "fixture": "coding-normalise-tags-v1",
+      "seed": 42,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```js\nexport function normaliseTags(tags) {\n  if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {\n    throw new Error('Input must be an array of strings.');\n  }\n\n  const result = [];\n  const seen = new Set();\n\n  for (const tag of tags) {\n    // 1. Trim, lowercase\n    let normalized = tag.trim().toLowerCase();\n\n    // 2. Replace runs of spaces or underscores with '-'\n    normalized = normalized.replace(/[\\s_]+/g, '-');\n\n    // 3. Collapse repeated '-'\n    normalized = normalized.replace(/-+/g, '-');\n\n    // 4. Remove leading and trailing '-'\n    normalized = normalized.replace(/^-|-$/g, '');\n\n    // 5. Drop empty results\n    if (normalized.length === 0) {\n      continue;\n    }\n\n    // 6. Deduplicate while preserving first occurrence order\n    if (!seen.has(normalized)) {\n      result.push(normalized);\n      seen.add(normalized);\n    }\n  }\n\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139390,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 259,
+          "prompt_tokens": 132,
+          "total_tokens": 391,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-pXL2hSlMRVq7xa3No4WjztWRgSACMwAf",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 132,
+          "prompt_ms": 1992.685,
+          "prompt_per_token_ms": 15.096098484848484,
+          "prompt_per_second": 66.24228114328156,
+          "predicted_n": 259,
+          "predicted_ms": 10455.827,
+          "predicted_per_token_ms": 40.36998841698841,
+          "predicted_per_second": 24.77087656480927,
+          "draft_n": 246,
+          "draft_n_accepted": 177
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-chunk-v1",
+      "seed": 42,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139397,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-IjmfVY6RZNWSvnVhQrXZvm7TD3gPVydE",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1707.186,
+          "prompt_per_token_ms": 18.55636956521739,
+          "prompt_per_second": 53.88985148659842,
+          "predicted_n": 154,
+          "predicted_ms": 5531.328,
+          "predicted_per_token_ms": 35.91771428571429,
+          "predicted_per_second": 27.84141529845997,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "retrieval",
+      "seed": 42,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"shippedRelease\": \"not in source\",\n  \"rollbackApprover\": \"Mira Patel\",\n  \"localIndexCache\": \"64 MiB\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139401,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 45,
+          "prompt_tokens": 137,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-4Tck7U1uSKju9MsZM1uBSVzz2Vg2x7fx",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 137,
+          "prompt_ms": 2122.9,
+          "prompt_per_token_ms": 15.495620437956205,
+          "prompt_per_second": 64.53436337086062,
+          "predicted_n": 45,
+          "predicted_ms": 1512.651,
+          "predicted_per_token_ms": 33.614466666666665,
+          "predicted_per_second": 29.74909612329612,
+          "draft_n": 36,
+          "draft_n_accepted": 32
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 1,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"owner\": \"Mira\",\n  \"severity\": \"medium\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139405,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 147,
+          "total_tokens": 183,
+          "prompt_tokens_details": {
+            "cached_tokens": 93
+          }
+        },
+        "id": "chatcmpl-KlyfwDBuct00MIaSGuvJVgx5c6K4zCYm",
+        "timings": {
+          "cache_n": 93,
+          "prompt_n": 54,
+          "prompt_ms": 913.207,
+          "prompt_per_token_ms": 16.91124074074074,
+          "prompt_per_second": 59.13226683544914,
+          "predicted_n": 36,
+          "predicted_ms": 1139.44,
+          "predicted_per_token_ms": 31.651111111111113,
+          "predicted_per_second": 31.594467457698517,
+          "draft_n": 27,
+          "draft_n_accepted": 26
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 2,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"component\": \"cache warmer\",\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139408,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 216,
+          "total_tokens": 252,
+          "prompt_tokens_details": {
+            "cached_tokens": 142
+          }
+        },
+        "id": "chatcmpl-Ed795NJNbm7gsath3fIagVzdwxNGryrM",
+        "timings": {
+          "cache_n": 142,
+          "prompt_n": 74,
+          "prompt_ms": 1231.163,
+          "prompt_per_token_ms": 16.637337837837837,
+          "prompt_per_second": 60.105769910239346,
+          "predicted_n": 36,
+          "predicted_ms": 1140.445,
+          "predicted_per_token_ms": 31.679027777777776,
+          "predicted_per_second": 31.566625308541845,
+          "draft_n": 27,
+          "draft_n_accepted": 27
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 3,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-18\",\n  \"owner\": \"Jon\",\n  \"severity\": \"high\",\n  \"moreSevereThanOps17\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139413,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 47,
+          "prompt_tokens": 346,
+          "total_tokens": 393,
+          "prompt_tokens_details": {
+            "cached_tokens": 292
+          }
+        },
+        "id": "chatcmpl-se1OUnlDF6AQunr7jDrH81VMqzHmv0m6",
+        "timings": {
+          "cache_n": 292,
+          "prompt_n": 54,
+          "prompt_ms": 884.618,
+          "prompt_per_token_ms": 16.381814814814817,
+          "prompt_per_second": 61.043297785032635,
+          "predicted_n": 47,
+          "predicted_ms": 1554.964,
+          "predicted_per_token_ms": 33.08434042553191,
+          "predicted_per_second": 30.225780146678638,
+          "draft_n": 36,
+          "draft_n_accepted": 36
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 4,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"tickets\": [\n    {\n      \"id\": \"OPS-17\",\n      \"owner\": \"Mira\"\n    },\n    {\n      \"id\": \"OPS-18\",\n      \"owner\": \"Jon\"\n    }\n  ],\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139417,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 434,
+          "total_tokens": 509,
+          "prompt_tokens_details": {
+            "cached_tokens": 341
+          }
+        },
+        "id": "chatcmpl-mWDKpHCTAVxdaYEMvoJ2HHNXRSzlcNIZ",
+        "timings": {
+          "cache_n": 341,
+          "prompt_n": 93,
+          "prompt_ms": 1463.698,
+          "prompt_per_token_ms": 15.738688172043013,
+          "prompt_per_second": 63.53769698394067,
+          "predicted_n": 75,
+          "predicted_ms": 2408.562,
+          "predicted_per_token_ms": 32.11416,
+          "predicted_per_second": 31.138911931683722,
+          "draft_n": 57,
+          "draft_n_accepted": 56
+        }
+      }
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-normalise-tags-v1",
+      "seed": 43,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```js\nexport function normaliseTags(tags) {\n  if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {\n    throw new Error('Input must be an array of strings.');\n  }\n\n  const result = [];\n  const seen = new Set();\n\n  for (const tag of tags) {\n    // 1. Trim, lowercase\n    let normalized = tag.trim().toLowerCase();\n\n    // 2. Replace runs of spaces or underscores with '-'\n    normalized = normalized.replace(/[\\s_]+/g, '-');\n\n    // 3. Collapse repeated '-'\n    normalized = normalized.replace(/-+/g, '-');\n\n    // 4. Remove leading and trailing '-'\n    normalized = normalized.replace(/^-|-$/g, '');\n\n    // 5. Drop empty results\n    if (normalized.length === 0) {\n      continue;\n    }\n\n    // 6. Deduplicate while preserving first occurrence order\n    if (!seen.has(normalized)) {\n      result.push(normalized);\n      seen.add(normalized);\n    }\n  }\n\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139429,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 259,
+          "prompt_tokens": 132,
+          "total_tokens": 391,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-Zo57guyCVNPv8hQB3m3Bb2b2tbWVfwlx",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 132,
+          "prompt_ms": 1942.153,
+          "prompt_per_token_ms": 14.713280303030302,
+          "prompt_per_second": 67.96580907889337,
+          "predicted_n": 259,
+          "predicted_ms": 10066.066,
+          "predicted_per_token_ms": 38.865119691119695,
+          "predicted_per_second": 25.73001210204662,
+          "draft_n": 246,
+          "draft_n_accepted": 177
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-chunk-v1",
+      "seed": 43,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139436,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-PLnWt2nAa735gNHH7dZc8l0tG0Wt8aNL",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1543.104,
+          "prompt_per_token_ms": 16.77286956521739,
+          "prompt_per_second": 59.620090415163205,
+          "predicted_n": 154,
+          "predicted_ms": 5297.674,
+          "predicted_per_token_ms": 34.40048051948052,
+          "predicted_per_second": 29.069361383882814,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "retrieval",
+      "seed": 43,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"shippedRelease\": \"not in source\",\n  \"rollbackApprover\": \"Mira Patel\",\n  \"localIndexCache\": \"64 MiB\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139439,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 45,
+          "prompt_tokens": 137,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-Hg0eIWJPfgrRRZE1BTwGoBhKyoNlqwbS",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 137,
+          "prompt_ms": 2156.642,
+          "prompt_per_token_ms": 15.741912408759124,
+          "prompt_per_second": 63.52468328076705,
+          "predicted_n": 45,
+          "predicted_ms": 1495.232,
+          "predicted_per_token_ms": 33.227377777777775,
+          "predicted_per_second": 30.095664084235757,
+          "draft_n": 36,
+          "draft_n_accepted": 32
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 1,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"owner\": \"Mira\",\n  \"severity\": \"medium\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139444,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 147,
+          "total_tokens": 183,
+          "prompt_tokens_details": {
+            "cached_tokens": 93
+          }
+        },
+        "id": "chatcmpl-0xsnkpIatkwfVrG352i4qwbIedWgbqNF",
+        "timings": {
+          "cache_n": 93,
+          "prompt_n": 54,
+          "prompt_ms": 1022.252,
+          "prompt_per_token_ms": 18.930592592592593,
+          "prompt_per_second": 52.824548154466804,
+          "predicted_n": 36,
+          "predicted_ms": 1113.474,
+          "predicted_per_token_ms": 30.92983333333333,
+          "predicted_per_second": 32.33124437571062,
+          "draft_n": 27,
+          "draft_n_accepted": 26
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 2,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"component\": \"cache warmer\",\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139447,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 216,
+          "total_tokens": 252,
+          "prompt_tokens_details": {
+            "cached_tokens": 142
+          }
+        },
+        "id": "chatcmpl-G1snbuCfqKKDfDMxPRss3bXp3gvJaQLi",
+        "timings": {
+          "cache_n": 142,
+          "prompt_n": 74,
+          "prompt_ms": 1451.499,
+          "prompt_per_token_ms": 19.61485135135135,
+          "prompt_per_second": 50.98177814796979,
+          "predicted_n": 36,
+          "predicted_ms": 1098.407,
+          "predicted_per_token_ms": 30.511305555555552,
+          "predicted_per_second": 32.774736504774644,
+          "draft_n": 27,
+          "draft_n_accepted": 27
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 3,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-18\",\n  \"owner\": \"Jon\",\n  \"severity\": \"high\",\n  \"moreSevereThanOps17\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139451,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 47,
+          "prompt_tokens": 346,
+          "total_tokens": 393,
+          "prompt_tokens_details": {
+            "cached_tokens": 292
+          }
+        },
+        "id": "chatcmpl-fv9PDH3GSC87Nf2X6vSjJFQG403rqwd4",
+        "timings": {
+          "cache_n": 292,
+          "prompt_n": 54,
+          "prompt_ms": 1042.432,
+          "prompt_per_token_ms": 19.304296296296297,
+          "prompt_per_second": 51.80194007858546,
+          "predicted_n": 47,
+          "predicted_ms": 1533.157,
+          "predicted_per_token_ms": 32.62036170212766,
+          "predicted_per_second": 30.6556993184651,
+          "draft_n": 36,
+          "draft_n_accepted": 36
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 4,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"tickets\": [\n    {\n      \"id\": \"OPS-17\",\n      \"owner\": \"Mira\"\n    },\n    {\n      \"id\": \"OPS-18\",\n      \"owner\": \"Jon\"\n    }\n  ],\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139455,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 434,
+          "total_tokens": 509,
+          "prompt_tokens_details": {
+            "cached_tokens": 341
+          }
+        },
+        "id": "chatcmpl-v5oxl84NlGuSbmpLlmfngLAUhOGcV2mQ",
+        "timings": {
+          "cache_n": 341,
+          "prompt_n": 93,
+          "prompt_ms": 1679.717,
+          "prompt_per_token_ms": 18.061473118279572,
+          "prompt_per_second": 55.366469470750125,
+          "predicted_n": 75,
+          "predicted_ms": 2327.306,
+          "predicted_per_token_ms": 31.030746666666666,
+          "predicted_per_second": 32.22610176745129,
+          "draft_n": 57,
+          "draft_n_accepted": 56
+        }
+      }
+    }
+  ],
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "cpuBuild": "/var/home/agent/workspace/reports/gemma-query-reuse-20260911/runtime-cpu",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "extraEnv": {
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "coding-normalise-tags-v1-42",
+      "device": "cpu",
+      "wall_ms": 12452.908913,
+      "package_j": 477.927426,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 132,
+        "prompt_ms": 1992.685,
+        "prompt_per_token_ms": 15.096098484848484,
+        "prompt_per_second": 66.24228114328156,
+        "predicted_n": 259,
+        "predicted_ms": 10455.827,
+        "predicted_per_token_ms": 40.36998841698841,
+        "predicted_per_second": 24.77087656480927,
+        "draft_n": 246,
+        "draft_n_accepted": 177
+      },
+      "usage": {
+        "completion_tokens": 259,
+        "prompt_tokens": 132,
+        "total_tokens": 391,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "coding-chunk-v1-42",
+      "device": "cpu",
+      "wall_ms": 7242.530627,
+      "package_j": 276.009426,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 92,
+        "prompt_ms": 1707.186,
+        "prompt_per_token_ms": 18.55636956521739,
+        "prompt_per_second": 53.88985148659842,
+        "predicted_n": 154,
+        "predicted_ms": 5531.328,
+        "predicted_per_token_ms": 35.91771428571429,
+        "predicted_per_second": 27.84141529845997,
+        "draft_n": 132,
+        "draft_n_accepted": 112
+      },
+      "usage": {
+        "completion_tokens": 154,
+        "prompt_tokens": 92,
+        "total_tokens": 246,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "retrieval-42",
+      "device": "cpu",
+      "wall_ms": 3639.415777000002,
+      "package_j": 144.224118,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 137,
+        "prompt_ms": 2122.9,
+        "prompt_per_token_ms": 15.495620437956205,
+        "prompt_per_second": 64.53436337086062,
+        "predicted_n": 45,
+        "predicted_ms": 1512.651,
+        "predicted_per_token_ms": 33.614466666666665,
+        "predicted_per_second": 29.74909612329612,
+        "draft_n": 36,
+        "draft_n_accepted": 32
+      },
+      "usage": {
+        "completion_tokens": 45,
+        "prompt_tokens": 137,
+        "total_tokens": 182,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r1",
+      "device": "cpu",
+      "wall_ms": 2077.888371000001,
+      "package_j": 83.461273,
+      "timings": {
+        "cache_n": 1,
+        "prompt_n": 97,
+        "prompt_ms": 1554.982,
+        "prompt_per_token_ms": 16.030742268041237,
+        "prompt_per_second": 62.380143307125095,
+        "predicted_n": 17,
+        "predicted_ms": 516.6,
+        "predicted_per_token_ms": 30.38823529411765,
+        "predicted_per_second": 32.907471931862176,
+        "draft_n": 12,
+        "draft_n_accepted": 12
+      },
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 98,
+        "total_tokens": 115,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r1-answer",
+      "device": "cpu",
+      "wall_ms": 2059.5286289999967,
+      "package_j": 81.195837,
+      "timings": {
+        "cache_n": 93,
+        "prompt_n": 54,
+        "prompt_ms": 913.207,
+        "prompt_per_token_ms": 16.91124074074074,
+        "prompt_per_second": 59.13226683544914,
+        "predicted_n": 36,
+        "predicted_ms": 1139.44,
+        "predicted_per_token_ms": 31.651111111111113,
+        "predicted_per_second": 31.594467457698517,
+        "draft_n": 27,
+        "draft_n_accepted": 26
+      },
+      "usage": {
+        "completion_tokens": 36,
+        "prompt_tokens": 147,
+        "total_tokens": 183,
+        "prompt_tokens_details": {
+          "cached_tokens": 93
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r2",
+      "device": "cpu",
+      "wall_ms": 2381.734271000001,
+      "package_j": 94.489382,
+      "timings": {
+        "cache_n": 142,
+        "prompt_n": 74,
+        "prompt_ms": 1231.163,
+        "prompt_per_token_ms": 16.637337837837837,
+        "prompt_per_second": 60.105769910239346,
+        "predicted_n": 36,
+        "predicted_ms": 1140.445,
+        "predicted_per_token_ms": 31.679027777777776,
+        "predicted_per_second": 31.566625308541845,
+        "draft_n": 27,
+        "draft_n_accepted": 27
+      },
+      "usage": {
+        "completion_tokens": 36,
+        "prompt_tokens": 216,
+        "total_tokens": 252,
+        "prompt_tokens_details": {
+          "cached_tokens": 142
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r3",
+      "device": "cpu",
+      "wall_ms": 2004.3293309999935,
+      "package_j": 79.772013,
+      "timings": {
+        "cache_n": 211,
+        "prompt_n": 86,
+        "prompt_ms": 1467.484,
+        "prompt_per_token_ms": 17.063767441860463,
+        "prompt_per_second": 58.60370538963287,
+        "predicted_n": 17,
+        "predicted_ms": 522.441,
+        "predicted_per_token_ms": 30.731823529411766,
+        "predicted_per_second": 32.53955949092816,
+        "draft_n": 12,
+        "draft_n_accepted": 12
+      },
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 297,
+        "total_tokens": 314,
+        "prompt_tokens_details": {
+          "cached_tokens": 211
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r3-answer",
+      "device": "cpu",
+      "wall_ms": 2456.4718339999963,
+      "package_j": 95.922057,
+      "timings": {
+        "cache_n": 292,
+        "prompt_n": 54,
+        "prompt_ms": 884.618,
+        "prompt_per_token_ms": 16.381814814814817,
+        "prompt_per_second": 61.043297785032635,
+        "predicted_n": 47,
+        "predicted_ms": 1554.964,
+        "predicted_per_token_ms": 33.08434042553191,
+        "predicted_per_second": 30.225780146678638,
+        "draft_n": 36,
+        "draft_n_accepted": 36
+      },
+      "usage": {
+        "completion_tokens": 47,
+        "prompt_tokens": 346,
+        "total_tokens": 393,
+        "prompt_tokens_details": {
+          "cached_tokens": 292
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-42-r4",
+      "device": "cpu",
+      "wall_ms": 3917.2451189999992,
+      "package_j": 154.284089,
+      "timings": {
+        "cache_n": 341,
+        "prompt_n": 93,
+        "prompt_ms": 1463.698,
+        "prompt_per_token_ms": 15.738688172043013,
+        "prompt_per_second": 63.53769698394067,
+        "predicted_n": 75,
+        "predicted_ms": 2408.562,
+        "predicted_per_token_ms": 32.11416,
+        "predicted_per_second": 31.138911931683722,
+        "draft_n": 57,
+        "draft_n_accepted": 56
+      },
+      "usage": {
+        "completion_tokens": 75,
+        "prompt_tokens": 434,
+        "total_tokens": 509,
+        "prompt_tokens_details": {
+          "cached_tokens": 341
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "coding-normalise-tags-v1-43",
+      "device": "cpu",
+      "wall_ms": 12012.772324999998,
+      "package_j": 472.039624,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 132,
+        "prompt_ms": 1942.153,
+        "prompt_per_token_ms": 14.713280303030302,
+        "prompt_per_second": 67.96580907889337,
+        "predicted_n": 259,
+        "predicted_ms": 10066.066,
+        "predicted_per_token_ms": 38.865119691119695,
+        "predicted_per_second": 25.73001210204662,
+        "draft_n": 246,
+        "draft_n_accepted": 177
+      },
+      "usage": {
+        "completion_tokens": 259,
+        "prompt_tokens": 132,
+        "total_tokens": 391,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "coding-chunk-v1-43",
+      "device": "cpu",
+      "wall_ms": 6844.672595000004,
+      "package_j": 268.993269,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 92,
+        "prompt_ms": 1543.104,
+        "prompt_per_token_ms": 16.77286956521739,
+        "prompt_per_second": 59.620090415163205,
+        "predicted_n": 154,
+        "predicted_ms": 5297.674,
+        "predicted_per_token_ms": 34.40048051948052,
+        "predicted_per_second": 29.069361383882814,
+        "draft_n": 132,
+        "draft_n_accepted": 112
+      },
+      "usage": {
+        "completion_tokens": 154,
+        "prompt_tokens": 92,
+        "total_tokens": 246,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "retrieval-43",
+      "device": "cpu",
+      "wall_ms": 3655.6914259999903,
+      "package_j": 145.221308,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 137,
+        "prompt_ms": 2156.642,
+        "prompt_per_token_ms": 15.741912408759124,
+        "prompt_per_second": 63.52468328076705,
+        "predicted_n": 45,
+        "predicted_ms": 1495.232,
+        "predicted_per_token_ms": 33.227377777777775,
+        "predicted_per_second": 30.095664084235757,
+        "draft_n": 36,
+        "draft_n_accepted": 32
+      },
+      "usage": {
+        "completion_tokens": 45,
+        "prompt_tokens": 137,
+        "total_tokens": 182,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r1",
+      "device": "cpu",
+      "wall_ms": 2056.4200580000033,
+      "package_j": 83.177339,
+      "timings": {
+        "cache_n": 1,
+        "prompt_n": 97,
+        "prompt_ms": 1538.574,
+        "prompt_per_token_ms": 15.86158762886598,
+        "prompt_per_second": 63.045391381889985,
+        "predicted_n": 17,
+        "predicted_ms": 511.896,
+        "predicted_per_token_ms": 30.111529411764707,
+        "predicted_per_second": 33.209870754997105,
+        "draft_n": 12,
+        "draft_n_accepted": 12
+      },
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 98,
+        "total_tokens": 115,
+        "prompt_tokens_details": {
+          "cached_tokens": 1
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r1-answer",
+      "device": "cpu",
+      "wall_ms": 2143.24635999999,
+      "package_j": 83.557831,
+      "timings": {
+        "cache_n": 93,
+        "prompt_n": 54,
+        "prompt_ms": 1022.252,
+        "prompt_per_token_ms": 18.930592592592593,
+        "prompt_per_second": 52.824548154466804,
+        "predicted_n": 36,
+        "predicted_ms": 1113.474,
+        "predicted_per_token_ms": 30.92983333333333,
+        "predicted_per_second": 32.33124437571062,
+        "draft_n": 27,
+        "draft_n_accepted": 26
+      },
+      "usage": {
+        "completion_tokens": 36,
+        "prompt_tokens": 147,
+        "total_tokens": 183,
+        "prompt_tokens_details": {
+          "cached_tokens": 93
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r2",
+      "device": "cpu",
+      "wall_ms": 2559.7833050000045,
+      "package_j": 102.202558,
+      "timings": {
+        "cache_n": 142,
+        "prompt_n": 74,
+        "prompt_ms": 1451.499,
+        "prompt_per_token_ms": 19.61485135135135,
+        "prompt_per_second": 50.98177814796979,
+        "predicted_n": 36,
+        "predicted_ms": 1098.407,
+        "predicted_per_token_ms": 30.511305555555552,
+        "predicted_per_second": 32.774736504774644,
+        "draft_n": 27,
+        "draft_n_accepted": 27
+      },
+      "usage": {
+        "completion_tokens": 36,
+        "prompt_tokens": 216,
+        "total_tokens": 252,
+        "prompt_tokens_details": {
+          "cached_tokens": 142
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r3",
+      "device": "cpu",
+      "wall_ms": 1883.1739170000073,
+      "package_j": 76.202076,
+      "timings": {
+        "cache_n": 211,
+        "prompt_n": 86,
+        "prompt_ms": 1345.207,
+        "prompt_per_token_ms": 15.641941860465117,
+        "prompt_per_second": 63.93068130035005,
+        "predicted_n": 17,
+        "predicted_ms": 523.857,
+        "predicted_per_token_ms": 30.815117647058823,
+        "predicted_per_second": 32.45160415915031,
+        "draft_n": 12,
+        "draft_n_accepted": 12
+      },
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 297,
+        "total_tokens": 314,
+        "prompt_tokens_details": {
+          "cached_tokens": 211
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r3-answer",
+      "device": "cpu",
+      "wall_ms": 2592.185018999997,
+      "package_j": 100.222522,
+      "timings": {
+        "cache_n": 292,
+        "prompt_n": 54,
+        "prompt_ms": 1042.432,
+        "prompt_per_token_ms": 19.304296296296297,
+        "prompt_per_second": 51.80194007858546,
+        "predicted_n": 47,
+        "predicted_ms": 1533.157,
+        "predicted_per_token_ms": 32.62036170212766,
+        "predicted_per_second": 30.6556993184651,
+        "draft_n": 36,
+        "draft_n_accepted": 36
+      },
+      "usage": {
+        "completion_tokens": 47,
+        "prompt_tokens": 346,
+        "total_tokens": 393,
+        "prompt_tokens_details": {
+          "cached_tokens": 292
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "tool-43-r4",
+      "device": "cpu",
+      "wall_ms": 4025.2593500000075,
+      "package_j": 157.90432,
+      "timings": {
+        "cache_n": 341,
+        "prompt_n": 93,
+        "prompt_ms": 1679.717,
+        "prompt_per_token_ms": 18.061473118279572,
+        "prompt_per_second": 55.366469470750125,
+        "predicted_n": 75,
+        "predicted_ms": 2327.306,
+        "predicted_per_token_ms": 31.030746666666666,
+        "predicted_per_second": 32.22610176745129,
+        "draft_n": 57,
+        "draft_n_accepted": 56
+      },
+      "usage": {
+        "completion_tokens": 75,
+        "prompt_tokens": 434,
+        "total_tokens": 509,
+        "prompt_tokens_details": {
+          "cached_tokens": 341
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 91,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 11942374,
+    "peak_trial_rss_kib": 11945712,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24282408,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T15:10:56.504Z"
+}

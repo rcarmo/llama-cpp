@@ -1,0 +1,78 @@
+--- a/sgemm.cpp
++++ b/sgemm.cpp
+@@ -599,7 +599,46 @@
+                 C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
+     }
+ 
++    template <int RM, int RN>
++    inline void gemm_bloc_score_nounroll(int64_t ii, int64_t jj) {
++        D Cv[RN][RM] = {};
++        #if defined(__clang__)
++        #pragma clang loop unroll(disable)
++        #endif
++        for (int64_t l = 0; l < k; l += KN) {
++            // help compiler for op order.
++            if constexpr (RM <= RN) {
++                V Av[RM];
++                for (int64_t i = 0; i < RM; ++i) {
++                    Av[i] = load<V>(A + lda * (ii + i) + l);
++                }
++                for (int64_t j = 0; j < RN; ++j) {
++                    V Bv = load<V>(B + ldb * (jj + j) + l);
++                    for (int64_t i = 0; i < RM; ++i) {
++                        Cv[j][i] = madd(Av[i], Bv, Cv[j][i]);
++                    }
++                }
++            } else {
++                V Bv[RN];
++                for (int64_t j = 0; j < RN; ++j) {
++                    Bv[j] = load<V>(B + ldb * (jj + j) + l);
++                }
++                for (int64_t i = 0; i < RM; ++i) {
++                    V Av = load<V>(A + lda * (ii + i) + l);
++                    for (int64_t j = 0; j < RN; ++j) {
++                        Cv[j][i] = madd(Av, Bv[j], Cv[j][i]);
++                    }
++                }
++            }
++        }
++        for (int64_t j = 0; j < RN; ++j)
++            for (int64_t i = 0; i < RM; ++i)
++                C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
++    }
++
+     NOINLINE void gemm_score3(int64_t m) {
++        static const bool nounroll = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_NOUNROLL") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_NOUNROLL"), "1") == 0;
++        if (nounroll && params->ith == 0 && std::getenv("GGML_CPU_SCORE3_NOUNROLL_TRACE")) std::fprintf(stderr, "SCORE3_NOUNROLL m=%lld k=%lld\n", (long long)m, (long long)k);
+         const int64_t nb_job = (m + 47) / 48;
+         if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
+         ggml_barrier(params->threadpool);
+@@ -608,7 +647,10 @@
+             const int64_t begin = job * 48;
+             const int64_t end = begin + 48 < m ? begin + 48 : m;
+             int64_t ii = begin;
+-            for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
++            for (; ii + 3 <= end; ii += 3) {
++                if (nounroll) gemm_bloc_score_nounroll<3, 4>(ii, 0);
++                else gemm_bloc<3, 4>(ii, 0);
++            }
+             if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
+             if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
+             job = ggml_threadpool_chunk_add(params->threadpool, 1);
+@@ -1406,6 +1448,16 @@
+     }
+ 
+     void matmul(int64_t m, int64_t n) {
++#if defined(__AVX2__) && defined(__F16C__) && VECTOR_REGISTERS == 16
++        if constexpr (std::is_same<TA, block_q4_0>::value && std::is_same<TB, block_q8_0>::value) {
++            static const bool q4n4 = std::getenv("GGML_CPU_EXPERIMENTAL_Q4_N4_2X4") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_Q4_N4_2X4"), "1") == 0;
++            if (q4n4 && n == 4 && m >= 4 && m % 2 == 0) {
++                if (ith == 0 && std::getenv("GGML_CPU_Q4_N4_TRACE")) std::fprintf(stderr, "Q4_N4_2X4 m=%lld n=%lld kblocks=%lld\n", (long long)m, (long long)n, (long long)k);
++                gemmMx4<2>(0, m, 0, n);
++                return;
++            }
++        }
++#endif
+         mnpack(0, m, 0, n);
+     }
+ 

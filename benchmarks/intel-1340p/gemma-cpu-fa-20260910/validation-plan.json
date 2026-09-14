@@ -1,0 +1,9 @@
+{
+ "scope":"CPU Flash Attention after retained GPU FA-off prefill; separate question from failed GPU FA-on experiment",
+ "declared_before_inference":true,
+ "baseline":"Original CPU b10579-abdbeadfb Gemma E4B Q4_0 target/Q8_0 MTP3;8decode/16prefill,batch1024/ubatch256,compact128Kx2. FA-off default preserved.",
+ "candidate":"Same CPU with FA-on; lossless F16 V-layout transpose and validated v3->v2 text token alignment. GPU source state computed FA-off; no recomputation needed.",
+ "gates":["fresh speech clearance18:38:22UTC plus continuous jobs/native/sockets","6GiB reserve and16MiB/process swap; temperature annotation only","approved maintenance stop/automatic unchanged production restore","4K decode/recall/append and exact cache coverage before64K","same64K state/prompt as prior CPU screen,128 output budget; recall3keys and64658cache/25eval","if promising,ABBA/BAAB4per-profile confirmation and synthetic/native precision checks","record conversion cost,restoration overhead,generated/drafted/accepted counts; whole-workflow implications separate","do not infer GPU FA invalid output reproduces on CPU or that CPU FA works before tests"],
+ "stages":["offline FA-on v3/v2 format tests","CPUFA-on4K state smoke","CPUFA-on64K two-iteration screen plus optional MTP-off isolation only if needed","counterbalanced confirmation if correctness holds and improvement/potential merits it"],
+ "limits":"Model-specific bounded schema, not arbitrary input. Small regressions retain conditional branches. No deployment or unguarded model loading. Commit/push checkpoints authorised to rcarmo fork."
+}

@@ -1298,6 +1298,7 @@ struct vk_buffer_struct {
     void * ptr;
     size_t size = 0;
     vk::DeviceAddress bda_addr {};
+    bool imported_host = false;
 
     vk_device device;
 
@@ -1307,8 +1308,8 @@ struct vk_buffer_struct {
         }
         VK_LOG_DEBUG("~vk_buffer_struct(" << buffer << ", " << size << ")");
 
-        device->device.freeMemory(device_memory);
         device->device.destroyBuffer(buffer);
+        device->device.freeMemory(device_memory);
     }
 };
 
@@ -3775,6 +3776,7 @@ static vk_buffer ggml_vk_create_buffer(vk_device& device, size_t size, const std
 
     if (import_ptr) {
         buf->ptr = import_ptr;
+        buf->imported_host = true;
     } else {
         if (buf->memory_property_flags & vk::MemoryPropertyFlagBits::eHostVisible) {
             buf->ptr = device->device.mapMemory(buf->device_memory, 0, VK_WHOLE_SIZE);
@@ -8915,6 +8917,23 @@ static bool ggml_vk_buffer_read_async(vk_context subctx, vk_buffer& src, size_t 
     return ggml_vk_buffer_read_2d_async(subctx, src, offset, dst, size, size, size, 1, sync_staging);
 }
 
+static void ggml_vk_buffer_host_barrier(vk_buffer& src) {
+    std::lock_guard<std::recursive_mutex> guard(src->device->mutex);
+    vk_context subctx = ggml_vk_create_temporary_context(src->device->compute_queue->cmd_pool);
+    ggml_vk_ctx_begin(src->device, subctx);
+    subctx->s->buffer->buf.pipelineBarrier(
+        vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eTransfer,
+        vk::PipelineStageFlagBits::eHost, {},
+        { { vk::AccessFlagBits::eShaderWrite | vk::AccessFlagBits::eTransferWrite,
+            vk::AccessFlagBits::eHostRead | vk::AccessFlagBits::eHostWrite } }, {}, {});
+    ggml_vk_ctx_end(subctx);
+    ggml_vk_submit(subctx, src->device->fence);
+    VK_CHECK(src->device->device.waitForFences({ src->device->fence }, true, UINT64_MAX),
+             "buffer host visibility waitForFences", src->device);
+    src->device->device.resetFences({ src->device->fence });
+    ggml_vk_queue_command_pools_cleanup(src->device);
+}
+
 static void ggml_vk_buffer_read_2d(vk_buffer& src, size_t offset, void * dst, size_t spitch, size_t dpitch, size_t width, size_t height) {
     VK_LOG_DEBUG("ggml_vk_buffer_read_2d(" << src->buffer << ", " << offset << ", " << width << ", " << height << ")");
 
@@ -8925,21 +8944,7 @@ static void ggml_vk_buffer_read_2d(vk_buffer& src, size_t offset, void * dst, si
         GGML_ASSERT(src->memory_property_flags & vk::MemoryPropertyFlagBits::eHostCoherent);
 
         std::lock_guard<std::recursive_mutex> guard(src->device->mutex);
-        vk_context subctx = ggml_vk_create_temporary_context(src->device->compute_queue->cmd_pool);
-        ggml_vk_ctx_begin(src->device, subctx);
-        subctx->s->buffer->buf.pipelineBarrier(
-            vk::PipelineStageFlagBits::eComputeShader | vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eHost,
-            {},
-            { { vk::AccessFlagBits::eShaderWrite | vk::AccessFlagBits::eTransferWrite,
-                vk::AccessFlagBits::eHostRead } },
-            {}, {});
-        ggml_vk_ctx_end(subctx);
-        ggml_vk_submit(subctx, src->device->fence);
-        VK_CHECK(src->device->device.waitForFences({ src->device->fence }, true, UINT64_MAX),
-                 "vk_buffer_read_2d uma waitForFences", src->device);
-        src->device->device.resetFences({ src->device->fence });
-        ggml_vk_queue_command_pools_cleanup(src->device);
+        ggml_vk_buffer_host_barrier(src);
 
         if (width == spitch && width == dpitch) {
             memcpy(dst, (const uint8_t *) src->ptr + offset, width * height);
@@ -16905,6 +16910,77 @@ ggml_backend_buffer_type_t ggml_backend_vk_buffer_type(size_t dev_num) {
 
 // host buffer type
 
+ggml_backend_buffer_t ggml_backend_vk_alloc_cpu_shared_buffer(ggml_backend_t backend, size_t size) {
+    if (!backend || !ggml_backend_is_vk(backend) || size == 0) {
+        return nullptr;
+    }
+    auto * ctx = (ggml_backend_vk_context *) backend->context;
+    auto device = ctx->device;
+    if (!device->uma || device->properties.vendorID != VK_VENDOR_ID_INTEL) {
+        return nullptr;
+    }
+    const auto flags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostCached;
+    try {
+        std::lock_guard<std::recursive_mutex> guard(device->mutex);
+        vk_buffer storage = ggml_vk_create_buffer(device, size, {flags | vk::MemoryPropertyFlagBits::eDeviceLocal, flags});
+        auto * buffer_ctx = new ggml_backend_vk_buffer_context(device, std::move(storage), device->name);
+        return ggml_backend_buffer_init(&device->buffer_type, ggml_backend_vk_buffer_interface, buffer_ctx, size);
+    } catch (const vk::SystemError & e) {
+        GGML_LOG_WARN("ggml_vulkan: CPU shared allocation unavailable (%s)\n", e.what());
+        return nullptr;
+    }
+}
+
+struct ggml_backend_vk_cpu_view_context {
+    vk_buffer storage;
+    ggml_backend_buffer_t host;
+};
+
+static void * ggml_backend_vk_cpu_view_get_base(ggml_backend_buffer_t buffer) {
+    auto * ctx = (ggml_backend_vk_cpu_view_context *) buffer->context;
+    return ggml_backend_buffer_get_base(ctx->host);
+}
+
+static void ggml_backend_vk_cpu_view_clear(ggml_backend_buffer_t buffer, uint8_t value) {
+    auto * ctx = (ggml_backend_vk_cpu_view_context *) buffer->context;
+    ggml_backend_buffer_clear(ctx->host, value);
+}
+
+static void ggml_backend_vk_cpu_view_free(ggml_backend_buffer_t buffer) {
+    auto * ctx = (ggml_backend_vk_cpu_view_context *) buffer->context;
+    ggml_backend_buffer_free(ctx->host);
+    delete ctx;
+}
+
+ggml_backend_buffer_t ggml_backend_vk_buffer_cpu_view(ggml_backend_t backend, ggml_backend_buffer_t buffer, size_t offset, size_t size) {
+    if (!backend || !buffer || !ggml_backend_is_vk(backend) || !ggml_backend_buffer_is_vk(buffer) ||
+        size == 0 || offset > buffer->size || size > buffer->size - offset) {
+        return nullptr;
+    }
+    auto * backend_ctx = (ggml_backend_vk_context *) backend->context;
+    auto * buffer_ctx = (ggml_backend_vk_buffer_context *) buffer->context;
+    vk_buffer storage = buffer_ctx->dev_buffer;
+    const auto required = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent | vk::MemoryPropertyFlagBits::eHostCached;
+    if (!storage || storage->imported_host || storage->device != backend_ctx->device || !storage->device->uma ||
+        storage->device->properties.vendorID != VK_VENDOR_ID_INTEL || !storage->ptr ||
+        (storage->memory_property_flags & required) != required ||
+        offset > storage->size || size > storage->size - offset ||
+        ((uintptr_t) storage->ptr + offset) % ggml_backend_buft_get_alignment(ggml_backend_cpu_buffer_type()) != 0) {
+        return nullptr;
+    }
+
+    ggml_backend_synchronize(backend);
+    ggml_vk_buffer_host_barrier(storage);
+    auto * ctx = new ggml_backend_vk_cpu_view_context {
+        storage, ggml_backend_cpu_buffer_from_ptr((uint8_t *) storage->ptr + offset, size)
+    };
+    auto iface = ctx->host->iface;
+    iface.get_base = ggml_backend_vk_cpu_view_get_base;
+    iface.clear = ggml_backend_vk_cpu_view_clear;
+    iface.free_buffer = ggml_backend_vk_cpu_view_free;
+    return ggml_backend_buffer_init(ctx->host->buft, iface, ctx, size);
+}
+
 static const char * ggml_backend_vk_host_buffer_type_name(ggml_backend_buffer_type_t buft) {
     return GGML_VK_NAME "_Host";
 
@@ -20014,11 +20090,21 @@ static ggml_backend_dev_t ggml_backend_vk_reg_get_device(ggml_backend_reg_t reg,
     return devices[device];
 }
 
+static void * ggml_backend_vk_reg_get_proc_address(ggml_backend_reg_t, const char * name) {
+    if (strcmp(name, "ggml_backend_vk_alloc_cpu_shared_buffer") == 0) {
+        return (void *) ggml_backend_vk_alloc_cpu_shared_buffer;
+    }
+    if (strcmp(name, "ggml_backend_vk_buffer_cpu_view") == 0) {
+        return (void *) ggml_backend_vk_buffer_cpu_view;
+    }
+    return nullptr;
+}
+
 static const struct ggml_backend_reg_i ggml_backend_vk_reg_i = {
     /* .get_name         = */ ggml_backend_vk_reg_get_name,
     /* .get_device_count = */ ggml_backend_vk_reg_get_device_count,
     /* .get_device       = */ ggml_backend_vk_reg_get_device,
-    /* .get_proc_address = */ NULL,
+    /* .get_proc_address = */ ggml_backend_vk_reg_get_proc_address,
 };
 
 ggml_backend_reg_t ggml_backend_vk_reg() {

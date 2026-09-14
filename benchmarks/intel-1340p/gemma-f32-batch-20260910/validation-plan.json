@@ -1,0 +1,12 @@
+{
+ "declared_before_inference":true,
+ "question":"Does microbatch1024 improve long FP32-attention tail throughput relative to currentFP32+256? Previous independent gains are not additive evidence.",
+ "modes":[256,1024,1024,256,1024,256,256,1024],
+ "budget":"Eightone-requesttrials,total~10min,no newbuild;20minabsolute supervisedcap includingfinalfinite-state scan andrestoration",
+ "fixed":"Same retainedselectorlibrarysha2563d679dce59a861095089582b5a870b19d97e44d65ad7e24e2a77b02a697475b8,FP32mode,FAoff,F16,batch1024,GPUcontext147456/twostreams,onepopulatedsaved64Kstate;no splitKoverride,profiler ortrace",
+ "coverage":"Same fixturehash and sourceKV;64658cached/1022evaluated,32outputbudget,three-keyrecall. Final1024state saved/scannedafteralltimings:finiteKV,exactEOF,twoGemmacaches,SWA<=768cells. NoCPUhandofforfullprefillclaim inthisstage.",
+ "source_review":"F32gate constrainsothermatrixaxis<=1024,notqueryN,so1022querycolsremaineligible. Originaldevice/tensor/alignmentguardsunchanged. Largeoravailablemediumtilechosenbyexistingdispatch; no assumption thattileisidentical. Priorubatch1024layoutcontrolsretained;newfinalstateadditioncoverscombinedprecision+batch.",
+ "safety":"Rui resumed21:02:23UTC,PandaCLEAR21:03:08UTC snapshot. Recheckimmediately/continuouslyspeechjobs/nativeCPU/CLI/receivequeues,>=6GiBavailable,<=16MiBswappertrialprocess;stoponlytrials,temperatureannotations,automaticunchangedproductionrestore,noSTT/privateaccess.",
+ "review":"Delegated read-onlysourcecheck timedout120s;notindependentreviewapproval. Localsource/readandpriornativecontrolsused. Preservefailure/tradeoffs;newheavyfollowuprequiresfreshcoordination.",
+ "interpretation":"ContemporaneousFP32+256controlrequiredforinteraction. Confirmmedianprefill andrequestwallwithindividualruns; thissavedtailcannotjustify1024asfullprefilldefault or deployment."
+}

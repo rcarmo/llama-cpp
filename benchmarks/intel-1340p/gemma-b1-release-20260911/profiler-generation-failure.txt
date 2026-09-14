@@ -1,0 +1,10 @@
+Retained failed patch generation, before any profiler build:
+Bun v1.4.1, [stdin]:1:375: Error: Nodebegin, exit 1.
+The generator expected '// try to fuse and compute a sequence of nodes'.
+The pinned abdbeadfb source actually uses '// Try fused ops, fall back to normal compute'.
+No generated ggml-cpu.c or compiled profiler resulted from this attempt.
+The first untested header is retained as patch/operator-meter-first.h.
+Review found hardcoded PMU IDs, merged core/atom statistics, missing open-error context,
+and lost wall timing on PMU errors. The tested header retains separate PMU counters.
+
+Profiler build prelaunch path check failed: sgemm.o absent. Actual retained object is sgemm.cpp.o; corrected before maintenance.

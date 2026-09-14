@@ -1,0 +1,328 @@
+{
+  "pass": true,
+  "verified_at": "2026-09-10T22:25:48.742Z",
+  "rows": [
+    {
+      "label": "cold-sse",
+      "route": "gpu-cold",
+      "timings": {
+        "cache_n": 5235,
+        "prompt_n": 1,
+        "prompt_ms": 89.9,
+        "prompt_per_token_ms": 89.9,
+        "prompt_per_second": 11.123470522803114,
+        "predicted_n": 19,
+        "predicted_ms": 634.66,
+        "predicted_per_token_ms": 33.40315789473684,
+        "predicted_per_second": 29.937289257240096,
+        "draft_n": 15,
+        "draft_n_accepted": 13
+      },
+      "tool": {
+        "id": "1svNy2qYpB4NlQILYnqaordTJ8xkSzwy",
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+        }
+      }
+    },
+    {
+      "label": "tool-none",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "23"
+            }
+          }
+        ],
+        "created": 1789079147,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 5281,
+          "total_tokens": 5284,
+          "prompt_tokens_details": {
+            "cached_tokens": 5254
+          }
+        },
+        "id": "chatcmpl-zlJcnQ8PrzGY4ZiLcNdCD3AMQ5tVnOGZ",
+        "timings": {
+          "cache_n": 5254,
+          "prompt_n": 27,
+          "prompt_ms": 522.495,
+          "prompt_per_token_ms": 19.351666666666667,
+          "prompt_per_second": 51.67513564723107,
+          "predicted_n": 3,
+          "predicted_ms": 126.145,
+          "predicted_per_token_ms": 42.04833333333333,
+          "predicted_per_second": 23.78215545602283,
+          "draft_n": 3,
+          "draft_n_accepted": 2
+        }
+      }
+    },
+    {
+      "label": "tool-auto",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "23"
+            }
+          }
+        ],
+        "created": 1789079148,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 5281,
+          "total_tokens": 5284,
+          "prompt_tokens_details": {
+            "cached_tokens": 5280
+          }
+        },
+        "id": "chatcmpl-zYM3TYNxWw25dK6takvU02rlzwa5FxAG",
+        "timings": {
+          "cache_n": 5280,
+          "prompt_n": 1,
+          "prompt_ms": 98.717,
+          "prompt_per_token_ms": 98.717,
+          "prompt_per_second": 10.12996748280438,
+          "predicted_n": 3,
+          "predicted_ms": 126.798,
+          "predicted_per_token_ms": 42.266,
+          "predicted_per_second": 23.65967917475039,
+          "draft_n": 3,
+          "draft_n_accepted": 2
+        }
+      }
+    },
+    {
+      "label": "append",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "RESTORED"
+            }
+          }
+        ],
+        "created": 1789079148,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 5298,
+          "total_tokens": 5302,
+          "prompt_tokens_details": {
+            "cached_tokens": 5284
+          }
+        },
+        "id": "chatcmpl-VfxeZxeGge5qqpxUfmjPSPRDPAAFQAWO",
+        "timings": {
+          "cache_n": 5284,
+          "prompt_n": 14,
+          "prompt_ms": 385.769,
+          "prompt_per_token_ms": 27.554928571428572,
+          "prompt_per_second": 36.291148329699894,
+          "predicted_n": 4,
+          "predicted_ms": 126.675,
+          "predicted_per_token_ms": 31.66875,
+          "predicted_per_second": 31.576869942766923,
+          "draft_n": 3,
+          "draft_n_accepted": 3
+        }
+      }
+    }
+  ],
+  "status": {
+    "profile": "vulkan-f32-256/cpu8-mtp3",
+    "serial": true,
+    "gpuRange": [
+      4096,
+      65536
+    ],
+    "active": false,
+    "queued": 0,
+    "counters": {
+      "gpu": 1,
+      "warm": 3,
+      "cpu": 0,
+      "fallback": 0,
+      "errors": 0
+    },
+    "last": {
+      "route": "cpu-owner",
+      "slot": 0,
+      "prompt_tokens": 5298,
+      "headers_ms": 551.7124039999981
+    }
+  },
+  "slots": [
+    {
+      "id": 0,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false,
+      "id_task": 23,
+      "n_prompt_tokens": 5302,
+      "n_prompt_tokens_processed": 14,
+      "n_prompt_tokens_cache": 0,
+      "params": {
+        "seed": 42,
+        "temperature": 0,
+        "dynatemp_range": 0,
+        "dynatemp_exponent": 1,
+        "top_k": 64,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1,
+        "xtc_probability": 0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "dry_multiplier": 0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 131072,
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": 96,
+        "n_predict": 96,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "peg-gemma4",
+        "reasoning_format": "deepseek",
+        "reasoning_in_content": false,
+        "generation_prompt": "<|turn>model\n",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none,draft-mtp",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "next_token": [
+        {
+          "has_next_token": false,
+          "has_new_line": false,
+          "n_remain": 92,
+          "n_decoded": 4
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false
+    }
+  ],
+  "models": {
+    "models": [
+      {
+        "name": "gemma-4-e4b-qat-mtp",
+        "model": "gemma-4-e4b-qat-mtp",
+        "modified_at": "",
+        "size": "",
+        "digest": "",
+        "type": "model",
+        "description": "",
+        "tags": [
+          ""
+        ],
+        "capabilities": [
+          "completion"
+        ],
+        "parameters": "",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "",
+          "families": [
+            ""
+          ],
+          "parameter_size": "",
+          "quantization_level": ""
+        }
+      }
+    ],
+    "object": "list",
+    "data": [
+      {
+        "id": "gemma-4-e4b-qat-mtp",
+        "aliases": [
+          "gemma-4-e4b-qat-mtp"
+        ],
+        "tags": [],
+        "object": "model",
+        "created": 1789079148,
+        "owned_by": "llamacpp",
+        "meta": {
+          "vocab_type": 2,
+          "n_vocab": 262144,
+          "n_ctx": 131072,
+          "n_ctx_train": 131072,
+          "n_embd": 2560,
+          "n_params": 7463013674,
+          "size": 5139117224,
+          "ftype": "Q4_0"
+        }
+      }
+    ]
+  },
+  "info": {
+    "pid": 632949,
+    "cpu_pid": 632969,
+    "port": 8091,
+    "started_at": "2026-09-10T22:25:04.078Z"
+  },
+  "cpu_swap_kib": 0,
+  "cpu_hashes": {
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml-base.so.0.18.1": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml-cpu.so.0.18.1": "e461ebf2d5d8a91d456a10d152af675b1cb769b0323ba56f584c46518f8ae822",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml.so.0.18.1": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-common.so.0.0.10579": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-server-impl.so": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama.so.0.0.10579": "1a9975272e3ebcacbb8c75262e468fdfe082e6b41339920d701ed93383fc04aa",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libmtmd.so.0.0.10579": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/runtime/libomp.so": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a"
+  }
+}

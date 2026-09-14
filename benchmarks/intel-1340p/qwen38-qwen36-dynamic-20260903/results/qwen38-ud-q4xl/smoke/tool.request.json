@@ -1,0 +1,40 @@
+{
+  "model": "qwen3.8-27b-ud-q4-k-xl",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Use the add tool to add 17 and 25."
+    }
+  ],
+  "reasoning_effort": "none",
+  "temperature": 0,
+  "seed": 731,
+  "max_tokens": 96,
+  "tool_choice": "required",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "add",
+        "description": "Add two integers",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "integer"
+            },
+            "b": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "a",
+            "b"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "stream": false
+}

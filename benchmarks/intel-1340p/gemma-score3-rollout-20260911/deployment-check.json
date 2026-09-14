@@ -1,0 +1,271 @@
+{
+  "pass": true,
+  "verified_at": "2026-09-11T06:25:38.206Z",
+  "release": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-score3-stopped",
+  "info": {
+    "pid": 689006,
+    "cpu_pid": 689029,
+    "port": 8091,
+    "started_at": "2026-09-11T06:24:32.866Z"
+  },
+  "argv": [
+    "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server",
+    "--model",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "--alias",
+    "gemma-4-e4b-qat-mtp",
+    "--load-mode",
+    "mmap",
+    "--gpu-layers",
+    "0",
+    "--threads",
+    "8",
+    "--cpu-range",
+    "0-7",
+    "--cpu-strict",
+    "1",
+    "--threads-batch",
+    "16",
+    "--cpu-range-batch",
+    "0-15",
+    "--cpu-strict-batch",
+    "1",
+    "--ctx-size",
+    "262144",
+    "--parallel",
+    "2",
+    "--no-kv-unified",
+    "--cont-batching",
+    "--batch-size",
+    "1024",
+    "--ubatch-size",
+    "256",
+    "--cache-type-k",
+    "f16",
+    "--cache-type-v",
+    "f16",
+    "--flash-attn",
+    "off",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-min",
+    "1",
+    "--spec-draft-n-max",
+    "3",
+    "--spec-draft-threads",
+    "8",
+    "--spec-draft-threads-batch",
+    "16",
+    "--spec-draft-cpu-range",
+    "0-7",
+    "--spec-draft-cpu-strict",
+    "1",
+    "--spec-draft-cpu-mask-batch",
+    "ffff",
+    "--spec-draft-cpu-strict-batch",
+    "1",
+    "--spec-draft-type-k",
+    "f16",
+    "--spec-draft-type-v",
+    "f16",
+    "--model-draft",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+    "--cache-prompt",
+    "--cache-ram",
+    "12288",
+    "--cache-reuse",
+    "256",
+    "--ctx-checkpoints",
+    "32",
+    "--checkpoint-min-step",
+    "8192",
+    "--cache-idle-slots",
+    "--slot-save-path",
+    "/var/home/agent/.cache/llama-gemma-hybrid/state/",
+    "--metrics",
+    "--slots",
+    "--ui",
+    "--no-warmup",
+    "--timeout",
+    "10800",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "18092"
+  ],
+  "flags": [
+    "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH=1",
+    "GGML_CPU_EXPERIMENTAL_ATTN4=1",
+    "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW=1"
+  ],
+  "libraries": [
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml-base.so.0.18.1",
+      "expected": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+      "actual": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml.so.0.18.1",
+      "expected": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+      "actual": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-common.so.0.0.10579",
+      "expected": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+      "actual": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-server-impl.so",
+      "expected": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+      "actual": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libmtmd.so.0.0.10579",
+      "expected": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+      "actual": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server",
+      "expected": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+      "actual": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/runtime/libomp.so",
+      "expected": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a",
+      "actual": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260910-smallbatch/cpu-lib/libllama.so.0",
+      "expected": "35289adccdf6965d3d7eb7ade2271723b1169e65772bf849c8a5431288d0aec9",
+      "actual": "35289adccdf6965d3d7eb7ade2271723b1169e65772bf849c8a5431288d0aec9",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-score3-stopped/cpu-backend/libggml-cpu.so.0",
+      "expected": "f288945950f823924282dc70f5d1b68ea8750f0b4ab29adb14e4db5016468ba1",
+      "actual": "f288945950f823924282dc70f5d1b68ea8750f0b4ab29adb14e4db5016468ba1",
+      "mapped": true
+    }
+  ],
+  "cpu_swap_kib": 0,
+  "health": {
+    "status": "ok"
+  },
+  "status": {
+    "profile": "vulkan-f32-256/cpu8-mtp3",
+    "serial": true,
+    "gpuRange": [
+      4096,
+      65536
+    ],
+    "active": false,
+    "queued": 0,
+    "counters": {
+      "gpu": 1,
+      "warm": 3,
+      "cpu": 0,
+      "fallback": 0,
+      "errors": 0
+    },
+    "last": {
+      "route": "cpu-owner",
+      "slot": 0,
+      "prompt_tokens": 5298,
+      "headers_ms": 629.4992990000028
+    }
+  },
+  "slots": [
+    {
+      "id": 0,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false,
+      "id_task": 23,
+      "n_prompt_tokens": 5302,
+      "n_prompt_tokens_processed": 14,
+      "n_prompt_tokens_cache": 0,
+      "params": {
+        "seed": 42,
+        "temperature": 0,
+        "dynatemp_range": 0,
+        "dynatemp_exponent": 1,
+        "top_k": 64,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1,
+        "xtc_probability": 0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "dry_multiplier": 0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 131072,
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": 96,
+        "n_predict": 96,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "peg-gemma4",
+        "reasoning_format": "deepseek",
+        "reasoning_in_content": false,
+        "generation_prompt": "<|turn>model\n",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none,draft-mtp",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "next_token": [
+        {
+          "has_next_token": false,
+          "has_new_line": false,
+          "n_remain": 92,
+          "n_decoded": 4
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false
+    }
+  ],
+  "gpu_profile_unchanged": true,
+  "adapter_changes": [
+    "workers.ts",
+    "speech.ts"
+  ],
+  "speech_mode": "stopped",
+  "scope": "Read-only live state; serving/tool/cache acceptance is in production-smoke.json"
+}

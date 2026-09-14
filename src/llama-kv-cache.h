@@ -118,6 +118,9 @@ public:
 
     ~llama_kv_cache() = default;
 
+    void init_cpu_shared(const llama_memory_alloc_cb & alloc) override;
+    llama_memory_transfer_ptr prepare_handoff(llama_memory_i & source, const llama_memory_view_cb & view, bool allow_copy, size_t & shared, size_t & copied) override;
+
     //
     // llama_memory_i
     //
@@ -244,6 +247,8 @@ public:
     void get_prev_tokens(const llama_ubatch & ubatch, uint32_t n, std::vector<llama_token> & res) const;
 
 private:
+    struct handoff;
+    std::vector<ggml_backend_buffer_ptr> handoff_buffers;
     const llama_model & model;
     const llama_hparams & hparams;
 

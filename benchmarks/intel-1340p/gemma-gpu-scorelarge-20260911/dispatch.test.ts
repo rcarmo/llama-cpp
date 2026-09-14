@@ -1,0 +1,2 @@
+import{test,expect}from'bun:test';import{readFileSync}from'node:fs';
+test('optin pipeline availability retains generic and shared-memory checks',()=>{const s=readFileSync(import.meta.dir+'/patch/ggml-vulkan.cpp','utf8');expect(s).toContain('use_l_warptile || experimental_score');expect(s).toContain('&& !score_only_large;');expect(s).toContain('ne10 == 512 && ne01 >= 32768 && ne11 >= 128');expect(s).toContain('ggml_vk_matmul_shmem_support');expect(s).toContain('pipeline = aligned ? mmp->a_l : mmp->l;')});

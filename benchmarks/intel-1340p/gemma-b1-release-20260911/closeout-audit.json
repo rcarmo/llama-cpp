@@ -1,0 +1,510 @@
+{
+  "status": "held-not-deployed",
+  "production": "20260911-score3-stopped",
+  "repair": {
+    "cause": "CPU full sequence writer removes valid masked SWA rollback history; shared B0/B1",
+    "original_cells": 512,
+    "repaired_cells": 766,
+    "cached": 64684,
+    "evaluated": 15,
+    "finite_states": 4,
+    "common_tensor_comparisons": 96,
+    "bytes_added": 10406888,
+    "scope": "Opt-in standard SWA full save only; partial/checkpoint path unchanged. Empty/foreign cell filtering unchanged. Native v2 schema unchanged."
+  },
+  "staging": {
+    "status": "failed-resource-gate",
+    "completed_native_rows": 0,
+    "guard": {
+      "reason": "Error: Worker swap",
+      "at": "2026-09-11T15:56:35.856Z",
+      "live": {
+        "pid": 0,
+        "rss_kib": 0,
+        "pss_kib": 0,
+        "swap_kib": 0,
+        "cpu_ticks": 0,
+        "majflt": 0
+      },
+      "servers": [
+        {
+          "device": "cpu",
+          "pid": 793568,
+          "rss_kib": 11479100,
+          "pss_kib": 10025399,
+          "swap_kib": 352516,
+          "cpu_ticks": 1013,
+          "majflt": 0
+        }
+      ]
+    },
+    "first_overlimit_sample": {
+      "at": "2026-09-11T15:56:35.634Z",
+      "phase": "init",
+      "temp_c": 57,
+      "throttle": 222653,
+      "mem_available_kib": 19116044,
+      "pswpin": 8971243,
+      "pswpout": 39062991,
+      "live": {
+        "pid": 0,
+        "rss_kib": 0,
+        "pss_kib": 0,
+        "swap_kib": 0,
+        "cpu_ticks": 0,
+        "majflt": 0
+      },
+      "servers": [
+        {
+          "device": "cpu",
+          "pid": 793568,
+          "rss_kib": 11650336,
+          "pss_kib": 10183221,
+          "swap_kib": 182336,
+          "cpu_ticks": 1013,
+          "majflt": 0
+        }
+      ]
+    },
+    "sample_peak_swap_kib": 182336,
+    "minimum_available_kib": 19116044,
+    "system_swapout_delta": 41070,
+    "cause_limit": "CPU VmSwap crossed 16MiB during simultaneous GPU startup despite >18GiB MemAvailable. Native workers suppress stderr, GPU startup exit code and allocation trace were not captured. No proof of CPU repair, B1 compute, RAM exhaustion or a driver defect as the cause. No GPU retry."
+  },
+  "profiles": [
+    {
+      "order": 0,
+      "work": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1575.595,
+        "prompt_per_token_ms": 63.0238,
+        "prompt_per_second": 15.867021664831382,
+        "predicted_n": 128,
+        "predicted_ms": 14719.301,
+        "predicted_per_token_ms": 114.9945390625,
+        "predicted_per_second": 8.69606511885313,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "resources": {
+        "peak_trial_pss_kib": 11974338,
+        "peak_trial_rss_kib": 11977552,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23879384,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 62,
+        "hot": false,
+        "abort_enabled": false
+      },
+      "families": [
+        {
+          "family": 1,
+          "samples": 72,
+          "wall_thread_ns": 1331034407,
+          "tids": [
+            795336,
+            795388,
+            795394,
+            795392,
+            795390,
+            795391,
+            795393,
+            795389
+          ],
+          "cpus": [
+            6,
+            8,
+            3,
+            1,
+            2,
+            10,
+            5,
+            4,
+            15,
+            9,
+            12,
+            14,
+            7,
+            11
+          ],
+          "migrations": 1,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 1312896418,
+              "running_ns": 689927534,
+              "residency_ratio": 0.5255003552001465,
+              "cycles": 2099740886,
+              "instructions": 1596452356,
+              "cache_references": 82771516,
+              "cache_misses": 78854820
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 1312887964,
+              "running_ns": 622961878,
+              "residency_ratio": 0.47449736388930747,
+              "cycles": 1559632638,
+              "instructions": 842007645,
+              "cache_references": 38091191,
+              "cache_misses": 36282197
+            }
+          ],
+          "sampled_thread_wall_share": 0.4542455391497305,
+          "combined_running_ratio": 0.9999946637069734
+        },
+        {
+          "family": 2,
+          "samples": 72,
+          "wall_thread_ns": 852480791,
+          "tids": [
+            795336,
+            795393,
+            795390,
+            795394,
+            795391,
+            795389,
+            795388,
+            795392
+          ],
+          "cpus": [
+            6,
+            5,
+            2,
+            3,
+            10,
+            4,
+            8,
+            1,
+            15,
+            12,
+            9,
+            14,
+            7,
+            11
+          ],
+          "migrations": 1,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 852796536,
+              "running_ns": 454918820,
+              "residency_ratio": 0.5334435598598632,
+              "cycles": 1396367637,
+              "instructions": 1806712482,
+              "cache_references": 67272566,
+              "cache_misses": 56224813
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 852823695,
+              "running_ns": 397877783,
+              "residency_ratio": 0.4665416607590857,
+              "cycles": 1000596819,
+              "instructions": 570705820,
+              "cache_references": 22672819,
+              "cache_misses": 15360330
+            }
+          ],
+          "sampled_thread_wall_share": 0.29092831446436357,
+          "combined_running_ratio": 1.0000000785650471
+        },
+        {
+          "family": 3,
+          "samples": 3168,
+          "wall_thread_ns": 746693890,
+          "tids": [
+            795394,
+            795388,
+            795336,
+            795389,
+            795390,
+            795391,
+            795393,
+            795392
+          ],
+          "cpus": [
+            3,
+            1,
+            6,
+            12,
+            11,
+            10,
+            5,
+            8,
+            2,
+            4,
+            15,
+            9,
+            7,
+            0,
+            14,
+            13
+          ],
+          "migrations": 9,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 764007470,
+              "running_ns": 375715562,
+              "residency_ratio": 0.4917694875417907,
+              "cycles": 1127799695,
+              "instructions": 3352750673,
+              "cache_references": 31815832,
+              "cache_misses": 21332584
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 756957358,
+              "running_ns": 384466259,
+              "residency_ratio": 0.5079100624846559,
+              "cycles": 944316823,
+              "instructions": 1261465865,
+              "cache_references": 18685990,
+              "cache_misses": 10708855
+            }
+          ],
+          "sampled_thread_wall_share": 0.25482614638590595,
+          "combined_running_ratio": 0.9949926549801928
+        }
+      ]
+    },
+    {
+      "order": 1,
+      "work": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1536.694,
+        "prompt_per_token_ms": 61.46776,
+        "prompt_per_second": 16.268691099203874,
+        "predicted_n": 128,
+        "predicted_ms": 14690.49,
+        "predicted_per_token_ms": 114.769453125,
+        "predicted_per_second": 8.713119848282801,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "resources": {
+        "peak_trial_pss_kib": 11974162,
+        "peak_trial_rss_kib": 11977512,
+        "peak_trial_swap_kib": 0,
+        "min_available_kib": 23906076,
+        "production_swap_initial_kib": 0,
+        "production_swap_final_kib": 0
+      },
+      "thermal": {
+        "peak_c": 68,
+        "hot": false,
+        "abort_enabled": false
+      },
+      "families": [
+        {
+          "family": 1,
+          "samples": 64,
+          "wall_thread_ns": 1162854551,
+          "tids": [
+            795892,
+            795897,
+            795894,
+            795842,
+            795898,
+            795895,
+            795896,
+            795893
+          ],
+          "cpus": [
+            7,
+            3,
+            5,
+            1,
+            15,
+            13,
+            8,
+            11,
+            9,
+            4,
+            0,
+            10,
+            2,
+            14,
+            12
+          ],
+          "migrations": 1,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 1163218818,
+              "running_ns": 562718483,
+              "residency_ratio": 0.4837597830196038,
+              "cycles": 1724817150,
+              "instructions": 1343916340,
+              "cache_references": 68834558,
+              "cache_misses": 65579072
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 1163206247,
+              "running_ns": 600491292,
+              "residency_ratio": 0.5162380218888216,
+              "cycles": 1510282106,
+              "instructions": 820420084,
+              "cache_references": 37243172,
+              "cache_misses": 35453693
+            }
+          ],
+          "sampled_thread_wall_share": 0.44994341677519173,
+          "combined_running_ratio": 0.9999922258823017
+        },
+        {
+          "family": 2,
+          "samples": 64,
+          "wall_thread_ns": 753956576,
+          "tids": [
+            795842,
+            795892,
+            795897,
+            795894,
+            795893,
+            795896,
+            795898,
+            795895
+          ],
+          "cpus": [
+            1,
+            7,
+            3,
+            5,
+            11,
+            8,
+            15,
+            13,
+            9,
+            4,
+            0,
+            2,
+            10,
+            14,
+            12
+          ],
+          "migrations": 0,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 754074184,
+              "running_ns": 376867475,
+              "residency_ratio": 0.4997750658972301,
+              "cycles": 1166263049,
+              "instructions": 1576757769,
+              "cache_references": 62664843,
+              "cache_misses": 49391795
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 754090637,
+              "running_ns": 377207145,
+              "residency_ratio": 0.5002145982088357,
+              "cycles": 950458375,
+              "instructions": 545469531,
+              "cache_references": 21377217,
+              "cache_misses": 14665435
+            }
+          ],
+          "sampled_thread_wall_share": 0.2917284862615329,
+          "combined_running_ratio": 1.0000005781924501
+        },
+        {
+          "family": 3,
+          "samples": 3160,
+          "wall_thread_ns": 667635067,
+          "tids": [
+            795893,
+            795892,
+            795894,
+            795842,
+            795895,
+            795896,
+            795898,
+            795897
+          ],
+          "cpus": [
+            3,
+            7,
+            11,
+            10,
+            14,
+            8,
+            0,
+            9,
+            4,
+            5,
+            1,
+            12,
+            13,
+            15,
+            2
+          ],
+          "migrations": 3,
+          "pmus": [
+            {
+              "pmu": 4,
+              "valid": true,
+              "enabled_ns": 685806555,
+              "running_ns": 330248971,
+              "residency_ratio": 0.4815482858719541,
+              "cycles": 983587480,
+              "instructions": 3314797794,
+              "cache_references": 31904437,
+              "cache_misses": 21657678
+            },
+            {
+              "pmu": 10,
+              "valid": true,
+              "enabled_ns": 678495273,
+              "running_ns": 351628683,
+              "residency_ratio": 0.5182478006740661,
+              "cycles": 855616693,
+              "instructions": 1210704426,
+              "cache_references": 19038231,
+              "cache_misses": 10928403
+            }
+          ],
+          "sampled_thread_wall_share": 0.25832809696327536,
+          "combined_running_ratio": 0.9942711235823636
+        }
+      ]
+    }
+  ],
+  "decision": {
+    "candidate": null,
+    "reason": "Boundary PMU samples include operator barriers and preparation, sparse phase selection is layer-correlated, and cache events cannot attribute KV/DRAM traffic or separate conversion from compute. No new mechanism justified beyond prior completed B1 and rejected kernel tests.",
+    "not_run": [
+      "P04 new implementation",
+      "P05 screen/confirm",
+      "D03 cutover",
+      "D04 postcutover"
+    ],
+    "next_discriminating_measurement": "Separately approved targeted repeated-KV/preparation accounting with actual pointer/byte counts and sampling-overhead control; privileged IMC counters only if separately authorised and useful. No immediate sweep or model rerun."
+  },
+  "restoration": "2026-09-11T16:20:21.425Z",
+  "limits": [
+    "No cumulative throughput claim",
+    "No new cold prefill or capacity claim",
+    "No repaired native cancellation/eviction/crash recovery qualification",
+    "No long-coding quality bound",
+    "No DRAM or KV-specific traffic attribution"
+  ]
+}

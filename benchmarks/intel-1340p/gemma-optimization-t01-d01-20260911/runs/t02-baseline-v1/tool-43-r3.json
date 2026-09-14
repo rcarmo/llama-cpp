@@ -1,0 +1,155 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": true,
+    "seed": 43,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookupTicket",
+          "description": "Return fixture ticket record",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookupTicket when requested. Reuse prior tool results for follow-ups. Return the requested JSON only after tool results. No prose."
+      },
+      {
+        "role": "user",
+        "content": "Check ticket OPS-17. Return JSON with keys id, owner, severity."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "lookupTicket",
+              "arguments": "{\"id\":\"OPS-17\"}"
+            },
+            "id": "WQhp0AQMLiSvmpfDHWuzVJxemA9QeqyV"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "WQhp0AQMLiSvmpfDHWuzVJxemA9QeqyV",
+        "content": "{\"id\":\"OPS-17\",\"owner\":\"Mira\",\"severity\":\"medium\",\"component\":\"cache warmer\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"owner\": \"Mira\",\n  \"severity\": \"medium\"\n}\n```"
+      },
+      {
+        "role": "user",
+        "content": "Using the previous tool result without calling the tool again, return JSON with keys id, component, usedCache (true)."
+      },
+      {
+        "role": "assistant",
+        "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"component\": \"cache warmer\",\n  \"usedCache\": true\n}\n```"
+      },
+      {
+        "role": "user",
+        "content": "Now check OPS-18. Return JSON with keys id, owner, severity, moreSevereThanOps17 (a boolean). Severity order is low, medium, high."
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "tool_calls",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "function": {
+                "name": "lookupTicket",
+                "arguments": "{\"id\":\"OPS-18\"}"
+              },
+              "id": "5DbApiCXyCxfvxBwevaqUTUbUg5VDwZH"
+            }
+          ]
+        }
+      }
+    ],
+    "created": 1789110995,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 297,
+      "total_tokens": 314,
+      "prompt_tokens_details": {
+        "cached_tokens": 211
+      }
+    },
+    "id": "chatcmpl-2USinJl6seiME9oGUHkOs2xn9h0kLXAV",
+    "timings": {
+      "cache_n": 211,
+      "prompt_n": 86,
+      "prompt_ms": 1521.416,
+      "prompt_per_token_ms": 17.69088372093023,
+      "prompt_per_second": 56.526288667925144,
+      "predicted_n": 17,
+      "predicted_ms": 541.077,
+      "predicted_per_token_ms": 31.82805882352941,
+      "predicted_per_second": 31.418818393685186,
+      "draft_n": 12,
+      "draft_n_accepted": 12
+    }
+  },
+  "measurement": {
+    "label": "tool-43-r3",
+    "device": "cpu",
+    "wall_ms": 2075.021372999996,
+    "package_j": 81.759251,
+    "timings": {
+      "cache_n": 211,
+      "prompt_n": 86,
+      "prompt_ms": 1521.416,
+      "prompt_per_token_ms": 17.69088372093023,
+      "prompt_per_second": 56.526288667925144,
+      "predicted_n": 17,
+      "predicted_ms": 541.077,
+      "predicted_per_token_ms": 31.82805882352941,
+      "predicted_per_second": 31.418818393685186,
+      "draft_n": 12,
+      "draft_n_accepted": 12
+    },
+    "usage": {
+      "completion_tokens": 17,
+      "prompt_tokens": 297,
+      "total_tokens": 314,
+      "prompt_tokens_details": {
+        "cached_tokens": 211
+      }
+    },
+    "token_hash": null
+  }
+}

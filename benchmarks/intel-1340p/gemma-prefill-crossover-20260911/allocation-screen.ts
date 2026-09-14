@@ -1,0 +1,6 @@
+/** SCRIPT_JDOC:
+{"summary":"Compare actual max256 against max1024-active256 allocation in4KABBA without trace timing overhead","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root,fixture}from'./campaign';import{capture}from'./capture';
+const i=Number(process.argv[2]),max=[256,1024,1024,256][i];if(!max)throw Error('Order');const t=new Trial(`allocation4k-${i}-${max}`,{maintenance:true,build:'baseline',format:'f16',fa:false,full:false,ctx:147456,parallel:2,cache:0,ubatch:max,batch:1024,vulkanBuild:root+'/runtime-gpu',preserveSwaPadding:true,extraEnv:{GGML_VK_EXPERIMENTAL_ATTN_MODE:'f32',LLAMA_EXPERIMENTAL_PREFILL_UBATCH:'256'}});let result:any={};
+try{await t.begin();const gpu=await t.start('vulkan');const provenance=capture(t.dir,gpu.p.pid);if(!provenance.files.some(f=>f.path.includes('libllama.so')))throw Error('Identity');const r=await t.req('vulkan','prefill',{...fixture(4096),n_predict:1,id_slot:0});if(r.timings.prompt_n!==4096||r.timings.cache_n!==0)throw Error('Workcounts');result={ok:true,order:i,max_ubatch:max,active_ubatch:256,timings:r.timings};}catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}

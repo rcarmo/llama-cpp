@@ -1,0 +1,103 @@
+{
+  "scope": "Original-profile labelled diagnostic, NOT promotion timing evidence",
+  "started": "2026-09-10T18:28:34.899Z",
+  "request": {
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "description": "Read fixture inventory",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 96,
+    "cache_prompt": true,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookup_stock exactly once for the requested SKU. After its result arrives, answer the user with the quantity from that result."
+      },
+      {
+        "role": "user",
+        "content": "How many items of SKU PANDA-RESTORE are in stock? Look it up, then reply with the quantity only."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "lookup_stock",
+              "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+            },
+            "id": "wWT3OdlL8CaxwX5Rujc4lFr047HtgVwz"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "wWT3OdlL8CaxwX5Rujc4lFr047HtgVwz",
+        "content": "{\"quantity\":23,\"sku\":\"PANDA-RESTORE\"}"
+      }
+    ],
+    "tool_choice": "none"
+  },
+  "status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "23"
+        }
+      }
+    ],
+    "created": 1789064915,
+    "model": "gemma-4-e4b-qat-mtp",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 3,
+      "prompt_tokens": 150,
+      "total_tokens": 153,
+      "prompt_tokens_details": {
+        "cached_tokens": 100
+      }
+    },
+    "id": "chatcmpl-5nEgpEEkFXfIPT8NttKKJXmYa7le7g3Q",
+    "timings": {
+      "cache_n": 100,
+      "prompt_n": 50,
+      "prompt_ms": 707.968,
+      "prompt_per_token_ms": 14.15936,
+      "prompt_per_second": 70.6246610016272,
+      "predicted_n": 3,
+      "predicted_ms": 109.533,
+      "predicted_per_token_ms": 36.511,
+      "predicted_per_second": 27.389006052970338,
+      "draft_n": 3,
+      "draft_n_accepted": 2
+    }
+  }
+}

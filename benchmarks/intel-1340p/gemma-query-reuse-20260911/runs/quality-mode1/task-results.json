@@ -1,0 +1,631 @@
+{
+  "rows": [
+    {
+      "kind": "coding",
+      "fixture": "coding-normalise-tags-v1",
+      "seed": 42,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```js\nexport function normaliseTags(tags) {\n  if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {\n    throw new Error('Input must be an array of strings.');\n  }\n\n  const result = [];\n  const seen = new Set();\n\n  for (const tag of tags) {\n    // 1. Trim, lowercase\n    let normalized = tag.trim().toLowerCase();\n\n    // 2. Replace runs of spaces or underscores with '-'\n    normalized = normalized.replace(/[\\s_]+/g, '-');\n\n    // 3. Collapse repeated '-'\n    normalized = normalized.replace(/-+/g, '-');\n\n    // 4. Remove leading and trailing '-'\n    normalized = normalized.replace(/^-|-$/g, '');\n\n    // 5. Drop empty results\n    if (normalized.length === 0) {\n      continue;\n    }\n\n    // 6. Deduplicate while preserving first occurrence order\n    if (!seen.has(normalized)) {\n      result.push(normalized);\n      seen.add(normalized);\n    }\n  }\n\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139390,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 259,
+          "prompt_tokens": 132,
+          "total_tokens": 391,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-pXL2hSlMRVq7xa3No4WjztWRgSACMwAf",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 132,
+          "prompt_ms": 1992.685,
+          "prompt_per_token_ms": 15.096098484848484,
+          "prompt_per_second": 66.24228114328156,
+          "predicted_n": 259,
+          "predicted_ms": 10455.827,
+          "predicted_per_token_ms": 40.36998841698841,
+          "predicted_per_second": 24.77087656480927,
+          "draft_n": 246,
+          "draft_n_accepted": 177
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-chunk-v1",
+      "seed": 42,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139397,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-IjmfVY6RZNWSvnVhQrXZvm7TD3gPVydE",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1707.186,
+          "prompt_per_token_ms": 18.55636956521739,
+          "prompt_per_second": 53.88985148659842,
+          "predicted_n": 154,
+          "predicted_ms": 5531.328,
+          "predicted_per_token_ms": 35.91771428571429,
+          "predicted_per_second": 27.84141529845997,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "retrieval",
+      "seed": 42,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"shippedRelease\": \"not in source\",\n  \"rollbackApprover\": \"Mira Patel\",\n  \"localIndexCache\": \"64 MiB\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139401,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 45,
+          "prompt_tokens": 137,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-4Tck7U1uSKju9MsZM1uBSVzz2Vg2x7fx",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 137,
+          "prompt_ms": 2122.9,
+          "prompt_per_token_ms": 15.495620437956205,
+          "prompt_per_second": 64.53436337086062,
+          "predicted_n": 45,
+          "predicted_ms": 1512.651,
+          "predicted_per_token_ms": 33.614466666666665,
+          "predicted_per_second": 29.74909612329612,
+          "draft_n": 36,
+          "draft_n_accepted": 32
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 1,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"owner\": \"Mira\",\n  \"severity\": \"medium\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139405,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 147,
+          "total_tokens": 183,
+          "prompt_tokens_details": {
+            "cached_tokens": 93
+          }
+        },
+        "id": "chatcmpl-KlyfwDBuct00MIaSGuvJVgx5c6K4zCYm",
+        "timings": {
+          "cache_n": 93,
+          "prompt_n": 54,
+          "prompt_ms": 913.207,
+          "prompt_per_token_ms": 16.91124074074074,
+          "prompt_per_second": 59.13226683544914,
+          "predicted_n": 36,
+          "predicted_ms": 1139.44,
+          "predicted_per_token_ms": 31.651111111111113,
+          "predicted_per_second": 31.594467457698517,
+          "draft_n": 27,
+          "draft_n_accepted": 26
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 2,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"component\": \"cache warmer\",\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139408,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 216,
+          "total_tokens": 252,
+          "prompt_tokens_details": {
+            "cached_tokens": 142
+          }
+        },
+        "id": "chatcmpl-Ed795NJNbm7gsath3fIagVzdwxNGryrM",
+        "timings": {
+          "cache_n": 142,
+          "prompt_n": 74,
+          "prompt_ms": 1231.163,
+          "prompt_per_token_ms": 16.637337837837837,
+          "prompt_per_second": 60.105769910239346,
+          "predicted_n": 36,
+          "predicted_ms": 1140.445,
+          "predicted_per_token_ms": 31.679027777777776,
+          "predicted_per_second": 31.566625308541845,
+          "draft_n": 27,
+          "draft_n_accepted": 27
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 3,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-18\",\n  \"owner\": \"Jon\",\n  \"severity\": \"high\",\n  \"moreSevereThanOps17\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139413,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 47,
+          "prompt_tokens": 346,
+          "total_tokens": 393,
+          "prompt_tokens_details": {
+            "cached_tokens": 292
+          }
+        },
+        "id": "chatcmpl-se1OUnlDF6AQunr7jDrH81VMqzHmv0m6",
+        "timings": {
+          "cache_n": 292,
+          "prompt_n": 54,
+          "prompt_ms": 884.618,
+          "prompt_per_token_ms": 16.381814814814817,
+          "prompt_per_second": 61.043297785032635,
+          "predicted_n": 47,
+          "predicted_ms": 1554.964,
+          "predicted_per_token_ms": 33.08434042553191,
+          "predicted_per_second": 30.225780146678638,
+          "draft_n": 36,
+          "draft_n_accepted": 36
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 42,
+      "round": 4,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"tickets\": [\n    {\n      \"id\": \"OPS-17\",\n      \"owner\": \"Mira\"\n    },\n    {\n      \"id\": \"OPS-18\",\n      \"owner\": \"Jon\"\n    }\n  ],\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139417,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 434,
+          "total_tokens": 509,
+          "prompt_tokens_details": {
+            "cached_tokens": 341
+          }
+        },
+        "id": "chatcmpl-mWDKpHCTAVxdaYEMvoJ2HHNXRSzlcNIZ",
+        "timings": {
+          "cache_n": 341,
+          "prompt_n": 93,
+          "prompt_ms": 1463.698,
+          "prompt_per_token_ms": 15.738688172043013,
+          "prompt_per_second": 63.53769698394067,
+          "predicted_n": 75,
+          "predicted_ms": 2408.562,
+          "predicted_per_token_ms": 32.11416,
+          "predicted_per_second": 31.138911931683722,
+          "draft_n": 57,
+          "draft_n_accepted": 56
+        }
+      }
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-normalise-tags-v1",
+      "seed": 43,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```js\nexport function normaliseTags(tags) {\n  if (!Array.isArray(tags) || tags.some(tag => typeof tag !== 'string')) {\n    throw new Error('Input must be an array of strings.');\n  }\n\n  const result = [];\n  const seen = new Set();\n\n  for (const tag of tags) {\n    // 1. Trim, lowercase\n    let normalized = tag.trim().toLowerCase();\n\n    // 2. Replace runs of spaces or underscores with '-'\n    normalized = normalized.replace(/[\\s_]+/g, '-');\n\n    // 3. Collapse repeated '-'\n    normalized = normalized.replace(/-+/g, '-');\n\n    // 4. Remove leading and trailing '-'\n    normalized = normalized.replace(/^-|-$/g, '');\n\n    // 5. Drop empty results\n    if (normalized.length === 0) {\n      continue;\n    }\n\n    // 6. Deduplicate while preserving first occurrence order\n    if (!seen.has(normalized)) {\n      result.push(normalized);\n      seen.add(normalized);\n    }\n  }\n\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139429,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 259,
+          "prompt_tokens": 132,
+          "total_tokens": 391,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-Zo57guyCVNPv8hQB3m3Bb2b2tbWVfwlx",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 132,
+          "prompt_ms": 1942.153,
+          "prompt_per_token_ms": 14.713280303030302,
+          "prompt_per_second": 67.96580907889337,
+          "predicted_n": 259,
+          "predicted_ms": 10066.066,
+          "predicted_per_token_ms": 38.865119691119695,
+          "predicted_per_second": 25.73001210204662,
+          "draft_n": 246,
+          "draft_n_accepted": 177
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "coding",
+      "fixture": "coding-chunk-v1",
+      "seed": 43,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nexport function chunk(items, size) {\n  if (!Array.isArray(items)) {\n    throw new Error(\"items must be an array\");\n  }\n  if (!Number.isInteger(size) || size <= 0) {\n    throw new Error(\"size must be a positive integer\");\n  }\n\n  if (items.length === 0) {\n    return [];\n  }\n\n  const result = [];\n  for (let i = 0; i < items.length; i += size) {\n    const chunk = items.slice(i, i + size);\n    result.push(chunk);\n  }\n  return result;\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139436,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 154,
+          "prompt_tokens": 92,
+          "total_tokens": 246,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-PLnWt2nAa735gNHH7dZc8l0tG0Wt8aNL",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1543.104,
+          "prompt_per_token_ms": 16.77286956521739,
+          "prompt_per_second": 59.620090415163205,
+          "predicted_n": 154,
+          "predicted_ms": 5297.674,
+          "predicted_per_token_ms": 34.40048051948052,
+          "predicted_per_second": 29.069361383882814,
+          "draft_n": 132,
+          "draft_n_accepted": 112
+        }
+      },
+      "execution": "not run in model worker"
+    },
+    {
+      "kind": "retrieval",
+      "seed": 43,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"shippedRelease\": \"not in source\",\n  \"rollbackApprover\": \"Mira Patel\",\n  \"localIndexCache\": \"64 MiB\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139439,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 45,
+          "prompt_tokens": 137,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-Hg0eIWJPfgrRRZE1BTwGoBhKyoNlqwbS",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 137,
+          "prompt_ms": 2156.642,
+          "prompt_per_token_ms": 15.741912408759124,
+          "prompt_per_second": 63.52468328076705,
+          "predicted_n": 45,
+          "predicted_ms": 1495.232,
+          "predicted_per_token_ms": 33.227377777777775,
+          "predicted_per_second": 30.095664084235757,
+          "draft_n": 36,
+          "draft_n_accepted": 32
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 1,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"owner\": \"Mira\",\n  \"severity\": \"medium\"\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139444,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 147,
+          "total_tokens": 183,
+          "prompt_tokens_details": {
+            "cached_tokens": 93
+          }
+        },
+        "id": "chatcmpl-0xsnkpIatkwfVrG352i4qwbIedWgbqNF",
+        "timings": {
+          "cache_n": 93,
+          "prompt_n": 54,
+          "prompt_ms": 1022.252,
+          "prompt_per_token_ms": 18.930592592592593,
+          "prompt_per_second": 52.824548154466804,
+          "predicted_n": 36,
+          "predicted_ms": 1113.474,
+          "predicted_per_token_ms": 30.92983333333333,
+          "predicted_per_second": 32.33124437571062,
+          "draft_n": 27,
+          "draft_n_accepted": 26
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 2,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-17\",\n  \"component\": \"cache warmer\",\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139447,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 36,
+          "prompt_tokens": 216,
+          "total_tokens": 252,
+          "prompt_tokens_details": {
+            "cached_tokens": 142
+          }
+        },
+        "id": "chatcmpl-G1snbuCfqKKDfDMxPRss3bXp3gvJaQLi",
+        "timings": {
+          "cache_n": 142,
+          "prompt_n": 74,
+          "prompt_ms": 1451.499,
+          "prompt_per_token_ms": 19.61485135135135,
+          "prompt_per_second": 50.98177814796979,
+          "predicted_n": 36,
+          "predicted_ms": 1098.407,
+          "predicted_per_token_ms": 30.511305555555552,
+          "predicted_per_second": 32.774736504774644,
+          "draft_n": 27,
+          "draft_n_accepted": 27
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 3,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"id\": \"OPS-18\",\n  \"owner\": \"Jon\",\n  \"severity\": \"high\",\n  \"moreSevereThanOps17\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139451,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 47,
+          "prompt_tokens": 346,
+          "total_tokens": 393,
+          "prompt_tokens_details": {
+            "cached_tokens": 292
+          }
+        },
+        "id": "chatcmpl-fv9PDH3GSC87Nf2X6vSjJFQG403rqwd4",
+        "timings": {
+          "cache_n": 292,
+          "prompt_n": 54,
+          "prompt_ms": 1042.432,
+          "prompt_per_token_ms": 19.304296296296297,
+          "prompt_per_second": 51.80194007858546,
+          "predicted_n": 47,
+          "predicted_ms": 1533.157,
+          "predicted_per_token_ms": 32.62036170212766,
+          "predicted_per_second": 30.6556993184651,
+          "draft_n": 36,
+          "draft_n_accepted": 36
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "seed": 43,
+      "round": 4,
+      "pass": true,
+      "error": "",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```json\n{\n  \"tickets\": [\n    {\n      \"id\": \"OPS-17\",\n      \"owner\": \"Mira\"\n    },\n    {\n      \"id\": \"OPS-18\",\n      \"owner\": \"Jon\"\n    }\n  ],\n  \"usedCache\": true\n}\n```"
+            }
+          }
+        ],
+        "created": 1789139455,
+        "model": "gemma-campaign",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 434,
+          "total_tokens": 509,
+          "prompt_tokens_details": {
+            "cached_tokens": 341
+          }
+        },
+        "id": "chatcmpl-v5oxl84NlGuSbmpLlmfngLAUhOGcV2mQ",
+        "timings": {
+          "cache_n": 341,
+          "prompt_n": 93,
+          "prompt_ms": 1679.717,
+          "prompt_per_token_ms": 18.061473118279572,
+          "prompt_per_second": 55.366469470750125,
+          "predicted_n": 75,
+          "predicted_ms": 2327.306,
+          "predicted_per_token_ms": 31.030746666666666,
+          "predicted_per_second": 32.22610176745129,
+          "draft_n": 57,
+          "draft_n_accepted": 56
+        }
+      }
+    }
+  ],
+  "mode": 1,
+  "fixture_version": "t02-v1-reviewed",
+  "scope": "Model baseline only; coding executes after nativeworkerstop in separate sandbox"
+}

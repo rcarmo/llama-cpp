@@ -1,0 +1,8 @@
+/** SCRIPT_JDOC:
+{"summary":"Shape andactivationpackingdiagnostic on deployedsmallbatchtarget, MTP3/targetonly saved64K","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{Trial,root,save}from'./campaign';import{copyFileSync,readFileSync}from'node:fs';
+const mode=process.argv[2];if(!['mtp3','target'].includes(mode))throw Error('mode');
+const t=new Trial('shapes64-'+mode,{maintenance:true,build:'baseline',cpuBuild:root+'/runtime-cpu',format:'f16',fa:false,full:false,cpuCtx:262144,parallel:2,cache:0,mtp:mode==='mtp3',extraEnv:{LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH:'1',GGML_CPU_SHAPE_PROFILE:'1',GGML_CPU_WHOLE_TOKEN_PROFILE:'1',GGML_SPECULATIVE_PROFILE:'1'}});let result:any={};
+try{await t.begin();await t.start('cpu');copyFileSync('/var/home/agent/workspace/reports/gemma-context-coding-20260910/runs/compact64-aligned/slots/long64-v2.slot',t.dir+'/slots/state.slot');const f=JSON.parse(readFileSync('/var/home/agent/workspace/reports/gemma-hybrid-perf-20260910/runs/decode64-base/fixture.json','utf8'));save(t.dir+'/fixture.json',f);await t.req('cpu','restore',{filename:'state.slot'},'/slots/0?action=restore');const r=await t.req('cpu','decode',{prompt:f.prompt,n_predict:128,temperature:0,top_k:1,seed:42,cache_prompt:true,id_slot:0,return_tokens:true});result={ok:true,mode,answer:r.content,timings:r.timings,pass:['CEDAR-481','MAPLE-726','BIRCH-953'].every(k=>r.content.includes(k)),scope:'Shape/packingdiagnostic on currenttargetsmallbatch,128decode+25tail;mutex/barrierinstrumentationmeansnospeedclaim;packthreadsumisnotnodewall'};if(!result.pass||r.timings.cache_n<64500||r.timings.prompt_n>128)throw Error('Recall/cachegate');}
+catch(e){t.error ||=String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}

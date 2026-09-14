@@ -1,0 +1,29 @@
+{
+  "declared_before_trials": true,
+  "scope": "Experimental >32K context and coding-round optimisation, not production deployment",
+  "prior_evidence": "../gemma-kv-quality-20260910; retained immutable",
+  "strategy": "Preserve existing compact-SWA ring padding during explicit sequence save. Keep original restore/reuse guard. Match stream geometry. Retain compact CPU KV for warm coding and large contexts.",
+  "isolated_patch": "Environment-gated LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING; only standard-SWA explicit seq saves, not partial checkpoint saves. No repo-source or installed-library edit.",
+  "gates": [
+    "Fresh speech-side clearance plus immediate and continuous native/jobs/socket checks",
+    "Approved maintenance stop and automatic original-service restore",
+    ">=6GiB MemAvailable, <=16MiB swap per experimental process; temperature annotation only",
+    "First4K compact same-backend save/restore with and without padding, target state finite and expected token coverage",
+    "Then compact GPU->CPU4K: same-type/layout, target/MTP recall and cached append; no exact cross-backend output equality gate",
+    "Only after4K gates,64K input with compact contexts. Startup/page-in separate; single-stream trial not claimed as two128K service",
+    "Independent beginning/middle/end long recall and followup correctness; inspect serialized state finite",
+    "Coding warm rounds: fixed teacher-forced history for cache/MTP/timing control plus real median edit/test loops; repeated counterbalanced candidate/baseline comparisons",
+    "Retain original prompt/token/tool-output schema; minimise fixture changes and preserve independently failing tests",
+    "No deploy, commit or push without further approval"
+  ],
+  "budget": {
+    "compact_target_kv_one64K_gib": 1.0439453125,
+    "compact_target_kv_two64K_gib": 2.087890625,
+    "compact_target_kv_two_backends_two64K_each_gib": 4.17578125,
+    "target_only_estimate": true,
+    "other_memory": "Weights, MTP/repacking, backend/driver staging, workspaces, transfers and services are additional; sampled host reserve mandatory. Avoid dual full-SWA64K allocation.",
+    "long_context_first_step": "single stream per backend65,536 or larger capacity, >=60K actual prompt; document capacity vs actual length"
+  },
+  "warm_diagnosis": "Saved warm runs have531 evaluated/573 generated tokens on each path. Aggregate hybrid overhead~7.80s, of which6.14s decode and1.42s prompt. Build/full-SWA/GPU-residency confounded. Do not presume a router-cache miss caused it.",
+  "acceptance": {"task_quality": "Independent correctness and source-grounded output; drift alone diagnostic", "warm_latency": "Aim <=baseline warm median; do not claim benefit unless matched repeated evidence supports it", "long_context": "Context beyond32K with finite transferable state and correct recall/append"}
+}

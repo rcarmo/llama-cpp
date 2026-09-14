@@ -1,0 +1,162 @@
+{
+  "release": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-query-reuse-swapad",
+  "previous": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-score3-stopped",
+  "config_sha256": "c7aa560eb3a1e4fe343d90a35763902a8f9da5d8317c10699b1ddc85d43eeb23",
+  "candidate_unit_sha256": "bf6ea56869811a00620ff7853aeb89f5ea27ff52014a9af235e0d4794d6b15d3",
+  "cpu": {
+    "argv": [
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server",
+      "--model",
+      "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+      "--alias",
+      "gemma-4-e4b-qat-mtp",
+      "--load-mode",
+      "mmap",
+      "--gpu-layers",
+      "0",
+      "--threads",
+      "8",
+      "--cpu-range",
+      "0-7",
+      "--cpu-strict",
+      "1",
+      "--threads-batch",
+      "16",
+      "--cpu-range-batch",
+      "0-15",
+      "--cpu-strict-batch",
+      "1",
+      "--ctx-size",
+      "262144",
+      "--parallel",
+      "2",
+      "--no-kv-unified",
+      "--cont-batching",
+      "--batch-size",
+      "1024",
+      "--ubatch-size",
+      "256",
+      "--cache-type-k",
+      "f16",
+      "--cache-type-v",
+      "f16",
+      "--flash-attn",
+      "off",
+      "--spec-type",
+      "draft-mtp",
+      "--spec-draft-n-min",
+      "1",
+      "--spec-draft-n-max",
+      "3",
+      "--spec-draft-threads",
+      "8",
+      "--spec-draft-threads-batch",
+      "16",
+      "--spec-draft-cpu-range",
+      "0-7",
+      "--spec-draft-cpu-strict",
+      "1",
+      "--spec-draft-cpu-mask-batch",
+      "ffff",
+      "--spec-draft-cpu-strict-batch",
+      "1",
+      "--spec-draft-type-k",
+      "f16",
+      "--spec-draft-type-v",
+      "f16",
+      "--model-draft",
+      "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+      "--cache-prompt",
+      "--cache-ram",
+      "12288",
+      "--cache-reuse",
+      "256",
+      "--ctx-checkpoints",
+      "32",
+      "--checkpoint-min-step",
+      "8192",
+      "--cache-idle-slots",
+      "--slot-save-path",
+      "/var/home/agent/.cache/llama-gemma-hybrid/state/",
+      "--metrics",
+      "--slots",
+      "--ui",
+      "--no-warmup",
+      "--timeout",
+      "10800",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "18092"
+    ],
+    "env": {
+      "LD_LIBRARY_PATH": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-query-reuse-swapad/cpu-lib:/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-query-reuse-swapad/cpu-backend:/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-score3-stopped/cpu-backend:/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260910-smallbatch/cpu-lib:/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin:/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/runtime",
+      "GGML_CPU_EXPERT_IO_PROFILE": "0",
+      "GGML_CPU_EXPERT_IO_ADVISE_MODE": "off",
+      "LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH": "1",
+      "GGML_CPU_EXPERIMENTAL_ATTN4": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE4_3ROW": "1",
+      "GGML_CPU_EXPERIMENTAL_SCORE_QUERY_REUSE": "1",
+      "LLAMA_EXPERIMENTAL_CPU_SWA_SAVE_PADDING": "1"
+    },
+    "hashes": {
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml-base.so.0.18.1": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml.so.0.18.1": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-common.so.0.0.10579": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-server-impl.so": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libmtmd.so.0.0.10579": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+      "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/runtime/libomp.so": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a",
+      "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-query-reuse-swapad/cpu-lib/libllama.so.0": "76477ece6e4bf17f88e31a26d16dbbe0b3907a4ac8830e15e005c3e1e5d32a6b",
+      "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-query-reuse-swapad/cpu-backend/libggml-cpu.so.0": "98201efbdf2bc0fa7c96acf6f904609dd9f8c6724ed50edf6fed0d841cbc970a"
+    }
+  },
+  "gpu_unchanged": true,
+  "code": [
+    {
+      "f": "main.ts",
+      "sha256": "e0da006485e8c88142013901724d35c5c56cc038c6b4faa68ad67a8e5c60fd54"
+    },
+    {
+      "f": "policy.ts",
+      "sha256": "6e2cd23050b589e1264b57cc9439fd7784e0d7fb0a807c6edd602153cad30448"
+    },
+    {
+      "f": "proxy.test.ts",
+      "sha256": "04a1e7eade958f1ea416d14cdecd2511d7a26add18abebe5303326b4de7e658c"
+    },
+    {
+      "f": "proxy.ts",
+      "sha256": "6d01ce671a2c1bf67f314dd54f73a933b17aac9cd442024d819b9437f9216bb7"
+    },
+    {
+      "f": "README.md",
+      "sha256": "e286ce9a15ce347cc599348c7b8c2b2258d2c85589556b519d1174e363fcf7fe"
+    },
+    {
+      "f": "speech.ts",
+      "sha256": "b5c8d23fe3f4e648abb5fa2718e076fe86b2c95ef690eeda12a7f729effc9102"
+    },
+    {
+      "f": "state.test.ts",
+      "sha256": "0faad7ad293e147fa7c6066b04a38afa29ace743eaa895a22c545fedb6d85837"
+    },
+    {
+      "f": "state.ts",
+      "sha256": "9a55939fea4f58a012c76ce8917910c55fe91251c7d7f724b7e5eed1e1e0ef1c"
+    },
+    {
+      "f": "stream.test.ts",
+      "sha256": "cbfe102f0e1536cf2783487fd37db08f199be67b6e91b69fcc5db6c389c21306"
+    },
+    {
+      "f": "stream.ts",
+      "sha256": "e9225f247ad0158c43e6f32c8e60f8cfa57805f2ca2f022633eef1520c2ddfdb"
+    },
+    {
+      "f": "workers.ts",
+      "sha256": "6bc6a1e899a7ea0109860de44ea9ff8b2c6788c8356b3cd688c9d96b3464c671"
+    }
+  ],
+  "status": "prepared-not-deployed"
+}

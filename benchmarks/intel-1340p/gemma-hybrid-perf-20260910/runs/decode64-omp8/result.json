@@ -1,0 +1,136 @@
+{
+  "ok": true,
+  "name": "omp8",
+  "rows": [
+    {
+      "rep": 0,
+      "pass": true,
+      "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1870.338,
+        "prompt_per_token_ms": 74.81352,
+        "prompt_per_second": 13.366567967928791,
+        "predicted_n": 128,
+        "predicted_ms": 23585.047,
+        "predicted_per_token_ms": 184.2581796875,
+        "predicted_per_second": 5.42716747607075,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      }
+    },
+    {
+      "rep": 1,
+      "pass": true,
+      "content": "CEDAR-481,MAPLE-726,BIRCH-953\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39",
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1842.571,
+        "prompt_per_token_ms": 73.70284,
+        "prompt_per_second": 13.567998193828082,
+        "predicted_n": 128,
+        "predicted_ms": 23716.907,
+        "predicted_per_token_ms": 185.2883359375,
+        "predicted_per_second": 5.396993798558977,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      }
+    }
+  ],
+  "limits": "Two128-output-token sequential screen requests from identical retained64K state; not a repeated coding workflow or final promotion. Qualitative list formatting may vary; recall and cache coverage hard checks.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "parallel": 2,
+    "cache": 0,
+    "extraEnv": {
+      "OMP_NUM_THREADS": "8",
+      "OMP_PROC_BIND": "true",
+      "OMP_PLACES": "{0},{1},{2},{3},{4},{5},{6},{7}"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "cpu",
+      "wall_ms": 535.7331910000003,
+      "package_j": 8.535256,
+      "timings": {
+        "restore_ms": 534.241
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode-0",
+      "device": "cpu",
+      "wall_ms": 25502.226801999997,
+      "package_j": 807.481454,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1870.338,
+        "prompt_per_token_ms": 74.81352,
+        "prompt_per_second": 13.366567967928791,
+        "predicted_n": 128,
+        "predicted_ms": 23585.047,
+        "predicted_per_token_ms": 184.2581796875,
+        "predicted_per_second": 5.42716747607075,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    },
+    {
+      "label": "restore-1",
+      "device": "cpu",
+      "wall_ms": 337.2440090000018,
+      "package_j": 4.839831,
+      "timings": {
+        "restore_ms": 335.74
+      },
+      "n_read": 1091923924,
+      "token_hash": null
+    },
+    {
+      "label": "decode-1",
+      "device": "cpu",
+      "wall_ms": 25593.592255999996,
+      "package_j": 807.221566,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 25,
+        "prompt_ms": 1842.571,
+        "prompt_per_token_ms": 73.70284,
+        "prompt_per_second": 13.567998193828082,
+        "predicted_n": 128,
+        "predicted_ms": 23716.907,
+        "predicted_per_token_ms": 185.2883359375,
+        "predicted_per_second": 5.396993798558977,
+        "draft_n": 110,
+        "draft_n_accepted": 90
+      },
+      "token_hash": "f1d732cd11275a7e3f7983977021320bb5ccda11b553e3d15e274fc5c42abce0"
+    }
+  ],
+  "thermal": {
+    "peak_c": 91,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12107923,
+    "peak_trial_rss_kib": 12111344,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 23491300,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T17:14:58.857Z"
+}

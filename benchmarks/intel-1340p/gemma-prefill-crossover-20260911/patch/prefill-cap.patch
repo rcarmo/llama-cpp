@@ -1,0 +1,45 @@
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -1,4 +1,7 @@
+ #include "llama-context.h"
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
+ 
+ #include "ggml.h"
+ #include "llama-arch.h"
+@@ -1747,10 +1750,25 @@
+     // handle any pending shifts/copies
+     memory_update(false);
+ 
++    uint32_t active_ubatch = cparams.n_ubatch;
++    const char * prefill_cap = std::getenv("LLAMA_EXPERIMENTAL_PREFILL_UBATCH");
++    if (std::getenv("LLAMA_PREFILL_CAP_TRACE")) {
++        std::fprintf(stderr, "PREFILL_GATE gemma=%d causal=%d allocated=%u tokens=%u text=%d cap=%s\n", model.arch == LLM_ARCH_GEMMA4, cparams.causal_attn, cparams.n_ubatch, n_tokens_all, batch_inp.token != nullptr, prefill_cap ? prefill_cap : "unset");
++    }
++    if (model.arch == LLM_ARCH_GEMMA4 && cparams.causal_attn && cparams.n_ubatch == 1024 && batch_inp.token && n_tokens_all > 4 && prefill_cap) {
++        if (std::strcmp(prefill_cap, "256") == 0) active_ubatch = 256;
++        else if (std::strcmp(prefill_cap, "1024") != 0) {
++            LLAMA_LOG_ERROR("Invalid experimental prefill cap\n");
++            return -1;
++        }
++        if (std::getenv("LLAMA_PREFILL_CAP_TRACE")) {
++            std::fprintf(stderr, "PREFILL_CAP allocated=%u active=%u tokens=%u\n", cparams.n_ubatch, active_ubatch, n_tokens_all);
++        }
++    }
+     llama_memory_context_ptr mctx;
+ 
+     while (true) {
+-        mctx = memory->init_batch(*balloc, cparams.n_ubatch, output_all);
++        mctx = memory->init_batch(*balloc, active_ubatch, output_all);
+         if (!mctx) {
+             return -2;
+         }
+@@ -1808,6 +1826,7 @@
+ 
+     do {
+         const auto & ubatch = mctx->get_ubatch();
++        if (std::getenv("LLAMA_PREFILL_CAP_TRACE")) std::fprintf(stderr, "PREFILL_UBATCH actual=%u cap=%u\n", ubatch.n_tokens, active_ubatch);
+ 
+         // count the outputs in this ubatch
+         {

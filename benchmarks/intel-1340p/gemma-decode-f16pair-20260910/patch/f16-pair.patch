@@ -1,0 +1,43 @@
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -1401,6 +1401,20 @@
+     assert(ne12 % ne02 == 0);
+     assert(ne13 % ne03 == 0);
+ 
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    const char * pair_mode = getenv("GGML_CPU_EXPERIMENTAL_F16_PAIR");
++    const bool pair_attention = pair_mode != NULL && strcmp(pair_mode, "1") == 0 && !params->use_ref &&
++        GGML_VEC_DOT_UNROLL == 2 && num_rows_per_vec_dot == 1 && type == GGML_TYPE_F16 &&
++        vec_dot_type == GGML_TYPE_F16 && ne11 >= 1 && ne11 <= 4 && ne12 == 8 && ne02 == 2 &&
++        ((ne00 >= 32768 && ne01 == 512) || (ne00 == 512 && ne01 >= 32768));
++#endif
++
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++    if (pair_attention && params->ith == 0 && getenv("GGML_CPU_F16_PAIR_TRACE") != NULL) {
++        fprintf(stderr, "F16_PAIR k=%lld m=%lld n=%lld threads=%d\n", (long long) ne00, (long long) ne01, (long long) ne11, params->nth);
++    }
++#endif
++
+     // block-tiling attempt
+     const int64_t blck_0 = 16;
+     const int64_t blck_1 = 16;
+@@ -1442,6 +1456,19 @@
+                 //    vec_dot(ne00, &dst_col[ir0], src0_row + ir0*nb01, src1_col);
+                 //}
+ 
++#if defined(__AVX2__) && defined(__F16C__) && defined(__FMA__)
++                if (pair_attention) {
++                    const int64_t block_end = MIN(iir0 + blck_0, ir0_end);
++                    int64_t ir0 = iir0;
++                    for (; ir0 + 1 < block_end; ir0 += 2) {
++                        ggml_vec_dot_f16_unroll(ne00, nb01, &dst_col[ir0],
++                            (const ggml_fp16_t *) (src0_row + ir0 * nb01), (const ggml_fp16_t *) src1_col);
++                    }
++                    for (; ir0 < block_end; ++ir0) vec_dot(ne00, &dst_col[ir0], 0, src0_row + ir0 * nb01, 0, src1_col, 0, 1);
++                    continue;
++                }
++#endif
++
+ #if defined(__riscv) || defined(__riscv__)
+                 if (num_rows_per_vec_dot == 1 && type == GGML_TYPE_F16 && vec_dot_type == GGML_TYPE_F16 &&
+                     src1->ne[2] == 8 &&

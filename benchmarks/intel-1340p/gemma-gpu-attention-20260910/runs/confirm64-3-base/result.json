@@ -1,0 +1,82 @@
+{
+  "ok": true,
+  "mode": "base",
+  "rows": [
+    {
+      "rep": 0,
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29727.894,
+        "prompt_per_token_ms": 29.087958904109588,
+        "prompt_per_second": 34.3784864141402,
+        "predicted_n": 21,
+        "predicted_ms": 6556.637,
+        "predicted_per_token_ms": 327.83185,
+        "predicted_per_second": 3.0503442542266717
+      }
+    }
+  ],
+  "scope": "Counterbalanced confirmation, same source state/prompt; not full fresh64K",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 256,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu",
+    "preserveSwaPadding": true,
+    "extraEnv": {}
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "vulkan",
+      "wall_ms": 535.0061740000001,
+      "package_j": 8.276163,
+      "timings": {
+        "restore_ms": 510.062
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-0",
+      "device": "vulkan",
+      "wall_ms": 36315.945886,
+      "package_j": 928.902713,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 29727.894,
+        "prompt_per_token_ms": 29.087958904109588,
+        "prompt_per_second": 34.3784864141402,
+        "predicted_n": 21,
+        "predicted_ms": 6556.637,
+        "predicted_per_token_ms": 327.83185,
+        "predicted_per_second": 3.0503442542266717
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 88,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5239749,
+    "peak_trial_rss_kib": 4711484,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24013064,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T20:01:34.118Z"
+}

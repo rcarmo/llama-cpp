@@ -1,0 +1,18 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-decode-score3-20260911/dispatch.test.ts:
+(pass) score3 row jobs cover all rows once including all residues [10.24ms]
+(pass) score-only opt-in remains inside existing exact ATTN4 gate [0.40ms]
+
+reports/gemma-decode-score3-20260911/audit.test.ts:
+(pass) saved score3 timing and tail-dispatch evidence against current ATTN4 [15.70ms]
+
+reports/gemma-decode-score3-20260911/guard-safety.test.ts:
+(pass) guard aborts work before TERM and escalates only owned handles [5.46ms]
+(pass) already signal-killed workers are not signalled again [0.09ms]
+(pass) native child ignoring TERM is killed promptly without inference [35.88ms]
+
+ 6 pass
+ 0 fail
+ 26 expect() calls
+Ran 6 tests across 3 files. [354.00ms]

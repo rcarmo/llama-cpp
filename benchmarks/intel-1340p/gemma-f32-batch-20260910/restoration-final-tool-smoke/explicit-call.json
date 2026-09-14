@@ -1,0 +1,94 @@
+{
+  "scope": "Original-profile labelled diagnostic, NOT promotion timing evidence",
+  "started": "2026-09-10T21:29:00.843Z",
+  "request": {
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "description": "Read fixture inventory",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 96,
+    "cache_prompt": true,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookup_stock exactly once for the requested SKU. After its result arrives, answer the user with the quantity from that result."
+      },
+      {
+        "role": "user",
+        "content": "How many items of SKU PANDA-RESTORE are in stock? Look it up, then reply with the quantity only."
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "tool_calls",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "function": {
+                "name": "lookup_stock",
+                "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+              },
+              "id": "5vwHbW8KvGHUjF5fRGAok3jsPmKkKIzs"
+            }
+          ]
+        }
+      }
+    ],
+    "created": 1789075742,
+    "model": "gemma-4-e4b-qat-mtp",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 19,
+      "prompt_tokens": 105,
+      "total_tokens": 124,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-pGQChkm1CXvFIkS5cun5VYHLPczX7QQP",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 105,
+      "prompt_ms": 1579.025,
+      "prompt_per_token_ms": 15.038333333333334,
+      "prompt_per_second": 66.49673057741327,
+      "predicted_n": 19,
+      "predicted_ms": 552.159,
+      "predicted_per_token_ms": 29.061,
+      "predicted_per_second": 34.41037817005609,
+      "draft_n": 15,
+      "draft_n_accepted": 15
+    }
+  }
+}

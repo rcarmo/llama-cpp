@@ -1,0 +1,23 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.003.633 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.435 W srv  llama_server: -----------------
+0.00.004.438 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.438 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.439 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.439 W srv  llama_server: -----------------
+0.00.006.027 I srv    load_model: loading model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf'
+0.03.307.676 I common_speculative_init_result: creating MTP draft context against the target model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.6/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf'
+0.03.467.657 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.03.487.492 I srv  llama_server: model loaded
+0.03.487.500 I srv  llama_server: listening on http://127.0.0.1:8090
+0.04.579.194 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.04.579.397 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.44.537.513 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   1024, progress = 0.20, t =  39.96 s / 25.63 tokens per second
+1.29.480.300 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   2048, progress = 0.40, t =  84.90 s / 24.12 tokens per second
+2.19.421.276 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =   3072, progress = 0.60, t = 134.84 s / 22.78 tokens per second
+3.14.419.875 I srv    operator(): operator(): cleaning up before exit...
+3.34.629.176 W srv          stop: cancel task, id_task = 1
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=total graphs=0 graph_us=0 node_wall_us=0 active_thread_us=0 capacity_us=0 idle_or_sync_us=0 logical_read_bytes=0 logical_write_bytes=0
+GGML_CPU_EXPERT_IO_PROFILE nodes=0 selections=0 unique=0 duplicates=0 repeated=0 invalid_ids=0 ranges=0 range_bytes=0 resident_pages=0 sampled_pages=0 advice_calls=0 advice_bytes=0 advice_failures=0 advice_skips=0 advice_us=0 advice_slow=0 advice_disabled=0 resident_skips=0

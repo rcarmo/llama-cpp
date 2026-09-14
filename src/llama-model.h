@@ -624,6 +624,8 @@ struct llama_model {
     llm_arch arch = LLM_ARCH_UNKNOWN;
 
     std::string name = "n/a";
+    // File snapshot identity for in-process handoff between independent loads, not a content hash.
+    std::string kv_handoff_identity;
 
     llama_hparams hparams = {};
     llama_vocab   vocab;

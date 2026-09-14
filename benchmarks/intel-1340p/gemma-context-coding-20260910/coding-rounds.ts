@@ -1,0 +1,22 @@
+import {Trial,save,api,root} from './campaign';import {Route} from './aligned-route';import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+const profile=process.argv[2],order=Number(process.argv[3]),hybrid=profile!=='baseline',park=profile!=='hybrid-resident';if(!['baseline','hybrid','hybrid-resident'].includes(profile)||!Number.isInteger(order))throw Error('profile/order');const t=new Trial(`coding-${order}-${profile}`,{maintenance:true,build:'baseline',format:'f16',fa:false,full:false,cpuCtx:262144,gpuCtx:147456,parallel:2,cache:256,vulkanBuild:root+'/runtime-vulkan',preserveSwaPadding:true});let result:any={};const runs:any[]=[];
+const tools=[{type:'function',function:{name:'read_file',description:'Read src/median.ts',parameters:{type:'object',properties:{},additionalProperties:false}}},{type:'function',function:{name:'edit_file',description:'Replace the entire src/median.ts with TypeScript code',parameters:{type:'object',properties:{code:{type:'string'}},required:['code'],additionalProperties:false}}},{type:'function',function:{name:'run_tests',description:'Run unchanged independent tests',parameters:{type:'object',properties:{},additionalProperties:false}}}];
+try{await t.begin();await t.start('cpu');const route=new Route(t,hybrid,park);
+for(const rep of [0]){
+ const cwd=t.dir+'/fixtures/'+rep;mkdirSync(cwd,{recursive:true});const src='export function median(values: number[]): number {\n const sorted = values.sort((a,b)=>a-b);\n return sorted[Math.floor(sorted.length/2)];\n}\n';
+ const tests="import {test,expect} from 'bun:test';import {median} from './median';test('odd/even/empty/no mutation',()=>{expect(median([1,4,2])).toBe(2);expect(median([1,9,3,5])).toBe(4);expect(()=>median([])).toThrow();const a=[3,1,2];median(a);expect(a).toEqual([3,1,2]);expect(median([-4,-2])).toBe(-3)});";
+ writeFileSync(cwd+'/median.ts',src);writeFileSync(cwd+'/median.test.ts',tests);
+ const padding=Array.from({length:150},(_,i)=>`Review record ${rep}-${i}: changes must preserve input arrays and be verified with tests.`).join('\n');
+ const messages:any[]=[{role:'system',content:'Use the tools to fix code. Read before edit. Only edit the source, run tests, give a brief result. Do not emit reasoning.'},{role:'user',content:padding+'\nFix median: even-length arrays require mean of two middle values, empty input throws, input array must remain unchanged. Read source, edit it, run tests.'}];
+ let read=false,edited=false,tested=false,final='',rounds:any[]=[];
+ async function test(){const p=Bun.spawn([process.execPath,'test'],{cwd,stdout:'pipe',stderr:'pipe'});const [rc,stdout,stderr]=await Promise.all([p.exited,new Response(p.stdout).text(),new Response(p.stderr).text()]);return {rc,stdout,stderr}}
+ for(let i=0;i<6;i++){
+  const r=await route.request(`median-${rep}-round-${i}`,{messages,tools,tool_choice:'auto',temperature:0,max_tokens:640,seed:42,cache_prompt:true,chat_template_kwargs:{enable_thinking:false}});
+  const m=r.choices[0].message;messages.push(m);rounds.push({i,usage:r.usage,timings:r.timings,tools:m.tool_calls?.map(x=>x.function.name)});
+  if(!m.tool_calls?.length){final=m.content??'';break}
+  for(const tc of m.tool_calls){let response:any;try{const args=JSON.parse(tc.function.arguments);if(tc.function.name==='read_file'){read=true;response=readFileSync(cwd+'/median.ts','utf8')}else if(tc.function.name==='edit_file'){if(!read||typeof args.code!=='string')throw Error('Read first / code required');writeFileSync(cwd+'/median.ts',args.code);edited=true;response='Source updated'}else if(tc.function.name==='run_tests'){response=await test();tested=response.rc===0}else throw Error('Unknown tool')}catch(e){response={error:String(e)}}messages.push({role:'tool',tool_call_id:tc.id,content:typeof response==='string'?response:JSON.stringify(response)})}
+ }
+ const independent=await test();if(readFileSync(cwd+'/median.test.ts','utf8')!==tests)throw Error('Test tampering');const row={rep,pass:edited&&tested&&independent.rc===0&&!!final,read,edited,tested,final,rounds,independent};runs.push(row);save(t.dir+'/median-results.json',runs);
+}
+result={ok:runs.every(x=>x.pass),profile,runs,scope:'Single matched median edit/test repetition in counterbalanced ordered block. Retained CPU binary/geometry on both; compact GPU padding+validated v2 conversion; park GPU before first decode. Cold wall includes GPU startup/conversion/park; warm timings separate.'};
+}catch(e){t.error ||= String(e);console.error(e)}finally{const r=await t.finish(result);if(!r.ok)process.exitCode=1}

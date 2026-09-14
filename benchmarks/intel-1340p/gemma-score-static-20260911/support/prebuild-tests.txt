@@ -1,0 +1,24 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-score-static-20260911/stage-owner.test.ts:
+(pass) normal stage owns lease until restoration verification [1.46ms]
+(pass) simultaneous launch/rejected second poststop cannot restore first [0.47ms]
+(pass) failed preflight never gains restoration permission [0.29ms]
+(pass) queued cancellation/no lease is no-op [0.12ms]
+(pass) abort/owner crash after stop-intent restores the frozen current release [0.39ms]
+(pass) crash during work followed by new owner is refused, original cleanup allowed [0.41ms]
+(pass) delayed old poststop cannot release or restart a new owner [0.61ms]
+(pass) restoring owner holds lease during verification, rejects next stage [0.46ms]
+(pass) cleanup failure keeps lease and never starts production [0.40ms]
+(pass) verification failure/cancel keeps lease for explicit recovery [0.47ms]
+(pass) changed release blocks obsolete restoration [0.43ms]
+
+reports/gemma-score-static-20260911/schedule.test.ts:
+(pass) static and dynamic jobs cover each job once [7.47ms]
+(pass) score row ownership exact including job and tile tails [15.14ms]
+(pass) candidate retains barriers and removes atomics only in static mode [0.57ms]
+
+ 14 pass
+ 0 fail
+ 178 expect() calls
+Ran 14 tests across 2 files. [351.00ms]

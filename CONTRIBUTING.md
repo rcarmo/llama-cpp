@@ -1,30 +1,14 @@
-# Contributors
+# Contributing to rcarmo/llama-cpp
 
-The project differentiates between 3 levels of contributors:
+This is an owner-directed development fork. AI-assisted implementation, experiments, documentation, commit messages and authorised commits/pushes are permitted. The owner remains responsible for what is published. Use `Assisted-by:` for material AI contributions and keep checkpoints small, reviewed and tested.
 
-- Contributors: people who have contributed before (no special privileges)
-- Collaborators (Triage): people with significant contributions, who may be responsible for some parts of the code, and are expected to maintain and review contributions for the code they own
-- Maintainers: responsible for reviewing and merging PRs, after approval from the code owners
+Confirm the destination remote before publishing. Permission to work or push here does not permit submissions to `ggml-org/llama.cpp` or deployment of experimental code. See [AGENTS.md](AGENTS.md) for scope, preservation and authorisation rules.
 
-# AI Usage Policy
+## Upstream workflow reference
 
-> [!IMPORTANT]
->
-> AI-generated code is allowed. You are 100% responsible for every line, however it was produced.
->
-> Undisclosed AI usage may result in your account being permanently banned from contributing to the project.
->
-> Detailed information regarding permissible and restricted uses of AI can be found in the [AGENTS.md](AGENTS.md) file.
+The contributor roles and pull-request practices below are inherited guidance for work submitted to upstream. They are not prerequisites for owner-authorised experiments or commits in this fork. Before an upstream submission, consult the current upstream [contribution guide](https://github.com/ggml-org/llama.cpp/blob/master/CONTRIBUTING.md) and [AI policy](https://github.com/ggml-org/llama.cpp/blob/master/AGENTS.md); this fork does not grant permission to publish there.
 
-If AI is used to generate any portion of the code, contributors must adhere to the following requirements:
-
-1. Explicitly disclose the manner in which AI was employed.
-2. Check for an existing PR addressing the same change; if one exists, comment there to work with its author instead of opening a duplicate.
-3. Perform a comprehensive manual review prior to submitting the pull request.
-4. Be prepared to explain every line of code they submitted when asked about it by a maintainer.
-5. It is strictly prohibited to use AI to write your posts for you (bug reports, feature requests, pull request descriptions, Github discussions, responding to humans, ...).
-
-For more info, please refer to the [AGENTS.md](AGENTS.md) file.
+Technical coding, naming and testing conventions also apply to fork changes. Experimental performance trade-offs must be measured and labelled; small regressions can justify further research rather than automatic abandonment.
 
 # Pull requests (for contributors & collaborators)
 
@@ -61,7 +45,7 @@ For more info, please refer to the [AGENTS.md](AGENTS.md) file.
 
 - Expect requests for modifications to ensure the code meets llama.cpp's standards for quality and long-term maintainability
 - Maintainers will rely on your insights and approval when making a final decision to approve and merge a PR
-- If your PR becomes stale, rebase it on top of latest `master` to get maintainers attention
+- In this fork, update a stale branch by merging current `master`; rebase only when the owner explicitly requests it. For an upstream PR, agree the update method with its maintainers.
 - Consider adding yourself to [CODEOWNERS](CODEOWNERS) to indicate your availability for fixing related issues and reviewing related PRs
 
 # Pull requests (for maintainers)

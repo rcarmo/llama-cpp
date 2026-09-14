@@ -1,0 +1,12 @@
+12 | const originalCorpus = resolve("benchmarks/intel-1340p/qwen35moe-vulkan-mtp/corpus");
+13 | const extraCorpus = resolve(import.meta.dir, "../maple-preview/agentic");
+14 | await mkdir(outDir, { recursive: true });
+15 | 
+16 | function assert(condition: unknown, message: string): asserts condition {
+17 |   if (!condition) throw new Error(message);
+                                 ^
+error: qwen36: one or more semantic cases failed
+      at assert (/var/home/agent/workspace/projects/llama-cpp/benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/run-matched-corpus.ts:17:29)
+      at /var/home/agent/workspace/projects/llama-cpp/benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/run-matched-corpus.ts:137:1
+
+Bun v1.4.0 (Linux x64)

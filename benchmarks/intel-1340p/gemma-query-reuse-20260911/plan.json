@@ -1,0 +1,11 @@
+{
+ "before_load":true,"baseline":"B0-score3 / 20260911-score3-stopped","restore_target":"20260911-score3-stopped",
+ "Q02":"ggml-cpu.c MUL_MAT: contiguousF32query firstSGEMM attempt withF16keys rejectsF32B; existingfrom_float convertsqueries tovec_dot_typeF16 wdata; barrier; perhead/worker secondllamafile call receivesF16B. Outer !use_ref/ATTN4 gate andscore3gate preserved.",
+ "Q03":"Threadprivate alignas64floatquery[2048] innoinline helper,8KiB/worker/headcall,64KiBteam8threads. Eachworker expands fouralreadyroundedF16rows once;gemm_score3reusesF32scratch acrossallitskeyjobs. No shared lifetime ornewbarrier. Eachcall completelyoverwritesbuffer;no stale persistentcache. Overhead is8workersduplicatepreparation,chargedtotiming;headcalls serialperworker.",
+ "Q04":"OneoptinF16A/F32Btemplate reuseexistinggemm_score3(m),same3x4/48jobs/FMAorder/tails,ldb512 forpreparedquery. Key/sourceKV unchanged. Allthreads takeuniformprocessflag/shape gate andremaininhelperthroughfinalbarrier.",
+ "Q05":"19nativecases/mode incllongscore/valuecontrol/paddedstride/groupbroadcast/rowtails/n1/3/4/5andbelowgate/reference;standalonebitexact vsF16baseline,inputscratch/outputcanaries,changedquery/repeatedcalls andparallelgroupisolation.",
+ "Q06":"Compiledpreparedscore innerloop3FP16keyconversions not7;queryprep outsidejobs. Trace allworkersenter/exit2048elements8KiB/call;actualmodelandcounts verifyamortisation. Traces offscreen.",
+ "Q07_Q09":"4ABBA64K128screen;8independentABBA/BAABconfirmation onlyuseful;then512sustained4runs,4K/32K2perarm,frozenquality/finite64Klifecycle. No minimumpercentage, onejustifiedambiguityblockmax.",
+ "guards":"Sequentialheavywork;stoppedspeechfailclosed;6GiBavailable/16MiBmaxswap,95Cannotation;supervisedbuild10min/native5min/probe3min/screen5min,ownedcleanup+automaticcurrentB0restore. No deploymentwithoutapproval. Model/state/fixturefreshlyhashed.",
+ "later":"IfQloses,atmost2PMUdiagnostics;GandFconditionalonactualevidencepernotesplan. No unapprovedsecuritychanges orrepeatnear128."
+}

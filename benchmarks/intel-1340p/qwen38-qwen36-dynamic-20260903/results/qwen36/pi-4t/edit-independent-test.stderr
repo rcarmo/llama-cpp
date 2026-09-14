@@ -1,0 +1,21 @@
+
+src/clamp.test.ts:
+2 | import { clamp } from "./clamp";
+3 | 
+4 | test("clamps below, within, and above the range", () => {
+5 |   expect(clamp(-2, 0, 10)).toBe(0);
+6 |   expect(clamp(5, 0, 10)).toBe(5);
+7 |   expect(clamp(12, 0, 10)).toBe(10);
+                               ^
+error: expect(received).toBe(expected)
+
+Expected: 10
+Received: 12
+
+      at <anonymous> (/tmp/qwen-dynamic-pi-fixture-qwen36/src/clamp.test.ts:7:28)
+(fail) clamps below, within, and above the range [1.04ms]
+
+ 0 pass
+ 1 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [13.00ms]

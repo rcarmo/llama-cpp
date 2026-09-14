@@ -1,0 +1,9 @@
+{
+ "scope":"Fresh user-resumed CPUFA-specific optimisation, not repetition of GPUFA test",
+ "screen_outcomes":{"CPUFA":"correct4K/64K but~4.43tok/s vs earlierFA-off7.24","scalarF32":"correct but~3.17tok/s; temp float row costs","small_tiled":"correct but~1.02tok/s; fixed64 query rows waste work","active_rows":"native21 helper tests pass; removes wasted rows,1.46-1.67tok/s but still slow","fused_value":"AVX2/F16C/FMA load+convert+F32 madd without temp row;native7helper cases+sentinels pass;64Kscreen4.84-4.92tok/s;confirm needed"},
+ "correctness":"Source snapshot matches originalabdbeadfb CPU ABI; build changes only ops object and links retained objects, no production libs overwritten. All measured variants preserve recall/cache counts,128 generated tokens and90/110MTP acceptance.",
+ "confirmation":"ABBA/BAAB8 runs,4each same isolated backend patched-default vs fused flag.64Ksaved state, identicalprompt,CPU128Kx2,decode8/pre16,MTP3; measure request/decode/conversion separately.",
+ "reference_guard":"Before native whole-attention tests, ensure fused/F32 flags do not modify params->use_ref reference backend. Benchmarkedpre-guard source/runtime frozen inpatch-fused-v1/runtime-fused-v1; guard only affects reference mode, not normal inference.",
+ "native_cases":"Masked grouped-query F16 attention at32K/64K,querycounts1/4/25,headwidth512,8Qheads/2KVheads. Compare default/fused errors separately; preserve baseline failures and do not loosen tolerance.",
+ "status":"No claim of beatingFA-off; retainFA-specific gain if confirmed. No deployment, model weights or private media access. Delegated source review timed out; local review and native tests explicit."
+}

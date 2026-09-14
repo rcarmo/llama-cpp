@@ -1,0 +1,84 @@
+{
+  "request": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "id_slot": 0,
+    "cache_prompt": false,
+    "seed": 42,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Write a JavaScript module. Return only one fenced ```js code block.\nExport exactly:\nexport function mergeIntervals(intervals)\nRequirements:\n- intervals must be an array of [start, end] pairs of finite numbers; otherwise throw Error.\n- Reverse endpoints when start > end.\n- Return a new array of sorted merged intervals.\n- Overlapping or touching intervals must merge.\n- Keep zero-length intervals.\n- Never mutate the input array or nested arrays.\n- No imports, no external libraries, no explanation."
+      }
+    ]
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```js\nexport function mergeIntervalInterval(intervals) {\n  if (!Array.isArray(intervals)) {\n    throw new Error(\"Input must be an array.\");\n  }\n\n  const processedInterval = (interval) => {\n    if (!Array.isArray(interval) || interval.length !== 2 ||\n        !Number.isFinite(interval[0]) || !Number.isFinite(interval[1])) {\n      throw new Error(\"Interval must be an array of two finite numbers.\");\n    }\n    const [start, end] = [...interval];\n    return start > end ? [end, start] : [start, end];\n  };\n\n  const validatedAndProcessed = intervals.map(processedInterval);\n\n  if (validatedAndProcessed.length === 0) {\n    return [];\n  }\n\n  // Sort by start time\n  const sortedInterval = [...validatedAndProcessed].sort((a, b) => a[0] - b[0]);\n\n  const merged = [];\n  let currentInterval = [...sortedInterval[0]];\n\n  for (let i = 1; i < sortedInterval.length; i++) {\n    const nextInterval = sortedInterval[i];\n    const [currentStart, currentEnd] = currentInterval;\n    const [nextStart, nextEnd] = nextInterval;\n\n    // Check for overlap or touching: nextStart <= currentEnd\n    if (nextStart <= currentEnd) {\n      // Merge: extend the end of the current interval\n      currentInterval = [currentStart, Math.max(currentEnd, nextEnd)];\n    } else {\n      // No overlap, push current and start a new one\n      merged.push([...currentInterval]);\n      currentInterval = [...nextInterval];\n    }\n  }\n\n  // Push the last processed interval\n  merged.push([...currentInterval]);\n\n  return merged;\n}\n```"
+        }
+      }
+    ],
+    "created": 1789110932,
+    "model": "gemma-campaign",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 414,
+      "prompt_tokens": 122,
+      "total_tokens": 536,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-fDLwkb9uEY4qLhBbTNQTF0nQKY5mKrXI",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 122,
+      "prompt_ms": 1996.095,
+      "prompt_per_token_ms": 16.361434426229508,
+      "prompt_per_second": 61.11933550256877,
+      "predicted_n": 414,
+      "predicted_ms": 16942.724,
+      "predicted_per_token_ms": 40.92445410628019,
+      "predicted_per_second": 24.43526790615252,
+      "draft_n": 411,
+      "draft_n_accepted": 277
+    }
+  },
+  "measurement": {
+    "label": "coding-merge-intervals-v1-42",
+    "device": "cpu",
+    "wall_ms": 19036.834759,
+    "package_j": 721.93376,
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 122,
+      "prompt_ms": 1996.095,
+      "prompt_per_token_ms": 16.361434426229508,
+      "prompt_per_second": 61.11933550256877,
+      "predicted_n": 414,
+      "predicted_ms": 16942.724,
+      "predicted_per_token_ms": 40.92445410628019,
+      "predicted_per_second": 24.43526790615252,
+      "draft_n": 411,
+      "draft_n_accepted": 277
+    },
+    "usage": {
+      "completion_tokens": 414,
+      "prompt_tokens": 122,
+      "total_tokens": 536,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "token_hash": null
+  }
+}

@@ -5,12 +5,12 @@ description: Guided workflow for adding a new model architecture to llama.cpp. U
 
 # Add a new model architecture to llama.cpp
 
-This skill walks a contributor through adding a new model architecture. AI-generated code is permitted in this project, so you may write full implementations for the steps below rather than only pointing at patterns - but follow `AGENTS.md`'s AI usage policy throughout:
+This skill covers model implementation in the fork and preparation for upstream review. Owner-authorised fork work follows `AGENTS.md`; upstream-specific approval and submission requirements below apply only when targeting `ggml-org/llama.cpp`:
 
 - The contributor is 100% responsible for every line, however it was produced. They must be able to explain and defend any part of it to a reviewer. Check in with them as you go (don't silently generate everything and hand over a finished diff) so they actually absorb what was written.
 - Before writing code, make sure the contributor owns the design choices for this architecture (which reference model to follow, how non-standard bits like RoPE variants or MoE routing should be handled) - AI accelerates a design the contributor has already made, it doesn't make the design for them.
 - Disclosure is mandatory: any AI-meaningful contribution must be disclosed per the PR template. Remind the contributor of this before they open the PR.
-- Never write the PR description, commit message, GitHub issue/discussion post, or reviewer replies - those must come from the contributor. If asked to commit on their behalf, use `Assisted-by:` (never `Co-authored-by:`) and only after explicit confirmation.
+- Authorised fork documentation, commit messages and Git checkpoints are allowed; use `Assisted-by:` for AI assistance. Public posts need explicit authorisation. Upstream submissions follow upstream human-authorship and review rules.
 - If the requested change looks large or introduces a new pattern not covered here, pause and tell the user this kind of change is likely to need prior discussion with maintainers before a PR.
 - Keep the PR self-contained. If the work would require a lot of unconventional changes outside the new model file(s) (e.g. touching shared graph-building code, the sampler, or core APIs in ways other models don't), STOP and tell the contributor to open a discussion/issue first - invasive or excessive changes get closed without full review.
 - Do not bundle unrelated work into this PR - see Step 4 and Step 5 below for the specifics on multimodal and chat-template/parsing work.
@@ -96,4 +96,4 @@ Reference: `examples/model-conversion/README.md`.
 - Confirm the contributor can explain every changed line to a reviewer and is prepared to be asked about any of it - this is required regardless of how much of the code was AI-generated.
 - Confirm they did a comprehensive manual review of the full diff, not just a skim.
 - Fill in the AI-disclosure section of `.github/pull_request_template.md` describing how AI was used (do not omit or understate this).
-- Do not write the PR description, commit message, GitHub issue/discussion text, or any reviewer replies yourself - the contributor writes these.
+- Confirm the destination: authorised fork drafts/checkpoints are allowed; upstream descriptions, posts and replies follow its current submission policy.

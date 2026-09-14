@@ -1,0 +1,96 @@
+--- a/sgemm.cpp
++++ b/sgemm.cpp
+@@ -599,7 +599,77 @@
+                 C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
+     }
+ 
++#if defined(__x86_64__) && defined(__AVX2__) && defined(__F16C__) && defined(__FMA__) && defined(__GNUC__)
++    // Twelve accumulators plus three A vectors and one B vector fill sixteen YMM registers.
++    // Exactly one FMA per eight elements per output; stores occur only after the K loop.
++    __attribute__((always_inline)) inline void gemm_bloc_score_registers(int64_t ii) {
++        alignas(32) float sums[12][8];
++        int64_t offset = 0;
++        const int64_t bytes = k * sizeof(ggml_fp16_t);
++        asm volatile (
++            "vxorps %%ymm0, %%ymm0, %%ymm0\n\t"
++            "vxorps %%ymm1, %%ymm1, %%ymm1\n\t"
++            "vxorps %%ymm2, %%ymm2, %%ymm2\n\t"
++            "vxorps %%ymm3, %%ymm3, %%ymm3\n\t"
++            "vxorps %%ymm4, %%ymm4, %%ymm4\n\t"
++            "vxorps %%ymm5, %%ymm5, %%ymm5\n\t"
++            "vxorps %%ymm6, %%ymm6, %%ymm6\n\t"
++            "vxorps %%ymm7, %%ymm7, %%ymm7\n\t"
++            "vxorps %%ymm8, %%ymm8, %%ymm8\n\t"
++            "vxorps %%ymm9, %%ymm9, %%ymm9\n\t"
++            "vxorps %%ymm10, %%ymm10, %%ymm10\n\t"
++            "vxorps %%ymm11, %%ymm11, %%ymm11\n\t"
++            "1:\n\t"
++            "vcvtph2ps (%[a0],%[offset]), %%ymm12\n\t"
++            "vcvtph2ps (%[a1],%[offset]), %%ymm13\n\t"
++            "vcvtph2ps (%[a2],%[offset]), %%ymm14\n\t"
++            "vcvtph2ps (%[b0],%[offset]), %%ymm15\n\t"
++            "vfmadd231ps %%ymm15, %%ymm12, %%ymm0\n\t"
++            "vfmadd231ps %%ymm15, %%ymm13, %%ymm1\n\t"
++            "vfmadd231ps %%ymm15, %%ymm14, %%ymm2\n\t"
++            "vcvtph2ps (%[b1],%[offset]), %%ymm15\n\t"
++            "vfmadd231ps %%ymm15, %%ymm12, %%ymm3\n\t"
++            "vfmadd231ps %%ymm15, %%ymm13, %%ymm4\n\t"
++            "vfmadd231ps %%ymm15, %%ymm14, %%ymm5\n\t"
++            "vcvtph2ps (%[b2],%[offset]), %%ymm15\n\t"
++            "vfmadd231ps %%ymm15, %%ymm12, %%ymm6\n\t"
++            "vfmadd231ps %%ymm15, %%ymm13, %%ymm7\n\t"
++            "vfmadd231ps %%ymm15, %%ymm14, %%ymm8\n\t"
++            "vcvtph2ps (%[b3],%[offset]), %%ymm15\n\t"
++            "vfmadd231ps %%ymm15, %%ymm12, %%ymm9\n\t"
++            "vfmadd231ps %%ymm15, %%ymm13, %%ymm10\n\t"
++            "vfmadd231ps %%ymm15, %%ymm14, %%ymm11\n\t"
++            "addq $16, %[offset]\n\t"
++            "cmpq %[bytes], %[offset]\n\t"
++            "jb 1b\n\t"
++            "vmovups %%ymm0, 0(%[out])\n\t"
++            "vmovups %%ymm1, 32(%[out])\n\t"
++            "vmovups %%ymm2, 64(%[out])\n\t"
++            "vmovups %%ymm3, 96(%[out])\n\t"
++            "vmovups %%ymm4, 128(%[out])\n\t"
++            "vmovups %%ymm5, 160(%[out])\n\t"
++            "vmovups %%ymm6, 192(%[out])\n\t"
++            "vmovups %%ymm7, 224(%[out])\n\t"
++            "vmovups %%ymm8, 256(%[out])\n\t"
++            "vmovups %%ymm9, 288(%[out])\n\t"
++            "vmovups %%ymm10, 320(%[out])\n\t"
++            "vmovups %%ymm11, 352(%[out])\n\t"
++            : [offset] "+&r" (offset)
++            : [a0] "r" (A + lda * ii), [a1] "r" (A + lda * (ii + 1)), [a2] "r" (A + lda * (ii + 2)),
++              [b0] "r" (B), [b1] "r" (B + ldb), [b2] "r" (B + 2 * ldb), [b3] "r" (B + 3 * ldb),
++              [bytes] "r" (bytes), [out] "r" (sums)
++            : "cc", "memory", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"
++        );
++        for (int j = 0; j < 4; ++j)
++            for (int i = 0; i < 3; ++i)
++                C[ldc * j + ii + i] = hsum(_mm256_load_ps(sums[j * 3 + i]));
++    }
++#endif
++
+     NOINLINE void gemm_score3(int64_t m) {
++        static const bool registers = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_INLINE") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE3_INLINE"), "1") == 0;
++        if (registers && params->ith == 0 && std::getenv("GGML_CPU_SCORE3_INLINE_TRACE")) std::fprintf(stderr,"SCORE3_INLINE m=%lld k=%lld\n",(long long)m,(long long)k);
++
+         const int64_t nb_job = (m + 47) / 48;
+         if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
+         ggml_barrier(params->threadpool);
+@@ -608,7 +678,14 @@
+             const int64_t begin = job * 48;
+             const int64_t end = begin + 48 < m ? begin + 48 : m;
+             int64_t ii = begin;
+-            for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
++            for (; ii + 3 <= end; ii += 3) {
++#if defined(__x86_64__) && defined(__AVX2__) && defined(__F16C__) && defined(__FMA__) && defined(__GNUC__)
++                if constexpr (KN == 8 && std::is_same<TA, ggml_fp16_t>::value && std::is_same<TB, ggml_fp16_t>::value) {
++                    if (registers) { gemm_bloc_score_registers(ii); continue; }
++                }
++#endif
++                gemm_bloc<3, 4>(ii, 0);
++            }
+             if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
+             if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
+             job = ggml_threadpool_chunk_add(params->threadpool, 1);

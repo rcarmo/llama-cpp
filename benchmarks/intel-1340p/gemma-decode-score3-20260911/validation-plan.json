@@ -1,0 +1,9 @@
+{
+ "declared_before_build":true,
+ "hypothesis":"Historical smallbatch64K profile: longn4 score5.041s/value3.568s, longn1combined0.897s; deployedATTN4 reduction still dominant. Score-only3x4tile reuses4queryvectorsacross3rows vs2;12accumulators+3A+1B fits16AVX2registers atlimit. May spill or lose cache/parallelism; measurement required.",
+ "factor":"Compared withdeployedATTN4:onlyscore(k512,m>=32768,n4)uses3x4tile,48rowchunks,one/tworowtails;valuepathstill2x4. FlagGGML_CPU_EXPERIMENTAL_SCORE4_3ROW. Newchunkgeometrycombinedwithtile isonecandidate,notisolatedmechanismattribution.",
+ "fixed":"ATTN4=1,smallbatch=1,CPU8/16,draft8/16,MTP3,F16FAoff,batch1024/256,retainedstate64658cached25eval128generated;noGPU/newprefill",
+ "gates":"11nativecases/mode:old8score/value32K64Kn1n4 plusm32784/64768/65024scoretails;traceallmod3classes. Ifnativepass,8uninstrumentedoff/on/on/off/on/off/off/on trials. Exactoutputdiagnostic notcrossbackendacceptancegate;recall/cache/counts/resourceshardchecks. No deployment without usefulness and separate qualification.",
+ "safety":"SpeechCLEAR00:46:54UTC11Sep~3minbuild+conditional5minconfirm,continuous>=6GiB/<=16MiB/jobs/native/socket;automaticCURRENT20260911-attn4restoration;stoponlytrials/build;noSTT/privatefiles",
+ "prior_failure":"PrioractualcutoverabortedGPUstartup,186MiBcgrouppeakunattributed;successfuldiagnostic92sampleszeroWorkerSwap didnotidentifycause. Retainfailure;thisexperimentCPUonly."
+}

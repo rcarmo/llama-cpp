@@ -1,0 +1,49 @@
+{
+  "choices": [
+    {
+      "finish_reason": "tool_calls",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "reasoning_content": "The user is asking to find the Vulkan shader and dispatch code responsible for Q2_K multi-column matrix-vector decode (probably in llama.cpp or a similar repository). Let me search the repository.\n\nLet me search for related terms like \"q2_k\", \"dequantize\", \"mul_mat\", \"vulkan\", etc.\n",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "search_repository",
+              "arguments": "{\"query\":\"q2_k\",\"path\":\".\",\"max_results\":20}"
+            },
+            "id": "4RJ1h7Oj1MTjJp9ShGR2KNx4SLOhrKmy"
+          }
+        ]
+      }
+    }
+  ],
+  "created": 1788456797,
+  "model": "qwen3.8-27b-ud-q4-k-xl-mtp",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 121,
+    "prompt_tokens": 401,
+    "total_tokens": 522,
+    "prompt_tokens_details": {
+      "cached_tokens": 12
+    }
+  },
+  "id": "chatcmpl-O9IItPKatbmOJZ4Ui0bnF6XqBlXHgQYR",
+  "timings": {
+    "cache_n": 12,
+    "prompt_n": 389,
+    "prompt_ms": 158074.822,
+    "prompt_per_token_ms": 406.36201028277634,
+    "prompt_per_second": 2.4608599590895,
+    "predicted_n": 121,
+    "predicted_ms": 73656.576,
+    "predicted_per_token_ms": 608.7320330578513,
+    "predicted_per_second": 1.6427589574622636,
+    "draft_n": 108,
+    "draft_n_accepted": 84
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "ok": false,
+  "error": "Error: Tail correctness/coverage",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": true,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "build": "baseline",
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+    "preserveSwaPadding": true
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "vulkan",
+      "wall_ms": 550.3318510000008,
+      "package_j": 8.83561,
+      "timings": {
+        "restore_ms": 544.693
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-0",
+      "device": "vulkan",
+      "wall_ms": 152792.088019,
+      "package_j": 3414.144153,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 146093.502,
+        "prompt_per_token_ms": 142.94863209393347,
+        "prompt_per_second": 6.995519896565967,
+        "predicted_n": 32,
+        "predicted_ms": 6672.408,
+        "predicted_per_token_ms": 215.23896774193548,
+        "predicted_per_second": 4.645998865776793
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 85,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5239000,
+    "peak_trial_rss_kib": 5243936,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 22629224,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T17:26:10.651Z"
+}

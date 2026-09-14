@@ -1,0 +1,66 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.328 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.005.336 W srv  llama_server: -----------------
+0.00.005.340 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.005.340 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.005.341 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.005.341 W srv  llama_server: -----------------
+0.00.006.878 I srv    load_model: loading model '/var/home/agent/workspace/projects/llama-cpp/../models/qwen3.8-27b/Qwen3.8-27B-UD-Q4_K_XL.gguf'
+0.00.861.893 W model has unused tensor blk.64.attn_norm.weight (size = 20480 bytes) -- ignoring
+0.00.861.908 W model has unused tensor blk.64.post_attention_norm.weight (size = 20480 bytes) -- ignoring
+0.00.861.912 W model has unused tensor blk.64.attn_q.weight (size = 51609600 bytes) -- ignoring
+0.00.861.914 W model has unused tensor blk.64.attn_k.weight (size = 5570560 bytes) -- ignoring
+0.00.861.917 W model has unused tensor blk.64.attn_v.weight (size = 5570560 bytes) -- ignoring
+0.00.861.925 W model has unused tensor blk.64.attn_output.weight (size = 25804800 bytes) -- ignoring
+0.00.861.927 W model has unused tensor blk.64.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.861.929 W model has unused tensor blk.64.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.861.932 W model has unused tensor blk.64.ffn_gate.weight (size = 73113600 bytes) -- ignoring
+0.00.861.934 W model has unused tensor blk.64.ffn_down.weight (size = 73113600 bytes) -- ignoring
+0.00.861.936 W model has unused tensor blk.64.ffn_up.weight (size = 73113600 bytes) -- ignoring
+0.00.861.940 W model has unused tensor blk.64.nextn.eh_proj.weight (size = 43008000 bytes) -- ignoring
+0.00.861.942 W model has unused tensor blk.64.nextn.enorm.weight (size = 20480 bytes) -- ignoring
+0.00.861.945 W model has unused tensor blk.64.nextn.hnorm.weight (size = 20480 bytes) -- ignoring
+0.00.861.952 W model has unused tensor blk.64.nextn.shared_head_norm.weight (size = 20480 bytes) -- ignoring
+0.08.166.481 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+0.08.173.097 I srv  llama_server: model loaded
+0.08.173.105 I srv  llama_server: listening on http://127.0.0.1:8094
+0.09.150.975 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.09.151.115 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.12.971.020 I slot print_timing: id  0 | task 1 | prompt processing, n_tokens =     22, progress = 0.85, t =   3.82 s / 5.76 tokens per second
+0.16.641.404 I slot print_timing: id  0 | task 1 | prompt eval time =    4824.50 ms /    26 tokens (  185.56 ms per token,     5.39 tokens per second)
+0.16.641.416 I slot print_timing: id  0 | task 1 |        eval time =    2665.74 ms /     8 tokens (  333.22 ms per token,     3.00 tokens per second)
+0.16.641.417 I slot print_timing: id  0 | task 1 |       total time =    7490.24 ms /    34 tokens
+0.16.641.421 I slot print_timing: id  0 | task 1 |    graphs reused =          6
+0.16.641.479 I slot      release: id  0 | task 1 | stop processing: n_tokens = 33, truncated = 0
+0.16.695.752 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.103 (> 0.100 thold), f_keep = 0.091
+0.16.695.806 I slot launch_slot_: id  0 | task 11 | processing task, is_child = 0
+0.20.972.890 I slot print_timing: id  0 | task 11 | prompt processing, n_tokens =     25, progress = 0.86, t =   4.28 s / 5.85 tokens per second
+0.24.491.031 I slot print_timing: id  0 | task 11 | prompt eval time =    5168.11 ms /    29 tokens (  178.21 ms per token,     5.61 tokens per second)
+0.24.491.040 I slot print_timing: id  0 | task 11 |        eval time =    2627.09 ms /     8 tokens (  328.39 ms per token,     3.05 tokens per second)
+0.24.491.041 I slot print_timing: id  0 | task 11 |       total time =    7795.20 ms /    37 tokens
+0.24.491.042 I slot print_timing: id  0 | task 11 |    graphs reused =         12
+0.24.491.070 I slot      release: id  0 | task 11 | stop processing: n_tokens = 36, truncated = 0
+0.24.503.765 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1185256899
+0.24.504.241 I slot launch_slot_: id  0 | task 21 | processing task, is_child = 0
+0.30.784.506 I slot print_timing: id  0 | task 21 | prompt processing, n_tokens =     37, progress = 0.12, t =   6.28 s / 5.89 tokens per second
+1.10.434.679 I slot print_timing: id  0 | task 21 | prompt processing, n_tokens =    271, progress = 0.91, t =  45.93 s / 5.90 tokens per second
+1.14.601.475 I slot print_timing: id  0 | task 21 | prompt processing, n_tokens =    293, progress = 0.99, t =  50.10 s / 5.85 tokens per second
+1.28.776.269 I slot print_timing: id  0 | task 21 | prompt eval time =   50981.57 ms /   297 tokens (  171.66 ms per token,     5.83 tokens per second)
+1.28.776.277 I slot print_timing: id  0 | task 21 |        eval time =   13290.44 ms /    37 tokens (  359.20 ms per token,     2.78 tokens per second)
+1.28.776.278 I slot print_timing: id  0 | task 21 |       total time =   64272.01 ms /   334 tokens
+1.28.776.279 I slot print_timing: id  0 | task 21 |    graphs reused =         47
+1.28.776.974 I slot      release: id  0 | task 21 | stop processing: n_tokens = 333, truncated = 0
+1.28.800.810 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1249542804
+1.28.800.914 I slot launch_slot_: id  0 | task 62 | processing task, is_child = 0
+1.33.332.242 I slot print_timing: id  0 | task 62 | prompt eval time =    3797.13 ms /    21 tokens (  180.82 ms per token,     5.53 tokens per second)
+1.33.332.246 I slot print_timing: id  0 | task 62 |        eval time =     734.17 ms /     3 tokens (  244.72 ms per token,     4.09 tokens per second)
+1.33.332.246 I slot print_timing: id  0 | task 62 |       total time =    4531.30 ms /    24 tokens
+1.33.332.247 I slot print_timing: id  0 | task 62 |    graphs reused =         48
+1.33.332.309 I slot      release: id  0 | task 62 | stop processing: n_tokens = 23, truncated = 0
+1.33.351.186 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.120 (> 0.100 thold), f_keep = 0.130
+1.33.351.258 I slot launch_slot_: id  0 | task 67 | processing task, is_child = 0
+1.36.357.214 W srv          stop: cancel task, id_task = 67
+1.36.945.387 I slot      release: id  0 | task 67 | stop processing: n_tokens = 21, truncated = 0
+1.37.034.413 I srv    operator(): operator(): cleaning up before exit...

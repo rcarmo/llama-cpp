@@ -1,0 +1,308 @@
+{
+  "ok": true,
+  "profile": "hybrid",
+  "runs": [
+    {
+      "rep": 0,
+      "pass": true,
+      "read": true,
+      "edited": true,
+      "tested": true,
+      "final": "The median function has been updated to handle empty arrays by throwing an error, correctly calculate the median for even-length arrays by averaging the two middle elements, and ensure the input array is not mutated by creating a copy before sorting. Tests passed.",
+      "rounds": [
+        {
+          "i": 0,
+          "usage": {
+            "completion_tokens": 19,
+            "prompt_tokens": 3216,
+            "total_tokens": 3235,
+            "prompt_tokens_details": {
+              "cached_tokens": 3215
+            }
+          },
+          "timings": {
+            "cache_n": 3215,
+            "prompt_n": 1,
+            "prompt_ms": 123.298,
+            "prompt_per_token_ms": 123.298,
+            "prompt_per_second": 8.11043163717173,
+            "predicted_n": 19,
+            "predicted_ms": 1132.34,
+            "predicted_per_token_ms": 59.59684210526316,
+            "predicted_per_second": 16.779412543935567,
+            "draft_n": 15,
+            "draft_n_accepted": 14
+          },
+          "tools": [
+            "read_file"
+          ]
+        },
+        {
+          "i": 1,
+          "usage": {
+            "completion_tokens": 132,
+            "prompt_tokens": 3291,
+            "total_tokens": 3423,
+            "prompt_tokens_details": {
+              "cached_tokens": 3235
+            }
+          },
+          "timings": {
+            "cache_n": 3235,
+            "prompt_n": 56,
+            "prompt_ms": 1254.759,
+            "prompt_per_token_ms": 22.406410714285716,
+            "prompt_per_second": 44.63008434288975,
+            "predicted_n": 132,
+            "predicted_ms": 6758.668,
+            "predicted_per_token_ms": 51.2020303030303,
+            "predicted_per_second": 19.53047553156924,
+            "draft_n": 111,
+            "draft_n_accepted": 95
+          },
+          "tools": [
+            "edit_file"
+          ]
+        },
+        {
+          "i": 2,
+          "usage": {
+            "completion_tokens": 9,
+            "prompt_tokens": 3437,
+            "total_tokens": 3446,
+            "prompt_tokens_details": {
+              "cached_tokens": 3423
+            }
+          },
+          "timings": {
+            "cache_n": 3423,
+            "prompt_n": 14,
+            "prompt_ms": 511.275,
+            "prompt_per_token_ms": 36.519642857142856,
+            "prompt_per_second": 27.382524081951985,
+            "predicted_n": 9,
+            "predicted_ms": 258.901,
+            "predicted_per_token_ms": 28.76677777777778,
+            "predicted_per_second": 34.762322277627355,
+            "draft_n": 6,
+            "draft_n_accepted": 6
+          },
+          "tools": [
+            "run_tests"
+          ]
+        },
+        {
+          "i": 3,
+          "usage": {
+            "completion_tokens": 50,
+            "prompt_tokens": 3553,
+            "total_tokens": 3603,
+            "prompt_tokens_details": {
+              "cached_tokens": 3445
+            }
+          },
+          "timings": {
+            "cache_n": 3445,
+            "prompt_n": 108,
+            "prompt_ms": 1929.029,
+            "prompt_per_token_ms": 17.861379629629628,
+            "prompt_per_second": 55.986716633083276,
+            "predicted_n": 50,
+            "predicted_ms": 3642.48,
+            "predicted_per_token_ms": 72.8496,
+            "predicted_per_second": 13.726911335134304,
+            "draft_n": 60,
+            "draft_n_accepted": 29
+          }
+        }
+      ],
+      "independent": {
+        "rc": 0,
+        "stdout": "bun test v1.4.1 (4661e494f)\n",
+        "stderr": "\nmedian.test.ts:\n(pass) odd/even/empty/no mutation [0.32ms]\n\n 1 pass\n 0 fail\n 5 expect() calls\nRan 1 test across 1 file. [3.00ms]\n"
+      }
+    }
+  ],
+  "scope": "Single matched median edit/test repetition in counterbalanced ordered block. Retained CPU binary/geometry on both; compact GPU padding+validated v2 conversion; park GPU before first decode. Cold wall includes GPU startup/conversion/park; warm timings separate.",
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "cpuCtx": 262144,
+    "gpuCtx": 147456,
+    "parallel": 2,
+    "cache": 256,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+    "preserveSwaPadding": true
+  },
+  "calls": [
+    {
+      "label": "median-0-round-0-gpu",
+      "device": "vulkan",
+      "wall_ms": 23111.209851,
+      "package_j": 663.563364,
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 3215,
+        "prompt_ms": 23049.738,
+        "prompt_per_token_ms": 7.1694363919129085,
+        "prompt_per_second": 139.48097804842726,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "median-0-round-0-save",
+      "device": "vulkan",
+      "wall_ms": 3690.4249379999965,
+      "package_j": 38.731102,
+      "timings": {
+        "save_ms": 3689.056
+      },
+      "n_written": 84193140,
+      "token_hash": null
+    },
+    {
+      "label": "median-0-round-0-restore",
+      "device": "cpu",
+      "wall_ms": 28.799159999995027,
+      "package_j": 1.726497,
+      "timings": {
+        "restore_ms": 27.484
+      },
+      "n_read": 84193124,
+      "token_hash": null
+    },
+    {
+      "label": "median-0-round-0",
+      "device": "cpu",
+      "wall_ms": 1278.9638339999947,
+      "package_j": 42.049941,
+      "timings": {
+        "cache_n": 3215,
+        "prompt_n": 1,
+        "prompt_ms": 123.298,
+        "prompt_per_token_ms": 123.298,
+        "prompt_per_second": 8.11043163717173,
+        "predicted_n": 19,
+        "predicted_ms": 1132.34,
+        "predicted_per_token_ms": 59.59684210526316,
+        "predicted_per_second": 16.779412543935567,
+        "draft_n": 15,
+        "draft_n_accepted": 14
+      },
+      "usage": {
+        "completion_tokens": 19,
+        "prompt_tokens": 3216,
+        "total_tokens": 3235,
+        "prompt_tokens_details": {
+          "cached_tokens": 3215
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "median-0-round-1",
+      "device": "cpu",
+      "wall_ms": 8027.124405000002,
+      "package_j": 287.784359,
+      "timings": {
+        "cache_n": 3235,
+        "prompt_n": 56,
+        "prompt_ms": 1254.759,
+        "prompt_per_token_ms": 22.406410714285716,
+        "prompt_per_second": 44.63008434288975,
+        "predicted_n": 132,
+        "predicted_ms": 6758.668,
+        "predicted_per_token_ms": 51.2020303030303,
+        "predicted_per_second": 19.53047553156924,
+        "draft_n": 111,
+        "draft_n_accepted": 95
+      },
+      "usage": {
+        "completion_tokens": 132,
+        "prompt_tokens": 3291,
+        "total_tokens": 3423,
+        "prompt_tokens_details": {
+          "cached_tokens": 3235
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "median-0-round-2",
+      "device": "cpu",
+      "wall_ms": 790.4849599999943,
+      "package_j": 29.058641,
+      "timings": {
+        "cache_n": 3423,
+        "prompt_n": 14,
+        "prompt_ms": 511.275,
+        "prompt_per_token_ms": 36.519642857142856,
+        "prompt_per_second": 27.382524081951985,
+        "predicted_n": 9,
+        "predicted_ms": 258.901,
+        "predicted_per_token_ms": 28.76677777777778,
+        "predicted_per_second": 34.762322277627355,
+        "draft_n": 6,
+        "draft_n_accepted": 6
+      },
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 3437,
+        "total_tokens": 3446,
+        "prompt_tokens_details": {
+          "cached_tokens": 3423
+        }
+      },
+      "token_hash": null
+    },
+    {
+      "label": "median-0-round-3",
+      "device": "cpu",
+      "wall_ms": 5586.777688000002,
+      "package_j": 207.925859,
+      "timings": {
+        "cache_n": 3445,
+        "prompt_n": 108,
+        "prompt_ms": 1929.029,
+        "prompt_per_token_ms": 17.861379629629628,
+        "prompt_per_second": 55.986716633083276,
+        "predicted_n": 50,
+        "predicted_ms": 3642.48,
+        "predicted_per_token_ms": 72.8496,
+        "predicted_per_second": 13.726911335134304,
+        "draft_n": 60,
+        "draft_n_accepted": 29
+      },
+      "usage": {
+        "completion_tokens": 50,
+        "prompt_tokens": 3553,
+        "total_tokens": 3603,
+        "prompt_tokens_details": {
+          "cached_tokens": 3445
+        }
+      },
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 96,
+    "hot": true,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 12116805,
+    "peak_trial_rss_kib": 17078388,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 17167904,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T16:54:16.534Z"
+}

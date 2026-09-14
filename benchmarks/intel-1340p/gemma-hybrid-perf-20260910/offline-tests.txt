@@ -1,0 +1,27 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-hybrid-perf-20260910/padding.test.ts:
+(pass) default source and partial checkpoint behavior unchanged [0.86ms]
+(pass) retained padding satisfies original strict rollback coverage guard [0.25ms]
+(pass) source never exports empty/foreign cells and leaves read path unchanged [0.15ms]
+(pass) larger GPU ring remains bounded to target CPU capacity [0.33ms]
+
+reports/gemma-hybrid-perf-20260910/state-layout.test.ts:
+(pass) validated subset emits v2 with byte-identical payload [206.22ms]
+(pass) rejects mismatched version and stream layout [27.93ms]
+(pass) rejects truncated and trailing content [96.29ms]
+(pass) rejects unexpected cell extension/schema and never overwrites source [58.53ms]
+(pass) unwraps newer text-only token envelope; rejects media [211.11ms]
+(pass) blocked transpose handles non-tile shapes and preserves every bit [6.70ms]
+(pass) full Gemma state roundtrip has exact original bytes [159.19ms]
+
+reports/gemma-hybrid-perf-20260910/splitk.test.ts:
+(pass) narrow long F16 Intel attention dispatch and disabled control [0.12ms]
+(pass) splits retain native256 alignment and nonempty tails [0.04ms]
+(pass) existing allocation/reduction and split disable are retained [0.24ms]
+(pass) unmatched override preserves actual heuristic result rather than forcing one [0.02ms]
+
+ 15 pass
+ 0 fail
+ 65 expect() calls
+Ran 15 tests across 3 files. [782.00ms]

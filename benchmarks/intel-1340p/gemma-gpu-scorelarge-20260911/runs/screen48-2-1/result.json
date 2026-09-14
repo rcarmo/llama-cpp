@@ -1,0 +1,91 @@
+{
+  "ok": true,
+  "order": 2,
+  "mode": 1,
+  "timings": {
+    "cache_n": 49152,
+    "prompt_n": 1022,
+    "prompt_ms": 93972.482,
+    "prompt_per_token_ms": 91.94959099804305,
+    "prompt_per_second": 10.87552417738631,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0,
+    "predicted_per_second": 0
+  },
+  "config": {
+    "maintenance": true,
+    "build": "baseline",
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 1024,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-gpu-scorelarge-20260911/runtime-gpu",
+    "preserveSwaPadding": true,
+    "extraEnv": {
+      "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32",
+      "LLAMA_EXPERIMENTAL_PREFILL_UBATCH": "256",
+      "GGML_VK_EXPERIMENTAL_SCORE_LARGE": "1"
+    }
+  },
+  "calls": [
+    {
+      "label": "restore",
+      "device": "vulkan",
+      "wall_ms": 411.4862290000001,
+      "package_j": 6.034469,
+      "timings": {
+        "restore_ms": 409.963
+      },
+      "n_read": 837559940,
+      "token_hash": null
+    },
+    {
+      "label": "tail",
+      "device": "vulkan",
+      "wall_ms": 94001.353109,
+      "package_j": 2273.600747,
+      "timings": {
+        "cache_n": 49152,
+        "prompt_n": 1022,
+        "prompt_ms": 93972.482,
+        "prompt_per_token_ms": 91.94959099804305,
+        "prompt_per_second": 10.87552417738631,
+        "predicted_n": 1,
+        "predicted_ms": 0.001,
+        "predicted_per_token_ms": 0,
+        "predicted_per_second": 0
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "save",
+      "device": "vulkan",
+      "wall_ms": 6935.5155220000015,
+      "package_j": 68.24653,
+      "timings": {
+        "save_ms": 6933.927
+      },
+      "n_written": 854320740,
+      "token_hash": null
+    }
+  ],
+  "thermal": {
+    "peak_c": 91,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5238522,
+    "peak_trial_rss_kib": 5242084,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 21873100,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-11T08:52:55.395Z"
+}

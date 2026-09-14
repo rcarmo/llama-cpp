@@ -1,0 +1,19 @@
+PASS pilot: 6 rendered prefixes, four append mutations rejected
+PASS exclusive: 7 rendered prefixes, four append mutations rejected
+PASS followup: 8 rendered prefixes, four append mutations rejected
+PASS original exclusive failure retained (1164 < 1166)
+PASS writev2-clamp-candidate-pilot: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS w2-clamp-b0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS w2-clamp-c0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS w2-median-c0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS w2-median-b0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS w2-defaults-b0: 10 persistent rounds, success=false, phases=1, all guards and grades checked
+PASS w2-defaults-c0: 10 persistent rounds, success=false, phases=1, all guards and grades checked
+PASS retained pilot: 5 completed rounds; harness failure retained
+PASS retained corrected: 2 completed rounds; contention excluded
+PASS retained retry: 3 completed rounds; contention excluded
+PASS retained exclusive: 6 completed rounds; harness failure retained
+PASS corrected boundary pilot: 10 uninterrupted rounds, task failed, immutable artifact rejected independently
+PASS baseline control: output cap/artifact failure and terminal sampling race retained separately
+PASS CPU-only control: six rounds, output-budget task failure, zero transfer/swap and clean native shutdown
+PASS checkpoint: native 2-view continuation, 14 retained attempts, 2 contention exclusions; write-v2 pilot passed, matrix4/6workflow and6/6artifact passes, no comparative speedup claim

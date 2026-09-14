@@ -22,6 +22,19 @@ GGML_BACKEND_API ggml_backend_buffer_type_t ggml_backend_vk_buffer_type(size_t d
 // pinned host buffer for use with the CPU backend for faster copies between CPU and GPU
 GGML_BACKEND_API ggml_backend_buffer_type_t ggml_backend_vk_host_buffer_type(void);
 
+// Opt-in Vulkan allocation eligible for CPU views; NULL if cached coherent Intel UMA memory is unavailable.
+// Other Vulkan allocations and scheduler placement are unchanged.
+GGML_BACKEND_API ggml_backend_buffer_t ggml_backend_vk_alloc_cpu_shared_buffer(ggml_backend_t backend, size_t size);
+
+// Explicit zero-copy CPU view of Vulkan-owned mapped, coherent, cached Intel UMA memory.
+// Waits for work submitted by backend and retains the allocation until the view is freed.
+// Returns NULL for unsupported buffers, devices, empty/unaligned ranges or overflow; never copies.
+// Caller must serialize access through all other backends and prohibit GPU access during CPU use.
+// Synchronize CPU work before submitting Vulkan work again; acquire a new view after GPU writes.
+// Storage aliases are not registered with the graph scheduler. Use only with explicit graph ownership.
+GGML_BACKEND_API ggml_backend_buffer_t ggml_backend_vk_buffer_cpu_view(
+    ggml_backend_t backend, ggml_backend_buffer_t buffer, size_t offset, size_t size);
+
 GGML_BACKEND_API ggml_backend_reg_t ggml_backend_vk_reg(void);
 
 #ifdef  __cplusplus

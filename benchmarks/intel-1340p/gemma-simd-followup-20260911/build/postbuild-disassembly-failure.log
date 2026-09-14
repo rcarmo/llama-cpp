@@ -1,0 +1,23 @@
+16 | const baseline=Bun.spawn(['objdump','-Cd','/var/home/agent/workspace/reports/gemma-dec
+           ^
+error: "baseline" has already been declared
+    at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/build/prepare.ts:16:7
+
+11 | const baseline='/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime
+           ^
+note: "baseline" was originally declared here
+   at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/build/prepare.ts:11:7
+
+Bun v1.4.1 (Linux x64)
+Score3 candidate built over retained ATTN4 baseline; no production modifications
+10 | writeFileSync(root+'/build/commands.sh','#!/usr/bin/env bash\nset -euo pipefail\ncd '+build+'\n'+commands.join('\n')+'\n'+link+'\n');const run=Bun.spawn(['/bin/bash',root+'/build/commands.sh'],{stdout:'inherit',stderr:'inherit'});if(await run.exited)throw Error('Diagnosticbuild');
+11 | const baseline='/var/home/agent/workspace/reports/gemma-decode-score3-20260911/runtime-cpu';for(const sub of ['bin','runtime']){mkdirSync(root+'/runtime-cpu/'+sub,{recursive:true});for(const name of readdirSync(baseline+'/'+sub))if(statSync(baseline+'/'+sub+'/'+name).isFile())copyFileSync(baseline+'/'+sub+'/'+name,root+'/runtime-cpu/'+sub+'/'+name)}
+12 | for(const n of ['libggml-cpu.so','libggml-cpu.so.0','libggml-cpu.so.0.18.1'])copyFileSync(root+'/build/libggml-cpu.so.0.18.1',root+'/runtime-cpu/bin/'+n);
+13 | console.log('Score3 candidate built over retained ATTN4 baseline; no production modifications');
+14 | 
+15 | const dis=Bun.spawn(['objdump','-Cd',outLib],{stdout:Bun.file(root+'/build/candidate-disassembly.txt'),stderr:'inherit'});if(await dis.exited)throw Error('Disassembly');
+                                                ^
+ReferenceError: outLib is not defined
+      at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/build/prepare.ts:15:44
+
+Bun v1.4.1 (Linux x64)

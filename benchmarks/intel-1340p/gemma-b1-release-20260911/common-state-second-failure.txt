@@ -1,0 +1,11 @@
+1 | /** SCRIPT_JDOC:
+2 | {"summary":"Compare all common native F16 KV cells before/after CPU save-padding repair without loading a model","kind":"read-only","weight":"standard","role":"entrypoint"}
+3 | */
+4 | import{readFileSync,openSync,readSync,closeSync,writeFileSync}from'node:fs';import{createHash}from'node:crypto';const root=import.meta.dir,read=(p:string)=>JSON.parse(readFileSync(p,'utf8'));function positions(fd:number,nt:number){let pos=12+nt*4;const u32=()=>{const b=Buffer.alloc(4);if(readSync(fd,b,0,4,pos)!==4)throw Error('Short metadata');pos+=4;return b.readUInt32LE()};const u64=()=>{const lo=u32(),hi=u32();return lo+hi*4294967296};const caches:number[][][]=[];for(let c=0;c<2;c++){const streams:number[][]=[];for(let s=0,n=u32();s<n;s++){const count=u32(),p:number[]=[];streams.push(p);if(!count)continue;for(let i=0;i<count;i++){p.push(u32());if(u32()!==1||u32()!==0)throw Error('Cell ownership');}const trans=u32(),nl=u32();for(let l=0;l<nl;l++){if(u32()!==1)throw Error('F16');pos+=u64()*count}for(let l=0;l<nl;l++){if(u32()!==1)throw Error('F16');if(trans){const elem=u32(),emb=u32();pos+=elem*emb*count}else pos+=u64()*count}}caches.push(streams)}return caches}const rows=[];for(const mode of[0,1]){const dir
+
+error: F16
+      at positions (/var/home/agent/workspace/reports/gemma-b1-release-20260911/audit-common-state.ts:4:779)
+      at map (1:11)
+      at /var/home/agent/workspace/reports/gemma-b1-release-20260911/audit-common-state.ts:4:1340
+
+Bun v1.4.1 (Linux x64)

@@ -1,0 +1,15 @@
+{
+  "authorised_at": "2026-09-11T12:51:04.575Z",
+  "scope": "One concrete SIMD candidate per score3 and Q4 n4 target. Qualification only; no implicit deployment.",
+  "baseline": "B0-score3 / 20260911-score3-stopped",
+  "restore_target": "20260911-score3-stopped",
+  "hypotheses": [
+    {"id":"score", "change":"Disable Clang reduction-loop unrolling only for score3 3x4 tiles; same12 FP32 accumulators/order,48rowjobs,tails unchanged", "evidence":"Retained disassembly gemm_score3 inner loop spills two YMM accumulators; compare actual current runtime and candidate assembly before timing", "flag":"GGML_CPU_EXPERIMENTAL_SCORE3_NOUNROLL"},
+    {"id":"q4", "change":"Use existing gemmMx4<2> for Q4_0/Q8_0,n4,evenm>=4,AVX2/F16C16registers; instead of two4x2 tiles", "evidence":"tinyBLAS_Q0_AVX::mnpack routes0x44 to4x2 on16regs; weight nibbles/scales reused within4queries by2x4 path. Existing code already VNNI; verify actual dispatch", "flag":"GGML_CPU_EXPERIMENTAL_Q4_N4_2X4"}
+  ],
+  "controls": "Other candidate flag0; smallbatch/ATTN4/score3 remain1, CPU8/prefill16/draft8/16,MTP3,F16,FAoff,1024/256,cache/context fixed. Frozen64658cache25eval128generated fixture, seed42/temp0/topk1.",
+  "gates": "Exact B0 code/library mapping; score native11cases; Q4 actual model shapes+boundaryn1/3/4/5,even/oddm,strided/reference controls; dispatch trace before uninstrumented timings. No tolerance relaxation.",
+  "budget": "One isolated two-flag build, 10min supervised; native stage5min;4runABBA per candidate, then8independent confirmations only useful candidate. Sustained512,shortcontrols,frozenquality/finitehandoff gates only finalists. No arbitrary minimum gain, no repeat-until-win.",
+  "guards": "Sequential heavy work. Explicitstoppedspeech/readsfailclosed;12GiBGPUadmission(ifneeded),6GiBcontinuousreserve,16MiBmaxworkerSwap,>=95Cannotationonly. Supervisedownedcleanup/automaticB0restore after maintenance; no production faults.",
+  "delegation": "Read-only Q4 review timed out; no review approval inferred. Direct source/assembly inspection used."
+}

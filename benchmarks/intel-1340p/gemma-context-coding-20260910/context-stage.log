@@ -1,0 +1,16 @@
+true
+true
+{"label":"prefill","device":"vulkan","wall_ms":32898.962502,"package_j":902.316599,"timings":{"cache_n":0,"prompt_n":4347,"prompt_ms":32893.729,"prompt_per_token_ms":7.566995399125834,"prompt_per_second":132.15284895184732,"predicted_n":1,"predicted_ms":0.001,"predicted_per_token_ms":0,"predicted_per_second":0},"token_hash":"dbd59852f46207af2d5daa2e1b546a20b719f1648b90cf70d7756aceed84967f"}
+{"label":"save","device":"vulkan","wall_ms":3202.9344109999947,"package_j":32.913001,"timings":{"save_ms":3195.802},"n_written":102757940,"token_hash":null}
+ 8 | export const save=(p:string,x:any)=>{mkdirSync(p.substring(0,p.lastIndexOf('/')),{recursive:true});writeFileSync(p,JSON.stringify(x,null,2)+'\n')};
+ 9 | export const text=(p:string)=>{try{return readFileSync(p,'utf8').trim()}catch{return ''}};
+10 | export const sleep=(ms:number)=>Bun.sleep(ms);
+11 | export const hash=(x:any)=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
+12 | const num=(s:string,k:string)=>Number(s.match(new RegExp('^'+k+':?\\s+(\\d+)','m'))?.[1]??0);
+13 | export async function api(url:string,body?:any,timeout=1200000){const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(timeout),timeout:false});const s=await r.text();if(!r.ok)throw Error(`HTTP ${r.status} ${url}: ${s.slice(0,500)}`);return JSON.parse(s)}
+                                                                                                                                                                                                                                                                                                                                                  ^
+error: HTTP 400 http://127.0.0.1:18792/slots/0?action=restore: {"error":{"code":400,"message":"Unable to restore slot, no available space in KV cache or invalid slot save file","type":"invalid_request_error"}}
+      at api (/var/home/agent/workspace/reports/gemma-context-coding-20260910/campaign.ts:13:334)
+      at async req (/var/home/agent/workspace/reports/gemma-context-coding-20260910/campaign.ts:62:173)
+
+FINISHED compact4-hybrid-baseline-r1 false

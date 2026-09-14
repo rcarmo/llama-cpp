@@ -1,0 +1,414 @@
+{
+  "pass": true,
+  "verified_at": "2026-09-11T09:33:52.250Z",
+  "info": {
+    "pid": 746174,
+    "cpu_pid": 746192,
+    "port": 8091,
+    "started_at": "2026-09-11T09:33:17.770Z"
+  },
+  "swap_kib": 0,
+  "libraries": [
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml-base.so.0.18.1",
+      "expected": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+      "actual": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libggml.so.0.18.1",
+      "expected": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+      "actual": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-common.so.0.0.10579",
+      "expected": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+      "actual": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libllama-server-impl.so",
+      "expected": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+      "actual": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/libmtmd.so.0.0.10579",
+      "expected": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+      "actual": "6d835965d4f7c9d611408af7fe614423217bea769fd292bc5143b930c4670e4d",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/bin/llama-server",
+      "expected": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+      "actual": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/workspace/projects/llama-cpp/build-intel-clang/runtime/libomp.so",
+      "expected": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a",
+      "actual": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260910-smallbatch/cpu-lib/libllama.so.0",
+      "expected": "35289adccdf6965d3d7eb7ade2271723b1169e65772bf849c8a5431288d0aec9",
+      "actual": "35289adccdf6965d3d7eb7ade2271723b1169e65772bf849c8a5431288d0aec9",
+      "mapped": true
+    },
+    {
+      "path": "/var/home/agent/.local/share/llama-gemma-hybrid/releases/20260911-score3-stopped/cpu-backend/libggml-cpu.so.0",
+      "expected": "f288945950f823924282dc70f5d1b68ea8750f0b4ab29adb14e4db5016468ba1",
+      "actual": "f288945950f823924282dc70f5d1b68ea8750f0b4ab29adb14e4db5016468ba1",
+      "mapped": true
+    }
+  ],
+  "unit_sha256": "1e1d13f9e82a65a6c66b641ae6a936f6b7fd5f0ac8e404534c2e3faca3078940",
+  "config_sha256": "99512ec722acb2ead423a2a49a6dd561cd6712470fb26cc1842a54b3f588bbb6",
+  "rows": [
+    {
+      "route": "cpu",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "tool_calls",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "lookup_stock",
+                    "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+                  },
+                  "id": "kPMAQ8OP6b5TrK9KEk3a4KLY1kYNOKcZ"
+                }
+              ]
+            }
+          }
+        ],
+        "created": 1789119229,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 19,
+          "prompt_tokens": 92,
+          "total_tokens": 111,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-hWC6sGzs8zxheB7kMWBldbXMXllpfTL5",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 92,
+          "prompt_ms": 1620.14,
+          "prompt_per_token_ms": 17.61021739130435,
+          "prompt_per_second": 56.78521609243645,
+          "predicted_n": 19,
+          "predicted_ms": 664.187,
+          "predicted_per_token_ms": 34.95721052631579,
+          "predicted_per_second": 28.606401510417996,
+          "draft_n": 15,
+          "draft_n_accepted": 15
+        }
+      }
+    },
+    {
+      "route": "cpu",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "23"
+            }
+          }
+        ],
+        "created": 1789119231,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 137,
+          "total_tokens": 140,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-d0D5x9SGzcIJCv2qMbECCIMYdzNFLOa6",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 137,
+          "prompt_ms": 1954.366,
+          "prompt_per_token_ms": 14.265445255474452,
+          "prompt_per_second": 70.09945936431559,
+          "predicted_n": 3,
+          "predicted_ms": 135.199,
+          "predicted_per_token_ms": 45.06633333333334,
+          "predicted_per_second": 22.189513236044643,
+          "draft_n": 3,
+          "draft_n_accepted": 2
+        }
+      }
+    },
+    {
+      "route": "cpu-owner",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "23"
+            }
+          }
+        ],
+        "created": 1789119231,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 137,
+          "total_tokens": 140,
+          "prompt_tokens_details": {
+            "cached_tokens": 132
+          }
+        },
+        "id": "chatcmpl-JErRABQzsIMxfsGGBdeAA4RW6jEdDcF2",
+        "timings": {
+          "cache_n": 132,
+          "prompt_n": 5,
+          "prompt_ms": 170.237,
+          "prompt_per_token_ms": 34.047399999999996,
+          "prompt_per_second": 29.370818329740302,
+          "predicted_n": 3,
+          "predicted_ms": 128.094,
+          "predicted_per_token_ms": 42.698,
+          "predicted_per_second": 23.420300716661203,
+          "draft_n": 3,
+          "draft_n_accepted": 2
+        }
+      }
+    },
+    {
+      "route": "cpu-owner",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "RESTORED"
+            }
+          }
+        ],
+        "created": 1789119232,
+        "model": "gemma-4-e4b-qat-mtp",
+        "system_fingerprint": "b10579-abdbeadfb",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 154,
+          "total_tokens": 158,
+          "prompt_tokens_details": {
+            "cached_tokens": 132
+          }
+        },
+        "id": "chatcmpl-cWU55xBFTEsu2AIBE5junhE1bbulRaCy",
+        "timings": {
+          "cache_n": 132,
+          "prompt_n": 22,
+          "prompt_ms": 443.686,
+          "prompt_per_token_ms": 20.167545454545454,
+          "prompt_per_second": 49.58461614745564,
+          "predicted_n": 4,
+          "predicted_ms": 136.016,
+          "predicted_per_token_ms": 34.004,
+          "predicted_per_second": 29.40830490530526,
+          "draft_n": 3,
+          "draft_n_accepted": 3
+        }
+      }
+    }
+  ],
+  "status": {
+    "profile": "vulkan-f32-256/cpu8-mtp3",
+    "serial": true,
+    "gpuRange": [
+      4096,
+      65536
+    ],
+    "active": false,
+    "queued": 0,
+    "counters": {
+      "gpu": 0,
+      "warm": 2,
+      "cpu": 2,
+      "fallback": 0,
+      "errors": 0
+    },
+    "last": {
+      "route": "cpu-owner",
+      "slot": 1,
+      "prompt_tokens": 154,
+      "headers_ms": 599.0613030000022
+    }
+  },
+  "slots": [
+    {
+      "id": 0,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false,
+      "id_task": 2,
+      "n_prompt_tokens": 112,
+      "n_prompt_tokens_processed": 92,
+      "n_prompt_tokens_cache": 0,
+      "params": {
+        "seed": 42,
+        "temperature": 0,
+        "dynatemp_range": 0,
+        "dynatemp_exponent": 1,
+        "top_k": 64,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1,
+        "xtc_probability": 0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "dry_multiplier": 0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 131072,
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": 64,
+        "n_predict": 64,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "peg-gemma4",
+        "reasoning_format": "deepseek",
+        "reasoning_in_content": false,
+        "generation_prompt": "<|turn>model\n",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none,draft-mtp",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "next_token": [
+        {
+          "has_next_token": false,
+          "has_new_line": false,
+          "n_remain": 45,
+          "n_decoded": 19
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "n_ctx": 131072,
+      "speculative": true,
+      "is_processing": false,
+      "id_task": 26,
+      "n_prompt_tokens": 158,
+      "n_prompt_tokens_processed": 22,
+      "n_prompt_tokens_cache": 0,
+      "params": {
+        "seed": 42,
+        "temperature": 0,
+        "dynatemp_range": 0,
+        "dynatemp_exponent": 1,
+        "top_k": 64,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1,
+        "xtc_probability": 0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "dry_multiplier": 0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 131072,
+        "mirostat": 0,
+        "mirostat_tau": 5,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": 64,
+        "n_predict": 64,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "peg-gemma4",
+        "reasoning_format": "deepseek",
+        "reasoning_in_content": false,
+        "generation_prompt": "<|turn>model\n",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none,draft-mtp",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "next_token": [
+        {
+          "has_next_token": false,
+          "has_new_line": false,
+          "n_remain": 60,
+          "n_decoded": 4
+        }
+      ]
+    }
+  ]
+}

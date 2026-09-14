@@ -1,0 +1,5 @@
+/** SCRIPT_JDOC:
+{"summary":"Freeze reviewed T02 fixture hashes and per-task contracts before nativebaseline","kind":"mutating","weight":"lightweight","role":"entrypoint"}
+*/
+import{codingFixtures,groundedRetrievalFixture,toolCacheFixture}from'./fixtures';import{writeFileSync,readFileSync,existsSync}from'node:fs';import{createHash}from'node:crypto';
+const p=import.meta.dir+'/frozen-fixtures.json';if(existsSync(p))throw Error('Already frozen');const sha=(s:string)=>createHash('sha256').update(s).digest('hex');writeFileSync(p,JSON.stringify({version:'t02-v1-reviewed',frozen_at:new Date().toISOString(),source_sha256:sha(readFileSync(import.meta.dir+'/fixtures.ts','utf8')),coding:codingFixtures.map(f=>({id:f.id,exportName:f.exportName,prompt_sha256:sha(f.prompt),validator_sha256:sha(f.validatorSource),reference_sha256:sha(f.referenceSource),max_tokens:512,seeds:[42,43]})),retrieval:groundedRetrievalFixture,tools:toolCacheFixture,contract:'Explicit JSON keys frozen before model runs; all output capped512; fixedretrievalnot-in-source for unestablishedshipment; no candidate-specificrepairs'},null,2)+'\n');

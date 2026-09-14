@@ -1,0 +1,554 @@
+{
+  "arm": "candidate",
+  "kind": "clamp",
+  "abort": "resource/contention guard",
+  "services_unchanged": true,
+  "phases": 0,
+  "success": false,
+  "wall_ms": 14482.460368,
+  "rounds": [
+    {
+      "id": 0,
+      "round": 1,
+      "cold": true,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\":\"src/main.ts\"}"
+            }
+          }
+        ]
+      },
+      "raw": "<|tool_call>call:read_file{path:<|\"|>src/main.ts<|\"|>}<tool_call|>",
+      "stop": "eog",
+      "prompt_tokens": 324,
+      "cached_tokens": 0,
+      "canonical_replay_tokens": 0,
+      "stable_prefix_tokens": 321,
+      "evaluated_prompt_tokens": 325,
+      "kv_pos_before": -1,
+      "kv_pos_max": 341,
+      "history_tokens": 342,
+      "generated_tokens": 18,
+      "verified_tokens": 20,
+      "drafted": 15,
+      "accepted": 13,
+      "shared_bytes": 181403648,
+      "copied_bytes": 0,
+      "handoff_ms": 168.911542,
+      "source_load_s": 3.166282989,
+      "prefill_s": 1.781756485,
+      "wall_s": 9.459431943,
+      "first_token_s": 8.571696691,
+      "decode_tps": 19.17045645916843,
+      "request_wall_ms": 9552.488507,
+      "phase": 0,
+      "tool_ms": 1.0741130000005796
+    },
+    {
+      "id": 1,
+      "round": 2,
+      "cold": false,
+      "message": {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\":\"visible.test.ts\"}"
+            }
+          }
+        ]
+      },
+      "raw": "<|tool_call>call:read_file{path:<|\"|>visible.test.ts<|\"|>}<tool_call|>",
+      "stop": "eog",
+      "prompt_tokens": 392,
+      "cached_tokens": 342,
+      "canonical_replay_tokens": 0,
+      "stable_prefix_tokens": 392,
+      "evaluated_prompt_tokens": 50,
+      "kv_pos_before": 341,
+      "kv_pos_max": 409,
+      "history_tokens": 410,
+      "generated_tokens": 18,
+      "verified_tokens": 20,
+      "drafted": 15,
+      "accepted": 13,
+      "shared_bytes": 0,
+      "copied_bytes": 0,
+      "handoff_ms": 0,
+      "source_load_s": 0,
+      "prefill_s": 1.469105858,
+      "wall_s": 2.320614022,
+      "first_token_s": 1.482182824,
+      "decode_tps": 20.29667828968684,
+      "request_wall_ms": 2321.1495910000012,
+      "phase": 0,
+      "tool_ms": 0.21242800000072748
+    }
+  ],
+  "tool_calls": [
+    {
+      "name": "read_file",
+      "args": {
+        "path": "src/main.ts"
+      },
+      "result": {
+        "content": "export function clamp(value:number,lo:number,hi:number){return Math.min(lo,Math.max(hi,value));}\n"
+      }
+    },
+    {
+      "name": "read_file",
+      "args": {
+        "path": "visible.test.ts"
+      },
+      "result": {
+        "content": "import{test,expect}from'bun:test';import{clamp}from'./src/main';test('contract',()=>{expect(clamp(5,1,10)).toBe(5);expect(clamp(-2,1,10)).toBe(1);expect(clamp(15,1,10)).toBe(10);expect(clamp(5,10,1)).toBe(5);});\n"
+      }
+    }
+  ],
+  "grades": [],
+  "samples": [
+    {
+      "at": "2026-09-13T20:55:55.376Z",
+      "available_kib": 29091804,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:55.580Z",
+      "available_kib": 29042124,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:55.780Z",
+      "available_kib": 29018360,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:55.980Z",
+      "available_kib": 28970380,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:56.183Z",
+      "available_kib": 27100092,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:56.384Z",
+      "available_kib": 24953968,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:56.584Z",
+      "available_kib": 22995884,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:56.785Z",
+      "available_kib": 23387724,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:56.984Z",
+      "available_kib": 23393080,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:57.184Z",
+      "available_kib": 23422448,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:57.385Z",
+      "available_kib": 23412732,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:57.585Z",
+      "available_kib": 23410916,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:57.785Z",
+      "available_kib": 23418472,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:57.985Z",
+      "available_kib": 23417476,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:58.186Z",
+      "available_kib": 23419072,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:58.386Z",
+      "available_kib": 23418676,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:58.587Z",
+      "available_kib": 23425264,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:58.787Z",
+      "available_kib": 22541932,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:58.987Z",
+      "available_kib": 22536884,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:59.192Z",
+      "available_kib": 22533684,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:59.394Z",
+      "available_kib": 22532932,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:59.593Z",
+      "available_kib": 22526960,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:59.790Z",
+      "available_kib": 22506160,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:55:59.992Z",
+      "available_kib": 22505544,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:00.196Z",
+      "available_kib": 22495036,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:00.393Z",
+      "available_kib": 22496004,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:00.593Z",
+      "available_kib": 22447628,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:00.793Z",
+      "available_kib": 22435916,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:00.993Z",
+      "available_kib": 22395512,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:01.194Z",
+      "available_kib": 22244420,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:01.394Z",
+      "available_kib": 21306244,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:01.595Z",
+      "available_kib": 19543052,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:01.795Z",
+      "available_kib": 19437680,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:01.995Z",
+      "available_kib": 19437680,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:02.195Z",
+      "available_kib": 17987488,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:02.396Z",
+      "available_kib": 18372400,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:02.596Z",
+      "available_kib": 17682728,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:02.797Z",
+      "available_kib": 16941504,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:02.997Z",
+      "available_kib": 16867344,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:03.197Z",
+      "available_kib": 16802648,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:03.398Z",
+      "available_kib": 22793720,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:03.598Z",
+      "available_kib": 22798644,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:03.798Z",
+      "available_kib": 22798628,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:04.000Z",
+      "available_kib": 22322744,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:04.200Z",
+      "available_kib": 22049968,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:04.402Z",
+      "available_kib": 22057172,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:04.602Z",
+      "available_kib": 22057172,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:04.802Z",
+      "available_kib": 22057172,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:05.005Z",
+      "available_kib": 22057536,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:05.206Z",
+      "available_kib": 22057536,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:05.405Z",
+      "available_kib": 22064424,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:05.605Z",
+      "available_kib": 22064424,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:05.806Z",
+      "available_kib": 22064788,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:06.006Z",
+      "available_kib": 22064788,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:06.207Z",
+      "available_kib": 22064788,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:06.413Z",
+      "available_kib": 22070964,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:06.608Z",
+      "available_kib": 22070964,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:06.808Z",
+      "available_kib": 22071328,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:07.009Z",
+      "available_kib": 22071328,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:07.209Z",
+      "available_kib": 22071328,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:07.428Z",
+      "available_kib": 22076380,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:07.629Z",
+      "available_kib": 22076380,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:07.829Z",
+      "available_kib": 22076380,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:08.030Z",
+      "available_kib": 22076744,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:08.232Z",
+      "available_kib": 22076744,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:08.438Z",
+      "available_kib": 22081692,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:08.641Z",
+      "available_kib": 22082056,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:08.841Z",
+      "available_kib": 22082420,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:09.042Z",
+      "available_kib": 22082420,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:09.242Z",
+      "available_kib": 22082420,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:09.447Z",
+      "available_kib": 22085648,
+      "swap_kib": 0,
+      "competitors": []
+    },
+    {
+      "at": "2026-09-13T20:56:09.645Z",
+      "available_kib": 22045200,
+      "swap_kib": 0,
+      "competitors": [
+        "870891"
+      ]
+    }
+  ]
+}

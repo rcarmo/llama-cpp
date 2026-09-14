@@ -1,0 +1,13 @@
+PASS speech state
+true
+ 9 |  const args=['podman','--root','/var/home/agent/workspace/projects/.podman-llama-storage','--runroot','/var/home/agent/workspace/projects/.podman-llama-run','--storage-driver','vfs','--cgroup-manager=cgroupfs','run','--rm','--name','gemma-simd-followup-build','--network=none','--security-opt','label=disable','--userns=keep-id','-v','/var/home/agent/workspace:/var/home/agent/workspace','-v',process.execPath+':/tmp/host-bun:ro','localhost/llama-intel-vulkan-validation:fedora44','/tmp/host-bun',root+'/packed-build/prepare.ts'];
+10 |  const fd=openSync(root+'/packed-build/build.log','a');
+11 |  const p=Bun.spawn(args,{stdout:fd,stderr:fd});t.servers.push({p,fd,device:'build'});
+12 |  const rc=await p.exited;t.servers=[];closeSync(fd);
+13 |  const cleanup=Bun.spawn(args.slice(0,args.indexOf('run')).concat(['rm','-f','gemma-simd-followup-build']),{stdout:'ignore',stderr:'ignore'});await cleanup.exited;
+14 |  if(rc!==0||t.error)throw Error(t.error||'Build exit'+rc);
+                               ^
+error: Build exit1
+      at /var/home/agent/workspace/reports/gemma-simd-followup-20260911/packed-build-guard.ts:14:27
+
+FINISHED build-packed-q4 false

@@ -1,0 +1,21 @@
+# Optimised in-memory handoff comparison
+
+Rui authorised optimised-build stage timings and a matched comparison on 13 September. No production changes. Prior correctness and primitive timing experiments remain closed.
+
+## Comparison
+
+A = shared handoff; B = forced RAM copy. Both load the same E4B model, GPU prefill, context geometry, cached/coherent source allocations and CPU destination, then use the same MTP3 assistant. A report-only native harness wraps the existing caller without changing its arithmetic. During B's synchronous handoff only, registry lookup for `ggml_backend_vk_buffer_cpu_view` returns null, invoking the implemented bounded-copy fallback. Allocation policy and GPU work stay matched. Registry is restored immediately; only one process/caller exists per trial. No default or public API change.
+
+O3 CPU/base/llama/common/caller build from fresh CMake objects; O3 Vulkan translation unit linked to retained shader-generation objects. CPU native optimisation, threads8/prefill16, F16 KV, FA off, compact SWA, batch/microbatch256, output limits256. Correctness CTests before timing; new instrumented harness tests build without model load.
+
+A fixed chat-formatted prompt requests a long JSON array of integers; generation budget128tokens. Short moderate prompt (target roughly512 tokens) held byte-identical. Greedy target and MTP3; retain exact evaluated/generated counts, drafted/accepted and output bytes. Cross-arm same-backend differences are diagnostic, but unequal work prevents unqualified speedup claims. If EOG ends early, preserve/report actual generation and don't extrapolate sustained throughput. Fewer than96 emitted tokens fails this screen's sustained-work gate and stops further repeats; 0/1token runs retain raw evidence but have no warm tok/s metric.
+
+Initial screen: one A then B correctness/admission pair. Confirm using ABBA/BAAB total8 runs including the initial A/B: A B B A B A A B. One process at a time, no concurrent residency. At most8 measured runs and one failed admission retry only if the reason is fixed and owner window renewed. Cap each native run180s initially; aggregate window requested after preflight. No automatic long-context or capacity increase.
+
+Metrics from steady-clock wrappers: model load by source/CPU/assistant; context setup by source/CPU/assistant; synchronized GPU prefill; handoff; source release; last-token reevaluation; first accepted output-ready time from process start and from after prefill; complete request wall; generation after first token using final output-ready time. Report `(generated-1)/interval` excluding first token for warm decode, plus all output tokens/generation wall including first token. MTP verified/draft work counts retained. No direct comparison of full process wall to steady decode tok/s. GPU prefill is synchronised at its stage boundary; CPU/MTP decode is not additionally synchronised by the harness. CPU decode-call duration is diagnostic, not complete compute duration. Linker output hook counts one fwrite per token in this exact caller's emit lambda; validate against its independent MTP output count and retain output hash. Source model free is identified by model ID, not destruction order.
+
+## Controls
+
+CPU-only build window acknowledged by @whisper; request exact GPU/model admission after build. >=6GiB MemAvailable, <=16MiB per worker swap, record temperature/throttle; zero competing known model/media processes and inactive Gemma/speech units. Use systemd-owned invocation/cgroup, native deadline and process-group cleanup. Initial proposed unitMemoryMax16GiB/SwapMax16MiB with admission check rather than repeated14GiB reclaim; ask explicitly before run. Prior dual-model peak14GiB generated swap under cap despite host spare memory. No services stopped/restarted, no model downloads. Keychain-free worker environment.
+
+Loaded library/source/model identities, exact args/environment, source snapshot/patch and failures retained. Pin model hash only once rather than read5GiB before every run. No speedup threshold or best-only selection; raw medians/ranges and all observations reported. Release host window when complete and verify original services/state. No deployment or release throughput claim beyond tested O3/mixed retained shader build.

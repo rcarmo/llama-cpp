@@ -1,0 +1,42 @@
+diff --git a/reports/gemma-score-static-20260911/patch/sgemm-parent.cpp b/reports/gemma-score-static-20260911/patch/sgemm.cpp
+index ed63799..7bbc81b 100644
+--- a/reports/gemma-score-static-20260911/patch/sgemm-parent.cpp
++++ b/reports/gemma-score-static-20260911/patch/sgemm.cpp
+@@ -59,6 +59,8 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <cstdio>
++#include <chrono>
++#include <sched.h>
+ 
+ #ifdef _MSC_VER
+ #define NOINLINE __declspec(noinline)
+@@ -622,9 +624,13 @@ class tinyBLAS {
+ 
+     NOINLINE void gemm_score3(int64_t m) {
+         const int64_t nb_job = (m + 47) / 48;
+-        if (params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
++        static const bool schedule_static = std::getenv("GGML_CPU_EXPERIMENTAL_SCORE_STATIC_JOBS") && std::strcmp(std::getenv("GGML_CPU_EXPERIMENTAL_SCORE_STATIC_JOBS"), "1") == 0;
++        if (!schedule_static && params->ith == 0) ggml_threadpool_chunk_set(params->threadpool, params->nth);
+         ggml_barrier(params->threadpool);
++        static const bool trace_jobs = std::getenv("GGML_CPU_SCORE_STATIC_JOBS_TRACE") != nullptr;
++        const auto jobs_started = trace_jobs ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
+         int64_t job = params->ith;
++        int64_t jobs_done = 0;
+         while (job < nb_job) {
+             const int64_t begin = job * 48;
+             const int64_t end = begin + 48 < m ? begin + 48 : m;
+@@ -632,7 +638,12 @@ class tinyBLAS {
+             for (; ii + 3 <= end; ii += 3) gemm_bloc<3, 4>(ii, 0);
+             if (end - ii == 2) gemm_bloc<2, 4>(ii, 0);
+             if (end - ii == 1) gemm_bloc<1, 4>(ii, 0);
+-            job = ggml_threadpool_chunk_add(params->threadpool, 1);
++            ++jobs_done;
++            job = schedule_static ? job + params->nth : ggml_threadpool_chunk_add(params->threadpool, 1);
++        }
++        if (trace_jobs && jobs_done > 0) {
++            const auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - jobs_started).count();
++            std::fprintf(stderr, "SCORE_STATIC_JOBS ith=%d nth=%d jobs=%lld total=%lld mode=%s elapsed_us=%lld cpu=%d\n", params->ith, params->nth, (long long) jobs_done, (long long) nb_job, schedule_static ? "static" : "dynamic", (long long) elapsed_us, sched_getcpu());
+         }
+         ggml_barrier(params->threadpool);
+     }

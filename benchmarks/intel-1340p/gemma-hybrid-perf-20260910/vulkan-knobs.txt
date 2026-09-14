@@ -1,0 +1,44 @@
+6307:        const char* GGML_VK_PREFER_HOST_MEMORY = getenv("GGML_VK_PREFER_HOST_MEMORY");
+6310:        const char* GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM = getenv("GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM");
+6313:        const char* GGML_VK_ALLOW_SYSMEM_FALLBACK = getenv("GGML_VK_ALLOW_SYSMEM_FALLBACK");
+6316:        const char* GGML_VK_DISABLE_GRAPH_OPTIMIZE = getenv("GGML_VK_DISABLE_GRAPH_OPTIMIZE");
+6354:                       !getenv("GGML_VK_DISABLE_COOPMAT")) {
+6362:                       !getenv("GGML_VK_DISABLE_COOPMAT2")) {
+6366:                       !getenv("GGML_VK_DISABLE_COOPMAT2_DECODE_VECTOR")) {
+6370:                       !getenv("GGML_VK_DISABLE_INTEGER_DOT_PRODUCT")) {
+6375:                       !getenv("GGML_VK_DISABLE_BFLOAT16")) {
+6387:                       !getenv("GGML_VK_DISABLE_DOT2")) {
+6392:                       getenv("GGML_VK_ENABLE_MEMORY_PRIORITY")) {
+6478:                                getenv("GGML_VK_DISABLE_ASYNC") == nullptr;
+6484:        const char* GGML_VK_FORCE_MAX_ALLOCATION_SIZE = getenv("GGML_VK_FORCE_MAX_ALLOCATION_SIZE");
+6494:        const char* GGML_VK_FORCE_MAX_BUFFER_SIZE = getenv("GGML_VK_FORCE_MAX_BUFFER_SIZE");
+6504:        const char* GGML_VK_SUBALLOCATION_BLOCK_SIZE = getenv("GGML_VK_SUBALLOCATION_BLOCK_SIZE");
+6557:        const char* GGML_VK_MAX_NODES_PER_SUBMIT = getenv("GGML_VK_MAX_NODES_PER_SUBMIT");
+6563:        const bool force_disable_f16 = getenv("GGML_VK_DISABLE_F16") != nullptr;
+6581:        const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
+6800:                          !getenv("GGML_VK_DISABLE_OCP_FP4");
+6806:                            getenv("GGML_VK_DISABLE_MULTI_ADD") == nullptr;
+7172:            device->async_use_transfer_queue = prefers_transfer_queue || (getenv("GGML_VK_ASYNC_USE_TRANSFER_QUEUE") != nullptr);
+7189:        device->serialize_submissions = getenv("GGML_VK_SERIALIZE_SUBMISSIONS") != nullptr;
+7191:        device->disable_fusion = getenv("GGML_VK_DISABLE_FUSION") != nullptr;
+7200:        if (getenv("GGML_VK_DISABLE_MMVQ")) {
+7202:        } else if (getenv("GGML_VK_FORCE_MMVQ")) {
+7246:                   !getenv("GGML_VK_DISABLE_COOPMAT")) {
+7251:                   !getenv("GGML_VK_DISABLE_COOPMAT2")) {
+7255:                   !getenv("GGML_VK_DISABLE_COOPMAT2_DECODE_VECTOR")) {
+7259:                    !getenv("GGML_VK_DISABLE_INTEGER_DOT_PRODUCT")) {
+7264:                    !getenv("GGML_VK_DISABLE_BFLOAT16")) {
+7276:                    !getenv("GGML_VK_DISABLE_DOT2")) {
+7283:    const char* GGML_VK_DISABLE_F16 = getenv("GGML_VK_DISABLE_F16");
+7441:                     !getenv("GGML_VK_DISABLE_OCP_FP4");
+7497:    const bool debug_utils_ext = ggml_vk_instance_debug_utils_ext_available(instance_extensions) && getenv("GGML_VK_DEBUG_MARKERS") != nullptr;
+7546:    vk_perf_logger_enabled = getenv("GGML_VK_PERF_LOGGER") != nullptr;
+7547:    vk_perf_logger_concurrent = getenv("GGML_VK_PERF_LOGGER_CONCURRENT") != nullptr;
+7548:    vk_enable_sync_logger = getenv("GGML_VK_SYNC_LOGGER") != nullptr;
+7549:    vk_memory_logger_enabled = getenv("GGML_VK_MEMORY_LOGGER") != nullptr;
+7550:    const char* GGML_VK_PIPELINE_STATS = getenv("GGML_VK_PIPELINE_STATS");
+7554:    const char* GGML_VK_PERF_LOGGER_FREQUENCY = getenv("GGML_VK_PERF_LOGGER_FREQUENCY");
+7566:    char * devices_env = getenv("GGML_VK_VISIBLE_DEVICES");
+7761:    const char* skip_checks = getenv("GGML_VULKAN_SKIP_CHECKS");
+7763:    const char* output_tensor = getenv("GGML_VULKAN_OUTPUT_TENSOR");
+19384:            const int min_batch_size = getenv("GGML_OP_OFFLOAD_MIN_BATCH") ? atoi(getenv("GGML_OP_OFFLOAD_MIN_BATCH")) : 32;

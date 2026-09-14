@@ -1,0 +1,76 @@
+{
+  "input": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runs/full64-f32/slots/state.slot",
+  "output": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runs/full64-f32/slots/state-v2.slot",
+  "parsed": {
+    "tokens": 64662,
+    "packed": 64666,
+    "serverWrapped": true,
+    "kv_offset": 258676,
+    "size": 1091923940,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 64662,
+            "min": 0,
+            "max": 64661
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 63894,
+            "max": 64661
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 1091923940,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "target": {
+    "tokens": 64662,
+    "packed": 64662,
+    "serverWrapped": false,
+    "kv_offset": 258660,
+    "size": 1091923924,
+    "caches": [
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 64662,
+            "min": 0,
+            "max": 64661
+          }
+        ]
+      },
+      {
+        "streams": 2,
+        "seqs": [
+          {
+            "stream": 0,
+            "owner": 0,
+            "count": 768,
+            "min": 63894,
+            "max": 64661
+          }
+        ]
+      }
+    ],
+    "parsed_bytes": 1091923924,
+    "schema": "Gemma E4B standard compact-SWA, no M-RoPE/PLE extensions, F16 FA-off, identical v2/v3 payload subset"
+  },
+  "kv_sha256": "47e06d7dcf8d5dc7943b656c702d1c8991d66b32cac2f15a92363e67294ce7aa",
+  "scope": "Validate Gemma subset; unwrap text-only server tokens and translate v3 to v2. KV bytes and token IDs unchanged. Native loader guards retained; media/extensions rejected."
+}

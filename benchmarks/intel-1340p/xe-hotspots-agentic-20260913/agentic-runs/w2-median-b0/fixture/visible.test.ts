@@ -1,0 +1,1 @@
+import{test,expect}from'bun:test';import{median}from'./src/main';test('contract',()=>{expect(median([8,1,3])).toBe(3);expect(median([9,3,1,7])).toBe(5);expect(median([])).toBeNull();const x=[4,1,3];median(x);expect(x).toEqual([4,1,3]);});

@@ -1,0 +1,1 @@
+import{test,expect}from'bun:test';import{normalize}from'./src/main';test('contract',()=>{expect(normalize({})).toEqual({retries:3,label:"job",enabled:true});expect(normalize({retries:0,label:"",enabled:false})).toEqual({retries:0,label:"",enabled:false});});

@@ -1,0 +1,9 @@
+{
+  "recorded_before_coding_trials": true,
+  "handoff_alignment": "User requested alignment. Candidate writes seqv3 plus newer server token envelope; retained CPU reads seqv2/plain tokens. Gemma E4B F16 no-extension KV writer is byte-identical. Adapter validates exact subset, unwraps text token envelope, preserves token IDs and KV bytes, emitsv2; native loader unchanged. Live4348-token recall/append passed on retained baseline.",
+  "long_context": "Use two streams for compatibility, GPU73728 tokens/stream, retained CPU131072/stream. Test64663-token input in one slot; allocation of second slot does not qualify full two-slot load. Corrected fixture proportional sizing after undersized adjustment failure; original attempt retained.",
+  "coding": "ABBA/BAAB eight short independent runs, four/profile: original CPU binary and compact128Kx2 geometry on both; same median fixture rep0, tools/sampling/output cap. Hybrid on-demand GPU startup->prefill->save->validated format conversion->CPU restore->GPU shutdown->CPU decode. Entire cold route includes GPU lifecycle; warm stays CPU. Independent file tests unchanged.",
+  "timing_controls": "Keep prompt/generated counts, MTP draft/acceptance and wall/prompt/decode metrics separate; compare medians, retain individual runs and no broad statistical quality claim. Warm-side request results separate from model startup.",
+  "isolated_original_failures": ["ccache permission failure", "missing copied libomp runtime", "native baseline rejects v3", "long fixture adjustment undershot"],
+  "production": "No deployment or original source/library changes; approved maintenance restores baseline automatically. Temperature annotation only; speech/native guards remain active."
+}

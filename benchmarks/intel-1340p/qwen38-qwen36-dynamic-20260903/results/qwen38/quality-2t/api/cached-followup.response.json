@@ -1,0 +1,39 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "| Gate | Invariant | Measurable threshold |\n|---|---|---|\n| **Correctness** | Deterministic target logits and token acceptance | On a fixed 128-prompt suite: top-1 token match ≥ 99.9% vs CPU reference; max logit L2 error ≤ 1e-3; MTP accepted-token sequence identical to CPU reference for 100% of prompts; no NaN/Inf. |\n| **Correctness** | Correct KV/recurrent rollback across partial MTP acceptance | After forced partial accept/reject cycles: KV cache checksum matches CPU reference; next-token distribution error ≤ 1e-3; no state drift over 1000 decode steps. |\n| **Performance** | Preserve CPU advantage and MTP benefit | CPU+MTP draft-1 must remain ≥ 1.10× faster than CPU baseline. Vulkan exact-row kernel must be ≥ 1.05× faster than CPU for N=2 Q2_K decode; N=4 must not regress > 2% vs CPU. MTP orchestration overhead ≤ 5% of per-token time. |\n| **Stability** | No shared-LPDDR contention regression | Sustained 30-min mixed CPU/Vulkan run: p95 token latency regression ≤ 3% vs CPU-only; no OOM; no device reset; memory growth ≤ 1% over run. |\n| **Fallback coverage** | Generic Vulkan path remains safe | Fallback triggers for unsupported shape, dtype, device, or kernel failure in 100% of injected fault tests; fallback output matches CPU reference within correctness thresholds; fallback latency penalty ≤ 20% vs CPU baseline. |",
+        "reasoning_content": "We need answer user's request: \"Now turn those invariants into a compact release gate with measurable thresholds for correctness, performance, stability, and fallback coverage.\"\n\nWe need produce concise technical reproducible release gate. Need likely include thresholds. Need align with prior invariants: deterministic target logits/token acceptance, correct KV/recurrent rollback state across partial MTP acceptance, generic Vulkan fallback. Need measurable thresholds for correctness, performance, stability, fallback coverage.\n\nNeed think about campaign facts: Qwen3.6 35B-A3B hybrid attention MoE, Intel i5-1340P AVX2/AVX-VNNI, Iris Xe FP16/int dot no cooperative matrices. CPU faster than full Vulkan. Native MTP draft-1 high acceptance improves CPU generation. Vulkan multi-column Q2_K decode gains at N=2 plateaus N=4. Disabling MMVQ or integer dot removes gain. Same-session CPU/Vulkan branch-overlap prototype correct but regressed due shared LPDDR. Next work targets model-specific exact-row Vulkan kernel and reduced MTP orchestration overhead.\n\nNeed release gate compact. Could be table with category, invariant, measurable threshold, pass/fail. Need thresholds plausible. Need maybe define metrics"
+      }
+    }
+  ],
+  "created": 1788454632,
+  "model": "qwen3.8-27b-ud-q4-k-xl-mtp",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 619,
+    "prompt_tokens": 320,
+    "total_tokens": 939,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-P9nzXEnSgE8cy7Qc5KZhb2ZlGE1gAqbH",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 320,
+    "prompt_ms": 130215.475,
+    "prompt_per_token_ms": 406.923359375,
+    "prompt_per_second": 2.457465212948,
+    "predicted_n": 619,
+    "predicted_ms": 451930.315,
+    "predicted_per_token_ms": 730.0974394184168,
+    "predicted_per_second": 1.3696801906285043,
+    "draft_n": 660,
+    "draft_n_accepted": 399
+  }
+}

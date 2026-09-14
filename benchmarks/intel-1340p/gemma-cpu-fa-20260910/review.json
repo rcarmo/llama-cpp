@@ -1,0 +1,8 @@
+{
+ "reviewer":"github-copilot/gpt-5.4 delegated judge",
+ "scope":"Standalone fused-only patch and native helper test; no full independent codebase review",
+ "finding":"No obvious safety/correctness blocker visible: unalignedloads/stores and bounded8-element loop+tail, existing scratch reuse, symmetric ISA compile gates, default and use_ref preserved. Intentional FP32/FMA semantics differ fromF16 accumulation.",
+ "nit":"DV narrows to int helper length; changed helper length and index to int64_t before final standalone build/testing.",
+ "qualification":"Native helper7cases and21active-row helper cases pass. Whole masked attention4cases/profile pass with unchanged reference. ABBA/BAAB8-run improvement measured in combined backend with unrelatedflags off; standalone extracted patch is rebuilt and reverified separately. Nonfinite/exceptional inputs, arbitrarymodel quality and otherarchitectures not broadly qualified.",
+ "source_review_timeout":"Earlier broad source delegation timed out; not counted as a completed review."
+}

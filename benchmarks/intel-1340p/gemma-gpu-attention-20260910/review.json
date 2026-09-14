@@ -1,0 +1,7 @@
+{
+ "reviewer":"github-copilot/gpt-5.4 delegated judge",
+ "scope":"attached exact-device attention-selector patch, no independent full-source audit",
+ "findings":["MMQ getter sees selectedF32 precision when quantize_y is initiallytrue; verify that mode changes accumulation only","trace currently prints pre64bit-indexwrapper tile metadata","no concrete alignment issue with existing small/mediumBK16 and alignedpipeline availability guard"],
+ "local_source_followup":"Inspected getter and MMQcreation: F16xQ8_1 has no compiledMMQ registration (onlyquantizedtypes). Getter returnsnullptr for empty F16MMQ slot; fallback setsquantize_y=false. Q8_1 getter alreadyusesf32acc independentofprec. Thus actual gatedF16/F32 path changesaccumulationonly ontesteddevice; mustrevisitifF16MMQsupportisadded. Trace identifies selectedtilebefore64bitwrapper,notafinalpipeline-ID proof.",
+ "retention":"Opt-in exactPCI8086:a7a0 only; existingindex64 wrapper andsplitK/allocguards retained. No runtime benefit or broadcorrectness implied by source review."
+}

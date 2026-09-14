@@ -1,0 +1,30 @@
+/** SCRIPT_JDOC:
+{"summary":"One admitted O3 shared/copy MTP performance trial, exact manifest, stage timing and resource guards","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{readFileSync,writeFileSync,readdirSync,existsSync,mkdirSync,statSync}from'node:fs';import{createHash}from'node:crypto';import{summarize,guards}from'./metrics';
+const root=import.meta.dir,name=process.argv[2],arm=process.argv[3];
+if(!/^r[0-7]$/.test(name)||!['share','copy'].includes(arm))throw Error('Expected run r0..r7 share|copy');
+if(!existsSync(root+'/admission.json'))throw Error('No admitted benchmark window');
+const admission=JSON.parse(readFileSync(root+'/admission.json','utf8'));if(Date.now()>Date.parse(admission.expires))throw Error('Expired admission');
+const order=['share','copy','copy','share','copy','share','share','copy'];if(order[+name[1]]!==arm)throw Error('Prespecified order');
+if(+name[1]>=2){const a=JSON.parse(readFileSync(root+'/runs/r0/result.json','utf8')),b=JSON.parse(readFileSync(root+'/runs/r1/result.json','utf8'));if(a.rc||b.rc||a.abort||b.abort||a.output_sha256!==b.output_sha256||JSON.stringify(a.mtp)!==JSON.stringify(b.mtp))throw Error('Initial pair parity failed');}
+const dir=root+'/runs/'+name;if(existsSync(dir))throw Error('Retained run exists');mkdirSync(dir,{recursive:true});
+const bin=root+'/release/bin/handoff-perf',plugin=root+'/vulkan/libggml-vulkan.so.0.23.0',model='/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf',assistant='/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf';
+const env={PATH:'/usr/bin:/bin',HOME:process.env.HOME!,XDG_RUNTIME_DIR:'/run/user/1001',DBUS_SESSION_BUS_ADDRESS:'unix:path=/run/user/1001/bus',LD_LIBRARY_PATH:root+'/release/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime',GGML_BACKEND_PATH:plugin,PERF_ARM:arm,PERF_METRICS:dir+'/metrics.json'};
+const text=(p:string)=>{try{return readFileSync(p,'utf8')}catch{return''}},save=(p:string,x:any)=>writeFileSync(dir+'/'+p,JSON.stringify(x,null,2)+'\n');
+async function services(){const p=Bun.spawn(['systemctl','--user','show','llama-gemma-local-provider.service','whisper-stt.service','whisper-stt-diarizer.service','-p','Id','-p','ActiveState','-p','MainPID'],{env,stdout:'pipe'});const s=await new Response(p.stdout).text();if(await p.exited)throw Error('Service check');return s;}
+const initial=await services();if((initial.match(/ActiveState=inactive/g)||[]).length!==3)throw Error('Services changed');
+for(const f of JSON.parse(readFileSync(root+'/model-identities.json','utf8'))){const s=statSync(f.path);if(s.size!==f.size||s.mtimeMs!==f.mtimeMs)throw Error('Model changed since checksum');}
+const prompt=readFileSync(root+'/prompt.txt','utf8');const args=[bin,model,prompt,'128','--mtp',assistant];
+const hash=(f:string)=>createHash('sha256').update(readFileSync(f)).digest('hex');
+save('manifest.json',{at:new Date().toISOString(),admission,argv:args,env,prompt_sha256:hash(root+'/prompt.txt'),hashes:Object.fromEntries([bin,plugin,...['libllama.so.0','libllama-common.so.0','libggml-base.so.0','libggml.so.0','libggml-cpu.so.0'].map(n=>root+'/release/bin/'+n)].map(f=>[f,hash(f)])),models:JSON.parse(readFileSync(root+'/model-identities.json','utf8')),services:initial});
+let abort='',p:ReturnType<typeof Bun.spawn>|undefined;const samples:any[]=[];
+function kill(){if(p)try{process.kill(-p.pid,'SIGKILL')}catch{}}
+for(const sig of ['SIGTERM','SIGINT']as const)process.on(sig,()=>{abort=sig;kill()});
+function sample(){const available_kib=Number(text('/proc/meminfo').match(/^MemAvailable:\s+(\d+)/m)?.[1]);const workers=readdirSync('/proc').filter(x=>/^\d+$/.test(x)).map(pid=>({pid:+pid,comm:text('/proc/'+pid+'/comm').trim(),cmd:text('/proc/'+pid+'/cmdline').split('\0')[0],status:text('/proc/'+pid+'/status')}));const own=workers.filter(w=>w.cmd===bin).map(w=>({pid:w.pid,swap_kib:Number(w.status.match(/^VmSwap:\s+(\d+)/m)?.[1]),rss_kib:Number(w.status.match(/^VmRSS:\s+(\d+)/m)?.[1]),allowed:w.status.match(/^Cpus_allowed_list:\s+(.*)$/m)?.[1]}));const competing=workers.filter(w=>['llama-server','diar-server','whisper-cli','ffmpeg','go'].includes(w.comm)).map(w=>w.pid);const s={at:new Date().toISOString(),available_kib,workers:own,competing:competing.length,competing_pids:competing,competing_meta:workers.filter(w=>competing.includes(w.pid)).map(w=>({pid:w.pid,comm:w.comm,cmd:w.cmd})),temp_c:Number(text('/sys/class/thermal/thermal_zone1/temp'))/1000,throttle:Number(text('/sys/devices/system/cpu/cpu0/thermal_throttle/package_throttle_count'))};samples.push(s);for(const w of own){const maps=text('/proc/'+w.pid+'/maps');if(maps.includes(plugin))writeFileSync(dir+'/maps.txt',maps);}guards(s);}
+sample();const start=performance.now();p=Bun.spawn(['timeout','-k','3','170',...args],{env,detached:true,stdout:Bun.file(dir+'/stdout.log'),stderr:Bun.file(dir+'/stderr.log')});const timer=setInterval(()=>{try{sample()}catch(e){abort=String(e);kill()}},200);
+const rc=await p.exited;clearInterval(timer);kill();const final=await services();const log=text(dir+'/stderr.log');const mtp=log.match(/MTP drafted=(\d+) accepted=(\d+) output=(\d+)/);
+save('result.json',{rc,abort,wall_s:(performance.now()-start)/1000,samples,services_unchanged:initial===final,mtp:mtp?{drafted:+mtp[1],accepted:+mtp[2],output:+mtp[3]}:null,output_sha256:hash(dir+'/stdout.log')});
+if(rc||abort||initial!==final||!mtp||!text(dir+'/stdout.log').trim())throw Error('Trial failed');
+const m=JSON.parse(text(dir+'/metrics.json'));if(m.emitted!==+mtp[3])throw Error('Output hook count mismatch');
+if(m.emitted<96)throw Error('Insufficient output for prespecified sustained screen');save('summary.json',summarize(m));console.log(JSON.stringify(summarize(m)));

@@ -146,6 +146,7 @@ llama_context::llama_context(
     cparams.cb_eval           = params.cb_eval;
     cparams.cb_eval_user_data = params.cb_eval_user_data;
 
+    if (params.ctx_other && params.ctx_other->kv_consumed) throw std::runtime_error("cannot borrow a consumed KV context");
     cparams.ctx_other = nullptr;
 
     // TODO: more generic
@@ -399,6 +400,19 @@ llama_context::llama_context(
         };
 
         memory.reset(model.create_memory(params_mem, cparams));
+        if (memory && params.kv_cpu_shared) {
+            memory->init_cpu_shared([&](ggml_backend_buffer_type_t buft, size_t size) -> ggml_backend_buffer_t {
+                using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
+                for (const auto & backend : backends) {
+                    if (ggml_backend_get_default_buffer_type(backend.get()) != buft) continue;
+                    auto dev = ggml_backend_get_device(backend.get());
+                    if (!dev) continue;
+                    auto fn = (alloc_fn) ggml_backend_reg_get_proc_address(ggml_backend_dev_backend_reg(dev), "ggml_backend_vk_alloc_cpu_shared_buffer");
+                    if (fn) return fn(backend.get(), size);
+                }
+                return nullptr;
+            });
+        }
     }
 
     // init backends
@@ -483,6 +497,8 @@ llama_context::llama_context(
         }
     }
     model.register_residency_context(this);
+    if (params.ctx_other) ++params.ctx_other->kv_borrowers;
+    kv_borrowed_from=params.ctx_other;
 }
 
 llama_context::~llama_context() {
@@ -491,6 +507,7 @@ llama_context::~llama_context() {
     // wait for any pending asynchronous copies into the output buffers before they are freed
     synchronize();
     model.unregister_residency_context(this);
+    if (kv_borrowed_from) --kv_borrowed_from->kv_borrowers;
 
     // when training, ggml_opt allocates extra buffers through the scheduler, so the sizes no longer match the expectation
     if (!model.hparams.no_alloc && !opt_ctx) {
@@ -826,7 +843,7 @@ uint32_t llama_context::n_threads_batch() const {
 }
 
 llama_memory_t llama_context::get_memory() const {
-    return memory.get();
+    return kv_consumed ? nullptr : memory.get();
 }
 
 bool llama_context::memory_update(bool optimize) {
@@ -1364,6 +1381,7 @@ bool llama_context::set_adapter_cvec(
                 int32_t   il_end) {
     LLAMA_LOG_DEBUG("%s: il_start = %d, il_end = %d\n", __func__, il_start, il_end);
 
+    kv_cvec_modified = true;
     bool res = cvec->apply(model, data, len, n_embd, il_start, il_end);
 
     sched_need_reserve = true;
@@ -1454,6 +1472,7 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
 }
 
 int llama_context::encode(const llama_batch & batch_inp) {
+    if (kv_consumed) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -1694,6 +1713,7 @@ static bool needs_raw_logits(const llama_ubatch & ubatch, const std::map<llama_s
 }
 
 int llama_context::decode(const llama_batch & batch_inp) {
+    if (kv_consumed) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -3708,6 +3728,7 @@ llama_context_params llama_context_default_params() {
         /*.no_perf                     =*/ true,
         /*.op_offload                  =*/ true,
         /*.sched_async_cpu             =*/ false,
+        /*.kv_cpu_shared               =*/ false,
         /*.swa_full                    =*/ true,
         /*.kv_unified                  =*/ false,
         /*.sampler                     =*/ nullptr,

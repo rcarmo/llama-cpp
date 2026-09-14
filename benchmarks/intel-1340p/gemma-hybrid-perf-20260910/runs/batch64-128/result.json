@@ -1,0 +1,126 @@
+{
+  "ok": true,
+  "ubatch": 128,
+  "rows": [
+    {
+      "rep": 0,
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 30462.132,
+        "prompt_per_token_ms": 29.806391389432488,
+        "prompt_per_second": 33.54985133673507,
+        "predicted_n": 21,
+        "predicted_ms": 6453.888,
+        "predicted_per_token_ms": 322.6944,
+        "predicted_per_second": 3.098907201364511
+      }
+    },
+    {
+      "rep": 1,
+      "answer": "CEDAR-481,MAPLE-726,BIRCH-953",
+      "pass": true,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 30998.292,
+        "prompt_per_token_ms": 30.331009784735812,
+        "prompt_per_second": 32.96955845180115,
+        "predicted_n": 21,
+        "predicted_ms": 6479.818,
+        "predicted_per_token_ms": 323.9909,
+        "predicted_per_second": 3.0865064420019204
+      }
+    }
+  ],
+  "limits": "Two sequential screen requests, saved64K state reused; finalist needs counterbalanced repeats and fresh long prefill quality.",
+  "config": {
+    "maintenance": true,
+    "format": "f16",
+    "fa": false,
+    "full": false,
+    "ctx": 147456,
+    "parallel": 2,
+    "cache": 0,
+    "ubatch": 128,
+    "batch": 1024,
+    "vulkanBuild": "/var/home/agent/workspace/reports/gemma-context-coding-20260910/runtime-vulkan",
+    "preserveSwaPadding": true
+  },
+  "calls": [
+    {
+      "label": "restore-0",
+      "device": "vulkan",
+      "wall_ms": 517.8491559999993,
+      "package_j": 7.506145,
+      "timings": {
+        "restore_ms": 516.491
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-0",
+      "device": "vulkan",
+      "wall_ms": 36946.853724,
+      "package_j": 950.647225,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 30462.132,
+        "prompt_per_token_ms": 29.806391389432488,
+        "prompt_per_second": 33.54985133673507,
+        "predicted_n": 21,
+        "predicted_ms": 6453.888,
+        "predicted_per_token_ms": 322.6944,
+        "predicted_per_second": 3.098907201364511
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "label": "restore-1",
+      "device": "vulkan",
+      "wall_ms": 292.7965269999986,
+      "package_j": 4.154165,
+      "timings": {
+        "restore_ms": 291.682
+      },
+      "n_read": 1091923940,
+      "token_hash": null
+    },
+    {
+      "label": "tail-1",
+      "device": "vulkan",
+      "wall_ms": 37513.953395,
+      "package_j": 960.196394,
+      "timings": {
+        "cache_n": 64658,
+        "prompt_n": 1022,
+        "prompt_ms": 30998.292,
+        "prompt_per_token_ms": 30.331009784735812,
+        "prompt_per_second": 32.96955845180115,
+        "predicted_n": 21,
+        "predicted_ms": 6479.818,
+        "predicted_per_token_ms": 323.9909,
+        "predicted_per_second": 3.0865064420019204
+      },
+      "token_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "thermal": {
+    "peak_c": 92,
+    "hot": false,
+    "abort_enabled": false
+  },
+  "resources": {
+    "peak_trial_pss_kib": 5239902,
+    "peak_trial_rss_kib": 5243528,
+    "peak_trial_swap_kib": 0,
+    "min_available_kib": 24097648,
+    "production_swap_initial_kib": 0,
+    "production_swap_final_kib": 0
+  },
+  "finished_at": "2026-09-10T17:31:58.846Z"
+}

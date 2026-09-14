@@ -1,0 +1,34 @@
+--- a/src/llama-kv-cache.cpp
++++ b/src/llama-kv-cache.cpp
+@@ -8,6 +8,7 @@
+ #include <algorithm>
+ #include <cassert>
+ #include <cmath>
++#include <cstdlib>
+ #include <cstring>
+ #include <limits>
+ #include <map>
+@@ -2056,7 +2057,9 @@
+         return;
+     }
+ 
+-    GGML_UNUSED(flags);
++    const bool preserve_swa_padding = std::getenv("LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING") != nullptr &&
++        n_swa > 0 && swa_type == LLAMA_SWA_TYPE_STANDARD &&
++        (flags & LLAMA_STATE_SEQ_FLAGS_PARTIAL_ONLY) == 0;
+ 
+     io.write(&n_stream, sizeof(n_stream));
+ 
+@@ -2077,9 +2080,10 @@
+             add_cell = add_cell && !cells.is_empty(i);
+             add_cell = add_cell && (seq_id == -1 || cells.seq_has(i, seq_id));
+ 
+-            // check the cell is not SWA-masked
++            // The experimental handoff retains at most one CPU microbatch of SWA padding.
+             if (add_cell && seq_id != -1) {
+-                const bool is_masked = llama_hparams::is_masked_swa(n_swa, swa_type, cells.pos_get(i), cells.seq_pos_max(seq_id));
++                const uint32_t export_swa = preserve_swa_padding ? n_swa + 256 : n_swa;
++                const bool is_masked = llama_hparams::is_masked_swa(export_swa, swa_type, cells.pos_get(i), cells.seq_pos_max(seq_id));
+ 
+                 add_cell = !is_masked;
+             }

@@ -1,0 +1,32 @@
+bun test v1.4.1 (4661e494f)
+
+reports/gemma-b1-release-20260911/stage-owner.test.ts:
+(pass) normal stage owns lease until restoration verification [1.26ms]
+(pass) simultaneous launch/rejected second poststop cannot restore first [0.43ms]
+(pass) failed preflight never gains restoration permission [0.28ms]
+(pass) queued cancellation/no lease is no-op [0.11ms]
+(pass) abort/owner crash after stop-intent restores the frozen current release [0.39ms]
+(pass) crash during work followed by new owner is refused, original cleanup allowed [0.43ms]
+(pass) delayed old poststop cannot release or restart a new owner [0.62ms]
+(pass) restoring owner holds lease during verification, rejects next stage [0.48ms]
+(pass) cleanup failure keeps lease and never starts production [0.40ms]
+(pass) verification failure/cancel keeps lease for explicit recovery [0.49ms]
+(pass) changed release blocks obsolete restoration [0.43ms]
+
+reports/gemma-b1-release-20260911/closeout.test.ts:
+(pass) original failure is reproduced on both arms and stays a failure, not qualification [0.25ms]
+(pass) exact repaired restore-tool-append maintains tokens, slot isolation and MTP [0.15ms]
+(pass) all original and repaired F16 tensor payloads finite to exact EOF [0.27ms]
+(pass) all common cells compare by explicit position, without sorted-ring assumptions [0.14ms]
+(pass) only save-path library changes within the failure-repair comparison [0.20ms]
+(pass) save patch is narrow and keeps empty/foreign and partial-state filters [0.29ms]
+(pass) guard stop is retained; no native staging row completed and release held [0.32ms]
+(pass) candidate changes only two CPU libraries and two flags; GPU unchanged [0.28ms]
+(pass) synthetic PMU groups attribute equal work with disabled negative controls [0.22ms]
+(pass) exactly two CPU-only diagnostic profiles; actual counts, guards and residency preserved [47.63ms]
+(pass) latest B0 receipt has idle slots, exact original identities, zero swap and four CPU checks [0.40ms]
+
+ 22 pass
+ 0 fail
+ 146 expect() calls
+Ran 22 tests across 2 files. [376.00ms]

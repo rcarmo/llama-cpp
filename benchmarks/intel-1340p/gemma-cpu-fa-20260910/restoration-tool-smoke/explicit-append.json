@@ -1,0 +1,111 @@
+{
+  "scope": "Original-profile labelled diagnostic, NOT promotion timing evidence",
+  "started": "2026-09-10T19:33:34.413Z",
+  "request": {
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_stock",
+          "description": "Read fixture inventory",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "sku": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "sku"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 96,
+    "cache_prompt": true,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "Use lookup_stock exactly once for the requested SKU. After its result arrives, answer the user with the quantity from that result."
+      },
+      {
+        "role": "user",
+        "content": "How many items of SKU PANDA-RESTORE are in stock? Look it up, then reply with the quantity only."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "lookup_stock",
+              "arguments": "{\"sku\":\"PANDA-RESTORE\"}"
+            },
+            "id": "n9fXXGeN05xPsGnSX9QZAPCSHvaC5OTG"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "n9fXXGeN05xPsGnSX9QZAPCSHvaC5OTG",
+        "content": "{\"quantity\":23,\"sku\":\"PANDA-RESTORE\"}"
+      },
+      {
+        "role": "assistant",
+        "content": "23"
+      },
+      {
+        "role": "user",
+        "content": "Reply exactly RESTORED"
+      }
+    ],
+    "tool_choice": "none"
+  },
+  "status": 200,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "RESTORED"
+        }
+      }
+    ],
+    "created": 1789068814,
+    "model": "gemma-4-e4b-qat-mtp",
+    "system_fingerprint": "b10579-abdbeadfb",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 4,
+      "prompt_tokens": 167,
+      "total_tokens": 171,
+      "prompt_tokens_details": {
+        "cached_tokens": 145
+      }
+    },
+    "id": "chatcmpl-loN3AgAgFd4h9XM61bQcbKfJynvx0Zt6",
+    "timings": {
+      "cache_n": 145,
+      "prompt_n": 22,
+      "prompt_ms": 414.826,
+      "prompt_per_token_ms": 18.855727272727275,
+      "prompt_per_second": 53.034284254121005,
+      "predicted_n": 4,
+      "predicted_ms": 108.162,
+      "predicted_per_token_ms": 27.0405,
+      "predicted_per_second": 36.98156469000203,
+      "draft_n": 3,
+      "draft_n_accepted": 3
+    }
+  }
+}

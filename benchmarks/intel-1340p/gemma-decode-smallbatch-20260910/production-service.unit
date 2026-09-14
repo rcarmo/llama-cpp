@@ -1,0 +1,34 @@
+# /var/home/agent/.config/systemd/user/llama-gemma-local-provider.service
+[Unit]
+Description=Gemma E4B FP32 Vulkan cold prefill with retained CPU MTP decoding
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=4
+[Service]
+Type=simple
+WorkingDirectory=/var/home/agent/workspace
+ExecStart=/opt/piclaw/current/bun/bin/bun /var/home/agent/.local/share/llama-gemma-hybrid/releases/20260910-smallbatch/code/main.ts /var/home/agent/.local/share/llama-gemma-hybrid/releases/20260910-smallbatch/config.json
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+KillMode=control-group
+UMask=0077
+[Install]
+WantedBy=default.target
+
+# /usr/lib/systemd/user/service.d/10-timeout-abort.conf
+# This file is part of the systemd package.
+# See https://fedoraproject.org/wiki/Changes/Shorter_Shutdown_Timer.
+#
+# To facilitate debugging when a service fails to stop cleanly,
+# TimeoutStopFailureMode=abort is set to "crash" services that fail to stop in
+# the time allotted. This will cause the service to be terminated with SIGABRT
+# and a coredump to be generated.
+#
+# To undo this configuration change, create a mask file:
+#   sudo mkdir -p /etc/systemd/user/service.d
+#   sudo ln -sv /dev/null /etc/systemd/user/service.d/10-timeout-abort.conf
+
+[Service]
+TimeoutStopFailureMode=abort

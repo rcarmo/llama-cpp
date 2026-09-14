@@ -1,0 +1,260 @@
+{
+  "captured": "2026-09-10T21:17:18.166Z",
+  "scope": "Live FP32+1024full64Kworker maps;hashesmatchpriorFP32+256full64K",
+  "records": [
+    {
+      "pid": 623725,
+      "argv": [
+        "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/llama-server",
+        "--model",
+        "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+        "--alias",
+        "gemma-campaign",
+        "--load-mode",
+        "mmap",
+        "--gpu-layers",
+        "0",
+        "--threads",
+        "8",
+        "--cpu-mask",
+        "ff",
+        "--cpu-strict",
+        "1",
+        "--threads-batch",
+        "16",
+        "--cpu-mask-batch",
+        "ffff",
+        "--cpu-strict-batch",
+        "1",
+        "--ctx-size",
+        "262144",
+        "--parallel",
+        "2",
+        "--no-kv-unified",
+        "--cont-batching",
+        "--batch-size",
+        "1024",
+        "--ubatch-size",
+        "256",
+        "--cache-type-k",
+        "f16",
+        "--cache-type-v",
+        "f16",
+        "--flash-attn",
+        "off",
+        "--cache-prompt",
+        "--cache-ram",
+        "256",
+        "--cache-reuse",
+        "256",
+        "--ctx-checkpoints",
+        "32",
+        "--checkpoint-min-step",
+        "8192",
+        "--slots",
+        "--metrics",
+        "--no-ui",
+        "--no-warmup",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18792",
+        "--timeout",
+        "1800",
+        "--slot-save-path",
+        "/var/home/agent/workspace/reports/gemma-f32-batch-20260910/runs/full64-f32-1024/slots/",
+        "--model-draft",
+        "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf",
+        "--spec-type",
+        "draft-mtp",
+        "--spec-draft-n-min",
+        "1",
+        "--spec-draft-n-max",
+        "3",
+        "--spec-draft-threads",
+        "8",
+        "--spec-draft-threads-batch",
+        "16",
+        "--spec-draft-type-k",
+        "f16",
+        "--spec-draft-type-v",
+        "f16",
+        "--spec-draft-ngl",
+        "0",
+        "--cache-idle-slots",
+        "--spec-draft-cpu-mask",
+        "ff",
+        "--spec-draft-cpu-mask-batch",
+        "ffff",
+        "--spec-draft-cpu-strict",
+        "1",
+        "--spec-draft-cpu-strict-batch",
+        "1"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/runtime",
+        "GGML_VK_VISIBLE_DEVICES": "0",
+        "LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING": "1",
+        "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32"
+      },
+      "mapped_files": [
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/llama-server",
+          "sha256": "6152e9f04d2f24f99d7bcf6f040c504f83ea792af074a0e2fcf7d37e0c7b72ab"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/runtime/libomp.so",
+          "sha256": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libggml-base.so.0.18.1",
+          "sha256": "edeee59be0c9b66b1f5ae8b3b517abf2c48aa4866372cf20271b0a7eec50a905"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libggml-cpu.so.0.18.1",
+          "sha256": "e461ebf2d5d8a91d456a10d152af675b1cb769b0323ba56f584c46518f8ae822"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libllama.so.0.0.10579",
+          "sha256": "1a9975272e3ebcacbb8c75262e468fdfe082e6b41339920d701ed93383fc04aa"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libllama-common.so.0.0.10579",
+          "sha256": "e3a3cd012b419e7c0f2d44a1e6642a6f359bde6558ae363e508a764a5d8f1a03"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libllama-server-impl.so",
+          "sha256": "df4df22a1dd3eaf0a6d89b1a9eaa14a8931bd8f57b3c6dd1d8d704e18d71d74f"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-simd-async-20260906/baseline/bin/libggml.so.0.18.1",
+          "sha256": "eeae23d0bb4db838b295a85e0c3da44b22b710cac5a408be292abe0b2ae4ebaa"
+        }
+      ]
+    },
+    {
+      "pid": 623777,
+      "argv": [
+        "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/llama-server",
+        "--model",
+        "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+        "--alias",
+        "gemma-campaign",
+        "--load-mode",
+        "mmap",
+        "--gpu-layers",
+        "999",
+        "--threads",
+        "8",
+        "--cpu-mask",
+        "ff",
+        "--cpu-strict",
+        "1",
+        "--threads-batch",
+        "16",
+        "--cpu-mask-batch",
+        "ffff",
+        "--cpu-strict-batch",
+        "1",
+        "--ctx-size",
+        "147456",
+        "--parallel",
+        "2",
+        "--no-kv-unified",
+        "--cont-batching",
+        "--batch-size",
+        "1024",
+        "--ubatch-size",
+        "1024",
+        "--cache-type-k",
+        "f16",
+        "--cache-type-v",
+        "f16",
+        "--flash-attn",
+        "off",
+        "--cache-prompt",
+        "--cache-ram",
+        "256",
+        "--cache-reuse",
+        "256",
+        "--ctx-checkpoints",
+        "32",
+        "--checkpoint-min-step",
+        "8192",
+        "--slots",
+        "--metrics",
+        "--no-ui",
+        "--no-warmup",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "18791",
+        "--timeout",
+        "1800",
+        "--no-sched-async-cpu",
+        "--slot-save-path",
+        "/var/home/agent/workspace/reports/gemma-f32-batch-20260910/runs/full64-f32-1024/slots/",
+        "--cache-idle-slots"
+      ],
+      "environment": {
+        "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin:/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/runtime",
+        "GGML_VK_VISIBLE_DEVICES": "0",
+        "LLAMA_EXPERIMENTAL_SWA_SAVE_PADDING": "1",
+        "GGML_VK_EXPERIMENTAL_ATTN_MODE": "f32"
+      },
+      "mapped_files": [
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/llama-server",
+          "sha256": "3fb4b4c3d0dd6b4ec8c5998edeba7267cddedf3d8d19ff8bcd87350c14f0883b"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/runtime/libomp.so",
+          "sha256": "74e53bb8e1a0cf9ce7cd28f8f078ddac07c2833f539b28e7aef3774e407afa3a"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libggml-vulkan.so.0",
+          "sha256": "3d679dce59a861095089582b5a870b19d97e44d65ad7e24e2a77b02a697475b8"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libggml-cpu.so.0",
+          "sha256": "f3d66643a64ccb17eb273cf83596aa6627e7214318d9cb0229f008e006ad8d2f"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libllama.so.0",
+          "sha256": "715e3c612d937cba653c6172653e0afa4431f26e65e270998ae56211b33cbffb"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libllama-common.so.0",
+          "sha256": "f7f1ce48edf308255188c9b5e2be83a8b814a3e87c72908403b4db54f83cd280"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libggml-base.so.0",
+          "sha256": "07910eb6e09514db39f7ab50185dc7aacc7db07219d6cfabb233638d92392904"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libllama-server-impl.so",
+          "sha256": "d921a60b8d5ce1defafc6c3c595e31bffbfc592b0d3cd60a644fdd3d7a2e5b52"
+        },
+        {
+          "path": "/var/home/agent/workspace/reports/gemma-gpu-attention-20260910/runtime-gpu/bin/libggml.so.0",
+          "sha256": "6ac5fd32c4118e1ef93766d92ea8a3d517e009413631e7cfd38c69026ba14367"
+        }
+      ]
+    }
+  ],
+  "source_provenance_sha256": "8d38797b96ffc8eb32c839a6505d77e168fb8039ab4d081c442ee9ddd8304b84",
+  "sources": [
+    {
+      "path": "campaign.ts",
+      "sha256": "c823e2563222e17e2790ac6b0e6d16792f028f65035e7b94d73538f6c0be0f32"
+    },
+    {
+      "path": "batch-screen.ts",
+      "sha256": "75de234cf74e70c66a4c8c66f01f8f2950ff36119a86f55ee26b22df6f12a4cc"
+    },
+    {
+      "path": "full64.ts",
+      "sha256": "39badc433f13232625a16ee653f121fd18f731c3a05dcf6d7b046c54fcdea496"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+ "declared_before_inference":true,
+ "question":"Does independent draft-decode4 versus8 reduce MTP assistant overhead after the target-smallbatch optimisation? Previous broadthreads changedtarget anddrafttogether;thisfactorisunmeasured.",
+ "order":[8,4,4,8,4,8,8,4],
+ "fixed":"Patchedtargetsmallbatch<=4rowsdecode8,largeprefill16,draftbatch16,MTP3,F16,FAoff,CPU2x128K,same64658cached/25evaluated/128output countingrecallfixture. NoGPU/build/profiling;only--spec-draft-threads changes.",
+ "gates":"Three-keyrecall;exactcached/evaluated/generatedcounts;actualargv isolation,enabledsmallbatchflag/mappedlibraryhash;draftacceptanceandtokenhashreportednotparitygate. Continuous6GiBavailable/16MiBswap,zeroswapexpected.",
+ "budget":"Eightfreshworker/restoredKVruns,~5min total,8min supervisory cap. Separate unprofiledtiming not claim of longcodingquality.",
+ "safety":"FreshspeechCLEAR23:28:42UTC;immediateandcontinuousjobs/nativeCPU/CLI/socketguards. StoponlytrialCPU. Restorecurrent20260910-smallbatchhybridunit/config unchanged;verifyactualmappedfiles/flag,health/tools/cache/swap. NoSTT/privatefiles.",
+ "decision":"Onlyrepeat orpromotewhenmeasuredgainexceedsobservedvariabilityandscopeconfirmed;smallornegativegain retained as limitedopportunity. Noautomaticconfigchange or globalmaximumclaim."
+}

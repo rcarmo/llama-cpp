@@ -1,0 +1,3 @@
+import{test,expect}from'bun:test';import{audit,parse}from'./audit-results';
+test('shapeprofile totals reconcile nativeMUL_MAT,notpackingthreadsum',()=>{const r=audit(import.meta.dir);expect(r.audit_pass).toBe(true);expect(r.runs[0].summary.overflow).toBe(0);expect(r.runs[0].categories['f16_score small'].wall_us).toBe(5717152);expect(r.runs[0].categories['f16_value small'].wall_us).toBe(4313540);expect(r.restoration.pass).toBe(true)});
+test('metadata parser retains type/name and threadtime separately',()=>{const r=parse('GGML_CPU_SHAPE_PROFILE phase=repack_pack_thread name=x a=blk.3.w at=q4_0 n=4 calls=8 elapsed_us=23\n')[0];expect(r.phase).toBe('repack_pack_thread');expect(r.a).toBe('blk.3.w');expect(r.elapsed_us).toBe(23)});

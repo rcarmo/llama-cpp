@@ -1,0 +1,49 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.003.922 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.032 I srv          init: The UI is disabled
+0.00.004.032 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.004.121 W srv  llama_server: -----------------
+0.00.004.122 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.123 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.123 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.123 W srv  llama_server: -----------------
+0.00.005.531 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+0.01.069.731 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.070.272 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+0.01.101.803 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+0.01.950.803 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.332.680 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+0.03.367.539 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.03.674.352 I srv    load_model: initializing, n_slots = 2, n_ctx_slot = 131072, kv_unified = 'false'
+0.03.683.745 I srv  llama_server: model loaded
+0.03.683.756 I srv  llama_server: listening on http://127.0.0.1:18792
+0.05.031.286 I slot get_availabl: id  0 | task -1 | selected slot by id (0)
+0.05.031.423 I slot launch_slot_: id  0 | task 1 | processing task, is_child = 0
+0.24.071.526 I slot print_timing: id  0 | task 1 | n_decoded =    100, tg =   5.81 t/s, tg_3s =   5.81 t/s
+0.27.200.200 I slot print_timing: id  0 | task 1 | n_decoded =    118, tg =   5.80 t/s, tg_3s =   5.75 t/s
+0.28.952.285 I slot print_timing: id  0 | task 1 | prompt eval time =    1815.50 ms /    25 tokens (   72.62 ms per token,    13.77 tokens per second)
+0.28.952.293 I slot print_timing: id  0 | task 1 |        eval time =   22105.33 ms /   128 tokens (  172.70 ms per token,     5.79 tokens per second)
+0.28.952.295 I slot print_timing: id  0 | task 1 |       total time =   23920.83 ms /   153 tokens
+0.28.952.298 I slot print_timing: id  0 | task 1 |    graphs reused =        125
+0.28.954.450 I slot      release: id  0 | task 1 | stop processing: n_tokens = 64810, truncated = 0
+0.29.025.994 I srv    operator(): operator(): cleaning up before exit...
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=ADD family=other calls=16510 wall_us=62019 active_thread_us=72060 capacity_us=606240 logical_read_bytes=410640384 logical_write_bytes=205320192
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=MUL family=other calls=10920 wall_us=70955 active_thread_us=77489 capacity_us=645200 logical_read_bytes=79500624 logical_write_bytes=72855552
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=RMS_NORM family=other calls=39260 wall_us=245745 active_thread_us=315782 capacity_us=2336984 logical_read_bytes=418840576 logical_write_bytes=418840576
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=MUL_MAT family=matrix calls=55640 wall_us=20173772 active_thread_us=162815539 capacity_us=174463760 logical_read_bytes=741526383616 logical_write_bytes=3357425664
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SCALE family=other calls=780 wall_us=21449 active_thread_us=25389 capacity_us=178104 logical_read_bytes=291979264 logical_write_bytes=291979264
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=CONT family=copy calls=5590 wall_us=19817 active_thread_us=52452 capacity_us=197928 logical_read_bytes=68440064 logical_write_bytes=68440064
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=GET_ROWS family=other calls=390 wall_us=3027 active_thread_us=6032 capacity_us=32176 logical_read_bytes=372141201108 logical_write_bytes=9521152
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SET_ROWS family=copy calls=6240 wall_us=31280 active_thread_us=117613 capacity_us=307184 logical_read_bytes=570668364672 logical_write_bytes=570614087680
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=SOFT_MAX family=attention calls=5460 wall_us=2194311 active_thread_us=2627134 capacity_us=18194832 logical_read_bytes=2631444480 logical_write_bytes=2339061760
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=ROPE family=attention calls=8580 wall_us=57278 active_thread_us=209691 capacity_us=544480 logical_read_bytes=72152784 logical_write_bytes=70647808
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=PAD family=other calls=2600 wall_us=22899 active_thread_us=27895 capacity_us=205608 logical_read_bytes=6307840 logical_write_bytes=12615680
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=UNARY family=other calls=5590 wall_us=367703 active_thread_us=375315 capacity_us=3007080 logical_read_bytes=141889536 logical_write_bytes=141889536
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=op name=GLU family=other calls=5460 wall_us=504295 active_thread_us=569743 capacity_us=4240232 logical_read_bytes=529858560 logical_write_bytes=264929280
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=matrix calls=55640 wall_us=20173772 active_thread_us=162815539 capacity_us=174463760 idle_or_sync_us=11648221 logical_read_bytes=741526383616 logical_write_bytes=3357425664
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=attention calls=14040 wall_us=2251589 active_thread_us=2836825 capacity_us=18739312 idle_or_sync_us=15902487 logical_read_bytes=2703597264 logical_write_bytes=2409709568
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=copy calls=11830 wall_us=51097 active_thread_us=170065 capacity_us=505112 idle_or_sync_us=335047 logical_read_bytes=570736804736 logical_write_bytes=570682527744
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=family name=other calls=81510 wall_us=1298092 active_thread_us=1469705 capacity_us=11251624 idle_or_sync_us=9781919 logical_read_bytes=374020217892 logical_write_bytes=1417951232
+GGML_CPU_WHOLE_TOKEN_PROFILE kind=total graphs=130 graph_us=23802666 node_wall_us=23774550 active_thread_us=167292134 capacity_us=204959808 idle_or_sync_us=37667674 logical_read_bytes=1688987003508 logical_write_bytes=577867614208
