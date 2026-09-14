@@ -2524,6 +2524,15 @@ ggml_tensor * llama_model::get_rope_factors(const llama_cparams & cparams, int i
 }
 
 llama_memory_i * llama_model::create_memory(const llama_memory_params & params, const llama_cparams & cparams) const {
+    if (params.init.strict || params.init.deferred) {
+        if (arch != LLM_ARCH_QWEN35 || cparams.ctx_type != LLAMA_CONTEXT_TYPE_DEFAULT || cparams.n_seq_max != 1 || hparams.no_alloc || hparams.swa_type != LLAMA_SWA_TYPE_NONE) {
+            throw std::runtime_error("unsupported strict hybrid memory");
+        }
+        return new llama_memory_hybrid(*this, params.type_k, params.type_v, !cparams.flash_attn,
+                cparams.n_ctx_seq, 1, hparams.n_swa, hparams.swa_type,
+                GGML_TYPE_F32, GGML_TYPE_F32, 1, 1, cparams.n_rs_seq, cparams.offload_kqv,
+                cparams.kv_unified, nullptr, nullptr, params.init);
+    }
     llama_memory_i * res;
 
     switch (arch) {

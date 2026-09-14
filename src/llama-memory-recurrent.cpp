@@ -25,7 +25,16 @@ llama_memory_recurrent::llama_memory_recurrent(
                  uint32_t   mem_size,
                  uint32_t   n_seq_max,
                  uint32_t   n_rs_seq,
-    const layer_filter_cb & filter) : hparams(model.hparams), n_seq_max(n_seq_max) {
+    const layer_filter_cb & filter,
+    const llama_memory_init & init) : hparams(model.hparams), n_seq_max(n_seq_max) {
+    handoff_strict = init.strict || init.deferred;
+    handoff_deferred = init.deferred;
+    if (handoff_strict && (n_seq_max != 1 || mem_size != 1 || model.arch != LLM_ARCH_QWEN35 || hparams.no_alloc)) {
+        throw std::runtime_error("strict recurrent handoff requires one Qwen35 sequence");
+    }
+    if (n_rs_seq == UINT32_MAX || (uint64_t) mem_size * (1ull + n_rs_seq) > INT32_MAX) {
+        throw std::runtime_error("recurrent snapshot row count overflow");
+    }
     const int32_t n_layer = hparams.n_layer();
 
     head = 0;
@@ -116,7 +125,11 @@ llama_memory_recurrent::llama_memory_recurrent(
 
     // allocate tensors and initialize the buffers to avoid NaNs in the padding
     for (auto & [buft, ctx] : ctx_map) {
-        ggml_backend_buffer_t buf = ggml_backend_alloc_ctx_tensors_from_buft(ctx.get(), buft);
+        if (init.deferred) {
+            ctxs_bufs.emplace_back(std::move(ctx), nullptr);
+            continue;
+        }
+        ggml_backend_buffer_t buf = llama_memory_alloc(ctx.get(), buft, init);
         if (!buf) {
             throw std::runtime_error("failed to allocate buffer for rs cache");
         }
@@ -151,10 +164,16 @@ void llama_memory_recurrent::clear(bool data) {
 
     if (data) {
         for (auto & [_, buf] : ctxs_bufs) {
-            ggml_backend_buffer_clear(buf.get(), 0);
+            if (buf) ggml_backend_buffer_clear(buf.get(), 0);
         }
     }
 
+    if (data) {
+        for (auto & buf : handoff_buffers) ggml_backend_buffer_clear(buf.get(), 0);
+    }
+    handoff_valid_depth = 0;
+    handoff_committed = true;
+    ++handoff_generation;
     std::fill(rs_idx.begin(), rs_idx.end(), 0);
 }
 
@@ -195,7 +214,8 @@ bool llama_memory_recurrent::seq_rm(llama_seq_id seq_id, llama_pos p0, llama_pos
                 const llama_pos rollback = cell.pos - (p0 - 1);
                 // pending rollback is single-use
                 const bool pending = rs_idx[seq_id] != 0;
-                if (!pending && rollback >= 1 && rollback <= (llama_pos) n_rs_seq) {
+                if (!pending && rollback >= 1 && rollback <= (llama_pos) n_rs_seq &&
+                    (!handoff_strict || (handoff_committed && rollback <= (llama_pos) handoff_valid_depth))) {
                     set_rs_idx(seq_id, (uint32_t) rollback);
                     cell.pos = p0 - 1;
                     return true;
@@ -420,8 +440,9 @@ void llama_memory_recurrent::set_rs_idx(llama_seq_id seq_id, uint32_t idx) {
 std::map<ggml_backend_buffer_type_t, size_t> llama_memory_recurrent::memory_breakdown() const {
     std::map<ggml_backend_buffer_type_t, size_t> ret;
     for (const auto & [_, buf] : ctxs_bufs) {
-        ret[ggml_backend_buffer_get_type(buf.get())] += ggml_backend_buffer_get_size(buf.get());
+        if (buf) ret[ggml_backend_buffer_get_type(buf.get())] += ggml_backend_buffer_get_size(buf.get());
     }
+    for (const auto & buf : handoff_buffers) ret[ggml_backend_buffer_get_type(buf.get())] += ggml_backend_buffer_get_size(buf.get());
     return ret;
 }
 
@@ -721,7 +742,7 @@ bool llama_memory_recurrent::get_can_shift() const {
 size_t llama_memory_recurrent::total_size() const {
     size_t size = 0;
     for (const auto & [_, buf] : ctxs_bufs) {
-        size += ggml_backend_buffer_get_size(buf.get());
+        if (buf) size += ggml_backend_buffer_get_size(buf.get());
     }
 
     return size;
@@ -873,6 +894,8 @@ void llama_memory_recurrent::state_read(llama_io_read_i & io, llama_seq_id seq_i
     if (n_rs_seq != 0) {
         set_rs_idx(seq_id, 0);
     }
+    handoff_valid_depth = 0;
+    ++handoff_generation;
 }
 
 void llama_memory_recurrent::state_write_meta(llama_io_write_i & io, const std::vector<std::pair<uint32_t, uint32_t>> & cell_ranges, llama_seq_id seq_id) const {

@@ -106,6 +106,14 @@ llama_context::llama_context(
         throw std::runtime_error("n_seq_max must be <= " + std::to_string(LLAMA_MAX_SEQ));
     }
 
+    kv_handoff_strict = params.kv_handoff_strict || params.kv_handoff_destination;
+    kv_handoff_pending = params.kv_handoff_destination;
+    if (kv_handoff_strict && (model.arch != LLM_ARCH_QWEN35 || cparams.n_seq_max != 1 ||
+        params.ctx_type != LLAMA_CONTEXT_TYPE_DEFAULT || params.ctx_other || hparams.no_alloc ||
+        model.shared_residency_enabled() || hparams.swa_type != LLAMA_SWA_TYPE_NONE ||
+        (kv_handoff_pending && (model.n_gpu_layers() != 0 || params.offload_kqv || params.op_offload)))) {
+        throw std::runtime_error("unsupported strict Qwen handoff context");
+    }
     cparams.n_rs_seq = params.n_rs_seq;
     if (cparams.n_rs_seq > 0 && !llm_arch_supports_rs_rollback(model.arch)) {
         LLAMA_LOG_DEBUG("%s: n_rs_seq=%u requested but model does not support recurrent partial rollback; clamping to 0\n",
@@ -399,8 +407,21 @@ llama_context::llama_context(
             /*.mem_other =*/ llama_get_memory(cparams.ctx_other),
         };
 
+        params_mem.init.strict = kv_handoff_strict;
+        params_mem.init.deferred = kv_handoff_pending;
+        params_mem.init.alloc = [&](ggml_backend_buffer_type_t buft, size_t size) -> ggml_backend_buffer_t {
+            using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
+            for (const auto & backend : backends) {
+                if (ggml_backend_get_default_buffer_type(backend.get()) != buft) continue;
+                auto * dev = ggml_backend_get_device(backend.get());
+                if (!dev) continue;
+                auto fn = (alloc_fn) ggml_backend_reg_get_proc_address(ggml_backend_dev_backend_reg(dev), "ggml_backend_vk_alloc_cpu_shared_buffer");
+                if (fn) return fn(backend.get(), size);
+            }
+            return nullptr;
+        };
         memory.reset(model.create_memory(params_mem, cparams));
-        if (memory && params.kv_cpu_shared) {
+        if (memory && params.kv_cpu_shared && !kv_handoff_strict) {
             memory->init_cpu_shared([&](ggml_backend_buffer_type_t buft, size_t size) -> ggml_backend_buffer_t {
                 using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
                 for (const auto & backend : backends) {
@@ -510,7 +531,7 @@ llama_context::~llama_context() {
     if (kv_borrowed_from) --kv_borrowed_from->kv_borrowers;
 
     // when training, ggml_opt allocates extra buffers through the scheduler, so the sizes no longer match the expectation
-    if (!model.hparams.no_alloc && !opt_ctx) {
+    if (!model.hparams.no_alloc && !opt_ctx && sched) {
         for (size_t i = 0; i < backend_ptrs.size(); ++i) {
             ggml_backend_t             backend = backend_ptrs[i];
             ggml_backend_buffer_type_t buft    = backend_buft[i];
@@ -607,7 +628,7 @@ void llama_context::resolve_fused_ops(const llama_memory_context_i * mctx, uint3
 }
 
 void llama_context::sched_reserve() {
-    if (!sched_need_reserve) {
+    if (kv_handoff_pending || !sched_need_reserve) {
         return;
     }
 
@@ -843,7 +864,11 @@ uint32_t llama_context::n_threads_batch() const {
 }
 
 llama_memory_t llama_context::get_memory() const {
-    return kv_consumed ? nullptr : memory.get();
+    return kv_consumed || kv_handoff_pending ? nullptr : memory.get();
+}
+
+bool llama_context::is_handoff_strict() const {
+    return kv_handoff_strict;
 }
 
 bool llama_context::memory_update(bool optimize) {
@@ -1400,6 +1425,17 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
         ret = GGML_STATUS_ALLOC_FAILED;
         return nullptr;
     }
+    struct strict_compute_guard {
+        llama_memory_i * mem;
+        const llama_ubatch & batch;
+        bool success = false;
+        ~strict_compute_guard() { if (mem) mem->handoff_end_compute(batch, success); }
+    } strict_guard { kv_handoff_strict && mctx ? memory.get() : nullptr, ubatch };
+    if (strict_guard.mem && !strict_guard.mem->handoff_begin_compute()) {
+        strict_guard.mem = nullptr;
+        ret = GGML_STATUS_FAILED;
+        return nullptr;
+    }
     if (mctx && !mctx->apply()) {
         LLAMA_LOG_ERROR("%s: failed to apply memory context\n", __func__);
         ret = GGML_STATUS_FAILED;
@@ -1460,6 +1496,10 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
     }
 
     const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1);
+    if (strict_guard.mem) {
+        synchronize();
+        strict_guard.success = status == GGML_STATUS_SUCCESS;
+    }
     if (status != GGML_STATUS_SUCCESS) {
         LLAMA_LOG_ERROR("%s: failed to compute graph, compute status: %d\n", __func__, status);
         ret = status;
@@ -1472,7 +1512,7 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
 }
 
 int llama_context::encode(const llama_batch & batch_inp) {
-    if (kv_consumed) return -1;
+    if (kv_consumed || kv_handoff_pending) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -1713,7 +1753,7 @@ static bool needs_raw_logits(const llama_ubatch & ubatch, const std::map<llama_s
 }
 
 int llama_context::decode(const llama_batch & batch_inp) {
-    if (kv_consumed) return -1;
+    if (kv_consumed || kv_handoff_pending) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -3729,6 +3769,8 @@ llama_context_params llama_context_default_params() {
         /*.op_offload                  =*/ true,
         /*.sched_async_cpu             =*/ false,
         /*.kv_cpu_shared               =*/ false,
+        /*.kv_handoff_strict           =*/ false,
+        /*.kv_handoff_destination      =*/ false,
         /*.swa_full                    =*/ true,
         /*.kv_unified                  =*/ false,
         /*.sampler                     =*/ nullptr,
@@ -3879,6 +3921,10 @@ uint32_t llama_n_seq_max(const llama_context * ctx) {
 
 uint32_t llama_n_rs_seq(const llama_context * ctx) {
     return ctx->get_cparams().n_rs_seq;
+}
+
+bool llama_is_handoff_strict(const llama_context * ctx) {
+    return ctx && ctx->is_handoff_strict();
 }
 
 const llama_model * llama_get_model(const llama_context * ctx) {

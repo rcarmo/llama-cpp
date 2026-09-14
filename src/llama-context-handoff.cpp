@@ -6,10 +6,13 @@
 
 bool llama_context::kv_handoff_cpu(llama_context & src, bool allow_copy, llama_kv_handoff_result & result) {
     result = {};
+    if (kv_handoff_strict != src.kv_handoff_strict || (kv_handoff_strict && (allow_copy || !kv_handoff_pending || src.kv_handoff_pending))) return false;
     if (&src==this || kv_consumed || src.kv_consumed || !memory || !src.memory ||
         kv_borrowers || src.kv_borrowers || kv_borrowed_from || src.kv_borrowed_from || cparams.ctx_other || src.cparams.ctx_other ||
         model.shared_residency_enabled() || src.model.shared_residency_enabled() ||
         model.n_gpu_layers()!=0 || cparams.offload_kqv || cparams.op_offload ||
+        (!kv_handoff_strict && (src.model.n_gpu_layers()!=0 || src.cparams.offload_kqv || src.cparams.op_offload)) ||
+        (kv_handoff_strict && (src.model.n_gpu_layers()==0 || !src.cparams.offload_kqv || !src.cparams.op_offload)) ||
         model.has_tensor_overrides() || src.model.has_tensor_overrides() ||
         opt_ctx || src.opt_ctx || kv_cvec_modified || src.kv_cvec_modified ||
         (loras && !loras->empty()) || (src.loras && !src.loras->empty()) || !sampling.samplers.empty() || !src.sampling.samplers.empty()) return false;
@@ -21,7 +24,7 @@ bool llama_context::kv_handoff_cpu(llama_context & src, bool allow_copy, llama_k
         if (!b || a.second->type!=b->type || !ggml_are_same_shape(a.second,b)) return false;
     }
     const auto & a=cparams; const auto & b=src.cparams;
-    if (a.n_ctx!=b.n_ctx || a.n_ctx_seq!=b.n_ctx_seq || a.n_ubatch!=b.n_ubatch || a.n_seq_max!=b.n_seq_max ||
+    if (a.n_rs_seq!=b.n_rs_seq || a.n_ctx!=b.n_ctx || a.n_ctx_seq!=b.n_ctx_seq || a.n_ubatch!=b.n_ubatch || a.n_seq_max!=b.n_seq_max ||
         a.kv_unified!=b.kv_unified || a.ctx_type!=b.ctx_type || a.ctx_type!=LLAMA_CONTEXT_TYPE_DEFAULT ||
         a.causal_attn!=b.causal_attn || a.flash_attn!=b.flash_attn ||
         a.rope_scaling_type!=b.rope_scaling_type || a.rope_freq_base!=b.rope_freq_base || a.rope_freq_scale!=b.rope_freq_scale ||
@@ -55,9 +58,10 @@ bool llama_context::kv_handoff_cpu(llama_context & src, bool allow_copy, llama_k
     // No allocation or fallible work after ownership changes.
     invalidate_residency_graphs(); src.invalidate_residency_graphs();
     transfer->commit();
+    kv_handoff_pending = false;
+    sched_need_reserve = true;
     src.kv_consumed=true;
     src.memory.reset();
-    sched_need_reserve=true;
     mem_storage.clear(); src.mem_storage.clear();
     n_outputs=0;
     result.shared_bytes=shared; result.copied_bytes=copied;

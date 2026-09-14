@@ -20,20 +20,32 @@ static std::vector<uint8_t> state(llama_context * c){std::vector<uint8_t> b(llam
 static void step(llama_context * c,llama_token token,llama_pos pos){auto b=llama_batch_init(1,0,1);b.n_tokens=1;b.token[0]=token;b.pos[0]=pos;b.n_seq_id[0]=1;b.seq_id[0][0]=0;b.logits[0]=1;GGML_ASSERT(llama_decode(c,b)==0);llama_batch_free(b);}
 int main(int argc,char ** argv){
     const bool gemma=argc>1 && std::strcmp(argv[1],"--gemma")==0;
+    const bool qwen=argc>1 && std::strcmp(argv[1],"--qwen-strict-destination")==0;
     const bool vulkan=argc>3;
     if(vulkan) GGML_ASSERT(ggml_backend_load(argv[2]));
     ggml_backend_load_all();
     llama_backend_init();
-    auto meta=gguf_init_empty();llama_model_saver m(gemma?LLM_ARCH_GEMMA4:LLM_ARCH_LLAMA,meta);
-    m.add_kv(LLM_KV_GENERAL_ARCHITECTURE,gemma?"gemma4":"llama");m.add_kv(LLM_KV_VOCAB_SIZE,uint32_t(128));m.add_kv(LLM_KV_CONTEXT_LENGTH,uint32_t(256));
+    const llm_arch arch=gemma?LLM_ARCH_GEMMA4:qwen?LLM_ARCH_QWEN35:LLM_ARCH_LLAMA;
+    auto meta=gguf_init_empty();llama_model_saver m(arch,meta);
+    m.add_kv(LLM_KV_GENERAL_ARCHITECTURE,gemma?"gemma4":qwen?"qwen35":"llama");m.add_kv(LLM_KV_VOCAB_SIZE,uint32_t(128));m.add_kv(LLM_KV_CONTEXT_LENGTH,uint32_t(256));
     m.add_kv(LLM_KV_EMBEDDING_LENGTH,uint32_t(32));m.add_kv(LLM_KV_BLOCK_COUNT,uint32_t(gemma?5:2));m.add_kv(LLM_KV_FEED_FORWARD_LENGTH,uint32_t(64));
     m.add_kv(LLM_KV_ATTENTION_HEAD_COUNT,uint32_t(1));m.add_kv(LLM_KV_ATTENTION_HEAD_COUNT_KV,uint32_t(1));m.add_kv(LLM_KV_ROPE_DIMENSION_COUNT,uint32_t(32));
     m.add_kv(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS,1e-5f);m.add_kv(LLM_KV_TOKENIZER_MODEL,"no_vocab");
+    if(qwen){m.add_kv(LLM_KV_ROPE_DIMENSION_SECTIONS,std::vector<uint32_t>{8,8,8,8});m.add_kv(LLM_KV_ATTENTION_KEY_LENGTH,uint32_t(32));m.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH,uint32_t(32));m.add_kv(LLM_KV_SSM_CONV_KERNEL,uint32_t(4));m.add_kv(LLM_KV_SSM_INNER_SIZE,uint32_t(8));m.add_kv(LLM_KV_SSM_STATE_SIZE,uint32_t(4));m.add_kv(LLM_KV_SSM_TIME_STEP_RANK,uint32_t(1));m.add_kv(LLM_KV_SSM_GROUP_COUNT,uint32_t(1));m.add_kv(LLM_KV_FULL_ATTENTION_INTERVAL,uint32_t(2));}
     if(gemma){m.add_kv(LLM_KV_EMBEDDING_LENGTH_PER_LAYER,uint32_t(16));m.add_kv(LLM_KV_ATTENTION_SHARED_KV_LAYERS,uint32_t(0));m.add_kv(LLM_KV_ATTENTION_KEY_LENGTH,uint32_t(32));m.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH,uint32_t(32));m.add_kv(LLM_KV_ATTENTION_KEY_LENGTH_SWA,uint32_t(32));m.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH_SWA,uint32_t(32));m.add_kv(LLM_KV_ROPE_FREQ_BASE_SWA,10000.0f);m.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW,uint32_t(64));m.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN,std::vector<uint32_t>{1,1,1,1,0});}
     auto mp=llama_model_default_params();mp.n_gpu_layers=0;
     using model_owner=std::unique_ptr<llama_model,decltype(&llama_model_free)>;
     model_owner model(llama_model_init_from_user(meta,fill,nullptr,mp),llama_model_free);gguf_free(meta);GGML_ASSERT(model);
     model_owner gpu(nullptr,llama_model_free);
+    if(qwen){
+        auto pending_cp=llama_context_default_params();pending_cp.n_ctx=256;pending_cp.n_batch=32;pending_cp.n_ubatch=32;pending_cp.n_seq_max=1;pending_cp.n_rs_seq=3;pending_cp.n_threads=2;pending_cp.n_threads_batch=2;pending_cp.type_k=GGML_TYPE_F16;pending_cp.type_v=GGML_TYPE_F16;pending_cp.offload_kqv=false;pending_cp.op_offload=false;pending_cp.kv_handoff_strict=true;pending_cp.kv_handoff_destination=true;
+        using context=std::unique_ptr<llama_context,decltype(&llama_free)>;
+        context pending(llama_init_from_model(model.get(),pending_cp),llama_free);GGML_ASSERT(pending && llama_get_memory(pending.get())==nullptr);
+        llama_token tok=3;auto batch=llama_batch_get_one(&tok,1);GGML_ASSERT(llama_decode(pending.get(),batch)!=0);
+        pending_cp.kv_handoff_destination=false;context rejected(llama_init_from_model(model.get(),pending_cp),llama_free);GGML_ASSERT(!rejected);
+        std::puts("PASS: strict Qwen destination exposes no memory, rejects decode and strict CPU source fails without mapped Vulkan allocation");
+        return 0;
+    }
     if(vulkan){{llama_model_saver saver(model.get());saver.add_kv_from_model();if(gemma){saver.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN,std::vector<uint32_t>{1,1,1,1,0});saver.add_kv(LLM_KV_EMBEDDING_LENGTH_PER_LAYER,uint32_t(16));saver.add_kv(LLM_KV_ATTENTION_SHARED_KV_LAYERS,uint32_t(0));saver.add_kv(LLM_KV_ATTENTION_KEY_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ROPE_FREQ_BASE_SWA,10000.0f);}for(const auto & tensor:model->tensors_by_name)saver.add_tensor(tensor.second);saver.save(argv[3]);}model.reset();model.reset(llama_model_load_from_file(argv[3],mp));mp.n_gpu_layers=999;gpu.reset(llama_model_load_from_file(argv[3],mp));GGML_ASSERT(model && gpu);}
     auto cp=llama_context_default_params();cp.n_ctx=gemma?512:256;cp.swa_full=false;cp.n_batch=32;cp.n_ubatch=32;cp.n_threads=2;cp.n_threads_batch=2;
     cp.type_k=GGML_TYPE_F16;cp.type_v=GGML_TYPE_F16;

@@ -73,6 +73,7 @@ struct llama_kv_cache::handoff : llama_memory_transfer_i {
         dst.v_heads.swap(heads);
         dst.seq_to_stream.swap(streams);
         dst.handoff_buffers.swap(buffers);
+        dst.handoff_deferred = false;
         for (auto & cb : dst.ctxs_bufs) cb.second.reset();
     }
 };
@@ -90,7 +91,7 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
     for (size_t i=0;i<layers.size();++i) {
         const auto & d=layers[i]; const auto & s=src->layers[i];
         if (d.il!=s.il || !same_tensor(d.k,s.k) || !same_tensor(d.v,s.v)) return nullptr;
-        for (auto t : {d.k,d.v}) if (t && (!t->buffer || !ggml_backend_buffer_is_host(t->buffer))) return nullptr;
+        for (auto t : {d.k,d.v}) if (t && !handoff_deferred && (!t->buffer || !ggml_backend_buffer_is_host(t->buffer))) return nullptr;
     }
     auto result = std::make_unique<handoff>(*this,*src);
     size_t n_shared=0,n_copied=0;

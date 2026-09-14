@@ -74,6 +74,7 @@ struct llama_context {
     uint32_t n_threads_batch() const;
 
     llama_memory_t get_memory() const;
+    bool is_handoff_strict() const;
     bool kv_handoff_cpu(llama_context & src, bool allow_copy, llama_kv_handoff_result & result);
 
     // return true if the memory was updated
@@ -291,6 +292,8 @@ private:
 
     llama_memory_ptr memory;
     bool kv_consumed = false;
+    bool kv_handoff_strict = false;
+    bool kv_handoff_pending = false;
     bool kv_cvec_modified = false;
     uint32_t kv_borrowers = 0;
     llama_context * kv_borrowed_from = nullptr;

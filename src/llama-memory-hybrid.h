@@ -39,7 +39,8 @@ public:
                      bool   unified,
                             /* layer filters */
     const layer_filter_cb & filter_attn = nullptr,
-    const layer_filter_cb & filter_recr = nullptr);
+    const layer_filter_cb & filter_recr = nullptr,
+    const llama_memory_init & init = {});
 
     ~llama_memory_hybrid() = default;
 
@@ -79,6 +80,10 @@ public:
     //
     // llama_memory_hybrid specific API
     //
+
+    llama_memory_transfer_ptr prepare_handoff(llama_memory_i &, const llama_memory_view_cb &, bool, size_t &, size_t &) override;
+    bool handoff_begin_compute() override;
+    void handoff_end_compute(const llama_ubatch &, bool) override;
 
     llama_kv_cache * get_mem_attn() const;
     llama_memory_recurrent * get_mem_recr() const;
