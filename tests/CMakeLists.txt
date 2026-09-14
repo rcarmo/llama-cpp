@@ -322,6 +322,8 @@ if (NOT WIN32 OR NOT BUILD_SHARED_LIBS)
     llama_build_and_test(test-hybrid-handoff.cpp)
     llama_build_and_test(test-hidden-state.cpp)
     llama_build_and_test(test-context-handoff.cpp)
+    # Manual exact-model qualification harness; built on demand and never registered with CTest.
+    llama_build(test-qwen-mtp-trained-handoff.cpp)
     llama_test(test-context-handoff NAME test-context-handoff-gemma ARGS --gemma)
     llama_test(test-context-handoff NAME test-context-handoff-qwen-strict-destination ARGS --qwen-strict-destination)
     llama_test(test-context-handoff NAME test-context-handoff-qwen-mtp-roundtrip ARGS --qwen-mtp-roundtrip)
