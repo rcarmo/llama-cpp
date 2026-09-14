@@ -131,13 +131,6 @@ llama_context::llama_context(
     cparams.embeddings              = params.embeddings;
     cparams.embeddings_nextn        = false;
     cparams.embeddings_nextn_masked = false;
-    if (kv_handoff_strict) {
-        hidden_state_write = std::make_shared<llama_hidden_state_storage>();
-        hidden_state_write->n_embd = hparams.n_embd_out();
-        hidden_state_write->n_rows = cparams.n_ctx + 1;
-        hidden_state_write->deferred = kv_handoff_pending;
-        cparams.hidden_state_write = hidden_state_write;
-    }
     cparams.offload_kqv             = params.offload_kqv;
     cparams.sched_async_cpu         = params.sched_async_cpu;
     cparams.no_perf                 = params.no_perf;
@@ -326,6 +319,14 @@ llama_context::llama_context(
         }
     }
 
+    if (kv_handoff_strict) {
+        hidden_state_write = std::make_shared<llama_hidden_state_storage>();
+        hidden_state_write->n_embd = hparams.n_embd_out();
+        hidden_state_write->n_rows = cparams.n_ctx + 1;
+        hidden_state_write->deferred = kv_handoff_pending;
+        cparams.hidden_state_write = hidden_state_write;
+    }
+
     LLAMA_LOG_INFO("%s: n_seq_max             = %u\n",   __func__, cparams.n_seq_max);
     LLAMA_LOG_INFO("%s: n_ctx                 = %u\n",   __func__, cparams.n_ctx);
     LLAMA_LOG_INFO("%s: n_ctx_seq             = %u\n",   __func__, cparams.n_ctx_seq);
@@ -394,6 +395,9 @@ llama_context::llama_context(
         llama_set_abort_callback(this, params.abort_callback, params.abort_callback_data);
 
         if (kv_handoff_strict && !kv_handoff_pending) {
+            if (hidden_state_write->n_embd > SIZE_MAX / hidden_state_write->n_rows / sizeof(float)) {
+                throw std::runtime_error("strict hidden-state size overflow");
+            }
             const size_t bytes = (size_t) hidden_state_write->n_embd * hidden_state_write->n_rows * sizeof(float);
             for (const auto & backend : backends) {
                 auto * dev = ggml_backend_get_device(backend.get());
