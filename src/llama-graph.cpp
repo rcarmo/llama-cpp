@@ -107,8 +107,8 @@ void llm_graph_input_embd_h::set_input(const llama_ubatch * ubatch) {
     // TODO: extend llama_ubatch to differentiate between token embeddings and hidden states
     //       for now, we assume that the hidden state is always provided as an embedding
     //       ref: https://github.com/ggml-org/llama.cpp/pull/23643
-    if (ubatch->embd) {
-        GGML_ASSERT(n_embd == h->ne[0]);
+    if (ubatch->embd && !ubatch->hidden_span) {
+        GGML_ASSERT(h && n_embd == h->ne[0]);
 
         ggml_backend_tensor_set(h, ubatch->embd, 0, n_tokens*n_embd*ggml_element_size(h));
     }
@@ -119,9 +119,21 @@ bool llm_graph_input_embd_h::can_reuse(const llm_graph_params & params) {
 
     res &= (!params.ubatch.token) || (tokens && tokens->ne[0] == params.ubatch.n_tokens);
     res &= (!params.ubatch.embd)  || (embd   && embd->ne[1]   == params.ubatch.n_tokens);
-    res &= (!params.ubatch.embd)  || (h      && h->ne[1]      == params.ubatch.n_tokens);
+    res &= (!params.ubatch.embd || params.ubatch.hidden_span) || (h && h->ne[1] == params.ubatch.n_tokens);
 
     return res;
+}
+
+void llm_graph_input_hidden_rows::set_input(const llama_ubatch * ubatch) {
+    GGML_ASSERT(write || ubatch->hidden_span);
+    std::vector<int32_t> data(ubatch->n_tokens);
+    const uint32_t first = write ? (uint32_t) ubatch->pos[0] + 1 : ubatch->hidden_span->row;
+    for (uint32_t i = 0; i < ubatch->n_tokens; ++i) data[i] = first + i;
+    ggml_backend_tensor_set(rows, data.data(), 0, data.size()*sizeof(int32_t));
+}
+
+bool llm_graph_input_hidden_rows::can_reuse(const llm_graph_params & params) {
+    return (write || params.ubatch.hidden_span) && rows && rows->ne[0] == params.ubatch.n_tokens;
 }
 
 void llm_graph_input_pos::set_input(const llama_ubatch * ubatch) {
@@ -1492,6 +1504,8 @@ llm_graph_context::llm_graph_context(const llm_graph_params & params) :
     samplers         (params.samplers),
     cb_func          (params.cb),
     res              (params.res),
+    hidden_state_read(cparams.hidden_state_read),
+    hidden_state_write(cparams.hidden_state_write),
     ctx0             (res->get_ctx()),
     gf               (res->get_gf()) {
         res->set_params(params);
@@ -2498,6 +2512,34 @@ ggml_tensor * llm_graph_context::build_inp_embd(ggml_tensor * tok_embd) const {
     ggml_build_forward_expand(gf, cur);
 
     return cur;
+}
+
+ggml_tensor * llm_graph_context::build_hidden_state_read() const {
+    GGML_ASSERT(hidden_state_read && ubatch.hidden_span && !hidden_state_read->deferred);
+    auto inp = std::make_unique<llm_graph_input_hidden_rows>(false);
+    inp->rows = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, n_tokens);
+    ggml_set_input(inp->rows);
+    auto * storage = ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, hidden_state_read->n_embd, hidden_state_read->n_rows);
+    storage->buffer = hidden_state_read->buffer.get();
+    storage->data = ggml_backend_buffer_get_base(storage->buffer);
+    storage->flags |= GGML_TENSOR_FLAG_INPUT;
+    auto * result = ggml_get_rows(ctx0, storage, inp->rows);
+    res->add_input(std::move(inp));
+    return result;
+}
+
+void llm_graph_context::build_hidden_state_write(ggml_tensor * state) const {
+    GGML_ASSERT(hidden_state_write && !hidden_state_write->deferred);
+    auto inp = std::make_unique<llm_graph_input_hidden_rows>(true);
+    inp->rows = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, n_tokens);
+    ggml_set_input(inp->rows);
+    auto * storage = ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, hidden_state_write->n_embd, hidden_state_write->n_rows);
+    storage->buffer = hidden_state_write->buffer.get();
+    storage->data = ggml_backend_buffer_get_base(storage->buffer);
+    storage->flags |= GGML_TENSOR_FLAG_OUTPUT;
+    auto * write = ggml_set_rows(ctx0, storage, state, inp->rows);
+    ggml_build_forward_expand(gf, write);
+    res->add_input(std::move(inp));
 }
 
 ggml_tensor * llm_graph_context::build_inp_pos() const {

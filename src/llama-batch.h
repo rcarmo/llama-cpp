@@ -66,6 +66,8 @@ struct llama_ubatch {
 
     // the llama_ubatch pointers above point to this data if set. otherwise - point to external non-owning data
     std::shared_ptr<data_t> data;
+
+    const llama_hidden_state_span * hidden_span = nullptr;
 };
 
 // a helper for sanitizing, fulfilling and splitting a batch
@@ -81,7 +83,8 @@ public:
             const llama_memory_i * memory,
             uint32_t n_embd,
             uint32_t n_seq_max,
-            bool output_all);
+            bool output_all,
+            const llama_hidden_state_span * hidden_span = nullptr);
 
     const llama_batch & get_batch() const;
 
@@ -125,6 +128,7 @@ private:
     void ubatch_print(const llama_ubatch & ubatch, int debug);
 
     llama_batch batch;
+    const llama_hidden_state_span * hidden_span = nullptr;
 
     // only for debugging purposes
     const llama_vocab * vocab;

@@ -4,6 +4,7 @@
 #include "llama-batch.h"
 #include "llama-hparams.h"
 #include "llama-adapter.h"
+#include "llama-hidden-state.h"
 
 #include <cstdint>
 #include <cstdlib>
@@ -154,6 +155,17 @@ public:
     ggml_tensor * h      = nullptr; // F32 [n_embd, n_batch]
 
     const int64_t n_embd = 0;
+};
+
+class llm_graph_input_hidden_rows : public llm_graph_input_i {
+public:
+    explicit llm_graph_input_hidden_rows(bool write) : write(write) {}
+
+    void set_input(const llama_ubatch * ubatch) override;
+    bool can_reuse(const llm_graph_params & params) override;
+
+    ggml_tensor * rows = nullptr;
+    bool write;
 };
 
 class llm_graph_input_pos : public llm_graph_input_i {
@@ -820,6 +832,7 @@ struct llm_graph_params {
             ubatch.n_seq_tokens == other.ubatch.n_seq_tokens &&
             ubatch.n_seqs       == other.ubatch.n_seqs &&
             ubatch.n_seqs_unq   == other.ubatch.n_seqs_unq &&
+            ubatch.hidden_span == other.ubatch.hidden_span &&
             (
                 (!ubatch.token && !other.ubatch.token) ||
                 (!ubatch.embd  && !other.ubatch.embd)  ||
@@ -875,6 +888,8 @@ struct llm_graph_params {
             cparams.embeddings              == other.cparams.embeddings              &&
             cparams.embeddings_nextn        == other.cparams.embeddings_nextn        &&
             cparams.embeddings_nextn_masked == other.cparams.embeddings_nextn_masked &&
+            cparams.hidden_state_read.get()  == other.cparams.hidden_state_read.get()  &&
+            cparams.hidden_state_write.get() == other.cparams.hidden_state_write.get() &&
             cparams.causal_attn             == other.cparams.causal_attn             &&
             arch  == other.arch  &&
             gtype == other.gtype &&
@@ -1033,6 +1048,9 @@ struct llm_graph_context {
 
     llm_graph_result * res;
 
+    const llama_hidden_state_ptr & hidden_state_read;
+    const llama_hidden_state_ptr & hidden_state_write;
+
     ggml_context * ctx0 = nullptr;
     ggml_cgraph  * gf   = nullptr;
 
@@ -1164,6 +1182,8 @@ struct llm_graph_context {
     //
 
     ggml_tensor * build_inp_embd(ggml_tensor * tok_embd) const;
+    ggml_tensor * build_hidden_state_read() const;
+    void build_hidden_state_write(ggml_tensor * state) const;
     ggml_tensor * build_inp_pos() const;
     ggml_tensor * build_inp_attn_scale() const;
     ggml_tensor * build_inp_out_ids() const;

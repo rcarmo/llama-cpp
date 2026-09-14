@@ -85,6 +85,13 @@ void common_speculative_draft(common_speculative * spec);
 // informs the speculative context that n_accepted tokens were accepted by the target model
 void common_speculative_accept(common_speculative * spec, llama_seq_id, uint16_t n_accepted);
 
+// Move a strict Qwen target+MTP pair and rebind the MTP controller atomically at the API level.
+bool common_speculative_handoff_cpu(
+        common_speculative * spec,
+        llama_context * dst_tgt, llama_context * dst_mtp,
+        llama_context * src_tgt, llama_context * src_mtp,
+        llama_kv_handoff_result * result);
+
 // (optional) get/set internal state
 bool common_speculative_get_state(common_speculative * spec, llama_seq_id seq_id, std::vector<uint8_t> & data);
 void common_speculative_set_state(common_speculative * spec, llama_seq_id seq_id, const std::vector<uint8_t> & data);
