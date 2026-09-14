@@ -1,6 +1,6 @@
 # Xe handoff and agentic harness checkpoint
 
-Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
+Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. The trained six-run matrix has mixed millisecond-scale handoff changes and no whole-workflow speedup.
 
 The write-v2 whole-file tool pilot now passes repair and follow-up in the same persistent process. The frozen six-run matrix is complete: clamp and median pass in both arms; defaults reaches the round cap in both despite passing final artifacts. Paired work is identical, but no whole-workflow speedup is established. The seven earlier edit-v1 attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
@@ -49,4 +49,8 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 
-No services were deployed or changed. The follow-on `q4-screen.md` records a compiled, bitwise-tested isolated Q4 tile candidate with exploratory two-thread timings and retained regressions. It has no trained or resource-monitored timing qualification. Q6_K and Vulkan FFN optimisation still need candidate implementations.
+No services were deployed or changed. Q4 confirmation passed 18 cases but regressed in three of four eight-thread timing groups; the two-thread opportunity is retained without a default change.
+
+The [Q6 promoted implementation](q6-promoted-results.md) is pushed on `feat/xe-q6-integration` (`2f998c903`): normal CMake42case OFF/ON exactness and a trained repair/follow-up pass with exact predecessor work. The predecessor ABBA measured -1.20% whole/-1.57% warm time; the promoted run is a correctness check.
+
+The [Vulkan large-tile probe](vulkan-large-results.md) passes numerical checks but has much slower O0 diagnostic samples. The [O1 untraced ABBA](vulkan-o1-results.md) confirms +250.36%/+225.80% time regressions; keep the default medium selector. Final combined trained measurements, master merge and progress charts are unfinished.

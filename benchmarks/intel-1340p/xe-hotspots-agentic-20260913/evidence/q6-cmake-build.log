@@ -1,0 +1,117 @@
+-- The C compiler identification is Clang 22.1.8
+-- The CXX compiler identification is Clang 22.1.8
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/sbin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/sbin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- llama.cpp version: 0.4.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Found Git: /usr/sbin/git (found version "2.55.0")
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /usr/sbin/clang
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP_CXX: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP: TRUE (found version "5.1")
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.23.0
+-- ggml commit:  07ae96865-dirty
+-- Configuring done (1.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-cmake-build
+[1/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/41] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[3/41] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[8/41] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-turbo-quant.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-turbo-quant.c:28:14: warning: 'extern' variable has an initializer [-Wextern-initializer]
+   28 | GGML_API int turbo3_cpu_wht_group_size = 0;
+      |              ^
+1 warning generated.
+[9/41] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[10/41] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[11/41] Linking CXX shared library bin/libggml-base.so.0.23.0
+[12/41] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[13/41] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[14/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[15/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/iqp.cpp.o
+[16/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[17/41] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[18/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/q6-pair.cpp.o
+[19/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[20/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[21/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[22/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[23/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[24/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:55: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                       ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:112: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                                ^
+10 warnings generated.
+[25/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[26/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/recurrent-profile.cpp.o
+[27/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-plan.cpp.o
+[28/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-advice.cpp.o
+[29/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/whole-token-profile.cpp.o
+[30/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
+[31/41] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[32/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[33/41] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[34/41] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:5913:13: warning: 5 enumeration values not handled in switch: 'GGML_TYPE_TURBO2_0', 'GGML_TYPE_TURBO3_0', 'GGML_TYPE_TURBO4_0'... [-Wswitch]
+ 5913 |     switch (src0->type) {
+      |             ^~~~~~~~~~
+1 warning generated.
+[35/41] Linking CXX shared library bin/libggml-cpu.so.0.23.0
+[36/41] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[37/41] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[38/41] Linking CXX shared library bin/libggml.so.0.23.0
+[39/41] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[40/41] Building CXX object tests/CMakeFiles/test-q6-pair.dir/test-q6-pair.cpp.o
+[41/41] Linking CXX executable bin/test-q6-pair
+Test project /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-cmake-build
+  Test #47: test-q6-pair
+
+Total Tests: 1

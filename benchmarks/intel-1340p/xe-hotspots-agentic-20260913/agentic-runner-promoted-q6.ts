@@ -1,0 +1,60 @@
+/** SCRIPT_JDOC:
+{"summary":"Real bounded multi-turn code-edit tool benchmark with persistent native CPU-owned conversation and independent sandbox grades","kind":"mixed","weight":"heavy","role":"entrypoint"}
+*/
+import{readFileSync,writeFileSync,mkdirSync,existsSync,readdirSync,realpathSync}from'node:fs';import{createHash}from'node:crypto';
+import{createFixture,ToolSandbox,grade,fixtures,type Kind}from'./agentic-tools';
+import{outcome,validAdmission,closeNative}from'./agentic-outcome';
+import{stableToolResponse}from'./tool-response';
+const root=import.meta.dir,id=process.argv[2],kind=process.argv[3]as Kind,arm=process.argv[4],series=process.argv[5]||'edit-v1';
+if(!['edit-v1','write-v2'].includes(series))throw Error('Unknown series');
+if(!/^[a-z0-9-]{1,40}$/.test(id)||!fixtures[kind]||!['q6off','q6on'].includes(arm))throw Error('Args: id fixture baseline|candidate|cpu');
+const admission=JSON.parse(readFileSync(root+'/agentic-admission.json','utf8'));validAdmission(admission,id);if(admission.arm!==arm)throw Error('Q6 arm admission mismatch');if(series==='write-v2'&&admission.series!==series)throw Error('Series admission mismatch');
+const dir=root+'/agentic-runs/'+id;if(existsSync(dir))throw Error('Retained run exists');mkdirSync(dir,{recursive:true});
+process.env.AGENTIC_CONTAINER_LEDGER=dir+'/containers.txt';
+const fixture=dir+'/fixture';createFixture(kind,fixture);const box=new ToolSandbox(fixture,undefined,series==='write-v2');
+const base='/var/home/agent/workspace/reports/xe-in-memory-perf-20260913',libs=root+'/q6-portable-build/native/bin:'+root+'/build-cpu/bin:'+base+'/release/bin';
+const target='/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf',assistant='/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf',bin=root+'/build-cpu/bin/agentic-session';
+const env={PATH:'/usr/bin:/bin',HOME:process.env.HOME!,XDG_RUNTIME_DIR:'/run/user/1001',LD_LIBRARY_PATH:libs+':/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime',GGML_BACKEND_PATH:base+'/vulkan/libggml-vulkan.so.0.23.0',GGML_CPU_Q6_PAIR:arm==='q6off'?'0':'1'};
+const hash=(p:string)=>createHash('sha256').update(readFileSync(p)).digest('hex'),save=(name:string,x:any)=>writeFileSync(dir+'/'+name,JSON.stringify(x,null,2)+'\n');
+const argv=[bin,target,assistant,...(arm==='cpu'?['--cpu']:[])];save('manifest.json',{at:new Date().toISOString(),kind,arm,series,admission,argv,env,source_hash:hash(root+'/agentic-session.cpp'),binary_hash:hash(bin),library_hash:hash(root+'/build-cpu/bin/libllama.so.0'),cpu_library_hash:hash(root+'/q6-portable-build/native/bin/libggml-cpu.so.0'),implementation_hashes:Object.fromEntries(['ggml/src/ggml-cpu/q6-pair.h','ggml/src/ggml-cpu/q6-pair.cpp','ggml/src/ggml-cpu/ggml-cpu.c'].map(f=>[f,hash('/var/home/agent/workspace/projects/llama-cpp/'+f)])),test_hash:box.testHash,harness_hashes:Object.fromEntries(['agentic-runner-promoted-q6.ts','agentic-tools.ts','agentic-outcome.ts','tool-response.ts','launch-agentic-promoted-q6.sh','agentic-stop.sh'].map(f=>[f,hash(root+'/'+f)]))});
+const tools=[{type:'function',function:{name:'read_file',description:'Read a relative fixture file.',parameters:{type:'object',properties:{path:{type:'string'}},required:['path'],additionalProperties:false}}},{type:'function',function:{name:'search_files',description:'Literal substring search in fixture source and visible tests.',parameters:{type:'object',properties:{text:{type:'string'}},required:['text'],additionalProperties:false}}},{type:'function',function:{name:'edit_file',description:'Replace one exact unique substring in src/main.ts. Must read that file first. Tests are immutable.',parameters:{type:'object',properties:{path:{type:'string'},before:{type:'string'},after:{type:'string'}},required:['path','before','after'],additionalProperties:false}}},{type:'function',function:{name:'run_tests',description:'Run fixed visible test suite in an isolated sandbox. No arguments or commands.',parameters:{type:'object',properties:{},additionalProperties:false}}}];
+if(series==='write-v2')tools[2]={type:'function',function:{name:'write_file',description:'Replace the entire src/main.ts file with complete TypeScript source. Read source and visible tests first. No markdown fences; tests are immutable.',parameters:{type:'object',properties:{path:{type:'string'},content:{type:'string'}},required:['path','content'],additionalProperties:false}}};
+const systemEnv={PATH:'/usr/bin:/bin',HOME:process.env.HOME!,XDG_RUNTIME_DIR:'/run/user/1001',DBUS_SESSION_BUS_ADDRESS:'unix:path=/run/user/1001/bus'};
+async function serviceState(){const p=Bun.spawn(['systemctl','--user','show','llama-gemma-local-provider.service','whisper-stt.service','whisper-stt-diarizer.service','-p','Id','-p','ActiveState','-p','MainPID'],{env:systemEnv,stdout:'pipe'});const out=await new Response(p.stdout).text();if(await p.exited)throw Error('Service inspection');return out;}
+const initialServices=await serviceState();if((initialServices.match(/ActiveState=inactive/g)||[]).length!==3)throw Error('Services changed');
+const messages:any[]=[{role:'system',content:(series==='write-v2'?'You are fixing a TypeScript project using tools. Read src/main.ts and visible.test.ts, then use write_file with the complete corrected source. Run tests before reporting. Preserve tests; no shell is available. Keep responses concise.':'You are fixing a TypeScript project using tools. Work only with the provided fixture files. Read src/main.ts and visible.test.ts before editing; use edit_file for changes and run_tests to verify. Never claim success without tests. No shell commands are available. Preserve the test file. Finish with a concise explanation.')},{role:'user',content:fixtures[kind].prompt}];
+let child:ReturnType<typeof Bun.spawn>|undefined,abort='',pending:((x:any)=>void)|undefined,fail:((e:any)=>void)|undefined;const samples:any[]=[],rounds:any[]=[],grades:any[]=[];const begin=performance.now();let phases=0,finalGrade:any;let finalOutcome={success:false,failure_reason:'unfinished',exit_code:1};
+function stop(reason:string){abort=abort||reason;if(child)try{process.kill(-child.pid,'SIGKILL')}catch{};fail?.(Error(reason));}
+for(const sig of ['SIGTERM','SIGINT']as const)process.on(sig,()=>stop(sig));
+const text=(p:string)=>{try{return readFileSync(p,'utf8')}catch{return''}};
+function sample(){const avail=Number(text('/proc/meminfo').match(/^MemAvailable:\s+(\d+)/m)?.[1]);const own=child?text('/proc/'+child.pid+'/status'):'';const swap=own?Number(own.match(/^VmSwap:\s+(\d+)/m)?.[1]):0;const competitors=readdirSync('/proc').filter(p=>/^\d+$/.test(p)&&['go','llama-server','whisper-cli','diar-server','ffmpeg'].includes(text('/proc/'+p+'/comm').trim()));samples.push({at:new Date().toISOString(),available_kib:avail,swap_kib:swap,competitors,competitor_meta:competitors.map(pid=>({pid,comm:text('/proc/'+pid+'/comm').trim(),cmd:text('/proc/'+pid+'/cmdline').split('\0')[0]}))});if(child){const maps=text('/proc/'+child.pid+'/maps');if(maps.includes('libllama.so'))writeFileSync(dir+'/maps.txt',maps);}if(!Number.isFinite(avail)||avail<6*1048576)stop('available memory guard');if(!Number.isFinite(swap)||swap>16384)stop('worker swap guard');if(competitors.length)stop('competing process '+competitors.join(','));}
+sample();if(abort)throw Error(abort);
+child=Bun.spawn(argv,{env,detached:true,stdin:'pipe',stdout:'pipe',stderr:Bun.file(dir+'/native.log')});
+const readLoop=(async()=>{let buf='';const decoder=new TextDecoder();for await(const chunk of child!.stdout){buf+=decoder.decode(chunk,{stream:true});if(buf.length>2*1024*1024){stop('response bytes');break;}let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i);buf=buf.slice(i+1);try{const result=JSON.parse(line);if(!pending){stop('unsolicited native response');return;}const resolve=pending;pending=undefined;resolve(result);}catch(e){stop('invalid native response '+String(e));}}}if(pending)stop('native exited before reply');})();
+async function request(x:any){return await new Promise<any>((resolve,reject)=>{pending=resolve;fail=reject;child!.stdin.write(JSON.stringify(x)+'\n');});}
+const timer=setInterval(()=>{try{sample()}catch(e){stop('monitor '+String(e))}},200),deadline=setTimeout(()=>stop('workflow deadline'),570000);
+try{
+ for(let n=0;n<10;n++){
+  const before=performance.now();const response=await request({id:n,messages,tools,max_tokens:512});rounds.push({...response,request_wall_ms:performance.now()-before,phase:phases});save(`round-${n}.json`,{messages,tools,response});if(response.error)throw Error(response.error);
+  if(n>0&&(response.cold||response.cached_tokens<=0||response.shared_bytes||response.copied_bytes))throw Error('Warm owner/prefix contract');
+  if(response.stop==='length')break;
+  const msg=response.message;if(msg.role!=='assistant')throw Error('Assistant role');messages.push(msg);
+  if(msg.tool_calls?.length){if(msg.tool_calls.length>4)throw Error('Too many parallel tools');for(const call of msg.tool_calls){const toolStart=performance.now();let result;try{if(!tools.some(t=>t.function.name===call.function.name))throw Error('Tool not offered');result=await box.call(call.function.name,JSON.parse(call.function.arguments||'{}'));}catch(e){result={ok:false,error:String(e)};}messages.push({role:'tool',tool_call_id:call.id,name:call.function.name,content:JSON.stringify(series==='write-v2'?stableToolResponse(call.function.name,result):result)});save('tools.json',box.calls);rounds.at(-1).tool_ms=(rounds.at(-1).tool_ms||0)+performance.now()-toolStart;}continue;}
+  const g=await grade(kind,fixture,phases===1);grades.push(g);save(`grade-${phases}.json`,g);if(!g.ok)break;
+  if(phases===0){phases=1;messages.push({role:'user',content:fixtures[kind].followup});continue;}
+  phases=2;break;
+ }
+ // Grade the last artifact even when the model consumes its round budget. Never feed hidden results back.
+ if(phases<2&&grades.length===phases){finalGrade=await grade(kind,fixture,phases===1);save('final-artifact-grade.json',{phase:phases,...finalGrade});}
+ await closeNative(()=>clearInterval(timer),child,readLoop);
+}catch(e){stop(String(e));}finally{
+ clearInterval(timer);clearTimeout(deadline);if(child&&child.exitCode===null)stop('cleanup');
+ if(child)await child.exited;
+ await readLoop;
+ for(const name of text(dir+'/containers.txt').trim().split('\n').filter(n=>/^xe-agentic-test-[0-9a-f-]+$/.test(n))){const p=Bun.spawn(['podman','rm','-f','--ignore',name],{env:systemEnv,stdout:'ignore',stderr:'ignore'});await p.exited;}
+ const maps=text(dir+'/maps.txt');if(!maps.includes(root+'/q6-portable-build/native/bin/libggml-cpu.so.0.23.0'))abort=abort||'Q6 CPU library mapping missing';
+ const finalServices=await serviceState();if(finalServices!==initialServices)abort=abort||'Service state changed';
+ finalOutcome=outcome({abort,phases,rounds,grades,tool_calls:box.calls,final_grade:finalGrade,edit_tool:series==='write-v2'?'write_file':'edit_file'});
+ save('result.json',{arm,kind,series,edit_tool:series==='write-v2'?'write_file':'edit_file',abort,services_unchanged:finalServices===initialServices,phases,...finalOutcome,wall_ms:performance.now()-begin,rounds,tool_calls:box.calls,grades,final_artifact_grade:finalGrade,samples});
+}
+console.log(JSON.stringify({id,arm,kind,abort,phases,rounds:rounds.length,tools:box.calls.length,seconds:(performance.now()-begin)/1000}));process.exitCode=finalOutcome.exit_code;
