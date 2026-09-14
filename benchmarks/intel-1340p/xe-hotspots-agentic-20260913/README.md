@@ -1,4 +1,4 @@
-# Xe handoff and agentic harness checkpoint
+# Xe hotspots and persistent agentic benchmarks
 
 Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. The trained six-run matrix has mixed millisecond-scale handoff changes and no whole-workflow speedup.
 
@@ -53,4 +53,16 @@ No services were deployed or changed. Q4 confirmation passed 18 cases but regres
 
 The [Q6 promoted implementation](q6-promoted-results.md) is pushed on `feat/xe-q6-integration` (`2f998c903`): normal CMake42case OFF/ON exactness and a trained repair/follow-up pass with exact predecessor work. The predecessor ABBA measured -1.20% whole/-1.57% warm time; the promoted run is a correctness check.
 
-The [Vulkan large-tile probe](vulkan-large-results.md) passes numerical checks but has much slower O0 diagnostic samples. The [O1 untraced ABBA](vulkan-o1-results.md) confirms +250.36%/+225.80% time regressions; keep the default medium selector. Final combined trained measurements, master merge and progress charts are unfinished.
+The [Vulkan large-tile probe](vulkan-large-results.md) passes numerical checks but has much slower O0 diagnostic samples. The [O1 untraced ABBA](vulkan-o1-results.md) confirms +250.36%/+225.80% time regressions; keep the default medium selector.
+
+## Final combined result
+
+[Four frozen B/C/C/B workflows](combined-results.md) all pass both hidden grades with exact prompts, output and work. Allocation batching plus promoted Q6 reduces median whole-workflow time from 57.909 to 56.888 seconds (-1.76%) and warm native time from 48.881 to 47.941 seconds (-1.92%). Cold handoff is 70.648 to 66.061ms (-6.49%). Both arms use shared KV and the same default O3 Vulkan plugin.
+
+Two runs per arm on one task establish a small exploratory gain, not a broad performance guarantee. Original defaults failures, rejected Q4/Vulkan candidates and earlier contention/harness failures remain in the evidence. The accepted implementation is opt-in; no services or production defaults changed.
+
+- [Agentic progress chart](charts/agentic-progress.svg): whole times, final stages, task outcomes and limits.
+- [Hotspot decisions chart](charts/hotspot-decisions.svg): synthetic gains and regressions on separate axes.
+- [Chart data](charts/chart-data.csv): values used in both plots.
+- `compare-combined.ts`, `compare-combined.test.ts`: frozen source/library/work checks and recalculated medians.
+- `final-audit.md`: acceptance evidence, retained limits and final merge scope.

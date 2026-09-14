@@ -1,0 +1,44 @@
+{
+  "at": "2026-09-14T01:36:56.945Z",
+  "kind": "clamp",
+  "arm": "combined",
+  "series": "write-v2",
+  "admission": {
+    "run_id": "combined-clamp-c1",
+    "arm": "combined",
+    "series": "write-v2",
+    "expires": "2026-09-14T01:47:56.888Z",
+    "scope": "Explicit three-way ADMIT; one frozen run;600s16GiB16MiBswap6GiBreserve"
+  },
+  "argv": [
+    "/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/build-cpu/bin/agentic-session",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/var/home/agent",
+    "XDG_RUNTIME_DIR": "/run/user/1001",
+    "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-portable-build/native/bin:/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/build-cpu/bin:/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime",
+    "GGML_BACKEND_PATH": "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/vulkan/libggml-vulkan.so.0.23.0",
+    "GGML_CPU_Q6_PAIR": "1"
+  },
+  "source_hash": "9fa1080d1c5382a412ceda5c474b5e6fa9fa67dfbf36ba2886892df0d92a2c81",
+  "binary_hash": "85b4e6eae2397cebc2a7f5bf075e785555975c696401d5aad4ebedb547b571a2",
+  "library_hash": "44bc43e1dae25d127dea164323385017df9e5b85fc62e1fa95a17fd402bb6ce0",
+  "cpu_library_hash": "6a24a46e33a5520c43ebdc086ac642e38d4e2526b906dc32d7a00ef52bf9c834",
+  "implementation_hashes": {
+    "ggml/src/ggml-cpu/q6-pair.h": "bae03af9a24ae57ce3e31239cfe13ce68d3ea53a5f31ece3293aa67efb6292ec",
+    "ggml/src/ggml-cpu/q6-pair.cpp": "4d34b0dc251e5b2253d2ff362ae908900ce6678873a077fa257dd1c447201b7b",
+    "ggml/src/ggml-cpu/ggml-cpu.c": "9b68cf43e05ec89450e9cbc119ccaa2ea05c54304e31c24b4153ab410268ed19"
+  },
+  "test_hash": "79535c76707bb4c689bce64b35fc4fcda9bffd75b3bafe266610a4335a29b9bd",
+  "harness_hashes": {
+    "agentic-runner-combined.ts": "4e48e8a5fc3147b14b5ea0dce2c4f55fc2709b5b696f93d42f4dca916dfb7fbc",
+    "agentic-tools.ts": "19d01fe8b7cb487a52b411a38c6d46951726aa74db31743d1a8540168a4ec0fe",
+    "agentic-outcome.ts": "457368dc6e84da45efbdeb0b12475bbe7df7f69f50d7e21f33096a4241b62df6",
+    "tool-response.ts": "ced10ffea4b651397f6a06b2217749814bb54c9485e72ad3f3abaa14ea67aeaa",
+    "launch-agentic-combined.sh": "6f293ca7881d3eb98a9a4ac2dbf92a0db30d636cdba5e4821ce5267ee5a020b1",
+    "agentic-stop.sh": "1a5841974576e1aad61e0a7fb8686014484ef7133e4c54f8382d9f9e68202ef6"
+  }
+}
