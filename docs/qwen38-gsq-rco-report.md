@@ -2,6 +2,44 @@
 
 RTX 3060 12 GB; merged source 72035c65a; verified CUDA build in build-gsq-cuda. Eight source regression tests pass. Previous service is stopped as requested. GPU results exclude the accidental CPU-only run.
 
+## Latest upstream rebuild: 2026-09-14
+
+Measured source: `a380f11b5`, merging origin `661643e43`. Published in
+`3de2e2f6f` after merging parallel benchmark reports; that merge did not change
+runtime source. The fresh `build-gsq-cuda` server used the RTX 3060. All three
+three-turn `qwen-agentic.ts` tasks and 8/8 targeted regressions passed.
+
+| Metric | Median | Range |
+|---|---:|---:|
+| Tool-result prefill | 446.0 tok/s | 422.2-453.6 |
+| Final-response decoding | 32.9 tok/s | 31.1-33.5 |
+| Three-turn task time | 21.96 s | 21.64-22.26 s |
+
+Prefill covers 5,326 newly processed tokens with 361 cached tokens. The final
+response generates 245 tokens after processing 77 new tokens with 5,712 cached.
+Runs two and three also reused 332 tokens from the initial prompt. Task times
+are therefore not three cold-start measurements. These are task-specific
+server timings, not a matched speedup comparison against the earlier fixed-work
+benchmark. No thermal telemetry was collected for these three runs.
+
+The launcher `tools/pi/bin/run-qwen38-gsq-cuda.sh` now defaults to the verified
+`build-gsq-cuda/bin/llama-server`, with `LLAMA_SERVER` still available as an
+override. Tested defaults remain IQ2_S adaptive quant, full GPU offload, 65,536
+context, one slot, q4_0 K/V, batch 2048, ubatch 256, four CPU/batch threads,
+flash attention on, MTP4, and async CPU scheduling off. No hardware controls
+were changed. Exact plain/MTP parity and the earlier comprehension smoke-test
+failure remain unresolved; these task passes do not establish general quality.
+
+Run summaries and regression output are in
+`tools/pi/benchmarks/results/gsq-opt/origin-agentic/`. Reproduce with the launcher
+running, then execute from the repository root:
+
+```sh
+BENCH_URL=http://127.0.0.1:19450 bun tools/pi/benchmarks/qwen-agentic.ts /tmp/gsq-agentic-run
+```
+
+The sections below retain the earlier evaluation history.
+
 ## Artifacts
 
 | Variant | Bytes | SHA256 |
