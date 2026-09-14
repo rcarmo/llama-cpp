@@ -1,0 +1,88 @@
+[
+  {
+    "name": "read_file",
+    "args": {
+      "path": "src/main.ts"
+    },
+    "result": {
+      "content": "export function normalize(x:{retries?:number,label?:string,enabled?:boolean}){return {retries:x.retries||3,label:x.label||\"job\",enabled:x.enabled||true};}\n"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "visible.test.ts"
+    },
+    "result": {
+      "content": "import{test,expect}from'bun:test';import{normalize}from'./src/main';test('contract',()=>{expect(normalize({})).toEqual({retries:3,label:\"job\",enabled:true});expect(normalize({retries:0,label:\"\",enabled:false})).toEqual({retries:0,label:\"\",enabled:false});});\n"
+    }
+  },
+  {
+    "name": "write_file",
+    "args": {
+      "content": "export function normalize(x:{retries?:number,label?:string,enabled?:boolean}){return {retries:x.retries !== undefined ? x.retries : 3,label:x.label !== undefined ? x.label : \\\"job\\\",enabled:x.enabled !== undefined ? x.enabled : true};}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  },
+  {
+    "name": "run_tests",
+    "args": {},
+    "result": {
+      "ok": false,
+      "code": 1,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n\n# Unhandled error between tests\n-------------------------------\n1 | export function normalize(x:{retries?:number,label?:string,enabled?:boolean}){return {retries:x.retries !== undefined ? x.retries : 3,label:x.label !== undefined ? x.label : \\\"job\\\",enabled:x.enabled !== undefined ? x.enabled : true};}\n                                                                                                                                                                                  ^\nerror: Unexpected escaped double quote '\"'\n    at /fixture/src/main.ts:1:175\n-------------------------------\n\n\n 0 pass\n 1 fail\n 1 error\nRan 1 test across 1 file. [5.00ms]\n"
+    }
+  },
+  {
+    "name": "write_file",
+    "args": {
+      "content": "export function normalize(x:{retries?:number,label?:string,enabled?:boolean}){return {retries:x.retries !== undefined ? x.retries : 3,label:x.label !== undefined ? x.label : \"job\",enabled:x.enabled !== undefined ? x.enabled : true};}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  },
+  {
+    "name": "run_tests",
+    "args": {},
+    "result": {
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) contract [0.13ms]\n\n 1 pass\n 0 fail\n 2 expect() calls\nRan 1 test across 1 file. [4.00ms]\n"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "src/main.ts"
+    },
+    "result": {
+      "content": "export function normalize(x:{retries?:number,label?:string,enabled?:boolean}){return {retries:x.retries !== undefined ? x.retries : 3,label:x.label !== undefined ? x.label : \"job\",enabled:x.enabled !== undefined ? x.enabled : true};}"
+    }
+  },
+  {
+    "name": "read_file",
+    "args": {
+      "path": "visible.test.ts"
+    },
+    "result": {
+      "content": "import{test,expect}from'bun:test';import{normalize}from'./src/main';test('contract',()=>{expect(normalize({})).toEqual({retries:3,label:\"job\",enabled:true});expect(normalize({retries:0,label:\"\",enabled:false})).toEqual({retries:0,label:\"\",enabled:false});});\n"
+    }
+  },
+  {
+    "name": "write_file",
+    "args": {
+      "content": "export function normalize(x:{retries?:number,label?:string,enabled?:boolean}): {retries: number, label: string, enabled: boolean} {\n  const retries = x.retries !== undefined ? x.retries : 3;\n  if (typeof retries === 'number' && (retries < 0 || !Number.isInteger(retries) || !Number.isFinite(retries))) {\n    throw new RangeError('retries must be a non-negative integer');\n  }\n  return {\n    retries: retries,\n    label: x.label !== undefined ? x.label : \"job\",\n    enabled: x.enabled !== undefined ? x.enabled : true,\n  };\n}",
+      "path": "src/main.ts"
+    },
+    "result": {
+      "ok": true
+    }
+  }
+]

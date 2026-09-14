@@ -1,5 +1,9 @@
+PASS master-median-on0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS current-runtime identities/maps/cgroup for master-median-on0
+PASS master-median-off0: 10 persistent rounds, success=true, phases=2, all guards and grades checked
+PASS current-runtime identities/maps/cgroup for master-median-off0
 {
-  "complete": true,
+  "complete": false,
   "rows": [
     {
       "id": "master-median-on0",
@@ -66,72 +70,6 @@
       ],
       "raw_hash": "8cf07a0879d3533eaf017d6b15cff6640f9f77a9c3621153394526e51e7339b7",
       "source_hash": "e14328c05909ba38a7fda0c0d11090c050671bb05cfc00fa3a1e7a5a5f1d7c47"
-    },
-    {
-      "id": "master-defaults-off0",
-      "kind": "defaults",
-      "arm": "q6off",
-      "success": false,
-      "phases": 1,
-      "failure": "round_budget_exhausted",
-      "final_artifact_ok": true,
-      "rounds": 10,
-      "whole_ms": 55950.540684,
-      "warm_s": 46.70753498,
-      "handoff_ms": 63.406012999999994,
-      "work": {
-        "generated_tokens": 497,
-        "evaluated_prompt_tokens": 1055,
-        "drafted": 450,
-        "accepted": 347
-      },
-      "prompts": [
-        "9e4e0759cb66b5e8b9c6818be3aa56102b85e046de349b06aa145edc7e166a48",
-        "25d412e6796243f3edb69ab6c74078fff7a1dd95e63be3ead812cbe3c48d6234",
-        "d04736963a19e4e42336c668f67c1affee1de678d3117669cb367efe63c02733",
-        "a46edbb0304ae905bf3d0d969f415ae00a2cd1ecb7238139ac3865a85074009a",
-        "85f633428729aaf3b8e4c2ed780a4e653071c2ebfd4965269284ef39ef1e8ad1",
-        "9064cc15bb700d742a170e47ba09927bd230674476a101c8f11c0952b6ee1c5e",
-        "0f4f67c6be083048eb13babd4817db8239f3b0bd0c989fd2ec7171dfb9f22f3f",
-        "8e8f09710bd39244076788ee44515b6866ae2aed41688e0bc93643b60625e967",
-        "d8df51dc038e54d165f1f685fe812d8d4f2703630760ed4bfa6ccd7c22771c18",
-        "cc29d1d8238f2b91120fcbf696aff2c7082f7788440ed185c07e251049850a4a"
-      ],
-      "raw_hash": "c5f18d0c18fcaac71b51d1627e23b63ade4024d03eff9d0617e3910e74843302",
-      "source_hash": "ce3abc7fabfad53c76f07351c9bf45266c2d827f5f29c89ae965725b689e372f"
-    },
-    {
-      "id": "master-defaults-on0",
-      "kind": "defaults",
-      "arm": "q6on",
-      "success": false,
-      "phases": 1,
-      "failure": "round_budget_exhausted",
-      "final_artifact_ok": true,
-      "rounds": 10,
-      "whole_ms": 54872.873673,
-      "warm_s": 46.24405939,
-      "handoff_ms": 64.422974,
-      "work": {
-        "generated_tokens": 497,
-        "evaluated_prompt_tokens": 1055,
-        "drafted": 450,
-        "accepted": 347
-      },
-      "prompts": [
-        "9e4e0759cb66b5e8b9c6818be3aa56102b85e046de349b06aa145edc7e166a48",
-        "25d412e6796243f3edb69ab6c74078fff7a1dd95e63be3ead812cbe3c48d6234",
-        "d04736963a19e4e42336c668f67c1affee1de678d3117669cb367efe63c02733",
-        "a46edbb0304ae905bf3d0d969f415ae00a2cd1ecb7238139ac3865a85074009a",
-        "85f633428729aaf3b8e4c2ed780a4e653071c2ebfd4965269284ef39ef1e8ad1",
-        "9064cc15bb700d742a170e47ba09927bd230674476a101c8f11c0952b6ee1c5e",
-        "0f4f67c6be083048eb13babd4817db8239f3b0bd0c989fd2ec7171dfb9f22f3f",
-        "8e8f09710bd39244076788ee44515b6866ae2aed41688e0bc93643b60625e967",
-        "d8df51dc038e54d165f1f685fe812d8d4f2703630760ed4bfa6ccd7c22771c18",
-        "cc29d1d8238f2b91120fcbf696aff2c7082f7788440ed185c07e251049850a4a"
-      ],
-      "raw_hash": "c5f18d0c18fcaac71b51d1627e23b63ade4024d03eff9d0617e3910e74843302",
-      "source_hash": "ce3abc7fabfad53c76f07351c9bf45266c2d827f5f29c89ae965725b689e372f"
     }
   ],
   "pairs": [
@@ -147,16 +85,10 @@
     },
     {
       "kind": "defaults",
-      "complete": true,
-      "same_work": true,
-      "both_pass": false,
-      "comparable": false,
-      "whole_change_percent": null,
-      "warm_change_percent": null,
-      "handoff_change_ms": null
+      "complete": false
     }
   ],
   "workflow_passes": 2,
-  "artifact_passes": 4,
+  "artifact_passes": 2,
   "note": "One pair per task; current-runtime Q6 effect only, not pre/post-master timing. Clamp pilot excluded."
 }
