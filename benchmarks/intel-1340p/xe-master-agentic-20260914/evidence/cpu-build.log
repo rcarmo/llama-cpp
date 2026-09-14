@@ -1,0 +1,303 @@
+-- The C compiler identification is Clang 22.1.8
+-- The CXX compiler identification is Clang 22.1.8
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/sbin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/sbin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- llama.cpp version: 0.4.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Found Git: /usr/sbin/git (found version "2.55.0")
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /usr/sbin/clang
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP_CXX: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP: TRUE (found version "5.1")
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.23.0
+-- ggml commit:  d2c9ee838-dirty
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu
+[1/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/153] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[3/153] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[8/153] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-turbo-quant.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-turbo-quant.c:28:14: warning: 'extern' variable has an initializer [-Wextern-initializer]
+   28 | GGML_API int turbo3_cpu_wht_group_size = 0;
+      |              ^
+1 warning generated.
+[9/153] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[10/153] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[11/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/cmake_pch.hxx.pch
+[12/153] Linking CXX shared library bin/libggml-base.so.0.23.0
+[13/153] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/cmake_pch.h.pch
+[14/153] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[15/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[16/153] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[17/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/iqp.cpp.o
+[18/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[19/153] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[20/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/q6-pair.cpp.o
+[21/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[22/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[23/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[24/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[25/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[26/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:55: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                       ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:112: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                                ^
+10 warnings generated.
+[27/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[28/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/recurrent-profile.cpp.o
+[29/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-plan.cpp.o
+[30/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-advice.cpp.o
+[31/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/whole-token-profile.cpp.o
+[32/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
+[33/153] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[34/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[35/153] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[36/153] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:5913:13: warning: 5 enumeration values not handled in switch: 'GGML_TYPE_TURBO2_0', 'GGML_TYPE_TURBO3_0', 'GGML_TYPE_TURBO4_0'... [-Wswitch]
+ 5913 |     switch (src0->type) {
+      |             ^~~~~~~~~~
+1 warning generated.
+[37/153] Linking CXX shared library bin/libggml-cpu.so.0.23.0
+[38/153] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[39/153] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[40/153] Linking CXX shared library bin/libggml.so.0.23.0
+[41/153] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[42/153] Building CXX object src/CMakeFiles/llama.dir/cmake_pch.hxx.pch
+[43/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_9_cxx.cxx.o
+[44/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_8_cxx.cxx.o
+[45/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_7_cxx.cxx.o
+[46/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_6_cxx.cxx.o
+[47/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_5_cxx.cxx.o
+[48/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_4_cxx.cxx.o
+[49/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_3_cxx.cxx.o
+[50/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_2_cxx.cxx.o
+[51/153] Building CXX object vendor/cpp-httplib/CMakeFiles/cpp-httplib.dir/httplib.cpp.o
+[52/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_1_cxx.cxx.o
+[53/153] Building CXX object src/CMakeFiles/llama.dir/llama.cpp.o
+[54/153] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_0_cxx.cxx.o
+[55/153] Building CXX object src/CMakeFiles/llama.dir/llama-arch.cpp.o
+[56/153] Building CXX object src/CMakeFiles/llama.dir/llama-adapter.cpp.o
+[57/153] Building CXX object src/CMakeFiles/llama.dir/llama-chat.cpp.o
+[58/153] Building CXX object src/CMakeFiles/llama.dir/llama-batch.cpp.o
+[59/153] Building CXX object src/CMakeFiles/llama.dir/llama-context-handoff.cpp.o
+[60/153] Building CXX object src/CMakeFiles/llama.dir/llama-cparams.cpp.o
+[61/153] Building CXX object src/CMakeFiles/llama.dir/llama-context.cpp.o
+[62/153] Building CXX object src/CMakeFiles/llama.dir/llama-grammar.cpp.o
+[63/153] Building CXX object src/CMakeFiles/llama.dir/llama-hparams.cpp.o
+[64/153] Building CXX object src/CMakeFiles/llama.dir/llama-graph.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/src/llama-graph.cpp:1521:9: warning: 'ggml_mul_mat_set_prec' is deprecated: use ggml_prec_set_acc() instead [-Wdeprecated-declarations]
+ 1521 |         ggml_mul_mat_set_prec(res, GGML_PREC_F32);
+      |         ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:1494:5: note: 'ggml_mul_mat_set_prec' has been explicitly marked deprecated here
+ 1494 |     GGML_DEPRECATED(GGML_API void ggml_mul_mat_set_prec(
+      |     ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:192:61: note: expanded from macro 'GGML_DEPRECATED'
+  192 | #    define GGML_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+      |                                                             ^
+/var/home/agent/workspace/projects/llama-cpp/src/llama-graph.cpp:1557:9: warning: 'ggml_mul_mat_set_prec' is deprecated: use ggml_prec_set_acc() instead [-Wdeprecated-declarations]
+ 1557 |         ggml_mul_mat_set_prec(res, GGML_PREC_F32);
+      |         ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:1494:5: note: 'ggml_mul_mat_set_prec' has been explicitly marked deprecated here
+ 1494 |     GGML_DEPRECATED(GGML_API void ggml_mul_mat_set_prec(
+      |     ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:192:61: note: expanded from macro 'GGML_DEPRECATED'
+  192 | #    define GGML_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+      |                                                             ^
+2 warnings generated.
+[65/153] Building CXX object src/CMakeFiles/llama.dir/llama-impl.cpp.o
+[66/153] Building CXX object src/CMakeFiles/llama.dir/llama-io.cpp.o
+[67/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-handoff.cpp.o
+[68/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-iswa.cpp.o
+[69/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa.cpp.o
+[70/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa-iswa.cpp.o
+[71/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-msa.cpp.o
+[72/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsv4.cpp.o
+[73/153] Building CXX object src/CMakeFiles/llama.dir/llama-memory.cpp.o
+[74/153] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o
+[75/153] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o
+[76/153] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-iswa.cpp.o
+[77/153] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-idx.cpp.o
+[78/153] Building CXX object src/CMakeFiles/llama.dir/llama-memory-recurrent.cpp.o
+[79/153] Building CXX object src/CMakeFiles/llama.dir/llama-mmap.cpp.o
+[80/153] Building CXX object src/CMakeFiles/llama.dir/llama-model-saver.cpp.o
+[81/153] Building CXX object src/CMakeFiles/llama.dir/llama-model-loader.cpp.o
+[82/153] Building CXX object src/CMakeFiles/llama.dir/llama-model.cpp.o
+[83/153] Building CXX object src/CMakeFiles/llama.dir/llama-quant.cpp.o
+[84/153] Building CXX object src/CMakeFiles/llama.dir/llama-sampler.cpp.o
+[85/153] Building CXX object src/CMakeFiles/llama.dir/llama-vocab.cpp.o
+[86/153] Building CXX object src/CMakeFiles/llama.dir/unicode-data.cpp.o
+[87/153] Building CXX object common/CMakeFiles/llama-common-base.dir/build-info.cpp.o
+[88/153] Building CXX object common/CMakeFiles/llama-common.dir/cmake_pch.hxx.pch
+[89/153] Linking CXX static library vendor/cpp-httplib/libcpp-httplib.a
+[90/153] Linking CXX static library common/libllama-common-base.a
+[91/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/parsers.cpp.o
+[92/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/cohere2moe.cpp.o
+[93/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/deepseek.cpp.o
+[94/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/functionary-v3-2.cpp.o
+[95/153] Building CXX object src/CMakeFiles/llama.dir/unicode.cpp.o
+[96/153] Linking CXX shared library bin/libllama.so.0.4.0
+[97/153] Creating library symlink bin/libllama.so.0 bin/libllama.so
+[98/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gigachat-v3.cpp.o
+[99/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gemma4.cpp.o
+[100/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gpt-oss.cpp.o
+[101/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/kimi-k2.cpp.o
+[102/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/lfm2.cpp.o
+[103/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/kimi-k3.cpp.o
+[104/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/minicpm5.cpp.o
+[105/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/minimax-m3.cpp.o
+[106/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/ministral3.cpp.o
+[107/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/muse-glimmer.cpp.o
+[108/153] Building CXX object common/CMakeFiles/llama-common.dir/parsers/qwen3-coder.cpp.o
+[109/153] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-generator.cpp.o
+[110/153] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-helpers.cpp.o
+[111/153] Building CXX object common/CMakeFiles/llama-common.dir/chat-diff-analyzer.cpp.o
+[112/153] Building CXX object common/CMakeFiles/llama-common.dir/chat-peg-parser.cpp.o
+[113/153] Building CXX object common/CMakeFiles/llama-common.dir/chat.cpp.o
+[114/153] Building CXX object common/CMakeFiles/llama-common.dir/arg.cpp.o
+[115/153] Building CXX object common/CMakeFiles/llama-common.dir/console.cpp.o
+[116/153] Building CXX object common/CMakeFiles/llama-common.dir/common.cpp.o
+[117/153] Building CXX object common/CMakeFiles/llama-common.dir/debug.cpp.o
+[118/153] Building CXX object common/CMakeFiles/llama-common.dir/fit.cpp.o
+[119/153] Building CXX object common/CMakeFiles/llama-common.dir/hf-cache.cpp.o
+[120/153] Building CXX object common/CMakeFiles/llama-common.dir/imatrix-loader.cpp.o
+[121/153] Building CXX object common/CMakeFiles/llama-common.dir/download.cpp.o
+[122/153] Building CXX object common/CMakeFiles/llama-common.dir/json-schema.cpp.o
+[123/153] Building CXX object common/CMakeFiles/llama-common.dir/json-schema-to-grammar.cpp.o
+[124/153] Building CXX object common/CMakeFiles/llama-common.dir/llguidance.cpp.o
+[125/153] Building CXX object common/CMakeFiles/llama-common.dir/log.cpp.o
+[126/153] Building CXX object common/CMakeFiles/llama-common.dir/ngram-cache.cpp.o
+[127/153] Building CXX object common/CMakeFiles/llama-common.dir/json.cpp.o
+[128/153] Building CXX object common/CMakeFiles/llama-common.dir/ngram-mod.cpp.o
+[129/153] Building CXX object common/CMakeFiles/llama-common.dir/ngram-map.cpp.o
+[130/153] Building CXX object common/CMakeFiles/llama-common.dir/preset.cpp.o
+[131/153] Building CXX object common/CMakeFiles/llama-common.dir/reasoning-budget.cpp.o
+[132/153] Building CXX object common/CMakeFiles/llama-common.dir/sampling.cpp.o
+[133/153] Building CXX object common/CMakeFiles/llama-common.dir/peg-parser.cpp.o
+[134/153] Building CXX object common/CMakeFiles/llama-common.dir/subproc.cpp.o
+[135/153] Building CXX object common/CMakeFiles/llama-common.dir/trie.cpp.o
+[136/153] Building CXX object common/CMakeFiles/llama-common.dir/unicode.cpp.o
+[137/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/lexer.cpp.o
+[138/153] Building CXX object common/CMakeFiles/llama-common.dir/speculative.cpp.o
+[139/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/parser.cpp.o
+[140/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/runtime.cpp.o
+[141/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/string.cpp.o
+[142/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/caps.cpp.o
+[143/153] Building CXX object tests/CMakeFiles/test-q6-pair.dir/test-q6-pair.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tests/test-q6-pair.cpp:26:9: warning: 'ggml_mul_mat_set_prec' is deprecated: use ggml_prec_set_acc() instead [-Wdeprecated-declarations]
+   26 |         ggml_mul_mat_set_prec(z, GGML_PREC_F32);
+      |         ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:1494:5: note: 'ggml_mul_mat_set_prec' has been explicitly marked deprecated here
+ 1494 |     GGML_DEPRECATED(GGML_API void ggml_mul_mat_set_prec(
+      |     ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:192:61: note: expanded from macro 'GGML_DEPRECATED'
+  192 | #    define GGML_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+      |                                                             ^
+1 warning generated.
+[144/153] Building CXX object common/CMakeFiles/llama-common.dir/jinja/value.cpp.o
+[145/153] Linking CXX shared library bin/libllama-common.so.0.4.0
+[146/153] Creating library symlink bin/libllama-common.so.0 bin/libllama-common.so
+[147/153] Building CXX object tests/CMakeFiles/test-kv-handoff.dir/test-kv-handoff.cpp.o
+[148/153] Building CXX object tests/CMakeFiles/test-context-handoff.dir/test-context-handoff.cpp.o
+[149/153] Linking CXX executable bin/test-q6-pair
+[150/153] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-in-memory.dir/in-memory.cpp.o
+[151/153] Linking CXX executable bin/test-kv-handoff
+[152/153] Linking CXX executable bin/test-context-handoff
+[153/153] Linking CXX executable bin/llama-gemma-in-memory
+In file included from /var/home/agent/workspace/reports/xe-master-agentic-20260914/agentic-session.cpp:4:
+In file included from /var/home/agent/workspace/projects/llama-cpp/common/chat.h:7:
+In file included from /var/home/agent/workspace/projects/llama-cpp/common/jinja/parser.h:3:
+/var/home/agent/workspace/projects/llama-cpp/common/jinja/lexer.h:49:20: warning: unused function 'type_to_string' [-Wunused-function]
+   49 | static std::string type_to_string(token::type t) {
+      |                    ^~~~~~~~~~~~~~
+In file included from /var/home/agent/workspace/reports/xe-master-agentic-20260914/agentic-session.cpp:4:
+In file included from /var/home/agent/workspace/projects/llama-cpp/common/chat.h:7:
+In file included from /var/home/agent/workspace/projects/llama-cpp/common/jinja/parser.h:4:
+/var/home/agent/workspace/projects/llama-cpp/common/jinja/runtime.h:740:20: warning: unused function 'render_string_parts' [-Wunused-function]
+  740 | static std::string render_string_parts(const value_string & parts) {
+      |                    ^~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+Test project /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu
+  Test #47: test-q6-pair
+  Test #48: test-kv-handoff
+  Test #49: test-context-handoff
+  Test #50: test-context-handoff-gemma
+
+Total Tests: 4
+b11ffa5e1a69e761f0f3bc3bd094a14e66adde1eb32345a49a98a5dbe4bae5dd  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/agentic-session
+4e8c513b3e5c450b25c064ad56734032a61c905ed38d4aacc6993d0a04b09948  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/llama-gemma-in-memory
+6737f376f7cae20b1f597c3d1677f4bf09e65ec43a09ecd6875a215e754612ba  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/libllama.so.0
+fc788da1ffd9de793af1cc1d57506b5f6381f74c6e44d2ec3f77f560b667691a  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/libllama-common.so.0
+f2c4377100e5dc5e3aa9a5e6b69c261ded57be790dd4336bdf83380f080a9183  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/libggml-cpu.so.0
+9c6ad7599f7384aa9f6016e241b73647597437202a83189228837b97440d791e  /var/home/agent/workspace/reports/xe-master-agentic-20260914/build-cpu/bin/libggml-base.so.0
+memory.peak
+393322496
+memory.swap.peak
+0
+memory.events
+low 0
+high 0
+max 0
+oom 0
+oom_kill 0
+oom_group_kill 0
+sock_throttled 0
+cpu.stat
+usage_usec 156617066
+user_usec 151368463
+system_usec 5248603
+nice_usec 0
+core_sched.force_idle_usec 0
+nr_periods 814
+nr_throttled 14
+throttled_usec 3890
+nr_bursts 0
+burst_usec 0
