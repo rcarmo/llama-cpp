@@ -95,7 +95,7 @@ int main(int argc,char ** argv) {
                 llama_tokens draft;
                 const int past=history.size();
                 auto & dp=common_speculative_get_draft_params(spec.get(),0);
-                dp.drafting=true;dp.n_max=std::min(3,n-produced-1);dp.n_past=past;dp.id_last=last;dp.prompt=&history;dp.result=&draft;
+                dp.drafting=true;dp.n_max=std::min(3,n-produced-1);dp.pos0=past;dp.id_last=last;dp.prompt=&history;dp.result=&draft;
                 if(dp.n_max>0)common_speculative_draft(spec.get());
                 drafted+=draft.size();
                 auto batch=llama_batch_init(1+draft.size(),0,1);
