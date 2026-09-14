@@ -13,6 +13,15 @@ This is Rui Carmo's development fork. The owner permits AI-assisted implementati
 - Deployment, service interruption and public communication require their own authorisation; permission to commit does not imply permission to deploy.
 - Keep changes small enough to inspect and explain. Seek design confirmation for invasive work, but do not require the owner to satisfy upstream contributor procedures for local experiments.
 
+## Local documentation and benchmark defaults
+
+- Use `docs/local/README.md` as the entry point for fork-local work. Keep upstream documentation separate.
+- Place new local reports and runbooks in the existing hardware subtree under `docs/local/`; use `cross-platform/` for genuinely shared work. Do not add singleton reports to the top-level `docs/` directory.
+- Update the hardware, model and chronology indexes when adding a campaign. Keep current operational defaults separate from dated experimental results; identify superseded reports explicitly.
+- Use `benchmarks/README.md` and its platform indexes to make evidence discoverable. Preserve existing raw artifact paths; place new evidence in a platform/campaign directory, with a README linking the report and reproduction commands.
+- Record date, source commit, hardware, model/quantisation, runtime settings, workload, cache state, sample count and validation outcome. State missing thermal data and unresolved failures; do not compare unlike workloads as speedups.
+- Prefer extending an existing report over creating another document. Apply the available technical-writing/writing-style skill and validate relative links before committing. Compatibility stubs are for moved published paths, not a template for new documents.
+
 ## Upstream submissions
 
 When work explicitly targets `ggml-org/llama.cpp`, read its current [AGENTS.md](https://github.com/ggml-org/llama.cpp/blob/master/AGENTS.md) and [CONTRIBUTING.md](https://github.com/ggml-org/llama.cpp/blob/master/CONTRIBUTING.md) before any submission. Their review, AI-disclosure and human-authorship requirements apply there. Do not infer upstream submission permission from work on this fork.
