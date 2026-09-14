@@ -1,0 +1,42 @@
+{
+  "at": "2026-09-13T19:25:30.450Z",
+  "admission": {
+    "at": "2026-09-13T19:23:27.649Z",
+    "expires": "2026-09-13T20:23:27.649Z",
+    "owner": "@whisper",
+    "scope": "oraclecheckpointb82897bcomplete;max8unprofiled+2diagnostic;1021pairthenconfirmations/4003pairthenconfirmations onparity;300sunit285snative16GiBmemory16MiBswap6GiBreserve,contentionabort,no services;holdsallheavywork"
+  },
+  "size": "1k",
+  "arm": "share",
+  "profile": false,
+  "budget": 512,
+  "argv": [
+    "/var/home/agent/workspace/reports/xe-scale-profile-20260913/build/scale-perf",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf",
+    "<bos><start_of_turn>user\nI am testing a parser and need a deterministic, long JSON example. Read the following specification and then produce only the JSON data, without any prose, Markdown fences, commentary or explanation.\n\nThe top-level value must be one JSON array. Its elements must be the integers from 1 through 1000 in ascending order. Include each integer exactly once. Use decimal notation. Separate consecutive integers with a comma and a single space. Do not use ellipses, ranges, placeholders, strings, objects, null values or omitted sections. Begin with an opening square bracket and the number 1. Continue the complete sequence rather than describing how to generate it. The final element must be 1000, followed by a closing square bracket. This is a data-generation request, not a programming exercise: do not return a Python script, JavaScript expression, generator or shell command.\n\nThe consumer reads the stream from left to right, so every visible prefix must follow the same ascending sequence. Formatting should remain consistent throughout the entire answer. Do not add a heading, introductory sentence, progress report or closing note. There is no additional hidden schema. The array is the entire response. The values and order are fixed, so there is no need to choose examples, randomise anything or ask a clarifying question. Whitespace should consist only of the single spaces following commas. Reference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nReference data for the parser: the array contains consecutive numbers in ascending order. Each number is distinct. A comma separates two neighbouring elements. The parser accepts a partial prefix during streaming, but the generator should continue until the requested endpoint. Do not stop early or summarize the middle of the sequence. This paragraph is input context only and must not be echoed.\nStart producing the requested array now.\n<end_of_turn>\n<start_of_turn>model\n",
+    "512",
+    "--mtp",
+    "/var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf"
+  ],
+  "env": {
+    "PATH": "/usr/bin:/bin",
+    "HOME": "/var/home/agent",
+    "XDG_RUNTIME_DIR": "/run/user/1001",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus",
+    "LD_LIBRARY_PATH": "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin:/var/home/agent/workspace/reports/gemma-simd-async-20260906/build-vulkan/runtime",
+    "GGML_BACKEND_PATH": "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/vulkan/libggml-vulkan.so.0.23.0",
+    "PERF_ARM": "share",
+    "PERF_METRICS": "/var/home/agent/workspace/reports/xe-scale-profile-20260913/runs/s3/metrics.json"
+  },
+  "prompt_hash": "8f46d5dc8b468c80d0654444386ef6ef8466aa333d15ab8603264166b9ec1ba6",
+  "hashes": {
+    "/var/home/agent/workspace/reports/xe-scale-profile-20260913/build/scale-perf": "d5b3161189219e4a29084836e21edc3b1498bee5bf69e499a7ff697b5ddeb1aa",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/vulkan/libggml-vulkan.so.0.23.0": "ab1924e32c16d315d31509a030ab96113880c62a3c133654d768d0831672ac2d",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin/libllama.so.0": "a0d71c54631a293b47a6ab2ddeaaf26f40804e830712c180b94722cc02c41402",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin/libllama-common.so.0": "7a9a2a5c14ddcef725b96aff6c2d9e1cd7ecee832105396bb1f6e4b95120de8c",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin/libggml-base.so.0": "9cf0e7243228fb94ecc65984a599ed1e0f0dd568ba0a6fcd2ce5119f0d2e6751",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin/libggml.so.0": "cf8a4b3e0ab4c51e39f30e7e683a07b7e83a75ff47af148343022d391bfce8fd",
+    "/var/home/agent/workspace/reports/xe-in-memory-perf-20260913/release/bin/libggml-cpu.so.0": "13b87e19244cf7ee4fb84856944bdfc1492524b397fd133f16cbab6d769fa58e"
+  },
+  "services": "Id=llama-gemma-local-provider.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt.service\nActiveState=inactive\nMainPID=0\n\nId=whisper-stt-diarizer.service\nActiveState=inactive\nMainPID=0\n"
+}

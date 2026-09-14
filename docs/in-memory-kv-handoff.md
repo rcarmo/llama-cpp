@@ -65,11 +65,22 @@ A manual Vulkan mode of `test-context-handoff --gemma BACKEND_LIBRARY TEMP_GGUF`
 
 ## Measured results
 
-See [the dated implementation and performance evidence](../benchmarks/intel-1340p/xe-in-memory-20260913/README.md) for exact workload, source/runtime identities, individual runs, failures and limits.
+The [zero-copy throughput chart and bundled measurements](../benchmarks/intel-1340p/xe-zero-copy-throughput-20260914/README.md) compare copied and shared KV directly in tok/s. These retained 13 September runs use the same GPU prefill and cached/coherent source allocation; the copied control bypasses CPU-view acquisition during transfer and uses bounded RAM copying, not file I/O.
+
+| Prompt / output tokens | Runs per arm | Copied decode | Zero-copy decode | Decode change | Handoff saved |
+|---|---:|---:|---:|---:|---:|
+| 309 / 128 | 4 | 20.49 tok/s | 22.48 tok/s | +9.72% | 20.55 ms |
+| 1,021 / 512 | 2 | 21.18 tok/s | 20.48 tok/s | -3.34% | 4.09 ms |
+| 4,003 / 512 | 2 | 20.69 tok/s | 20.66 tok/s | -0.16% | 63.85 ms |
+
+Values are medians. The short-run decode gain did not persist: at 4K the two paths are effectively tied, while handoff falls from 160.85 to 97.00 ms. Observed decode ranges overlap in all three workloads. Two or four runs per arm do not establish a general throughput gain.
+
+Decode rate is `(outputs - 1) / (last emission time - first emission time)`, including CPU target/assistant and sampling work but excluding startup, prefill and first-token latency. The numeric-sequence workload favours MTP3; it is not coding-agent throughput. Output, prompt and evaluated/speculative work match within each workload. These runtime identities precede the later batching/Q6 changes and do not measure latest-master throughput. The chart includes all valid observations, ranges, source checksums and a model-free reproduction script.
+
+See [the original implementation and short-run evidence](../benchmarks/intel-1340p/xe-in-memory-20260913/README.md) for source/runtime identities and qualification failures:
 
 - Trained E4B handoff shared 19,922,944 KV bytes with zero payload copies. Target-only output was `Hello.`; corrected MTP3 produced the counting sequence up to a 16-token cap, with 12 drafted / 10 accepted tokens and zero swap.
-- Eight matched O3 runs used 309 prompt tokens, 128 output tokens, MTP3 and 38 MiB KV. Median handoff was 61.47 ms shared versus 82.02 ms copied; post-first-token generation was 22.48 versus 20.49 tok/s. Decode ranges overlapped, so the observed 9.7% median gain is workload-specific. Process-to-first-token stayed near 6.9 s.
-- The copied control used the same GPU prefill and source allocation, bypassing only CPU-view acquisition during transfer. It was not the historical file-based route.
+- Process-to-first-token stayed near 6.9 s on the short 309/128 workload; its 20.55 ms handoff saving is small relative to model loading and prefill.
 - Creating a sharing assistant previously reset populated target cells. The constructor now preserves and validates existing shared cells; the failed whitespace-only MTP result and corrected run are both retained.
 
 The feature is experimental and opt-in. Public context-parameter additions require consumers to rebuild against the updated header. Long-context capacity, broad quality, a clean all-shaders release build and production serving are unqualified. No default allocator/scheduler placement or deployed service is changed.

@@ -1,0 +1,562 @@
+{
+  "generated_at": "2026-09-14T06:59:52.656Z",
+  "measurement_date": "2026-09-13",
+  "metric": "(output_tokens - 1) / (last_emission_seconds - first_emission_seconds)",
+  "summaries": [
+    {
+      "name": "Short prompt",
+      "prompt": 309,
+      "output": 128,
+      "kv_mib": 38,
+      "source": "reports/xe-in-memory-perf-20260913",
+      "ids": [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7"
+      ],
+      "summaryKey": null,
+      "n_per_arm": 4,
+      "copy": {
+        "n": 4,
+        "decode_tps": {
+          "median": 20.486470528943954,
+          "min": 18.65487354758933,
+          "max": 22.264327895815526,
+          "values": [
+            18.79186560390351,
+            22.181075453984395,
+            22.264327895815526,
+            18.65487354758933
+          ]
+        },
+        "handoff_ms": {
+          "median": 82.01954850000038,
+          "min": 79.71575000000009,
+          "max": 85.10407699999956,
+          "values": [
+            79.79393700000071,
+            85.10407699999956,
+            79.71575000000009,
+            84.24516000000004
+          ]
+        },
+        "effective_output_tps": {
+          "median": 9.579580228667169,
+          "min": 9.136230778243023,
+          "max": 10.003120338191076,
+          "values": [
+            9.201966470069255,
+            9.95719398726508,
+            10.003120338191076,
+            9.136230778243023
+          ]
+        }
+      },
+      "share": {
+        "n": 4,
+        "decode_tps": {
+          "median": 22.478382229922477,
+          "min": 20.730818443120455,
+          "max": 23.08585826609934,
+          "values": [
+            23.08585826609934,
+            22.633903742876342,
+            20.730818443120455,
+            22.322860716968613
+          ]
+        },
+        "handoff_ms": {
+          "median": 61.46753950000017,
+          "min": 60.33884300000025,
+          "max": 62.65275999999975,
+          "values": [
+            61.919778000000036,
+            62.65275999999975,
+            60.33884300000025,
+            61.0153010000003
+          ]
+        },
+        "effective_output_tps": {
+          "median": 10.00798540060859,
+          "min": 9.635793455381235,
+          "max": 10.06568800124859,
+          "values": [
+            10.035876588772272,
+            10.06568800124859,
+            9.635793455381235,
+            9.980094212444907
+          ]
+        }
+      },
+      "decode_delta_tps": 1.9919117009785232,
+      "decode_change_percent": 9.723059412133894,
+      "handoff_change_percent": -25.057452004871884,
+      "handoff_saved_ms": 20.55200900000021
+    },
+    {
+      "name": "1K prompt",
+      "prompt": 1021,
+      "output": 512,
+      "kv_mib": 69,
+      "source": "reports/xe-scale-profile-20260913",
+      "ids": [
+        "s0",
+        "s1",
+        "s2",
+        "s3"
+      ],
+      "summaryKey": "1k",
+      "n_per_arm": 2,
+      "copy": {
+        "n": 2,
+        "decode_tps": {
+          "median": 21.18413486473638,
+          "min": 20.396624386828083,
+          "max": 21.97164534264467,
+          "values": [
+            21.97164534264467,
+            20.396624386828083
+          ]
+        },
+        "handoff_ms": {
+          "median": 140.17260399999998,
+          "min": 136.84377300000074,
+          "max": 143.50143499999922,
+          "values": [
+            143.50143499999922,
+            136.84377300000074
+          ]
+        },
+        "effective_output_tps": {
+          "median": 14.740045236132579,
+          "min": 14.366461579486488,
+          "max": 15.113628892778669,
+          "values": [
+            15.113628892778669,
+            14.366461579486488
+          ]
+        }
+      },
+      "share": {
+        "n": 2,
+        "decode_tps": {
+          "median": 20.476182669086285,
+          "min": 20.19763288521242,
+          "max": 20.754732452960152,
+          "values": [
+            20.754732452960152,
+            20.19763288521242
+          ]
+        },
+        "handoff_ms": {
+          "median": 136.0821129999996,
+          "min": 94.09242799999973,
+          "max": 178.0717979999995,
+          "values": [
+            178.0717979999995,
+            94.09242799999973
+          ]
+        },
+        "effective_output_tps": {
+          "median": 14.357843816652789,
+          "min": 14.28619465303034,
+          "max": 14.429492980275237,
+          "values": [
+            14.429492980275237,
+            14.28619465303034
+          ]
+        }
+      },
+      "decode_delta_tps": -0.707952195650094,
+      "decode_change_percent": -3.3418980768885165,
+      "handoff_change_percent": -2.9181815014297507,
+      "handoff_saved_ms": 4.090491000000384
+    },
+    {
+      "name": "4K prompt",
+      "prompt": 4003,
+      "output": 512,
+      "kv_mib": 117,
+      "source": "reports/xe-scale-profile-20260913",
+      "ids": [
+        "l0",
+        "l1",
+        "l2",
+        "l3"
+      ],
+      "summaryKey": "4k",
+      "n_per_arm": 2,
+      "copy": {
+        "n": 2,
+        "decode_tps": {
+          "median": 20.69324065951603,
+          "min": 20.41745221940046,
+          "max": 20.969029099631598,
+          "values": [
+            20.41745221940046,
+            20.969029099631598
+          ]
+        },
+        "handoff_ms": {
+          "median": 160.8466954999983,
+          "min": 158.78909599999957,
+          "max": 162.90429499999703,
+          "values": [
+            158.78909599999957,
+            162.90429499999703
+          ]
+        },
+        "effective_output_tps": {
+          "median": 10.031141776583496,
+          "min": 9.934846918042158,
+          "max": 10.127436635124834,
+          "values": [
+            9.934846918042158,
+            10.127436635124834
+          ]
+        }
+      },
+      "share": {
+        "n": 2,
+        "decode_tps": {
+          "median": 20.660254594863215,
+          "min": 20.46322808030857,
+          "max": 20.85728110941786,
+          "values": [
+            20.85728110941786,
+            20.46322808030857
+          ]
+        },
+        "handoff_ms": {
+          "median": 96.99773700000058,
+          "min": 95.65990100000121,
+          "max": 98.33557299999995,
+          "values": [
+            98.33557299999995,
+            95.65990100000121
+          ]
+        },
+        "effective_output_tps": {
+          "median": 10.11050033467384,
+          "min": 10.085308001293805,
+          "max": 10.135692668053874,
+          "values": [
+            10.135692668053874,
+            10.085308001293805
+          ]
+        }
+      },
+      "decode_delta_tps": -0.03298606465281395,
+      "decode_change_percent": -0.15940502116397193,
+      "handoff_change_percent": -39.695536362447925,
+      "handoff_saved_ms": 63.84895849999772
+    }
+  ],
+  "observations": [
+    {
+      "id": "r0",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "share",
+      "kv_mib": 38,
+      "decode_tps": 23.08585826609934,
+      "handoff_ms": 61.919778000000036,
+      "first_token_s": 7.023113796,
+      "whole_process_s": 12.75424213,
+      "effective_output_tps": 10.035876588772272,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r1",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "copy",
+      "kv_mib": 38,
+      "decode_tps": 18.79186560390351,
+      "handoff_ms": 79.79393700000071,
+      "first_token_s": 6.921790705,
+      "whole_process_s": 13.910070246,
+      "effective_output_tps": 9.201966470069255,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r2",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "copy",
+      "kv_mib": 38,
+      "decode_tps": 22.181075453984395,
+      "handoff_ms": 85.10407699999956,
+      "first_token_s": 6.888691612,
+      "whole_process_s": 12.855027246,
+      "effective_output_tps": 9.95719398726508,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r3",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "share",
+      "kv_mib": 38,
+      "decode_tps": 22.633903742876342,
+      "handoff_ms": 62.65275999999975,
+      "first_token_s": 6.869629406,
+      "whole_process_s": 12.716468063,
+      "effective_output_tps": 10.06568800124859,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r4",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "copy",
+      "kv_mib": 38,
+      "decode_tps": 22.264327895815526,
+      "handoff_ms": 79.71575000000009,
+      "first_token_s": 6.860680205,
+      "whole_process_s": 12.796007213,
+      "effective_output_tps": 10.003120338191076,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r5",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "share",
+      "kv_mib": 38,
+      "decode_tps": 20.730818443120455,
+      "handoff_ms": 60.33884300000025,
+      "first_token_s": 6.928067667,
+      "whole_process_s": 13.283804867,
+      "effective_output_tps": 9.635793455381235,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r6",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "share",
+      "kv_mib": 38,
+      "decode_tps": 22.322860716968613,
+      "handoff_ms": 61.0153010000003,
+      "first_token_s": 6.904054793,
+      "whole_process_s": 12.825530228,
+      "effective_output_tps": 9.980094212444907,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "r7",
+      "scenario": "Short prompt",
+      "prompt_tokens": 309,
+      "output_tokens": 128,
+      "arm": "copy",
+      "kv_mib": 38,
+      "decode_tps": 18.65487354758933,
+      "handoff_ms": 84.24516000000004,
+      "first_token_s": 6.965912764,
+      "whole_process_s": 14.01015398,
+      "effective_output_tps": 9.136230778243023,
+      "output_hash": "cc68d4d19ef99bdd0c5f8a13f6f9f92819df85f58f64ea757baa0ac6c25daaa7",
+      "drafted": 96,
+      "accepted": 94,
+      "evaluated": 130,
+      "prompt_hash": "219e9892e43694fce9d555e15772f5d455fafdda0583657e6ace3a528e824d81"
+    },
+    {
+      "id": "s0",
+      "scenario": "1K prompt",
+      "prompt_tokens": 1021,
+      "output_tokens": 512,
+      "arm": "share",
+      "kv_mib": 69,
+      "decode_tps": 20.754732452960152,
+      "handoff_ms": 178.0717979999995,
+      "first_token_s": 10.661331638,
+      "whole_process_s": 35.482882226,
+      "effective_output_tps": 14.429492980275237,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "8f46d5dc8b468c80d0654444386ef6ef8466aa333d15ab8603264166b9ec1ba6"
+    },
+    {
+      "id": "s1",
+      "scenario": "1K prompt",
+      "prompt_tokens": 1021,
+      "output_tokens": 512,
+      "arm": "copy",
+      "kv_mib": 69,
+      "decode_tps": 21.97164534264467,
+      "handoff_ms": 143.50143499999922,
+      "first_token_s": 10.399896436,
+      "whole_process_s": 33.876708475,
+      "effective_output_tps": 15.113628892778669,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "8f46d5dc8b468c80d0654444386ef6ef8466aa333d15ab8603264166b9ec1ba6"
+    },
+    {
+      "id": "s2",
+      "scenario": "1K prompt",
+      "prompt_tokens": 1021,
+      "output_tokens": 512,
+      "arm": "copy",
+      "kv_mib": 69,
+      "decode_tps": 20.396624386828083,
+      "handoff_ms": 136.84377300000074,
+      "first_token_s": 10.385023707,
+      "whole_process_s": 35.638559792,
+      "effective_output_tps": 14.366461579486488,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "8f46d5dc8b468c80d0654444386ef6ef8466aa333d15ab8603264166b9ec1ba6"
+    },
+    {
+      "id": "s3",
+      "scenario": "1K prompt",
+      "prompt_tokens": 1021,
+      "output_tokens": 512,
+      "arm": "share",
+      "kv_mib": 69,
+      "decode_tps": 20.19763288521242,
+      "handoff_ms": 94.09242799999973,
+      "first_token_s": 10.31244374,
+      "whole_process_s": 35.838794895,
+      "effective_output_tps": 14.28619465303034,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "8f46d5dc8b468c80d0654444386ef6ef8466aa333d15ab8603264166b9ec1ba6"
+    },
+    {
+      "id": "l0",
+      "scenario": "4K prompt",
+      "prompt_tokens": 4003,
+      "output_tokens": 512,
+      "arm": "copy",
+      "kv_mib": 117,
+      "decode_tps": 20.41745221940046,
+      "handoff_ms": 158.78909599999957,
+      "first_token_s": 26.273496021,
+      "whole_process_s": 51.535771434,
+      "effective_output_tps": 9.934846918042158,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "4e8bb134e51bd7713628bc199cd9c2b706f66493888c91a641afa1bed93eded6"
+    },
+    {
+      "id": "l1",
+      "scenario": "4K prompt",
+      "prompt_tokens": 4003,
+      "output_tokens": 512,
+      "arm": "share",
+      "kv_mib": 117,
+      "decode_tps": 20.85728110941786,
+      "handoff_ms": 98.33557299999995,
+      "first_token_s": 25.783653458,
+      "whole_process_s": 50.514554532,
+      "effective_output_tps": 10.135692668053874,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "4e8bb134e51bd7713628bc199cd9c2b706f66493888c91a641afa1bed93eded6"
+    },
+    {
+      "id": "l2",
+      "scenario": "4K prompt",
+      "prompt_tokens": 4003,
+      "output_tokens": 512,
+      "arm": "share",
+      "kv_mib": 117,
+      "decode_tps": 20.46322808030857,
+      "handoff_ms": 95.65990100000121,
+      "first_token_s": 25.554666593,
+      "whole_process_s": 50.766917573,
+      "effective_output_tps": 10.085308001293805,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "4e8bb134e51bd7713628bc199cd9c2b706f66493888c91a641afa1bed93eded6"
+    },
+    {
+      "id": "l3",
+      "scenario": "4K prompt",
+      "prompt_tokens": 4003,
+      "output_tokens": 512,
+      "arm": "copy",
+      "kv_mib": 117,
+      "decode_tps": 20.969029099631598,
+      "handoff_ms": 162.90429499999703,
+      "first_token_s": 25.938660688,
+      "whole_process_s": 50.555734728,
+      "effective_output_tps": 10.127436635124834,
+      "output_hash": "ea5eb30f5382b8dec6382c42dc8847cb7aa5f77f2c30497279c1cddf39bec777",
+      "drafted": 384,
+      "accepted": 382,
+      "evaluated": 514,
+      "prompt_hash": "4e8bb134e51bd7713628bc199cd9c2b706f66493888c91a641afa1bed93eded6"
+    }
+  ],
+  "exclusions": [
+    "r4-aborted-contention",
+    "p0",
+    "p1"
+  ],
+  "limitations": [
+    "Retained historical zero-copy/copy runs, not latest-master throughput",
+    "Predictable numeric-sequence workload favourable to MTP; not agentic coding throughput",
+    "Same cached/coherent GPU allocation and GPU prefill, only synchronous KV sharing/copy control differs",
+    "Ranges and individual samples are shown; they are not confidence intervals",
+    "No inference rerun; batching/Q6 changes are separate and not credited here"
+  ]
+}
