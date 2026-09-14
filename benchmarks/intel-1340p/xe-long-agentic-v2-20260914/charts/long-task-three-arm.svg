@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1410" viewBox="0 0 1200 1410" role="img"><title>Long coding task: CPU versus copied and zero-copy KV</title><desc>All three runs failed the four-milestone task. CPU reached two milestones; GPU arms reached none. Throughput is descriptive on unequal partial work. Identical initial prompt supports cold-start and handoff diagnostics only.</desc><rect width="1200" height="1410" fill="#f5f8fb"/><g font-family="DejaVu Sans,Arial,sans-serif">
+<text x="42" y="54" font-size="30" font-weight="700" fill="#18334a">Long coding task: CPU / copy / zero-copy</text>
+<text x="42" y="88" font-size="17" font-weight="400" fill="#526879">Gemma E4B · MTP3 · Q6 ON · identical four-milestone repository and task protocol</text>
+<rect x="32" y="111" width="1136" height="94" fill="#fbeae5" rx="8"/>
+<text x="52" y="146" font-size="23" font-weight="700" fill="#aa4035">No arm completed the task. This is not a successful-task speedup result.</text>
+<text x="52" y="179" font-size="16" font-weight="400" fill="#aa4035">One run per arm; reverse repeats cancelled. CPU and GPU trajectories differ after the initial prompt.</text>
+<rect x="32" y="226" width="1136" height="249" fill="#fff" rx="9"/>
+<text x="52" y="263" font-size="23" font-weight="700" fill="#18334a">Independent task progress and work</text>
+<text x="52" y="299" font-size="15" font-weight="400" fill="#526879">Arm</text>
+<text x="442" y="299" font-size="15" font-weight="400" fill="#526879">Milestones</text>
+<text x="612" y="299" font-size="15" font-weight="400" fill="#526879">Turns / tools</text>
+<text x="822" y="299" font-size="15" font-weight="400" fill="#526879">Generated tokens</text>
+<text x="52" y="336" font-size="19" font-weight="700" fill="#60748b">CPU-only</text>
+<text x="465" y="336" font-size="19" font-weight="700" fill="#aa4035">2 / 4</text>
+<text x="637" y="336" font-size="18" font-weight="400" fill="#18334a">19 / 16</text>
+<text x="861" y="336" font-size="18" font-weight="400" fill="#18334a">3791</text>
+<text x="52" y="376" font-size="19" font-weight="700" fill="#b77928">GPU → CPU · copy</text>
+<text x="465" y="376" font-size="19" font-weight="700" fill="#aa4035">0 / 4</text>
+<text x="637" y="376" font-size="18" font-weight="400" fill="#18334a">12 / 11</text>
+<text x="861" y="376" font-size="18" font-weight="400" fill="#18334a">1554</text>
+<text x="52" y="416" font-size="19" font-weight="700" fill="#147b67">GPU → CPU · zero-copy</text>
+<text x="465" y="416" font-size="19" font-weight="700" fill="#aa4035">0 / 4</text>
+<text x="637" y="416" font-size="18" font-weight="400" fill="#18334a">12 / 11</text>
+<text x="861" y="416" font-size="18" font-weight="400" fill="#18334a">1554</text>
+<text x="52" y="458" font-size="15" font-weight="400" fill="#526879">CPU: response cap during report edit. Both GPU arms: missing export; identical failed artifact.</text>
+<rect x="32" y="496" width="1136" height="291" fill="#fff" rx="9"/>
+<text x="52" y="534" font-size="23" font-weight="700" fill="#18334a">Decode throughput on executed responses</text>
+<text x="52" y="564" font-size="15" font-weight="400" fill="#aa4035">tok/s · first token of each response and tool time excluded · different work, no speedup ranking</text>
+<line x1="401" y1="581" x2="401" y2="735" stroke="#e1e8ef"/>
+<text x="395" y="767" font-size="13" font-weight="400" fill="#526879">0</text>
+<line x1="516" y1="581" x2="516" y2="735" stroke="#e1e8ef"/>
+<text x="510" y="767" font-size="13" font-weight="400" fill="#526879">5</text>
+<line x1="631" y1="581" x2="631" y2="735" stroke="#e1e8ef"/>
+<text x="625" y="767" font-size="13" font-weight="400" fill="#526879">10</text>
+<line x1="746" y1="581" x2="746" y2="735" stroke="#e1e8ef"/>
+<text x="740" y="767" font-size="13" font-weight="400" fill="#526879">15</text>
+<line x1="861" y1="581" x2="861" y2="735" stroke="#e1e8ef"/>
+<text x="855" y="767" font-size="13" font-weight="400" fill="#526879">20</text>
+<line x1="976" y1="581" x2="976" y2="735" stroke="#e1e8ef"/>
+<text x="970" y="767" font-size="13" font-weight="400" fill="#526879">25</text>
+<text x="52" y="606" font-size="18" font-weight="400" fill="#18334a">CPU-only</text>
+<rect x="401" y="586" width="469.6509975938553" height="26" fill="#60748b" rx="4"/>
+<text x="1010" y="606" font-size="18" font-weight="700" fill="#60748b">20.42 tok/s</text>
+<text x="52" y="654" font-size="18" font-weight="400" fill="#18334a">GPU → CPU · copy</text>
+<rect x="401" y="634" width="432.16301517935045" height="26" fill="#b77928" rx="4"/>
+<text x="1010" y="654" font-size="18" font-weight="700" fill="#b77928">18.79 tok/s</text>
+<text x="52" y="702" font-size="18" font-weight="400" fill="#18334a">GPU → CPU · zero-copy</text>
+<rect x="401" y="682" width="422.67204913916515" height="26" fill="#147b67" rx="4"/>
+<text x="1010" y="702" font-size="18" font-weight="700" fill="#147b67">18.38 tok/s</text>
+<rect x="32" y="808" width="1136" height="300" fill="#fff" rx="9"/>
+<text x="52" y="846" font-size="23" font-weight="700" fill="#18334a">Cold start: same 2,212-token initial prompt</text>
+<text x="52" y="875" font-size="15" font-weight="400" fill="#526879">One observation per arm · lower latency is better · not whole-task completion time</text>
+<text x="52" y="913" font-size="15" font-weight="400" fill="#526879">Arm</text>
+<text x="420" y="913" font-size="15" font-weight="400" fill="#526879">First token</text>
+<text x="650" y="913" font-size="15" font-weight="400" fill="#526879">Prefill</text>
+<text x="860" y="913" font-size="15" font-weight="400" fill="#526879">KV handoff</text>
+<text x="52" y="951" font-size="18" font-weight="700" fill="#60748b">CPU-only</text>
+<text x="420" y="951" font-size="20" font-weight="400" fill="#18334a">31.63 s</text>
+<text x="650" y="951" font-size="20" font-weight="400" fill="#18334a">29.47 s</text>
+<text x="860" y="951" font-size="20" font-weight="400" fill="#18334a">None</text>
+<text x="52" y="994" font-size="18" font-weight="700" fill="#b77928">GPU → CPU · copy</text>
+<text x="420" y="994" font-size="20" font-weight="400" fill="#18334a">17.27 s</text>
+<text x="650" y="994" font-size="20" font-weight="400" fill="#18334a">10.65 s</text>
+<text x="860" y="994" font-size="20" font-weight="400" fill="#18334a">524.15 ms</text>
+<text x="52" y="1037" font-size="18" font-weight="700" fill="#147b67">GPU → CPU · zero-copy</text>
+<text x="420" y="1037" font-size="20" font-weight="400" fill="#18334a">16.66 s</text>
+<text x="650" y="1037" font-size="20" font-weight="400" fill="#18334a">10.62 s</text>
+<text x="860" y="1037" font-size="20" font-weight="400" fill="#18334a">93.21 ms</text>
+<text x="52" y="1090" font-size="17" font-weight="700" fill="#147b67">Zero-copy shares 557 MiB; transfer saves 430.94 ms versus copied KV.</text>
+<rect x="32" y="1129" width="1136" height="229" fill="#fff" rx="9"/>
+<text x="52" y="1168" font-size="23" font-weight="700" fill="#aa4035">Elapsed time to failure — not time to completion</text>
+<text x="52" y="1203" font-size="16" font-weight="700" fill="#60748b">CPU-only</text>
+<text x="52" y="1236" font-size="24" font-weight="400" fill="#18334a">369.49 s</text>
+<text x="52" y="1266" font-size="16" font-weight="400" fill="#526879">3.11 GiB peak</text>
+<text x="424" y="1203" font-size="16" font-weight="700" fill="#b77928">GPU → CPU · copy</text>
+<text x="424" y="1236" font-size="24" font-weight="400" fill="#18334a">259.93 s</text>
+<text x="424" y="1266" font-size="16" font-weight="400" fill="#526879">13.43 GiB peak</text>
+<text x="796" y="1203" font-size="16" font-weight="700" fill="#147b67">GPU → CPU · zero-copy</text>
+<text x="796" y="1236" font-size="24" font-weight="400" fill="#18334a">261.02 s</text>
+<text x="796" y="1266" font-size="16" font-weight="400" fill="#526879">14.02 GiB peak</text>
+<text x="52" y="1306" font-size="15" font-weight="400" fill="#526879">Copy / zero-copy have identical output and work; zero-copy did not improve full-run time or tok/s.</text>
+<text x="52" y="1336" font-size="15" font-weight="400" fill="#526879">CPU completed more work. Treating its longer elapsed time as a loss would be misleading.</text>
+<text x="42" y="1388" font-size="14" font-weight="400" fill="#526879">All runs: zero swap; guards and owner cleanup passed. No deployment. Raw traces and first failed protocol retained.</text>
+</g></svg>

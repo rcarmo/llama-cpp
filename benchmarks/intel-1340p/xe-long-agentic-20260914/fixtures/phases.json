@@ -1,0 +1,22 @@
+[
+  {
+    "id": 0,
+    "title": "Normalize raw usage events",
+    "prompt": "Read SPEC.md and the read-only tests, then fix src/normalise.ts and any necessary exports so normalizeUsageEvent and normalizeUsageEvents canonicalize account names, derive UTC YYYY-MM-DD day strings from occurredAt, and reject invalid account/date/unit inputs with the specified TypeError and RangeError behaviour. Keep the code synchronous, pure, dependency-free, and do not modify tests."
+  },
+  {
+    "id": 1,
+    "title": "Aggregate normalized events deterministically",
+    "prompt": "Preserve the working normalization behaviour and implement milestone 2. Fix src/aggregate.ts so aggregateUsage groups by UTC day and account, sums both event counts and units, returns deterministic day-then-account ordering, and does not mutate caller-owned arrays or objects. Leave tests untouched."
+  },
+  {
+    "id": 2,
+    "title": "Generate report totals and per-account summaries",
+    "prompt": "Preserve phases 0 and 1, then implement milestone 3 in src/report.ts and src/main.ts. buildUsageReport must produce correct overall totals, per-account totals, deterministic ordering, and JSON-safe zero defaults for empty input. createUsageReport should compose normalization, aggregation, and report generation end to end without mutating inputs."
+  },
+  {
+    "id": 3,
+    "title": "Add retry idempotency with event IDs",
+    "prompt": "Keep all earlier behaviour passing and implement milestone 4. Optional eventId values now enable retry-safe ingestion: validate eventId, trim it, collapse exact duplicate retries by normalized event ID, and throw a RangeError when the same normalized event ID appears with conflicting normalized account/day/units data. Ensure createUsageReport inherits the same behaviour end to end."
+  }
+]

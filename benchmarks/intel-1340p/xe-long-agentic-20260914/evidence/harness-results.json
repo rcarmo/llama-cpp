@@ -1,0 +1,69 @@
+{
+  "pass": true,
+  "results": [
+    {
+      "case": "seed rejects phase0",
+      "ok": false,
+      "code": 1,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n11 |     normalizeUsageEvent({\n12 |       account: '  acme  ',\n13 |       occurredAt: '2026-03-01T23:30:00-02:00',\n14 |       units: 3,\n15 |     }),\n16 |   ).toEqual({\n         ^\nerror: expect(received).toEqual(expected)\n\n  {\n-   \"account\": \"acme\",\n+   \"account\": \"  acme  \",\n    \"day\": \"2026-03-02\",\n+   \"eventId\": undefined,\n    \"units\": 3,\n  }\n\n- Expected  - 1\n+ Received  + 2\n\n      at <anonymous> (/fixture/visible.test.ts:16:5)\n(fail) phase 0: normalize a single event into a UTC day [0.67ms]\n37 |     { account: ' team-a ', occurredAt: '2026-01-02T00:00:00Z', units: 1 },\n38 |     { account: 'team-b', occurredAt: '2026-01-01T23:00:00-02:00', units: 2 },\n39 |   ];\n40 |   const snapshot = events.map((event) => ({ ...event }));\n41 | \n42 |   expect(normalizeUsageEvents(events)).toEqual([\n                                            ^\nerror: expect(received).toEqual(expected)\n\n  [\n    {\n-     \"account\": \"team-a\",\n+     \"account\": \" team-a \",\n      \"day\": \"2026-01-02\",\n+     \"eventId\": undefined,\n      \"units\": 1,\n    },\n    {\n      \"account\": \"team-b\",\n      \"day\": \"2026-01-02\",\n+     \"eventId\": undefined,\n      \"units\": 2,\n    },\n  ]\n\n- Expected  - 1\n+ Received  + 3\n\n      at <anonymous> (/fixture/visible.test.ts:42:40)\n(fail) phase 0: normalizeUsageEvents preserves order and leaves inputs unchanged [0.43ms]\n52 |     normalizeUsageEvent({\n53 |       account: 7 as unknown as string,\n54 |       occurredAt: '2026-01-01T00:00:00Z',\n55 |       units: 1,\n56 |     }),\n57 |   ).toThrow(TypeError);\n         ^\nerror: expect(received).toThrow(expected)\n\nExpected constructor: TypeError\n\nReceived function did not throw\nReceived value: {\n  account: \"7\",\n  day: \"2026-01-01\",\n  units: 1,\n  eventId: undefined,\n}\n\n      at <anonymous> (/fixture/visible.test.ts:57:5)\n(fail) phase 0: validate types and value ranges [0.32ms]\n\n 0 pass\n 3 fail\n 3 expect() calls\nRan 3 tests across 1 file. [8.00ms]\n"
+    },
+    {
+      "case": "reference visible0",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) phase 0: normalize a single event into a UTC day [0.44ms]\n(pass) phase 0: normalizeUsageEvents preserves order and leaves inputs unchanged [0.32ms]\n(pass) phase 0: validate types and value ranges [0.37ms]\n\n 3 pass\n 0 fail\n 13 expect() calls\nRan 3 tests across 1 file. [8.00ms]\n"
+    },
+    {
+      "case": "reference hidden0",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) hidden 0: UTC day conversion handles offsets and year boundaries [0.56ms]\n(pass) hidden 0: batch normalization preserves order and caller input data [0.38ms]\n(pass) hidden 0: invalid Date instances and non-number units are rejected [0.20ms]\n\n 3 pass\n 0 fail\n 7 expect() calls\nRan 3 tests across 1 file. [7.00ms]\n"
+    },
+    {
+      "case": "reference visible1",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) phase 0: normalize a single event into a UTC day [0.47ms]\n(pass) phase 0: normalizeUsageEvents preserves order and leaves inputs unchanged [0.35ms]\n(pass) phase 0: validate types and value ranges [0.33ms]\n(pass) phase 1: aggregate by day and account with deterministic ordering [1.10ms]\n(pass) phase 1: aggregateUsage returns a new array and keeps zero-unit events [0.14ms]\n\n 5 pass\n 0 fail\n 16 expect() calls\nRan 5 tests across 1 file. [8.00ms]\n"
+    },
+    {
+      "case": "reference hidden1",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) hidden 0: UTC day conversion handles offsets and year boundaries [0.69ms]\n(pass) hidden 0: batch normalization preserves order and caller input data [0.53ms]\n(pass) hidden 0: invalid Date instances and non-number units are rejected [0.32ms]\n(pass) hidden 1: aggregateUsage sums units and counts across multiple groups [1.29ms]\n(pass) hidden 1: aggregateUsage does not mutate mutable caller arrays either [0.13ms]\n\n 5 pass\n 0 fail\n 9 expect() calls\nRan 5 tests across 1 file. [11.00ms]\n"
+    },
+    {
+      "case": "reference visible2",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) phase 0: normalize a single event into a UTC day [0.50ms]\n(pass) phase 0: normalizeUsageEvents preserves order and leaves inputs unchanged [0.34ms]\n(pass) phase 0: validate types and value ranges [0.32ms]\n(pass) phase 1: aggregate by day and account with deterministic ordering [1.14ms]\n(pass) phase 1: aggregateUsage returns a new array and keeps zero-unit events [0.15ms]\n(pass) phase 2: buildUsageReport computes totals and per-account summaries [0.44ms]\n(pass) phase 2: empty input produces JSON-safe zero defaults [0.10ms]\n(pass) phase 2: createUsageReport composes normalization, aggregation, and reporting [0.14ms]\n\n 8 pass\n 0 fail\n 21 expect() calls\nRan 8 tests across 1 file. [10.00ms]\n"
+    },
+    {
+      "case": "reference hidden2",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) hidden 0: UTC day conversion handles offsets and year boundaries [0.68ms]\n(pass) hidden 0: batch normalization preserves order and caller input data [0.53ms]\n(pass) hidden 0: invalid Date instances and non-number units are rejected [0.31ms]\n(pass) hidden 1: aggregateUsage sums units and counts across multiple groups [1.45ms]\n(pass) hidden 1: aggregateUsage does not mutate mutable caller arrays either [0.19ms]\n(pass) hidden 2: buildUsageReport sorts rows and computes distinct day/account totals [0.65ms]\n(pass) hidden 2: createUsageReport stays deterministic from raw input [0.34ms]\n\n 7 pass\n 0 fail\n 13 expect() calls\nRan 7 tests across 1 file. [11.00ms]\n"
+    },
+    {
+      "case": "reference visible3",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) phase 0: normalize a single event into a UTC day [0.50ms]\n(pass) phase 0: normalizeUsageEvents preserves order and leaves inputs unchanged [0.37ms]\n(pass) phase 0: validate types and value ranges [0.33ms]\n(pass) phase 1: aggregate by day and account with deterministic ordering [1.11ms]\n(pass) phase 1: aggregateUsage returns a new array and keeps zero-unit events [0.14ms]\n(pass) phase 2: buildUsageReport computes totals and per-account summaries [0.46ms]\n(pass) phase 2: empty input produces JSON-safe zero defaults [0.11ms]\n(pass) phase 2: createUsageReport composes normalization, aggregation, and reporting [0.13ms]\n(pass) phase 3: duplicate retry ids are idempotent when normalized content matches [0.14ms]\n(pass) phase 3: conflicting duplicate retry ids are rejected [0.18ms]\n(pass) phase 3: eventId is validated, but events without ids still count independently [0.12ms]\n\n 11 pass\n 0 fail\n 28 expect() calls\nRan 11 tests across 1 file. [11.00ms]\n"
+    },
+    {
+      "case": "reference hidden3",
+      "ok": true,
+      "code": 0,
+      "stdout": "bun test v1.4.1 (4661e494f)\n",
+      "stderr": "\nvisible.test.ts:\n(pass) hidden 0: UTC day conversion handles offsets and year boundaries [0.57ms]\n(pass) hidden 0: batch normalization preserves order and caller input data [0.41ms]\n(pass) hidden 0: invalid Date instances and non-number units are rejected [0.21ms]\n(pass) hidden 1: aggregateUsage sums units and counts across multiple groups [1.19ms]\n(pass) hidden 1: aggregateUsage does not mutate mutable caller arrays either [0.14ms]\n(pass) hidden 2: buildUsageReport sorts rows and computes distinct day/account totals [0.49ms]\n(pass) hidden 2: createUsageReport stays deterministic from raw input [0.21ms]\n(pass) hidden 3: matching retry ids dedupe after normalization, including whitespace and UTC-day normalization [0.15ms]\n(pass) hidden 3: conflicting retry ids reject changes in normalized day or account [0.18ms]\n(pass) hidden 3: blank and mistyped event ids are rejected, but missing ids are never deduped [0.12ms]\n\n 10 pass\n 0 fail\n 20 expect() calls\nRan 10 tests across 1 file. [12.00ms]\n"
+    }
+  ],
+  "guards": 9
+}
