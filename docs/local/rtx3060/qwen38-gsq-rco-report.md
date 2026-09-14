@@ -2,6 +2,15 @@
 
 RTX 3060 12 GB; merged source 72035c65a; verified CUDA build in build-gsq-cuda. Eight source regression tests pass. Previous service is stopped as requested. GPU results exclude the accidental CPU-only run.
 
+## Current network defaults
+
+The launcher defaults to `0.0.0.0:11434` (Ollama's customary port), exposing
+its OpenAI-compatible API at `http://<host>:11434/v1`. No authentication is
+configured: use only on a trusted LAN and restrict access with a firewall.
+Set `HOST=127.0.0.1` for local-only access; `PORT` also remains overridable.
+This network change does not alter the model or inference settings below.
+Historical benchmark records retain their original port 19450.
+
 ## Latest upstream rebuild: 2026-09-14
 
 Measured source: `a380f11b5`, merging origin `661643e43`. Published in
@@ -35,7 +44,7 @@ Run summaries and regression output are in
 running, then execute from the repository root:
 
 ```sh
-BENCH_URL=http://127.0.0.1:19450 bun tools/pi/benchmarks/qwen-agentic.ts /tmp/gsq-agentic-run
+BENCH_URL=http://127.0.0.1:11434 bun tools/pi/benchmarks/qwen-agentic.ts /tmp/gsq-agentic-run
 ```
 
 The sections below retain the earlier evaluation history.
