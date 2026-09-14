@@ -28,11 +28,16 @@ gated_delta_net_cuda(const float * q,
                                      float         scale,
                                      int64_t       state_slot_stride,
                                      int           K) {
-    const uint32_t h_idx    = blockIdx.x;
+#if defined(GGML_USE_HIP) || defined(GGML_USE_MUSA)
+    const bool grouped_columns = false;
+#else
+    const bool grouped_columns = H >= 32;
+#endif
+    const uint32_t h_idx    = grouped_columns ? blockIdx.z : blockIdx.x;
     const uint32_t sequence = blockIdx.y;
     // each warp owns one column, using warp-level primitives to reduce across rows
     const int      lane     = threadIdx.x;
-    const int      col      = blockIdx.z * blockDim.y + threadIdx.y;
+    const int      col      = (grouped_columns ? blockIdx.x : blockIdx.z) * blockDim.y + threadIdx.y;
 
     const uint32_t iq1 = fastmodulo(h_idx, neqk1_magic);
     const uint32_t iq3 = fastdiv(sequence, rq3_magic);
@@ -50,16 +55,23 @@ gated_delta_net_cuda(const float * q,
     constexpr int warp_size = ggml_cuda_get_physical_warp_size() < S_v ? ggml_cuda_get_physical_warp_size() : S_v;
     static_assert(S_v % warp_size == 0, "S_v must be a multiple of warp_size");
     constexpr int rows_per_lane = (S_v + warp_size - 1) / warp_size;
+#if defined(GGML_USE_HIP) || defined(GGML_USE_MUSA)
+    constexpr bool vector_qk = false;
+#else
+    constexpr bool vector_qk = S_v == 128 && warp_size == 32;
+#endif
     float         s_shard[rows_per_lane];
     // state is stored transposed: M[col][i] = S[i][col], row col is contiguous
 
     ggml_cuda_pdl_sync();
 #pragma unroll
     for (int r = 0; r < rows_per_lane; r++) {
-        const int i = r * warp_size + lane;
+        const int i = vector_qk ? lane * rows_per_lane + r : r * warp_size + lane;
         s_shard[r]  = curr_state[i];
     }
 
+    const bool aligned_qk = ((uintptr_t(q) | uintptr_t(k)) & 15) == 0 &&
+            (sq1 % 4 == 0) && (sq2 % 4 == 0) && (sq3 % 4 == 0);
     for (int t = 0; t < n_tokens; t++) {
         const float * q_t = q + iq3 * sq3 + t * sq2 + iq1 * sq1;
         const float * k_t = k + iq3 * sq3 + t * sq2 + iq1 * sq1;
@@ -74,11 +86,26 @@ gated_delta_net_cuda(const float * q,
         // Cache k and q in registers
         float k_reg[rows_per_lane];
         float q_reg[rows_per_lane];
+        if constexpr (vector_qk) {
+            if (aligned_qk) {
+                const float4 kv = reinterpret_cast<const float4 *>(k_t)[lane];
+                const float4 qv = reinterpret_cast<const float4 *>(q_t)[lane];
+                k_reg[0] = kv.x; k_reg[1] = kv.y; k_reg[2] = kv.z; k_reg[3] = kv.w;
+                q_reg[0] = qv.x; q_reg[1] = qv.y; q_reg[2] = qv.z; q_reg[3] = qv.w;
+            } else {
 #pragma unroll
-        for (int r = 0; r < rows_per_lane; r++) {
-            const int i = r * warp_size + lane;
-            k_reg[r] = k_t[i];
-            q_reg[r] = q_t[i];
+                for (int r = 0; r < rows_per_lane; r++) {
+                    k_reg[r] = k_t[lane * rows_per_lane + r];
+                    q_reg[r] = q_t[lane * rows_per_lane + r];
+                }
+            }
+        } else {
+#pragma unroll
+            for (int r = 0; r < rows_per_lane; r++) {
+                const int i = r * warp_size + lane;
+                k_reg[r] = k_t[i];
+                q_reg[r] = q_t[i];
+            }
         }
 
         if constexpr (!KDA) {
@@ -114,7 +141,7 @@ gated_delta_net_cuda(const float * q,
             float kv_shard = 0.0f;
 #pragma unroll
             for (int r = 0; r < rows_per_lane; r++) {
-                const int i = r * warp_size + lane;
+                const int i = vector_qk ? lane * rows_per_lane + r : r * warp_size + lane;
                 kv_shard += expf(g_t[i]) * s_shard[r] * k_reg[r];
             }
 
@@ -128,7 +155,7 @@ gated_delta_net_cuda(const float * q,
             float attn_partial = 0.0f;
 #pragma unroll
             for (int r = 0; r < rows_per_lane; r++) {
-                const int i = r * warp_size + lane;
+                const int i = vector_qk ? lane * rows_per_lane + r : r * warp_size + lane;
                 s_shard[r]  = expf(g_t[i]) * s_shard[r] + k_reg[r] * delta_col;
                 attn_partial += s_shard[r] * q_reg[r];
             }
@@ -150,7 +177,7 @@ gated_delta_net_cuda(const float * q,
                 float * curr_state = state + target_slot * state_slot_stride;
 #pragma unroll
                 for (int r = 0; r < rows_per_lane; r++) {
-                    const int i = r * warp_size + lane;
+                    const int i = vector_qk ? lane * rows_per_lane + r : r * warp_size + lane;
                     curr_state[col * S_v + i] = s_shard[r];
                 }
             }
@@ -160,7 +187,7 @@ gated_delta_net_cuda(const float * q,
     if constexpr (!keep_rs_t) {
 #pragma unroll
         for (int r = 0; r < rows_per_lane; r++) {
-            const int i          = r * warp_size + lane;
+            const int i          = vector_qk ? lane * rows_per_lane + r : r * warp_size + lane;
             state[col * S_v + i] = s_shard[r];
         }
     }
@@ -180,7 +207,14 @@ static void launch_gated_delta_net(
     //TODO: Add chunked kernel for even faster pre-fill
     const int warp_size = ggml_cuda_info().devices[ggml_cuda_get_device()].warp_size;
     const int num_warps = 4;
-    dim3      grid_dims(H, n_seqs, (S_v + num_warps - 1) / num_warps);
+#if defined(GGML_USE_HIP) || defined(GGML_USE_MUSA)
+    const bool grouped_columns = false;
+#else
+    const bool grouped_columns = H >= 32;
+#endif
+    dim3      grid_dims = grouped_columns
+        ? dim3((S_v + num_warps - 1) / num_warps, n_seqs, H)
+        : dim3(H, n_seqs, (S_v + num_warps - 1) / num_warps);
     dim3      block_dims(warp_size <= S_v ? warp_size : S_v, num_warps, 1);
 
     const uint3 neqk1_magic = init_fastdiv_values(neqk1);

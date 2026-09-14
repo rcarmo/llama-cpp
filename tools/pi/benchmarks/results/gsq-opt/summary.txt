@@ -1,0 +1,37 @@
+GSQ IQ2_S 64K optimisation checkpoint
+
+Retained: automatic IQ1_M conversion chunking under GPU memory pressure, including short batches. Accounts for reusable VMM pool bytes; optional override retained for comparison. This avoids the full 178257920-byte FP16 expansion of blk.0.ffn_up.weight. It enables MTP depth4 on RTX3060 12GB without changing the GGUF format.
+
+Selected tested profile: 64K, full GPU offload, q4_0 K/V, batch2048/ubatch256, four threads, MTP4, async off, normal CUDA dispatch. No forced-MMQ or chunking flag required. Launcher: tools/pi/bin/run-qwen38-gsq-cuda.sh. Build directory is historically named build-mmq but FORCE_MMQ is OFF.
+
+Matched reverse-depth runs: MTP1 task27.58/27.16s, MTP3 task23.94/24.36s. Subsequent MTP4 repeats22.29/24.14s; normal-build repeats21.43/23.26s. Final-turn MTP4 decode30.9--36.1tok/s vs MTP1 approximately24.5tok/s. Sequential timing drift and different generated lengths limit precision; do not claim identical outputs or a universal percentage speedup.
+
+Prefill remains approximately360--430tok/s in repeated tool-result runs; no repeatable isolated prefill gain established. Always chunking slows normal256 batches; use automatic pressure fallback. MTP5 and MTP4/ubatch512 hit memory limits. Smaller chunks and eager module loading do not resolve them. Two/six CPU threads and ubatch128 did not beat selected defaults.
+
+Rejected kernels: eight-warps GDN: no32-head gain, approximately9% slower at4 heads. MMQ64-column tiles approximately31% slower than128-column at representative IQ2_S shape. Forced stream-K1-block/SM improves512-token synthetic kernels1--5%, but has no meaningful256-token gain and no demonstrated task gain. All reverted; raw results stored alongside this file.
+
+Final checks:8/8 regression tests,16/16 IQ1_M backend cases,36/36 GDN cases pass. Rebuilt normal profile retrieves correct code from60388 tokens in205.06s, rejects doubled prompt with400, then recovers. Earlier MTP4 cancellation and repeated tools passed. Quality remains9/10; known comprehension error changes32->16 with deeper draft. Existing target-logit plain/MTP divergence remains unresolved; no parity guarantee.
+
+This is a bounded optimisation checkpoint, not proof of maximum attainable speed. Prefill throughput work remains open. Source is on perf/gsq-prefill, not merged into master or deployed as a service. Candidate launched manually on localhost:19450; previous service stays stopped as requested.
+
+Update after sustained-load validation:
+Activation conversion is now reused across IQ1_M chunks. With2048-row chunks the representative pressure-path kernel takes1.354ms vs original1024-row implementation1.725ms (approximately21.5% lower); full conversion with ample memory takes1.260ms and remains preferred. Expanded IQ1_M tests pass18/18 including multiple full chunks and trailing rows. Long-context checks pass again after these changes.
+
+Sustained fixed-work tests explain much of the earlier timing variation: GPU reaches89C, software thermal slowdown becomes active, and core clocks fall to roughly1.3GHz. Prefill falls from430 to361tok/s. Under comparable sustained load, MTP1 fixed-prose decode is approximately23.6tok/s, MTP4 approximately24.4tok/s. The larger tool-task improvement must not be generalized to all decode. No fan, clock or power controls were modified. Cooling remediation or an approved fan/power experiment is the next hardware investigation; current idle fan reading is76% at60C, which alone does not establish a cooling defect.
+
+No maximum-speed claim. Automatic memory fallback, normal CUDA dispatch,64K/q4 KV, four threads, batch2048/ubatch256, MTP4 remain the selected tested profile. Remaining engineering opportunities include a direct IQ1_M MMQ kernel and deeper target-evaluation parity diagnosis; neither has been implemented. Raw telemetry and fixed-work runner are included so subsequent comparisons can be thermally matched.
+
+Direct IQ1_M MMQ update:
+Implemented exact int8 tile representation8*grid+/-1 with per16-value scale divided by8. Direct dispatch is automatic only for validated NVIDIA compute8.6 dense operations with>=16 columns, compiled tensor-core support and adequate shared-memory capacity. Other GPUs/routed experts retain fallback; GGML_CUDA_IQ1M_MMQ=0 disables the path for comparisons. Ordinary small-token vector dispatch precedes MMQ.
+
+Representative4096x14336 weight matrix:256-column direct1.128ms vs full conversion1.260ms and bounded conversion1.354ms. At32 columns:0.271ms vs0.909ms;64 columns:0.370ms vs0.932ms;16 columns:0.218ms vs0.863ms.32/32 IQ1_M correctness cases pass, including multi-block5120-wide rows, full/partial chunks and direct/fallback selection. Final8/8 regression set passes.
+
+Whole-model sustained benefit is much smaller: order-reversed fixed workloads show direct prefill roughly384--389tok/s vs fallback378--383tok/s in one comparison; latest explicit0/1 comparison settles near391 versus387tok/s, decode essentially unchanged near26.9tok/s. Thermal telemetry remains active at88C. These are modest measured differences, not proof of maximum or a universal percentage gain. Automatic16-token threshold tool tests pass; earlier automatic128-token threshold passed60388-token retrieval in193.18s. Latest threshold still needs a final long-context rerun before merge/promotion. Depth5 and depth4/ubatch512 remain memory-limited.
+Final16-token-threshold validation completed:60388-token retrieval correct in187.56s; oversized request400; subsequent short request200. Cancellation followed by full agentic tool task also passed. Raw final-direct-context.json and final-direct-recovery.json record these checks. No claim that the single187.56s run is a controlled speedup.
+
+Final dispatch-gap update:
+Validated direct IQ1_M MMQ now starts at9 columns (ordinary1--8-column vector dispatch unchanged).9/12-column representative kernels drop fromapproximately0.830ms to0.218ms;16-column0.863ms to0.218ms.40/40 IQ1_M cases pass for automatic and explicit fallback paths;8/8 regression tests pass on retained build. New direct path avoids repeated full-weight conversions for cached turns and partial speculative batches; do not extrapolate microkernel ratios to full-model throughput.
+
+MTP5 now completes initial64K tools and60388-token retrieval after the dispatch fix, but fails after the broader workload/cancellation sequence at MMQ cudaFuncSetAttribute with OOM. Eager module loading fails at64K MTP-cache allocation instead.48K/MTP5/eager passes two tool tasks21.36/21.67s plus cancellation/recovery24.47s; this smaller-context alternative has not received full long-context validation and is not selected.64K/MTP4 remains default.
+
+Source remains on perf/gsq-prefill with tested commits; not merged/pushed. Direct IQ1_M is narrowly enabled on compute8.6 dense operations, and unrelated GPUs retain fallback. Thermal-limit and plain/MTP target-logit divergence caveats remain. No absolute maximum proven.

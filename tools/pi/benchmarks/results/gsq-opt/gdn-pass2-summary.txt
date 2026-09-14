@@ -1,0 +1,18 @@
+GDN hotspot optimisation pass, baseline b595a741f
+
+Retained changes: group column blocks for CUDA head counts >=32; use contiguous four-value per-lane state layout for128-wide state on32-lane CUDA warps; vector-load aligned query/key values. Hoist pointer/stride alignment decision outside the recurrence; use scalar loads for misalignment. HIP/MUSA retain original grouping and lane layout. Arithmetic reduction order changes; bitwise token parity is not claimed.
+
+Kernel result at48 heads,128 state width,256 tokens,K=5: original approximately1.53ms, retained1.209ms (about21% lower).45/45 CUDA-versus-CPU GDN cases pass existing1e-7 NMSE threshold, including grouped heads, permuted inputs, snapshot tails and deliberately unaligned query/key views. These tests bound numerical error, not broad model quality.
+
+Whole-model order-reversed fixed workloads: decode approximately28.0tok/s retained versus27.2tok/s published baseline (~3% gain). Prefill remains order/thermal sensitive and overlaps after warming; no isolated whole-model prefill speedup established. 60388-token retrieval, oversized request rejection, cancellation and tool recovery pass. Exact-answer smoke checks9/10; the known comprehension failure persists and changes answer with reduction ordering. Not a model-quality equivalence score.
+
+Rejected and removed: parallel chunked prefix, alternative warp counts/occupancy, explicit fast exp, read-only/L1-bypass/streaming cache hints, pairwise/factored arithmetic, shared output buffering, alternate interleaving, and smaller IQ2_S block/tile geometry. The initially promising128-thread IQ2_S result was invalid incomplete work; expanded tests caught it and corrected geometry was slower.
+
+Scope: this pass reduces a measured GDN hotspot and adds a repeatable small decode gain. It does not prove globally maximal performance or claim all hotspots eliminated. Retained code diff is limited to gated_delta_net.cu plus existing backend-test extensions. Measurements and rejected trials are preserved alongside this summary. Merge main/master only after final validation and goal decision.
+
+Completed combined validation:
+IQ3_XXS sign lookup is retained only for compute8.6; sampled64/128/256/512-column kernels improve roughly1--2%, including a reversed256-column repeat0.894ms versus0.903ms baseline. All other tile/occupancy/store experiments were reverted. Sign decoding remains exactly the same lookup-defined mapping; no quant format changes.
+
+Combined retained build:8/8 regression tests,45/45 GDN tests and74/74 selected IQ matmul tests pass. Initial backend-test allocation failures occurred while the64K server occupied GPU memory; stopping it and rerunning passes. Combined fixed-work post-warmup prefill430.5/444.6/449.6tok/s and generation28.28/28.32/28.52tok/s. Thermal telemetry reaches88C with software slowdown, so compare with order-reversed data rather than summing kernel gains.60,388-token retrieval, over-limit rejection, cancellation and agentic recovery passed on the combined code.
+
+Goal assessment: measured hotspot reduction achieved for this bounded pass, not universal maximum speed or elimination of all bottlenecks. Retained GDN and IQ3_XXS gains compound without an established whole-model prefill percentage. No new flags required; no hardware controls changed. Existing plain/MTP divergence and failed Python-comprehension smoke case remain explicitly unresolved; passing9/10 fixtures is not a broad quality score. Main/master integration follows final review.

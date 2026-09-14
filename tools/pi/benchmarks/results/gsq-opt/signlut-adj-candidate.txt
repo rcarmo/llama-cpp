@@ -1,0 +1,19 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 11909 MiB):
+  Device 0: NVIDIA GeForce RTX 3060, compute capability 8.6, VMM: yes, VRAM: 11909 MiB
+ggml_backend_cuda_graph_compute: CUDA graph warmup complete
+Testing 2 devices
+
+Backend 1/2: CUDA0
+  Device description: NVIDIA GeForce RTX 3060
+  Device memory: 11909 MB (11422 MB free)
+
+  MUL_MAT(type_a=iq3_xxs,type_b=f32,m=4096,n=64,k=14336,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0): ggml_backend_cuda_graph_compute: CUDA graph warmup complete
+              3332 runs -   300.32 us/run -   7.52 GFLOP/run - [1;34m 25.03 TFLOPS[0m
+  MUL_MAT(type_a=iq3_xxs,type_b=f32,m=4096,n=128,k=14336,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0): ggml_backend_cuda_graph_compute: CUDA graph warmup complete
+             2163 runs -   462.48 us/run -  15.03 GFLOP/run - [1;34m 32.50 TFLOPS[0m
+  MUL_MAT(type_a=iq3_xxs,type_b=f32,m=4096,n=512,k=14336,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0):               556 runs -  1800.37 us/run -  60.13 GFLOP/run - [1;34m 33.40 TFLOPS[0m
+  Backend CUDA0: [1;32mOK[0m
+Backend 2/2: CPU
+  Skipping
+2/2 backends passed
+[1;32mOK[0m

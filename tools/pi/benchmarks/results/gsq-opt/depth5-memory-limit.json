@@ -1,0 +1,24 @@
+{
+  "failure64k": "After long context and quality workload, recovery task OOM at cudaFuncSetAttribute in MMQ. EAGER loading moves failure to MTP KV allocation at startup.",
+  "trial48k": {
+    "eager": true,
+    "results": [
+      {
+        "run": "1",
+        "passed": true,
+        "totalMs": 21359.585658999997
+      },
+      {
+        "run": "2",
+        "passed": true,
+        "totalMs": 21671.253949
+      },
+      {
+        "run": "recovery",
+        "passed": true,
+        "totalMs": 24469.427735
+      }
+    ]
+  },
+  "selected": "Keep64K/MTP4;48K/MTP5 is a separate bounded trial, not full long-context validation."
+}

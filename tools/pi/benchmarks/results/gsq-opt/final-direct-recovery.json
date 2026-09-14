@@ -1,0 +1,110 @@
+{
+  "base": "http://127.0.0.1:19450",
+  "rows": 300,
+  "records": [
+    {
+      "turn": 0,
+      "ms": 1900.054948,
+      "valid": true,
+      "usage": {
+        "completion_tokens": 26,
+        "prompt_tokens": 336,
+        "total_tokens": 362,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "timings": {
+        "cache_n": 0,
+        "prompt_n": 336,
+        "prompt_ms": 1137.116,
+        "prompt_per_token_ms": 3.3842738095238096,
+        "prompt_per_second": 295.48436571114996,
+        "predicted_n": 26,
+        "predicted_ms": 512.021,
+        "predicted_per_token_ms": 20.480839999999997,
+        "predicted_per_second": 48.826122366074834,
+        "draft_n": 20,
+        "draft_n_accepted": 20
+      },
+      "content": "",
+      "calls": [
+        {
+          "type": "function",
+          "function": {
+            "name": "read_file",
+            "arguments": "{\"path\":\"config.json\"}"
+          },
+          "id": "hDjBzRLC2c5879I4U3Ztj7WG8iM5EtrC"
+        }
+      ]
+    },
+    {
+      "turn": 1,
+      "ms": 13121.643966,
+      "valid": true,
+      "usage": {
+        "completion_tokens": 26,
+        "prompt_tokens": 5687,
+        "total_tokens": 5713,
+        "prompt_tokens_details": {
+          "cached_tokens": 361
+        }
+      },
+      "timings": {
+        "cache_n": 361,
+        "prompt_n": 5326,
+        "prompt_ms": 12324.299,
+        "prompt_per_token_ms": 2.3139877957191137,
+        "prompt_per_second": 432.15439677339856,
+        "predicted_n": 26,
+        "predicted_ms": 566.269,
+        "predicted_per_token_ms": 22.650760000000002,
+        "predicted_per_second": 44.14862900847477,
+        "draft_n": 20,
+        "draft_n_accepted": 20
+      },
+      "content": "",
+      "calls": [
+        {
+          "type": "function",
+          "function": {
+            "name": "read_file",
+            "arguments": "{\"path\":\"worker.ts\"}"
+          },
+          "id": "vQCoI6yEO8DgVDOGz1mie0jjItj4tCnE"
+        }
+      ]
+    },
+    {
+      "turn": 2,
+      "ms": 6701.512264999998,
+      "valid": true,
+      "usage": {
+        "completion_tokens": 204,
+        "prompt_tokens": 5789,
+        "total_tokens": 5993,
+        "prompt_tokens_details": {
+          "cached_tokens": 5712
+        }
+      },
+      "timings": {
+        "cache_n": 5712,
+        "prompt_n": 77,
+        "prompt_ms": 463.712,
+        "prompt_per_token_ms": 6.022233766233766,
+        "prompt_per_second": 166.0513422124077,
+        "predicted_n": 204,
+        "predicted_ms": 6218.364,
+        "predicted_per_token_ms": 30.632334975369456,
+        "predicted_per_second": 32.64524238207992,
+        "draft_n": 216,
+        "draft_n_accepted": 149
+      },
+      "content": "**Why jobs can retry forever:**\n\nIn `worker.ts`, the retry logic is:\n\n```ts\nif (config.maxRetries === 0 || job.attempts < config.maxRetries) return enqueue(job);\n```\n\nThe condition `config.maxRetries === 0` short-circuits to `true`, so when `maxRetries` is `0`, the job is **always re-enqueued** regardless of how many attempts it has already made. The comment in the file confirms the intent: *\"maxRetries=0 explicitly means unlimited retries.\"*\n\nIn `config.json`, `\"maxRetries\": 0` is set, which triggers this unlimited-retry path.\n\n**Correction:**\n\nChange `config.json` from `\"maxRetries\": 0` to a finite positive value, e.g. `\"maxRetries\": 3`, so that after 3 failed attempts the job is routed to the dead-letter queue instead of being re-enqueued indefinitely.",
+      "calls": []
+    }
+  ],
+  "totalMs": 21723.211178999998,
+  "passed": true
+}
