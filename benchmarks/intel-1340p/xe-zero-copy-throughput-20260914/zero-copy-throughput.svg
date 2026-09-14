@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1460" viewBox="0 0 1200 1460" role="img"><title>Zero-copy versus copied KV: decode throughput and transfer latency</title><desc>Copied versus zero-copy medians across three retained workloads. Short decode22.48 versus20.49 tokens per second; longer runs show no sustained gain. Individual observations and ranges shown.</desc><rect width="100%" height="100%" fill="#f5f8fb"/><g font-family="DejaVu Sans,Arial,sans-serif">
+<text x="42" y="56" font-size="34" fill="#173047" font-weight="700">Zero-copy: what changed in tok/s?</text>
+<text x="42" y="92" font-size="17" fill="#526878" font-weight="400">Copied KV → shared (zero-copy) KV · Intel i5-1340P / Iris Xe · Gemma E4B Q4 + MTP3</text>
+<rect x="42" y="116" width="1120" height="85" rx="8" fill="#e5f1ec"/>
+<text x="62" y="149" font-size="23" fill="#13795b" font-weight="700">Short run: +1.99 tok/s (+9.72%). Longer runs: no decode gain.</text>
+<text x="62" y="180" font-size="18" fill="#173047" font-weight="400">At 4K, zero-copy saves 63.85 ms in handoff while decode remains about 20.7 tok/s.</text>
+<rect x="32" y="220" width="1136" height="587" rx="10" fill="#ffffff"/>
+<text x="52" y="259" font-size="25" fill="#173047" font-weight="700">Decode after first token</text>
+<text x="52" y="289" font-size="16" fill="#526878" font-weight="400">tok/s · higher is better · bars = medians · dots = runs · whiskers = observed range</text>
+<rect x="64" y="310" width="22" height="14" rx="4" fill="#587791"/>
+<text x="97" y="323" font-size="16" fill="#173047" font-weight="400">Copied KV</text>
+<rect x="265" y="310" width="22" height="14" rx="4" fill="#13795b"/>
+<text x="298" y="323" font-size="16" fill="#173047" font-weight="400">Zero-copy KV</text>
+<line x1="390" y1="343" x2="390" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="382" y="784" font-size="14" fill="#526878" font-weight="400">0</text>
+<line x1="505" y1="343" x2="505" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="497" y="784" font-size="14" fill="#526878" font-weight="400">5</text>
+<line x1="620" y1="343" x2="620" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="612" y="784" font-size="14" fill="#526878" font-weight="400">10</text>
+<line x1="735" y1="343" x2="735" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="727" y="784" font-size="14" fill="#526878" font-weight="400">15</text>
+<line x1="850" y1="343" x2="850" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="842" y="784" font-size="14" fill="#526878" font-weight="400">20</text>
+<line x1="965" y1="343" x2="965" y2="753" stroke="#e4ebf1" stroke-width="1"/>
+<text x="957" y="784" font-size="14" fill="#526878" font-weight="400">25</text>
+<text x="1060" y="784" font-size="14" fill="#526878" font-weight="400">tok/s</text>
+<text x="54" y="378" font-size="22" fill="#173047" font-weight="700">Short prompt</text>
+<text x="54" y="407" font-size="16" fill="#526878" font-weight="400">309 prompt / 128 output</text>
+<text x="54" y="433" font-size="15" fill="#526878" font-weight="400">4 runs/arm · 38 MiB KV</text>
+<rect x="390" y="361" width="471.1888221657109" height="23" rx="3" fill="#587791"/>
+<line x1="819.0620915945545" y1="373" x2="902.0795416037571" y2="373" stroke="#173047" stroke-width="2"/>
+<line x1="819.0620915945545" y1="367" x2="819.0620915945545" y2="379" stroke="#173047" stroke-width="2"/>
+<line x1="902.0795416037571" y1="367" x2="902.0795416037571" y2="379" stroke="#173047" stroke-width="2"/>
+<circle cx="822.2129088897807" cy="373" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="900.1647354416411" cy="373" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="902.0795416037571" cy="373" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="819.0620915945545" cy="373" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="398" width="517.0027912882169" height="23" rx="3" fill="#13795b"/>
+<line x1="866.8088241917704" y1="410" x2="920.9747401202848" y2="410" stroke="#173047" stroke-width="2"/>
+<line x1="866.8088241917704" y1="404" x2="866.8088241917704" y2="416" stroke="#173047" stroke-width="2"/>
+<line x1="920.9747401202848" y1="404" x2="920.9747401202848" y2="416" stroke="#173047" stroke-width="2"/>
+<circle cx="920.9747401202848" cy="410" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="910.5797860861559" cy="410" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="866.8088241917704" cy="410" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="903.4257964902781" cy="410" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="1013" y="378" font-size="23" fill="#587791" font-weight="700">20.49</text>
+<text x="1013" y="415" font-size="23" fill="#13795b" font-weight="700">22.48</text>
+<text x="390" y="455" font-size="21" fill="#13795b" font-weight="700">+1.99 tok/s  (+9.72%)</text>
+<text x="54" y="510" font-size="22" fill="#173047" font-weight="700">1K prompt</text>
+<text x="54" y="539" font-size="16" fill="#526878" font-weight="400">1,021 prompt / 512 output</text>
+<text x="54" y="565" font-size="15" fill="#526878" font-weight="400">2 runs/arm · 69 MiB KV</text>
+<rect x="390" y="493" width="487.2351018889367" height="23" rx="3" fill="#587791"/>
+<line x1="859.1223608970458" y1="505" x2="895.3478428808274" y2="505" stroke="#173047" stroke-width="2"/>
+<line x1="859.1223608970458" y1="499" x2="859.1223608970458" y2="511" stroke="#173047" stroke-width="2"/>
+<line x1="895.3478428808274" y1="499" x2="895.3478428808274" y2="511" stroke="#173047" stroke-width="2"/>
+<circle cx="895.3478428808274" cy="505" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="859.1223608970458" cy="505" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="530" width="470.9522013889846" height="23" rx="3" fill="#13795b"/>
+<line x1="854.5455563598857" y1="542" x2="867.3588464180834" y2="542" stroke="#173047" stroke-width="2"/>
+<line x1="854.5455563598857" y1="536" x2="854.5455563598857" y2="548" stroke="#173047" stroke-width="2"/>
+<line x1="867.3588464180834" y1="536" x2="867.3588464180834" y2="548" stroke="#173047" stroke-width="2"/>
+<circle cx="867.3588464180834" cy="542" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="854.5455563598857" cy="542" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="1013" y="510" font-size="23" fill="#587791" font-weight="700">21.18</text>
+<text x="1013" y="547" font-size="23" fill="#13795b" font-weight="700">20.48</text>
+<text x="390" y="587" font-size="21" fill="#b04434" font-weight="700">-0.71 tok/s  (-3.34%)</text>
+<text x="54" y="642" font-size="22" fill="#173047" font-weight="700">4K prompt</text>
+<text x="54" y="671" font-size="16" fill="#526878" font-weight="400">4,003 prompt / 512 output</text>
+<text x="54" y="697" font-size="15" fill="#526878" font-weight="400">2 runs/arm · 117 MiB KV</text>
+<rect x="390" y="625" width="475.94453516886864" height="23" rx="3" fill="#587791"/>
+<line x1="859.6014010462106" y1="637" x2="872.2876692915268" y2="637" stroke="#173047" stroke-width="2"/>
+<line x1="859.6014010462106" y1="631" x2="859.6014010462106" y2="643" stroke="#173047" stroke-width="2"/>
+<line x1="872.2876692915268" y1="631" x2="872.2876692915268" y2="643" stroke="#173047" stroke-width="2"/>
+<circle cx="859.6014010462106" cy="637" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="872.2876692915268" cy="637" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="662" width="475.1858556818539" height="23" rx="3" fill="#13795b"/>
+<line x1="860.6542458470972" y1="674" x2="869.7174655166107" y2="674" stroke="#173047" stroke-width="2"/>
+<line x1="860.6542458470972" y1="668" x2="860.6542458470972" y2="680" stroke="#173047" stroke-width="2"/>
+<line x1="869.7174655166107" y1="668" x2="869.7174655166107" y2="680" stroke="#173047" stroke-width="2"/>
+<circle cx="869.7174655166107" cy="674" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="860.6542458470972" cy="674" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="1013" y="642" font-size="23" fill="#587791" font-weight="700">20.69</text>
+<text x="1013" y="679" font-size="23" fill="#13795b" font-weight="700">20.66</text>
+<text x="390" y="719" font-size="21" fill="#b04434" font-weight="700">-0.03 tok/s  (-0.16%)</text>
+<rect x="32" y="830" width="1136" height="345" rx="10" fill="#ffffff"/>
+<text x="52" y="868" font-size="24" fill="#173047" font-weight="700">Handoff latency — the direct zero-copy benefit</text>
+<text x="52" y="898" font-size="15" fill="#526878" font-weight="400">ms · lower is better · same copied / zero-copy colours; no payload bytes copied in shared arm</text>
+<line x1="390" y1="920" x2="390" y2="1124" stroke="#e4ebf1" stroke-width="1"/>
+<text x="380" y="1157" font-size="13" fill="#526878" font-weight="400">0</text>
+<line x1="515" y1="920" x2="515" y2="1124" stroke="#e4ebf1" stroke-width="1"/>
+<text x="505" y="1157" font-size="13" fill="#526878" font-weight="400">50</text>
+<line x1="640" y1="920" x2="640" y2="1124" stroke="#e4ebf1" stroke-width="1"/>
+<text x="630" y="1157" font-size="13" fill="#526878" font-weight="400">100</text>
+<line x1="765" y1="920" x2="765" y2="1124" stroke="#e4ebf1" stroke-width="1"/>
+<text x="755" y="1157" font-size="13" fill="#526878" font-weight="400">150</text>
+<line x1="890" y1="920" x2="890" y2="1124" stroke="#e4ebf1" stroke-width="1"/>
+<text x="880" y="1157" font-size="13" fill="#526878" font-weight="400">200</text>
+<text x="933" y="1157" font-size="14" fill="#526878" font-weight="400">ms</text>
+<text x="54" y="953" font-size="20" fill="#173047" font-weight="700">Short prompt</text>
+<text x="54" y="980" font-size="16" fill="#13795b" font-weight="400">20.55 ms saved</text>
+<rect x="390" y="936" width="205.04887125000096" height="23" rx="3" fill="#587791"/>
+<line x1="589.2893750000002" y1="948" x2="602.7601924999989" y2="948" stroke="#173047" stroke-width="2"/>
+<line x1="589.2893750000002" y1="942" x2="589.2893750000002" y2="954" stroke="#173047" stroke-width="2"/>
+<line x1="602.7601924999989" y1="942" x2="602.7601924999989" y2="954" stroke="#173047" stroke-width="2"/>
+<circle cx="589.4848425000018" cy="948" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="602.7601924999989" cy="948" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="589.2893750000002" cy="948" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="600.6129000000001" cy="948" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="965" width="153.66884875000042" height="23" rx="3" fill="#13795b"/>
+<line x1="540.8471075000007" y1="977" x2="546.6318999999994" y2="977" stroke="#173047" stroke-width="2"/>
+<line x1="540.8471075000007" y1="971" x2="540.8471075000007" y2="983" stroke="#173047" stroke-width="2"/>
+<line x1="546.6318999999994" y1="971" x2="546.6318999999994" y2="983" stroke="#173047" stroke-width="2"/>
+<circle cx="544.7994450000001" cy="977" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="546.6318999999994" cy="977" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="540.8471075000007" cy="977" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="542.5382525000007" cy="977" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="944" y="953" font-size="18" fill="#587791" font-weight="600">82.02 ms</text>
+<text x="944" y="982" font-size="18" fill="#13795b" font-weight="600">61.47 ms</text>
+<text x="54" y="1028" font-size="20" fill="#173047" font-weight="700">1K prompt</text>
+<text x="54" y="1055" font-size="16" fill="#13795b" font-weight="400">4.09 ms saved</text>
+<rect x="390" y="1011" width="350.43150999999995" height="23" rx="3" fill="#587791"/>
+<line x1="732.1094325000018" y1="1023" x2="748.753587499998" y2="1023" stroke="#173047" stroke-width="2"/>
+<line x1="732.1094325000018" y1="1017" x2="732.1094325000018" y2="1029" stroke="#173047" stroke-width="2"/>
+<line x1="748.753587499998" y1="1017" x2="748.753587499998" y2="1029" stroke="#173047" stroke-width="2"/>
+<circle cx="748.753587499998" cy="1023" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="732.1094325000018" cy="1023" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="1040" width="340.205282499999" height="23" rx="3" fill="#13795b"/>
+<line x1="625.2310699999994" y1="1052" x2="835.1794949999987" y2="1052" stroke="#173047" stroke-width="2"/>
+<line x1="625.2310699999994" y1="1046" x2="625.2310699999994" y2="1058" stroke="#173047" stroke-width="2"/>
+<line x1="835.1794949999987" y1="1046" x2="835.1794949999987" y2="1058" stroke="#173047" stroke-width="2"/>
+<circle cx="835.1794949999987" cy="1052" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="625.2310699999994" cy="1052" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="944" y="1028" font-size="18" fill="#587791" font-weight="600">140.17 ms</text>
+<text x="944" y="1057" font-size="18" fill="#13795b" font-weight="600">136.08 ms</text>
+<text x="54" y="1103" font-size="20" fill="#173047" font-weight="700">4K prompt</text>
+<text x="54" y="1130" font-size="16" fill="#13795b" font-weight="400">63.85 ms saved</text>
+<rect x="390" y="1086" width="402.11673874999576" height="23" rx="3" fill="#587791"/>
+<line x1="786.9727399999989" y1="1098" x2="797.2607374999926" y2="1098" stroke="#173047" stroke-width="2"/>
+<line x1="786.9727399999989" y1="1092" x2="786.9727399999989" y2="1104" stroke="#173047" stroke-width="2"/>
+<line x1="797.2607374999926" y1="1092" x2="797.2607374999926" y2="1104" stroke="#173047" stroke-width="2"/>
+<circle cx="786.9727399999989" cy="1098" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="797.2607374999926" cy="1098" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<rect x="390" y="1115" width="242.49434250000147" height="23" rx="3" fill="#13795b"/>
+<line x1="629.149752500003" y1="1127" x2="635.8389324999998" y2="1127" stroke="#173047" stroke-width="2"/>
+<line x1="629.149752500003" y1="1121" x2="629.149752500003" y2="1133" stroke="#173047" stroke-width="2"/>
+<line x1="635.8389324999998" y1="1121" x2="635.8389324999998" y2="1133" stroke="#173047" stroke-width="2"/>
+<circle cx="635.8389324999998" cy="1127" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<circle cx="629.149752500003" cy="1127" r="4" fill="#fff" stroke="#173047" stroke-width="1.5"/>
+<text x="944" y="1103" font-size="18" fill="#587791" font-weight="600">160.85 ms</text>
+<text x="944" y="1132" font-size="18" fill="#13795b" font-weight="600">97.00 ms</text>
+<rect x="32" y="1197" width="1136" height="209" rx="10" fill="#ffffff"/>
+<text x="52" y="1234" font-size="23" fill="#173047" font-weight="700">How to read this</text>
+<text x="52" y="1264" font-size="16" fill="#173047" font-weight="400">Decode rate = (outputs − 1) / (last token time − first token time); startup/prefill excluded.</text>
+<text x="52" y="1294" font-size="16" fill="#173047" font-weight="400">Output and MTP work match within each workload. Numeric-sequence task favours MTP;</text>
+<text x="52" y="1320" font-size="16" fill="#173047" font-weight="400">these are not coding-agent tok/s results. Ranges overlap; the short-run gain did not persist.</text>
+<text x="52" y="1350" font-size="16" fill="#526878" font-weight="400">Retained 13 Sep measurements, before later batching/Q6 changes. No latest-master claim.</text>
+<text x="52" y="1380" font-size="16" fill="#526878" font-weight="400">Copied control is RAM handoff, not file I/O. One contended run and both profiles excluded.</text>
+<text x="42" y="1438" font-size="14" fill="#526878" font-weight="400">Verified from 16 raw runs; no benchmark reruns · source hashes and per-run CSV included</text>
+</g></svg>
