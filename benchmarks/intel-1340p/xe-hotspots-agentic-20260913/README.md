@@ -1,6 +1,6 @@
-# Xe handoff and agentic harness checkpoint
+# Xe hotspots and persistent agentic benchmarks
 
-Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. Trained latency savings for this change have not been measured.
+Allocation-level KV views are implemented in `6c39dbe5665e3e772109a0c02598283b4d0fc434`. Native synthetic continuation passes with two retained views. The trained six-run matrix has mixed millisecond-scale handoff changes and no whole-workflow speedup.
 
 The write-v2 whole-file tool pilot now passes repair and follow-up in the same persistent process. The frozen six-run matrix is complete: clamp and median pass in both arms; defaults reaches the round cap in both despite passing final artifacts. Paired work is identical, but no whole-workflow speedup is established. The seven earlier edit-v1 attempts are retained: two early harness failures, two contention interruptions, a candidate task-budget failure, a baseline output-budget failure additionally affected by a shutdown-sampling race, and a CPU-only output-budget failure. The narrow Gemma renderer-boundary correction passed both vocabulary-only regressions and that trained conversation.
 
@@ -49,4 +49,21 @@ Recipes retain Sigma workspace paths and are not production installers. To repea
 - `agentic-outcome.ts`: task/transport exit classification and exact-ID admission checks.
 - `opportunities.md`: small gains, uncertainties and combined-candidate measurements.
 
-No services were deployed or changed. The follow-on `q4-screen.md` records a compiled, bitwise-tested isolated Q4 tile candidate with exploratory two-thread timings and retained regressions. It has no trained or resource-monitored timing qualification. Q6_K and Vulkan FFN optimisation still need candidate implementations.
+No services were deployed or changed. Q4 confirmation passed 18 cases but regressed in three of four eight-thread timing groups; the two-thread opportunity is retained without a default change.
+
+The [Q6 promoted implementation](q6-promoted-results.md) is pushed on `feat/xe-q6-integration` (`2f998c903`): normal CMake42case OFF/ON exactness and a trained repair/follow-up pass with exact predecessor work. The predecessor ABBA measured -1.20% whole/-1.57% warm time; the promoted run is a correctness check.
+
+The [Vulkan large-tile probe](vulkan-large-results.md) passes numerical checks but has much slower O0 diagnostic samples. The [O1 untraced ABBA](vulkan-o1-results.md) confirms +250.36%/+225.80% time regressions; keep the default medium selector.
+
+## Final combined result
+
+[Four frozen B/C/C/B workflows](combined-results.md) all pass both hidden grades with exact prompts, output and work. Allocation batching plus promoted Q6 reduces median whole-workflow time from 57.909 to 56.888 seconds (-1.76%) and warm native time from 48.881 to 47.941 seconds (-1.92%). Cold handoff is 70.648 to 66.061ms (-6.49%). Both arms use shared KV and the same default O3 Vulkan plugin.
+
+Two runs per arm on one task establish a small exploratory gain, not a broad performance guarantee. Original defaults failures, rejected Q4/Vulkan candidates and earlier contention/harness failures remain in the evidence. The accepted implementation is opt-in; no services or production defaults changed.
+
+- [Agentic progress chart](charts/agentic-progress.svg): whole times, final stages, task outcomes and limits.
+- [Hotspot decisions chart](charts/hotspot-decisions.svg): synthetic gains and regressions on separate axes.
+- [Chart data](charts/chart-data.csv): values used in both plots.
+- `compare-combined.ts`, `compare-combined.test.ts`: frozen source/library/work checks and recalculated medians.
+- `final-audit.md`: acceptance evidence, retained limits and final merge scope.
+- `merge-validation.md`: parallel master preserved; fresh merged-tree43-step build and42-case CTest pass. Trained charts retain their measured pre-merge binary identity rather than claiming a rebuilt advanced-master benchmark.

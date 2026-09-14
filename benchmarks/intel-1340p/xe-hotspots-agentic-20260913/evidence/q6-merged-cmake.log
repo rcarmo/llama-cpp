@@ -1,0 +1,261 @@
+-- The C compiler identification is Clang 22.1.8
+-- The CXX compiler identification is Clang 22.1.8
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/sbin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/sbin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- llama.cpp version: 0.4.0-dev
+CMAKE_BUILD_TYPE=Release
+-- Found Git: /usr/sbin/git (found version "2.55.0")
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /usr/sbin/clang
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Found OpenMP_C: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP_CXX: -fopenmp=libomp (found version "5.1")
+-- Found OpenMP: TRUE (found version "5.1")
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.23.0
+-- ggml commit:  7838b21fe-dirty
+-- Configuring done (1.2s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build
+[1/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/43] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[3/43] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[8/43] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-turbo-quant.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-turbo-quant.c:28:14: warning: 'extern' variable has an initializer [-Wextern-initializer]
+   28 | GGML_API int turbo3_cpu_wht_group_size = 0;
+      |              ^
+1 warning generated.
+[9/43] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[10/43] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[11/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/cmake_pch.hxx.pch
+[12/43] Linking CXX shared library bin/libggml-base.so.0.23.0
+[13/43] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/cmake_pch.h.pch
+[14/43] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[15/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[16/43] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[17/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/iqp.cpp.o
+[18/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[19/43] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[20/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/q6-pair.cpp.o
+[21/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[22/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[23/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[24/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[25/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[26/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:51: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:99: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                   ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:55: warning: cast from 'const char *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                       ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:112: warning: cast from 'const unsigned short *' to 'unsigned short *' drops const qualifier [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                                ^
+10 warnings generated.
+[27/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[28/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/recurrent-profile.cpp.o
+[29/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-plan.cpp.o
+[30/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-advice.cpp.o
+[31/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/whole-token-profile.cpp.o
+[32/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
+[33/43] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[34/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[35/43] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[36/43] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:5913:13: warning: 5 enumeration values not handled in switch: 'GGML_TYPE_TURBO2_0', 'GGML_TYPE_TURBO3_0', 'GGML_TYPE_TURBO4_0'... [-Wswitch]
+ 5913 |     switch (src0->type) {
+      |             ^~~~~~~~~~
+1 warning generated.
+[37/43] Linking CXX shared library bin/libggml-cpu.so.0.23.0
+[38/43] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[39/43] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[40/43] Linking CXX shared library bin/libggml.so.0.23.0
+[41/43] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[42/43] Building CXX object tests/CMakeFiles/test-q6-pair.dir/test-q6-pair.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tests/test-q6-pair.cpp:26:9: warning: 'ggml_mul_mat_set_prec' is deprecated: use ggml_prec_set_acc() instead [-Wdeprecated-declarations]
+   26 |         ggml_mul_mat_set_prec(z, GGML_PREC_F32);
+      |         ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:1494:5: note: 'ggml_mul_mat_set_prec' has been explicitly marked deprecated here
+ 1494 |     GGML_DEPRECATED(GGML_API void ggml_mul_mat_set_prec(
+      |     ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/../include/ggml.h:192:61: note: expanded from macro 'GGML_DEPRECATED'
+  192 | #    define GGML_DEPRECATED(func, hint) func __attribute__((deprecated(hint)))
+      |                                                             ^
+1 warning generated.
+[43/43] Linking CXX executable bin/test-q6-pair
+UpdateCTestConfiguration  from :/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/DartConfiguration.tcl
+Parse Config file:/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/DartConfiguration.tcl
+Test project /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 47
+    Start 47: test-q6-pair
+
+47: Test command: /usr/sbin/cmake "-DTEST_EXE=/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/bin/test-q6-pair" "-DOUTPUT_DIR=/var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/tests" "-P" "/var/home/agent/workspace/projects/llama-cpp/tests/test-q6-pair.cmake"
+47: Working Directory: /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/tests
+47: Test timeout computed to be: 1500
+47: PASS finite m=1 n=1 mode=0
+47: PASS finite m=3 n=1 mode=0
+47: PASS finite m=65 n=1 mode=0
+47: PASS finite m=1 n=2 mode=0
+47: PASS finite m=3 n=2 mode=0
+47: PASS finite m=65 n=2 mode=0
+47: PASS finite m=1 n=3 mode=0
+47: PASS finite m=3 n=3 mode=0
+47: PASS finite m=65 n=3 mode=0
+47: PASS finite m=1 n=4 mode=0
+47: PASS finite m=3 n=4 mode=0
+47: PASS finite m=65 n=4 mode=0
+47: PASS finite m=1 n=5 mode=0
+47: PASS finite m=3 n=5 mode=0
+47: PASS finite m=65 n=5 mode=0
+47: PASS finite m=65 n=4 mode=1
+47: PASS finite m=65 n=4 mode=2
+47: PASS finite m=65 n=4 mode=3
+47: PASS finite m=65 n=4 mode=4
+47: PASS finite m=65 n=4 mode=5
+47: PASS finite m=65 n=4 mode=6
+47: PASS finite m=1 n=1 mode=0
+47: PASS finite m=3 n=1 mode=0
+47: PASS finite m=65 n=1 mode=0
+47: PASS finite m=1 n=2 mode=0
+47: PASS finite m=3 n=2 mode=0
+47: PASS finite m=65 n=2 mode=0
+47: PASS finite m=1 n=3 mode=0
+47: PASS finite m=3 n=3 mode=0
+47: PASS finite m=65 n=3 mode=0
+47: PASS finite m=1 n=4 mode=0
+47: PASS finite m=3 n=4 mode=0
+47: PASS finite m=65 n=4 mode=0
+47: PASS finite m=1 n=5 mode=0
+47: PASS finite m=3 n=5 mode=0
+47: PASS finite m=65 n=5 mode=0
+47: PASS finite m=65 n=4 mode=1
+47: PASS finite m=65 n=4 mode=2
+47: PASS finite m=65 n=4 mode=3
+47: PASS finite m=65 n=4 mode=4
+47: PASS finite m=65 n=4 mode=5
+47: PASS finite m=65 n=4 mode=6
+47: PASS 42 Q6 graph cases values=5710 mode=off
+47: PASS finite m=1 n=1 mode=0
+47: PASS finite m=3 n=1 mode=0
+47: PASS finite m=65 n=1 mode=0
+47: PASS finite m=1 n=2 mode=0
+47: PASS finite m=3 n=2 mode=0
+47: PASS finite m=65 n=2 mode=0
+47: PASS finite m=1 n=3 mode=0
+47: PASS finite m=3 n=3 mode=0
+47: PASS finite m=65 n=3 mode=0
+47: PASS finite m=1 n=4 mode=0
+47: PASS finite m=3 n=4 mode=0
+47: PASS finite m=65 n=4 mode=0
+47: PASS finite m=1 n=5 mode=0
+47: PASS finite m=3 n=5 mode=0
+47: PASS finite m=65 n=5 mode=0
+47: PASS finite m=65 n=4 mode=1
+47: PASS finite m=65 n=4 mode=2
+47: PASS finite m=65 n=4 mode=3
+47: PASS finite m=65 n=4 mode=4
+47: PASS finite m=65 n=4 mode=5
+47: PASS finite m=65 n=4 mode=6
+47: PASS finite m=1 n=1 mode=0
+47: PASS finite m=3 n=1 mode=0
+47: PASS finite m=65 n=1 mode=0
+47: PASS finite m=1 n=2 mode=0
+47: PASS finite m=3 n=2 mode=0
+47: PASS finite m=65 n=2 mode=0
+47: PASS finite m=1 n=3 mode=0
+47: PASS finite m=3 n=3 mode=0
+47: PASS finite m=65 n=3 mode=0
+47: PASS finite m=1 n=4 mode=0
+47: PASS finite m=3 n=4 mode=0
+47: PASS finite m=65 n=4 mode=0
+47: PASS finite m=1 n=5 mode=0
+47: PASS finite m=3 n=5 mode=0
+47: PASS finite m=65 n=5 mode=0
+47: PASS finite m=65 n=4 mode=1
+47: PASS finite m=65 n=4 mode=2
+47: PASS finite m=65 n=4 mode=3
+47: PASS finite m=65 n=4 mode=4
+47: PASS finite m=65 n=4 mode=5
+47: PASS finite m=65 n=4 mode=6
+47: PASS 42 Q6 graph cases values=5710 mode=on
+47: -- Q6 pair output SHA256: off=c67cf18881a9276643408605b27bb9fa7d53c24b992f0b58eceee3692d97325b on=c67cf18881a9276643408605b27bb9fa7d53c24b992f0b58eceee3692d97325b
+47: -- Q6 pair: all graph outputs bit-identical with opt-in off/on
+1/1 Test #47: test-q6-pair .....................   Passed    0.37 sec
+
+The following tests passed:
+	test-q6-pair
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.37 sec
+81f8b7ba5fe9f6ade99620714d55d30bfe706151a8f4c33aa1b91c5f40b17859  /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/bin/test-q6-pair
+021b1215964a789f7fbfde75d34861fc3025e4039357776d0d039ccce8658641  /var/home/agent/workspace/reports/xe-hotspots-agentic-20260913/q6-merged-build/bin/libggml-cpu.so.0.23.0
+memory.peak
+183668736
+memory.swap.peak
+0
+memory.events
+low 0
+high 0
+max 0
+oom 0
+oom_kill 0
+oom_group_kill 0
+sock_throttled 0
+cpu.stat
+usage_usec 29385099
+user_usec 27776725
+system_usec 1608374
+nice_usec 0
+core_sched.force_idle_usec 0
+nr_periods 155
+nr_throttled 14
+throttled_usec 754206
+nr_bursts 0
+burst_usec 0

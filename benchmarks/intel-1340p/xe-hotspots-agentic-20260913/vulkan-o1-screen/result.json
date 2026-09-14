@@ -1,0 +1,6703 @@
+{
+  "id": "vulkan-o1-screen",
+  "abort": "",
+  "pass": true,
+  "wall_ms": 8211.313041000001,
+  "results": [
+    {
+      "arm": "off",
+      "rc": 0,
+      "drained": true,
+      "mode": "diagoff",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            11.1106,
+            6.5912,
+            5.51227,
+            5.51346,
+            5.44139,
+            5.45904,
+            5.36977,
+            5.33899
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            7.45745,
+            6.34447,
+            5.73057,
+            5.7095,
+            5.8456,
+            5.74875,
+            5.9367,
+            5.73401
+          ]
+        }
+      ],
+      "traces": [
+        "XE_FFN_DISPATCH m=10240 n=256 k=2560 pipeline=matmul_q4_0_q8_1_m query_type=q8_1 wg_m=64 wg_n=64 split_k=1",
+        "XE_FFN_DISPATCH m=2560 n=256 k=10240 pipeline=matmul_q4_0_q8_1_m query_type=q8_1 wg_m=64 wg_n=64 split_k=1"
+      ],
+      "timing_qualified": false,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    },
+    {
+      "arm": "on",
+      "rc": 0,
+      "drained": true,
+      "mode": "diagon",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            20.1479,
+            19.146,
+            18.8214,
+            18.9753,
+            18.9116,
+            19.0484,
+            18.9608,
+            18.9744
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            19.0876,
+            19.0299,
+            18.5714,
+            18.8388,
+            18.6639,
+            18.8414,
+            18.6307,
+            18.72
+          ]
+        }
+      ],
+      "traces": [
+        "XE_FFN_DISPATCH m=10240 n=256 k=2560 pipeline=matmul_q4_0_q8_1_l query_type=q8_1 wg_m=128 wg_n=128 split_k=1",
+        "XE_FFN_DISPATCH m=2560 n=256 k=10240 pipeline=matmul_q4_0_q8_1_l query_type=q8_1 wg_m=128 wg_n=128 split_k=1"
+      ],
+      "timing_qualified": false,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    },
+    {
+      "arm": "off",
+      "rc": 0,
+      "drained": true,
+      "mode": "off0",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            6.86677,
+            5.87603,
+            5.43086,
+            5.29978,
+            5.61706,
+            5.37793,
+            5.32031,
+            5.40165
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            6.02655,
+            5.87075,
+            5.77393,
+            5.67797,
+            5.81893,
+            5.69838,
+            5.77449,
+            5.65628
+          ]
+        }
+      ],
+      "traces": [],
+      "timing_qualified": true,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    },
+    {
+      "arm": "on",
+      "rc": 0,
+      "drained": true,
+      "mode": "on0",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            19.1192,
+            19.3426,
+            18.9433,
+            19.0719,
+            18.9112,
+            19.052,
+            18.9259,
+            18.9671
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            19.0704,
+            19.152,
+            18.6682,
+            18.793,
+            18.7056,
+            18.7671,
+            18.5888,
+            18.6433
+          ]
+        }
+      ],
+      "traces": [],
+      "timing_qualified": true,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    },
+    {
+      "arm": "on",
+      "rc": 0,
+      "drained": true,
+      "mode": "on1",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            19.6822,
+            19.3896,
+            19.1096,
+            19.0059,
+            19.0378,
+            19.1209,
+            19.129,
+            19.0398
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            19.2253,
+            18.9593,
+            18.824,
+            18.7729,
+            20.0421,
+            18.7362,
+            18.9175,
+            18.9702
+          ]
+        }
+      ],
+      "traces": [],
+      "timing_qualified": true,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    },
+    {
+      "arm": "off",
+      "rc": 0,
+      "drained": true,
+      "mode": "off1",
+      "results": [
+        {
+          "shape": "10240 256 2560",
+          "gate_nmse": 2.22285e-7,
+          "nmse": 2.22285e-7,
+          "max_abs": 0.0404515,
+          "diagnostic_ms": [
+            6.36831,
+            5.64676,
+            5.49135,
+            5.40793,
+            5.47046,
+            5.46034,
+            5.37277,
+            5.42488
+          ]
+        },
+        {
+          "shape": "2560 256 10240",
+          "gate_nmse": 2.19341e-7,
+          "nmse": 2.19341e-7,
+          "max_abs": 0.076992,
+          "diagnostic_ms": [
+            5.91735,
+            5.7707,
+            5.79428,
+            5.76177,
+            5.85773,
+            5.91634,
+            5.78485,
+            5.69654
+          ]
+        }
+      ],
+      "traces": [],
+      "timing_qualified": true,
+      "limitation": "O1 same-plugin synthetic confirmation; no trained end-to-end claim."
+    }
+  ],
+  "samples": [
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.041Z",
+      "available_kib": 28706988,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 99909\nuser_usec 59552\nsystem_usec 40357\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "63291392\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.096Z",
+      "available_kib": 28716848,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 103752,
+      "cgroup": {
+        "cpu": "usage_usec 170234\nuser_usec 92304\nsystem_usec 77930\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "65650688\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.145Z",
+      "available_kib": 28620024,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 192576,
+      "cgroup": {
+        "cpu": "usage_usec 224888\nuser_usec 114456\nsystem_usec 110432\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "145252352\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.195Z",
+      "available_kib": 28612744,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 206980,
+      "cgroup": {
+        "cpu": "usage_usec 277467\nuser_usec 160028\nsystem_usec 117439\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.245Z",
+      "available_kib": 28603664,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 126768,
+      "cgroup": {
+        "cpu": "usage_usec 366408\nuser_usec 236655\nsystem_usec 129753\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.295Z",
+      "available_kib": 28595292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 132912,
+      "cgroup": {
+        "cpu": "usage_usec 469281\nuser_usec 334922\nsystem_usec 134358\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.346Z",
+      "available_kib": 28556380,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 118844,
+      "cgroup": {
+        "cpu": "usage_usec 572679\nuser_usec 424065\nsystem_usec 148613\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.395Z",
+      "available_kib": 28560428,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129184,
+      "cgroup": {
+        "cpu": "usage_usec 674567\nuser_usec 519133\nsystem_usec 155434\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.446Z",
+      "available_kib": 28560428,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129184,
+      "cgroup": {
+        "cpu": "usage_usec 777764\nuser_usec 618087\nsystem_usec 159677\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.496Z",
+      "available_kib": 28560428,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129184,
+      "cgroup": {
+        "cpu": "usage_usec 879939\nuser_usec 714286\nsystem_usec 165652\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.546Z",
+      "available_kib": 28560428,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129184,
+      "cgroup": {
+        "cpu": "usage_usec 954787\nuser_usec 786228\nsystem_usec 168559\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "159895552\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.596Z",
+      "available_kib": 28515092,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 196012,
+      "cgroup": {
+        "cpu": "usage_usec 1007072\nuser_usec 807462\nsystem_usec 199610\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "161886208\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.647Z",
+      "available_kib": 28496164,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 218844,
+      "cgroup": {
+        "cpu": "usage_usec 1062823\nuser_usec 854523\nsystem_usec 208300\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.697Z",
+      "available_kib": 28496164,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145676,
+      "cgroup": {
+        "cpu": "usage_usec 1127441\nuser_usec 904234\nsystem_usec 223207\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.747Z",
+      "available_kib": 28496164,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145676,
+      "cgroup": {
+        "cpu": "usage_usec 1229411\nuser_usec 1004299\nsystem_usec 225111\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.797Z",
+      "available_kib": 28466236,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150864,
+      "cgroup": {
+        "cpu": "usage_usec 1332647\nuser_usec 1100194\nsystem_usec 232453\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.847Z",
+      "available_kib": 28466236,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150864,
+      "cgroup": {
+        "cpu": "usage_usec 1434484\nuser_usec 1199128\nsystem_usec 235356\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.897Z",
+      "available_kib": 28466236,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150864,
+      "cgroup": {
+        "cpu": "usage_usec 1536804\nuser_usec 1298429\nsystem_usec 238375\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.948Z",
+      "available_kib": 28466236,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150864,
+      "cgroup": {
+        "cpu": "usage_usec 1646510\nuser_usec 1402281\nsystem_usec 244229\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagoff",
+      "at": "2026-09-14T01:28:33.985Z",
+      "available_kib": 28466236,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150932,
+      "cgroup": {
+        "cpu": "usage_usec 1709121\nuser_usec 1459987\nsystem_usec 249134\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927488",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927496",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927497",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927498",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.003Z",
+      "available_kib": 28550292,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 1719637\nuser_usec 1460259\nsystem_usec 259378\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.055Z",
+      "available_kib": 28546376,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 111296,
+      "cgroup": {
+        "cpu": "usage_usec 1772118\nuser_usec 1489009\nsystem_usec 283108\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.105Z",
+      "available_kib": 28530348,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 192112,
+      "cgroup": {
+        "cpu": "usage_usec 1823908\nuser_usec 1516677\nsystem_usec 307231\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.155Z",
+      "available_kib": 28522340,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 132784,
+      "cgroup": {
+        "cpu": "usage_usec 1875565\nuser_usec 1560103\nsystem_usec 315462\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.206Z",
+      "available_kib": 28519796,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 127272,
+      "cgroup": {
+        "cpu": "usage_usec 1967691\nuser_usec 1644315\nsystem_usec 323376\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.256Z",
+      "available_kib": 28516156,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 133416,
+      "cgroup": {
+        "cpu": "usage_usec 2069388\nuser_usec 1742153\nsystem_usec 327234\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.306Z",
+      "available_kib": 28469568,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 118692,
+      "cgroup": {
+        "cpu": "usage_usec 2173511\nuser_usec 1833486\nsystem_usec 340024\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.357Z",
+      "available_kib": 28469568,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2275278\nuser_usec 1929291\nsystem_usec 345987\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.407Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2377711\nuser_usec 2026675\nsystem_usec 351035\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.457Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2480182\nuser_usec 2127255\nsystem_usec 352926\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.507Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2548593\nuser_usec 2192790\nsystem_usec 355803\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.558Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2602258\nuser_usec 2242866\nsystem_usec 359392\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.608Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2654543\nuser_usec 2292117\nsystem_usec 362426\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.658Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2706960\nuser_usec 2343505\nsystem_usec 363454\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.708Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2759817\nuser_usec 2394284\nsystem_usec 365532\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.758Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2812555\nuser_usec 2445087\nsystem_usec 367468\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.809Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2866164\nuser_usec 2494085\nsystem_usec 372079\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.859Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2918427\nuser_usec 2544311\nsystem_usec 374116\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.909Z",
+      "available_kib": 28469520,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128888,
+      "cgroup": {
+        "cpu": "usage_usec 2971456\nuser_usec 2594212\nsystem_usec 377243\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:34.959Z",
+      "available_kib": 28463924,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 159876,
+      "cgroup": {
+        "cpu": "usage_usec 3026264\nuser_usec 2627002\nsystem_usec 399262\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "185741312\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.010Z",
+      "available_kib": 28407140,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 213784,
+      "cgroup": {
+        "cpu": "usage_usec 3078176\nuser_usec 2661791\nsystem_usec 416385\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "189992960\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.060Z",
+      "available_kib": 28407140,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 141736,
+      "cgroup": {
+        "cpu": "usage_usec 3130390\nuser_usec 2702141\nsystem_usec 428249\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.110Z",
+      "available_kib": 28405684,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145328,
+      "cgroup": {
+        "cpu": "usage_usec 3232845\nuser_usec 2802690\nsystem_usec 430154\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.160Z",
+      "available_kib": 28375616,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 147888,
+      "cgroup": {
+        "cpu": "usage_usec 3336028\nuser_usec 2898754\nsystem_usec 437274\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.211Z",
+      "available_kib": 28376320,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3439261\nuser_usec 2998256\nsystem_usec 441005\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.261Z",
+      "available_kib": 28376320,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3541572\nuser_usec 3099511\nsystem_usec 442060\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.311Z",
+      "available_kib": 28376012,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3644139\nuser_usec 3201002\nsystem_usec 443136\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.361Z",
+      "available_kib": 28376012,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3735879\nuser_usec 3290847\nsystem_usec 445031\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.411Z",
+      "available_kib": 28376012,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3788172\nuser_usec 3341128\nsystem_usec 447043\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.462Z",
+      "available_kib": 28376012,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3841398\nuser_usec 3392448\nsystem_usec 448949\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.512Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3894092\nuser_usec 3444069\nsystem_usec 450022\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.562Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3946387\nuser_usec 3494324\nsystem_usec 452062\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.612Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 3998640\nuser_usec 3545662\nsystem_usec 452977\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.664Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 4054655\nuser_usec 3598491\nsystem_usec 456163\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.714Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 4107197\nuser_usec 3649983\nsystem_usec 457214\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.765Z",
+      "available_kib": 28375724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150516,
+      "cgroup": {
+        "cpu": "usage_usec 4159558\nuser_usec 3701311\nsystem_usec 458247\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "diagon",
+      "at": "2026-09-14T01:28:35.788Z",
+      "available_kib": 28445124,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 98848,
+      "cgroup": {
+        "cpu": "usage_usec 4187180\nuser_usec 3723058\nsystem_usec 464121\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927503",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927504",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927505",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927506",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:35.821Z",
+      "available_kib": 28516052,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 4195178\nuser_usec 3723284\nsystem_usec 471894\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:35.874Z",
+      "available_kib": 28507212,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 107636,
+      "cgroup": {
+        "cpu": "usage_usec 4250518\nuser_usec 3749668\nsystem_usec 500849\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:35.924Z",
+      "available_kib": 28467320,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 192804,
+      "cgroup": {
+        "cpu": "usage_usec 4302157\nuser_usec 3775217\nsystem_usec 526939\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:35.975Z",
+      "available_kib": 28450940,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 168496,
+      "cgroup": {
+        "cpu": "usage_usec 4354490\nuser_usec 3819519\nsystem_usec 534971\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.025Z",
+      "available_kib": 28449596,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129060,
+      "cgroup": {
+        "cpu": "usage_usec 4444712\nuser_usec 3898742\nsystem_usec 545970\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.075Z",
+      "available_kib": 28444500,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 134180,
+      "cgroup": {
+        "cpu": "usage_usec 4549253\nuser_usec 4001394\nsystem_usec 547858\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.125Z",
+      "available_kib": 28387424,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129280,
+      "cgroup": {
+        "cpu": "usage_usec 4651121\nuser_usec 4088290\nsystem_usec 562830\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.176Z",
+      "available_kib": 28387424,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129280,
+      "cgroup": {
+        "cpu": "usage_usec 4752840\nuser_usec 4186058\nsystem_usec 566781\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.226Z",
+      "available_kib": 28387424,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129280,
+      "cgroup": {
+        "cpu": "usage_usec 4854937\nuser_usec 4285254\nsystem_usec 569683\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.276Z",
+      "available_kib": 28387284,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129280,
+      "cgroup": {
+        "cpu": "usage_usec 4957487\nuser_usec 4385763\nsystem_usec 571724\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.326Z",
+      "available_kib": 28361288,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 169612,
+      "cgroup": {
+        "cpu": "usage_usec 5020056\nuser_usec 4426362\nsystem_usec 593693\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.376Z",
+      "available_kib": 28313004,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 218940,
+      "cgroup": {
+        "cpu": "usage_usec 5071696\nuser_usec 4461041\nsystem_usec 610655\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.426Z",
+      "available_kib": 28338904,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145264,
+      "cgroup": {
+        "cpu": "usage_usec 5127969\nuser_usec 4507410\nsystem_usec 620558\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.477Z",
+      "available_kib": 28338904,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145776,
+      "cgroup": {
+        "cpu": "usage_usec 5229562\nuser_usec 4608086\nsystem_usec 621476\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.527Z",
+      "available_kib": 28338180,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150964,
+      "cgroup": {
+        "cpu": "usage_usec 5331981\nuser_usec 4702350\nsystem_usec 629630\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.578Z",
+      "available_kib": 28338180,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150964,
+      "cgroup": {
+        "cpu": "usage_usec 5437563\nuser_usec 4803001\nsystem_usec 634561\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.628Z",
+      "available_kib": 28338180,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150964,
+      "cgroup": {
+        "cpu": "usage_usec 5539761\nuser_usec 4903174\nsystem_usec 636587\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.678Z",
+      "available_kib": 28338180,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150964,
+      "cgroup": {
+        "cpu": "usage_usec 5642801\nuser_usec 4999235\nsystem_usec 643565\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off0",
+      "at": "2026-09-14T01:28:36.714Z",
+      "available_kib": 28338180,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151032,
+      "cgroup": {
+        "cpu": "usage_usec 5712828\nuser_usec 5066370\nsystem_usec 646457\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927507",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927508",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927509",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927510",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.736Z",
+      "available_kib": 28398980,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 5722304\nuser_usec 5067831\nsystem_usec 654473\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.788Z",
+      "available_kib": 28390620,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 121600,
+      "cgroup": {
+        "cpu": "usage_usec 5775159\nuser_usec 5092120\nsystem_usec 683038\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.838Z",
+      "available_kib": 28350740,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 193496,
+      "cgroup": {
+        "cpu": "usage_usec 5827908\nuser_usec 5119986\nsystem_usec 707922\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.888Z",
+      "available_kib": 28334724,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 108864,
+      "cgroup": {
+        "cpu": "usage_usec 5879659\nuser_usec 5161668\nsystem_usec 717990\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.939Z",
+      "available_kib": 28330760,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128488,
+      "cgroup": {
+        "cpu": "usage_usec 5973888\nuser_usec 5252821\nsystem_usec 721067\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:36.989Z",
+      "available_kib": 28330760,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 133608,
+      "cgroup": {
+        "cpu": "usage_usec 6076651\nuser_usec 5348653\nsystem_usec 727997\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.040Z",
+      "available_kib": 28306640,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 119692,
+      "cgroup": {
+        "cpu": "usage_usec 6180521\nuser_usec 5440696\nsystem_usec 739824\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.090Z",
+      "available_kib": 28306828,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6283045\nuser_usec 5536156\nsystem_usec 746888\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.140Z",
+      "available_kib": 28306828,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6386068\nuser_usec 5633209\nsystem_usec 752859\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.190Z",
+      "available_kib": 28306828,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6488691\nuser_usec 5734751\nsystem_usec 753940\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.240Z",
+      "available_kib": 28306828,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6560284\nuser_usec 5803304\nsystem_usec 756979\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.290Z",
+      "available_kib": 28306828,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6612448\nuser_usec 5854559\nsystem_usec 757889\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.341Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6665808\nuser_usec 5903304\nsystem_usec 762504\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.391Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6716616\nuser_usec 5951140\nsystem_usec 765475\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.441Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6768983\nuser_usec 6001508\nsystem_usec 767474\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.491Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6821201\nuser_usec 6051722\nsystem_usec 769479\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.541Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6873617\nuser_usec 6102086\nsystem_usec 771531\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.592Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6928234\nuser_usec 6152711\nsystem_usec 775522\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.642Z",
+      "available_kib": 28308876,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129888,
+      "cgroup": {
+        "cpu": "usage_usec 6980542\nuser_usec 6204050\nsystem_usec 776491\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.692Z",
+      "available_kib": 28329688,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 168668,
+      "cgroup": {
+        "cpu": "usage_usec 7033207\nuser_usec 6234612\nsystem_usec 798595\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.742Z",
+      "available_kib": 28328232,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 219492,
+      "cgroup": {
+        "cpu": "usage_usec 7086183\nuser_usec 6269785\nsystem_usec 816398\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.792Z",
+      "available_kib": 28326412,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145820,
+      "cgroup": {
+        "cpu": "usage_usec 7140509\nuser_usec 6313195\nsystem_usec 827313\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.843Z",
+      "available_kib": 28326412,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 146332,
+      "cgroup": {
+        "cpu": "usage_usec 7242231\nuser_usec 6413874\nsystem_usec 828357\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.893Z",
+      "available_kib": 28325464,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 148892,
+      "cgroup": {
+        "cpu": "usage_usec 7344647\nuser_usec 6510280\nsystem_usec 834366\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.943Z",
+      "available_kib": 28325400,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7446476\nuser_usec 6608153\nsystem_usec 838323\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:37.994Z",
+      "available_kib": 28325400,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7550012\nuser_usec 6709573\nsystem_usec 840439\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.044Z",
+      "available_kib": 28325400,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7653539\nuser_usec 6811414\nsystem_usec 842124\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.094Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7744603\nuser_usec 6900470\nsystem_usec 844132\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.144Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7796941\nuser_usec 6950793\nsystem_usec 846147\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.194Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7849520\nuser_usec 7001498\nsystem_usec 848022\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.244Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7901748\nuser_usec 7051811\nsystem_usec 849936\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.295Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 7954909\nuser_usec 7103199\nsystem_usec 851710\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.345Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 8007097\nuser_usec 7153376\nsystem_usec 853721\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.395Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 8059772\nuser_usec 7204044\nsystem_usec 855727\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.445Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 8112075\nuser_usec 7252378\nsystem_usec 859696\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.495Z",
+      "available_kib": 28325204,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151520,
+      "cgroup": {
+        "cpu": "usage_usec 8165201\nuser_usec 7302478\nsystem_usec 862723\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on0",
+      "at": "2026-09-14T01:28:38.519Z",
+      "available_kib": 28349080,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 99852,
+      "cgroup": {
+        "cpu": "usage_usec 8191533\nuser_usec 7323046\nsystem_usec 868486\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927511",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927512",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927513",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927514",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.535Z",
+      "available_kib": 28400884,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 8197976\nuser_usec 7323464\nsystem_usec 874511\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.588Z",
+      "available_kib": 28388860,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 130868,
+      "cgroup": {
+        "cpu": "usage_usec 8249851\nuser_usec 7341419\nsystem_usec 908432\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.638Z",
+      "available_kib": 28388880,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 192292,
+      "cgroup": {
+        "cpu": "usage_usec 8301546\nuser_usec 7372165\nsystem_usec 929381\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.688Z",
+      "available_kib": 28388880,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 120860,
+      "cgroup": {
+        "cpu": "usage_usec 8354812\nuser_usec 7412421\nsystem_usec 942391\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.739Z",
+      "available_kib": 28387068,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129560,
+      "cgroup": {
+        "cpu": "usage_usec 8452581\nuser_usec 7505253\nsystem_usec 947328\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.789Z",
+      "available_kib": 28387076,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 133660,
+      "cgroup": {
+        "cpu": "usage_usec 8555477\nuser_usec 7606167\nsystem_usec 949309\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.839Z",
+      "available_kib": 28363292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 8656982\nuser_usec 7692728\nsystem_usec 964253\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.889Z",
+      "available_kib": 28363292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 8759718\nuser_usec 7792573\nsystem_usec 967145\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.940Z",
+      "available_kib": 28363292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 8862564\nuser_usec 7891477\nsystem_usec 971087\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:38.990Z",
+      "available_kib": 28363292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 8967502\nuser_usec 7992603\nsystem_usec 974899\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.040Z",
+      "available_kib": 28363292,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9020979\nuser_usec 8044039\nsystem_usec 976939\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.090Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9074160\nuser_usec 8095227\nsystem_usec 978932\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.141Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9127509\nuser_usec 8144795\nsystem_usec 982713\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.191Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9179766\nuser_usec 8195029\nsystem_usec 984736\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.241Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9232043\nuser_usec 8246275\nsystem_usec 985768\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.291Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9284702\nuser_usec 8296989\nsystem_usec 987712\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.341Z",
+      "available_kib": 28363544,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9336885\nuser_usec 8348173\nsystem_usec 988712\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.391Z",
+      "available_kib": 28365592,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9388953\nuser_usec 8397580\nsystem_usec 991372\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.442Z",
+      "available_kib": 28372992,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129112,
+      "cgroup": {
+        "cpu": "usage_usec 9441025\nuser_usec 8446657\nsystem_usec 994368\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.492Z",
+      "available_kib": 28396640,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 204240,
+      "cgroup": {
+        "cpu": "usage_usec 9493127\nuser_usec 8462700\nsystem_usec 1030427\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.541Z",
+      "available_kib": 28380624,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 218716,
+      "cgroup": {
+        "cpu": "usage_usec 9545078\nuser_usec 8508664\nsystem_usec 1036414\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.592Z",
+      "available_kib": 28380260,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145560,
+      "cgroup": {
+        "cpu": "usage_usec 9611709\nuser_usec 8566486\nsystem_usec 1045222\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.642Z",
+      "available_kib": 28380260,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145560,
+      "cgroup": {
+        "cpu": "usage_usec 9713821\nuser_usec 8666610\nsystem_usec 1047211\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.692Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 9818102\nuser_usec 8763992\nsystem_usec 1054109\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.743Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 9919715\nuser_usec 8863649\nsystem_usec 1056066\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.793Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10022268\nuser_usec 8962159\nsystem_usec 1060108\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.843Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10124666\nuser_usec 9059556\nsystem_usec 1065109\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.893Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10198187\nuser_usec 9126134\nsystem_usec 1072053\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.944Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10251564\nuser_usec 9176594\nsystem_usec 1074969\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:39.994Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10306236\nuser_usec 9225824\nsystem_usec 1080412\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.044Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10358531\nuser_usec 9276126\nsystem_usec 1082405\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.094Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10412560\nuser_usec 9327147\nsystem_usec 1085413\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.145Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10465694\nuser_usec 9376327\nsystem_usec 1089366\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.194Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10518499\nuser_usec 9425180\nsystem_usec 1093319\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.245Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10571696\nuser_usec 9474447\nsystem_usec 1097249\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.295Z",
+      "available_kib": 28351196,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 150748,
+      "cgroup": {
+        "cpu": "usage_usec 10624082\nuser_usec 9523806\nsystem_usec 1100276\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "on1",
+      "at": "2026-09-14T01:28:40.308Z",
+      "available_kib": 28390884,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 99080,
+      "cgroup": {
+        "cpu": "usage_usec 10640251\nuser_usec 9535962\nsystem_usec 1104288\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927515",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927516",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927517",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927518",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.319Z",
+      "available_kib": 28428996,
+      "worker": {
+        "exited": true,
+        "swap": null,
+        "violation": false
+      },
+      "rss_kib": null,
+      "cgroup": {
+        "cpu": "usage_usec 10647296\nuser_usec 9536960\nsystem_usec 1110336\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": []
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.371Z",
+      "available_kib": 28450032,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 123092,
+      "cgroup": {
+        "cpu": "usage_usec 10699389\nuser_usec 9558177\nsystem_usec 1141211\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.422Z",
+      "available_kib": 28402032,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 193200,
+      "cgroup": {
+        "cpu": "usage_usec 10751176\nuser_usec 9586002\nsystem_usec 1165174\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.472Z",
+      "available_kib": 28385512,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 111708,
+      "cgroup": {
+        "cpu": "usage_usec 10802814\nuser_usec 9627697\nsystem_usec 1175116\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.522Z",
+      "available_kib": 28397404,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 128204,
+      "cgroup": {
+        "cpu": "usage_usec 10899879\nuser_usec 9719879\nsystem_usec 1179999\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.573Z",
+      "available_kib": 28394492,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 134348,
+      "cgroup": {
+        "cpu": "usage_usec 11001842\nuser_usec 9818850\nsystem_usec 1182991\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.623Z",
+      "available_kib": 28352000,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129384,
+      "cgroup": {
+        "cpu": "usage_usec 11103766\nuser_usec 9907777\nsystem_usec 1195989\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.673Z",
+      "available_kib": 28352000,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129384,
+      "cgroup": {
+        "cpu": "usage_usec 11205534\nuser_usec 10006592\nsystem_usec 1198941\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.723Z",
+      "available_kib": 28352000,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129384,
+      "cgroup": {
+        "cpu": "usage_usec 11307542\nuser_usec 10105634\nsystem_usec 1201908\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.773Z",
+      "available_kib": 28352000,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 129384,
+      "cgroup": {
+        "cpu": "usage_usec 11409712\nuser_usec 10204815\nsystem_usec 1204897\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.823Z",
+      "available_kib": 28393252,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 166284,
+      "cgroup": {
+        "cpu": "usage_usec 11475105\nuser_usec 10246232\nsystem_usec 1228873\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.873Z",
+      "available_kib": 28385356,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 218768,
+      "cgroup": {
+        "cpu": "usage_usec 11526752\nuser_usec 10279958\nsystem_usec 1246793\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.923Z",
+      "available_kib": 28375164,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145372,
+      "cgroup": {
+        "cpu": "usage_usec 11579318\nuser_usec 10324577\nsystem_usec 1254741\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:40.974Z",
+      "available_kib": 28374912,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 145884,
+      "cgroup": {
+        "cpu": "usage_usec 11683999\nuser_usec 10425443\nsystem_usec 1258556\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:41.025Z",
+      "available_kib": 28345536,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 148444,
+      "cgroup": {
+        "cpu": "usage_usec 11788153\nuser_usec 10520881\nsystem_usec 1267271\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:41.075Z",
+      "available_kib": 28345536,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151072,
+      "cgroup": {
+        "cpu": "usage_usec 11892008\nuser_usec 10620731\nsystem_usec 1271277\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:41.125Z",
+      "available_kib": 28345536,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151072,
+      "cgroup": {
+        "cpu": "usage_usec 11995406\nuser_usec 10721248\nsystem_usec 1274158\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:41.175Z",
+      "available_kib": 28345452,
+      "worker": {
+        "state": "R",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151072,
+      "cgroup": {
+        "cpu": "usage_usec 12097499\nuser_usec 10816317\nsystem_usec 1281182\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    },
+    {
+      "arm": "off1",
+      "at": "2026-09-14T01:28:41.219Z",
+      "available_kib": 28345132,
+      "worker": {
+        "state": "S",
+        "exited": false,
+        "swap": 0,
+        "violation": false
+      },
+      "rss_kib": 151140,
+      "cgroup": {
+        "cpu": "usage_usec 12182278\nuser_usec 10900000\nsystem_usec 1282278\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+        "quota": "max 100000\n",
+        "swap": "0\n",
+        "swap_peak": "0\n",
+        "memory_peak": "194969600\n",
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+      },
+      "competitors": [],
+      "threads": [
+        {
+          "tid": "927521",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927522",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927523",
+          "allowed": "0-15"
+        },
+        {
+          "tid": "927524",
+          "allowed": "0-15"
+        }
+      ]
+    }
+  ],
+  "before": {
+    "cpu": "usage_usec 34143\nuser_usec 22735\nsystem_usec 11407\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+    "quota": "max 100000\n",
+    "swap": "0\n",
+    "swap_peak": "0\n",
+    "memory_peak": "7729152\n",
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+  },
+  "after": {
+    "cpu": "usage_usec 12191830\nuser_usec 10901138\nsystem_usec 1290691\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+    "quota": "max 100000\n",
+    "swap": "0\n",
+    "swap_peak": "0\n",
+    "memory_peak": "194969600\n",
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n"
+  },
+  "throttle_delta": 0,
+  "services_unchanged": true
+}
