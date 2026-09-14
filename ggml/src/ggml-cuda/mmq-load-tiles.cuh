@@ -1399,7 +1399,11 @@ template <ggml_type type, int J, bool fallback> static __device__ __forceinline_
 #pragma unroll
         for (int l = 0; l < QR3_XXS; ++l) {
             const int2 grid_pos = make_int2(iq3xxs_grid[q3[2*l+0]], iq3xxs_grid[q3[2*l+1]]);
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ == 860 && !defined(GGML_USE_HIP) && !defined(GGML_USE_MUSA)
+            const uint32_t signs = uint32_t(ksigns_iq2xs[(aux32 >> (7*l)) & 127]) * 0x01010101;
+#else
             const uint32_t signs = unpack_ksigns(aux32 >> (7*l));
+#endif
 
             const int signs0 = __vcmpne4(signs & 0x08040201, 0);
             const int grid_l = __vsub4(grid_pos.x ^ signs0, signs0);

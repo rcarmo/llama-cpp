@@ -1,0 +1,19 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 11909 MiB):
+  Device 0: NVIDIA GeForce RTX 3060, compute capability 8.6, VMM: yes, VRAM: 11909 MiB
+Testing 2 devices
+
+Backend 1/2: CUDA0
+  Device description: NVIDIA GeForce RTX 3060
+  Device memory: 11909 MB (51 MB free)
+
+  GATED_DELTA_NET(type=f32,head_count=32,head_size=128,n_seq_tokens=256,n_seqs=1,v_repeat=1,permuted=0,kda=0,K=1): ggml_backend_cuda_buffer_type_alloc_buffer: allocating 100.25 MiB on device 0: cudaMalloc failed: out of memory
+alloc_tensor_range: failed to allocate CUDA0 buffer of size 105119744
+             1634 runs -  1009.08 us/run -    20544 kB/run - [1;34m  19.43 GB/s[0m
+failed to allocate tensors
+  GATED_DELTA_NET(type=f32,head_count=4,head_size=128,n_seq_tokens=256,n_seqs=1,v_repeat=1,permuted=0,kda=0,K=1):               8190 runs -   159.00 us/run -     2568 kB/run - [1;34m  15.40 GB/s[0m
+  GATED_DELTA_NET(type=f32,head_count=4,head_size=128,n_seq_tokens=1024,n_seqs=1,v_repeat=1,permuted=0,kda=0,K=1):              3841 runs -   622.22 us/run -     8736 kB/run - [1;34m  13.39 GB/s[0m
+  Backend CUDA0: [1;32mOK[0m
+Backend 2/2: CPU
+  Skipping
+2/2 backends passed
+[1;32mOK[0m

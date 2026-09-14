@@ -1,0 +1,7 @@
+GDN parallel-prefix design gate
+
+Current retained-state path uses fused recurrence for the entire ubatch because MTP rollback needs K trailing states. Existing build_delta_net_chunking returns all attention outputs plus final state, not intermediate snapshots. Candidate: process a multiple-of64 prefix using existing chunking (non-KDA only), then feed its final state into fused recurrence for the remaining >=K tokens. Concatenate attention outputs on token axis; retain K snapshots from fused suffix only.
+
+Required invariants: preserve sequence/head dimensions, original token order, contiguous output used by downstream attention, destination snapshot ordering0=latest, and final state. Prefix length must leave at least K tokens and avoid padded-prefix state updates. Gate off for short batches and KDA initially. Do not reuse prefix-mutated tensors in suffix. Numerical order changes require CPU/reference tolerances plus end-to-end quality and long-context recovery tests. Extra graph scratch can exceed64K VRAM headroom; measure admission and failures before recommending.
+
+This is a proposal, not implemented or benchmarked. Unlike local launch changes, it changes graph structure materially; user confirmation required before proceeding under repository guidance.
