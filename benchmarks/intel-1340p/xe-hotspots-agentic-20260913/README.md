@@ -66,3 +66,4 @@ Two runs per arm on one task establish a small exploratory gain, not a broad per
 - [Chart data](charts/chart-data.csv): values used in both plots.
 - `compare-combined.ts`, `compare-combined.test.ts`: frozen source/library/work checks and recalculated medians.
 - `final-audit.md`: acceptance evidence, retained limits and final merge scope.
+- `merge-validation.md`: parallel master preserved; fresh merged-tree43-step build and42-case CTest pass. Trained charts retain their measured pre-merge binary identity rather than claiming a rebuilt advanced-master benchmark.
