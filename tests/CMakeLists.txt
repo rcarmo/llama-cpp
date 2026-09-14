@@ -299,6 +299,15 @@ if (NOT LLAMA_SANITIZE_ADDRESS AND NOT GGML_SCHED_NO_REALLOC)
 endif()
 llama_build_and_test(test-backend-ops.cpp)
 llama_build_and_test(test-prefetch-budget.cpp)
+if (TARGET ggml-cpu AND NOT GGML_BACKEND_DL)
+    add_executable(test-q6-pair test-q6-pair.cpp)
+    target_include_directories(test-q6-pair PRIVATE ${PROJECT_SOURCE_DIR}/ggml/src)
+    target_link_libraries(test-q6-pair PRIVATE ggml ggml-cpu)
+    add_test(NAME test-q6-pair COMMAND ${CMAKE_COMMAND}
+        -DTEST_EXE=$<TARGET_FILE:test-q6-pair>
+        -DOUTPUT_DIR=${CMAKE_CURRENT_BINARY_DIR}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/test-q6-pair.cmake)
+endif()
 if (NOT WIN32 OR NOT BUILD_SHARED_LIBS)
     llama_build_and_test(test-kv-handoff.cpp)
     llama_build_and_test(test-context-handoff.cpp)

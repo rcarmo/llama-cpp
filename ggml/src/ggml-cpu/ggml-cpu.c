@@ -8,6 +8,7 @@
 #include "ggml-cpu-impl.h"
 #include "ggml-impl.h"
 #include "quants.h"
+#include "q6-pair.h"
 #include "ggml-threading.h"
 #include "unary-ops.h"
 #include "binary-ops.h"
@@ -77,6 +78,8 @@
 
 #define UNUSED GGML_UNUSED
 #define SWAP(x, y, T) do { T SWAP = x; (x) = y; (y) = SWAP; } while (0)
+
+static bool ggml_cpu_q6_pair_enabled = false;
 
 // precomputed f32 table for f16 (256 KB) (simd-mappings.h)
 float ggml_table_f32_f16[1 << 16];
@@ -1407,6 +1410,32 @@ static void ggml_compute_forward_mul_mat_one_chunk(
     const int64_t blck_1 = 16;
 
     const size_t src1_col_stride = src1_cont || src1->type != vec_dot_type ? row_size : nb11;
+
+    if (ggml_cpu_q6_pair_enabled && !params->use_ref && type == GGML_TYPE_Q6_K &&
+        ggml_get_op_params_i32(dst, 0) != GGML_PREC_F32 &&
+        num_rows_per_vec_dot == 1 && vec_dot_type == GGML_TYPE_Q8_K &&
+        ne11 == 4 && ne02 == 1 && ne03 == 1 && ne12 == 1 && ne13 == 1 &&
+        ggml_is_contiguous(src0) && ggml_is_contiguous(dst)) {
+        for (int64_t row = ir0_start; row < ir0_end; row += 16) {
+            int64_t col = ir1_start;
+            for (; col + 1 < ir1_end; col += 2) {
+                for (int64_t r = row; r < MIN(row + 16, ir0_end); r++) {
+                    ggml_cpu_q6_pair(ne00, (float *) dst->data + r + col * ne0, ne0,
+                                    (const block_q6_K *) ((const char *) src0->data + r * nb01),
+                                    (const block_q8_K *) ((const char *) wdata + col * src1_col_stride),
+                                    (const block_q8_K *) ((const char *) wdata + (col + 1) * src1_col_stride));
+                }
+            }
+            if (col < ir1_end) {
+                for (int64_t r = row; r < MIN(row + 16, ir0_end); r++) {
+                    vec_dot(ne00, (float *) dst->data + r + col * ne0, 0,
+                            (const char *) src0->data + r * nb01, 0,
+                            (const char *) wdata + col * src1_col_stride, 0, 1);
+                }
+            }
+        }
+        return;
+    }
 
     // attempt to reduce false-sharing (does not seem to make a difference)
     // 16 * 2, accounting for mmla kernels
@@ -4223,6 +4252,11 @@ void ggml_cpu_init(void) {
         {
             const char * env = getenv("GGML_CPU_DISABLE_FUSION");
             ggml_cpu_disable_fusion = (env != NULL && atoi(env) == 1);
+        }
+
+        {
+            const char * env = getenv("GGML_CPU_Q6_PAIR");
+            ggml_cpu_q6_pair_enabled = ggml_cpu_q6_pair_supported() && env != NULL && atoi(env) == 1;
         }
 
         is_first_call = false;

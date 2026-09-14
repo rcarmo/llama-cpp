@@ -37,6 +37,8 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
         ggml-cpu/hbm.h
         ggml-cpu/quants.c
         ggml-cpu/quants.h
+        ggml-cpu/q6-pair.cpp
+        ggml-cpu/q6-pair.h
         ggml-cpu/traits.cpp
         ggml-cpu/traits.h
         ggml-cpu/amx/amx.cpp
