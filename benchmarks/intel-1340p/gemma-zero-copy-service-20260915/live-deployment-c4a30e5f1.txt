@@ -1,0 +1,50 @@
+captured_utc=2026-09-15T21:02:25Z
+source_commit=c4a30e5f178f36591e9d9426687acf2ba72d8cf3
+remote_commit=c4a30e5f178f36591e9d9426687acf2ba72d8cf3
+
+RESPONSE
+{"id":"chatcmpl-gemma-zero-copy-1","object":"chat.completion","created":1789506127,"model":"gemma-4-e4b-qat-mtp-zero-copy","system_fingerprint":"b11486-c4a30e5f1","choices":[{"index":0,"message":{"role":"assistant","content":"FINAL ZERO COPY LIVE"},"finish_reason":"stop"}],"usage":{"prompt_tokens":17,"completion_tokens":4,"total_tokens":21,"prompt_tokens_details":{"cached_tokens":0}},"timings":{"prompt_n":17,"prompt_ms":3460.483868,"predicted_n":4,"predicted_ms":282.49183866666647},"zero_copy":{"route":"vulkan_prefill_cpu_mtp","cold":true,"round":1,"shared_bytes":584056832,"copied_bytes":0,"zero_copy":true,"prompt_tokens":17,"cached_tokens":0,"canonical_replay_tokens":0,"generated_tokens":4,"verified_tokens":4,"drafted":3,"accepted":3,"prefill_s":3.460483868,"handoff_ms":73.317968,"first_token_s":6.193255996,"wall_s":6.405440762,"decode_tps":14.159701104568558}}
+HEALTH
+{"status":"ok","model":"gemma-4-e4b-qat-mtp-zero-copy","context_size":32768,"processing":false,"round":1,"zero_copy_ready":true,"handoffs":1,"shared_bytes":584056832,"copied_bytes":0}
+UNITS
+Id=llama-gemma-zero-copy.service
+ActiveState=active
+SubState=running
+MainPID=1809454
+NRestarts=0
+ExecStart={ path=/usr/bin/bash ; argv[]=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-gemma-zero-copy-service.sh ; ignore_errors=no ; start_time=[Tue 2026-09-15 22:01:57 WEST] ; stop_time=[n/a] ; pid=1809454 ; code=(null) ; status=0/0 }
+MemoryCurrent=7503171584
+MemoryPeak=13912920064
+MemorySwapCurrent=0
+MemorySwapPeak=0
+
+Id=llama-gemma-lan-test.socket
+ActiveState=active
+SubState=running
+MemoryCurrent=[not set]
+MemoryPeak=[not set]
+MemorySwapCurrent=[not set]
+MemorySwapPeak=[not set]
+
+Id=llama-gemma-lan-test.service
+ActiveState=active
+SubState=running
+MainPID=1809456
+NRestarts=0
+ExecStart={ path=/usr/lib/systemd/systemd-socket-proxyd ; argv[]=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:18094 ; ignore_errors=no ; start_time=[Tue 2026-09-15 22:01:57 WEST] ; stop_time=[n/a] ; pid=1809456 ; code=(null) ; status=0/0 }
+MemoryCurrent=2969600
+MemoryPeak=3653632
+MemorySwapCurrent=0
+MemorySwapPeak=0
+
+LISTENERS
+LISTEN 0      512        127.0.0.1:18094      0.0.0.0:*    users:(("llama-gemma-zer",pid=1809454,fd=5))
+LISTEN 0      512        127.0.0.1:18092      0.0.0.0:*    users:(("llama-server",pid=1791208,fd=3))
+LISTEN 0      4096    192.168.1.70:8094       0.0.0.0:*    users:(("systemd-socket-",pid=1809456,fd=3))
+
+IDENTITY
+69bb44effe48edaeadeb1a99303b227b5ef2dc225408c65849a39ccf5f22c655  /var/home/agent/workspace/projects/llama-cpp/build-gemma-zero-copy-vulkan/bin/llama-gemma-zero-copy-server
+d231e9d4f835a3e8151c483a9031124541d236e3cb6a321755a851300afe537e  /var/home/agent/workspace/projects/llama-cpp/build-gemma-zero-copy-vulkan/bin/libllama.so.0.4.0
+6430eb55aefd51168f9a8aae6d4fb220fbc3cd13a81844f312e1101cb03fa178  /var/home/agent/workspace/projects/llama-cpp/build-gemma-zero-copy-vulkan/bin/libggml-vulkan.so.0.23.0
+
+STATE_FILES_CREATED_AFTER_CUTOVER

@@ -24,6 +24,8 @@ The short suite also passed:
 
 The 32K unit reached 14,344,970,240 B peak memory. `MemorySwapCurrent` and `MemorySwapPeak` were both zero under `MemoryMax=16G` and `MemorySwapMax=0`. Thermal data was not captured. The existing accepted CPU service stayed online during qualification.
 
+The LAN service was live-verified after commit `c4a30e5f178f36591e9d9426687acf2ba72d8cf3` was pushed. The response fingerprint was `b11486-c4a30e5f1`, content was `FINAL ZERO COPY LIVE`, and telemetry reported 584,056,832 shared bytes with zero copied bytes. The unit had zero restarts and zero process swap. See `live-deployment-c4a30e5f1.txt`.
+
 The service is intentionally serial, with at most eight outstanding HTTP requests. A new conversation resets the resident slot; only an append-only request with the same `X-Conversation-Id` reuses K/V. It supports non-streaming OpenAI Chat Completions and a finite SSE response compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
 
 ## Reproduce
