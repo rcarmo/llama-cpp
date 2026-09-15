@@ -1,6 +1,6 @@
 # Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe
 
-Commit `5f209cac0` caps the embedded MTP draft context at `n_ubatch=64` while the target context remains at batch/uBatch 256. On `sigma`, this reduced draft compute workspace from about 253 MiB to 63.2837 MiB and reduced peak memory in a matched production-server request by 54.59 MiB. The change was committed and pushed on 15 September 2026. It was not deployed.
+Commit `5f209cac0` caps the embedded MTP draft context at `n_ubatch=64` while the target context remains at batch/uBatch 256. On `sigma`, this reduced draft compute workspace from about 253 MiB to 63.2837 MiB and reduced peak memory in a matched production-server request by 54.59 MiB. The change was committed and pushed on 15 September 2026. The Qwen Vulkan/MTP service trial was rejected and removed after live interactive testing.
 
 ## Implementation scope
 
@@ -62,4 +62,16 @@ That peak includes simultaneous source and destination model/context residency b
 
 The [benchmark campaign](../../../benchmarks/intel-1340p/qwen38-vulkan-mtp-memory-20260915/README.md) contains the 18 structured results, aggregate CSV, resource checks, exact handoff result, server responses, cgroup records, focused test log, constructor log and reproduction source.
 
-`transcribe-web.service` stayed inactive during exclusive GPU tests. Qualification ended with no containers, server processes, listening test ports or GPU users. No service configuration or deployed runtime changed.
+`transcribe-web.service` stayed inactive during exclusive GPU tests. Qualification ended with no containers, server processes, listening test ports or GPU users.
+
+## Rejected interactive service trial
+
+A 32K test service was built from `5f209cac0` with 70 embedded llama.cpp UI assets and exposed on LAN port 8094. It used full Iris Xe offload, one slot, q4_0 KV, target batch/uBatch 256 and active embedded MTP depth 3.
+
+The deployment passed health, UI, allocation and trivial-completion checks, but failed the interactive acceptance test. Live decode measured 0.81 tok/s, and the tablet session produced incoherent output. The earlier fixed-work matrix measured prefill only; finite logits and expected positions did not qualify chat quality. The prior Sigma Qwen3.8 campaign had already rejected this model family for primary service use at 2.33-3.47 generation tok/s and 2/4 Pi tasks.
+
+CPU-only target-only diagnosis improved decode to 2.30 tok/s and produced a coherent factual answer. Two short requests exhausted their output budgets in hidden reasoning before final content. This profile was still too slow to replace the accepted Sigma provider.
+
+The Qwen test unit was stopped and disabled. Its installed profile, versioned UI runtime, container and unit file were removed; port 8094 closed and the render device had no owner. The MTP microbatch cap remains a valid allocation optimisation, but this Qwen model/backend combination is not an interactive Sigma service.
+
+The accepted Gemma 4 E4B provider now supplies the temporary LAN UI on port 8094. See the [Gemma provider runbook](gemma-local-provider-runbook.md#lan-test-ui-and-api).

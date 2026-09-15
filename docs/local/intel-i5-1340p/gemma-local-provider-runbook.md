@@ -291,6 +291,38 @@ curl -fsS -N http://127.0.0.1:8091/v1/chat/completions \
 
 The stream must contain content deltas, a terminal usage object and `data: [DONE]`.
 
+## LAN test UI and API
+
+A socket-activated test endpoint exposes the accepted CPU/MTP server directly at `http://192.168.1.70:8094/`. It bypasses the hybrid proxy because that proxy decompresses embedded UI assets while retaining their gzip response header. Inference still uses the existing Gemma process on `127.0.0.1:18092`; local Pi traffic stays on the hybrid endpoint at `127.0.0.1:8091`.
+
+The direct server has two 131,072-token slots and the embedded llama.cpp Web UI. The LAN endpoint has no API authentication. Use it only on the trusted LAN.
+
+Tracked units:
+
+- `tools/systemd/user/llama-gemma-lan-test.socket`
+- `tools/systemd/user/llama-gemma-lan-test.service`
+
+The socket binds to Sigma's current LAN address. Install and start it with:
+
+```sh
+install -m 0644 tools/systemd/user/llama-gemma-lan-test.socket ~/.config/systemd/user/
+install -m 0644 tools/systemd/user/llama-gemma-lan-test.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now llama-gemma-lan-test.socket
+```
+
+Check or remove LAN access with:
+
+```sh
+curl -fsS http://192.168.1.70:8094/health
+systemctl --user status llama-gemma-lan-test.socket llama-gemma-lan-test.service
+systemctl --user disable --now llama-gemma-lan-test.socket
+```
+
+The service requires and binds to `llama-gemma-local-provider.service`; the proxy stops when the provider stops. If Sigma's LAN address changes, update `ListenStream` in the installed and tracked socket before restarting it.
+
+Live verification returned `Lisbon`, `391` and valid `{"squares":[1,4,9,16,25]}` output with thinking disabled. The three short requests observed 8.23-27.95 generation tok/s; a repeated LAN arithmetic request measured 10.50 tok/s. These short output rates do not replace the matched 25.77 tok/s generation result above.
+
 ## Select the model in Pi
 
 List the model without changing the current session:

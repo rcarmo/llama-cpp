@@ -1,0 +1,13 @@
+[Unit]
+Description=Byte-preserving LAN proxy for the accepted Gemma 4 E4B server
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/local/intel-i5-1340p/gemma-local-provider-runbook.md
+Requires=llama-gemma-local-provider.service
+BindsTo=llama-gemma-local-provider.service
+After=llama-gemma-local-provider.service
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:18092
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true

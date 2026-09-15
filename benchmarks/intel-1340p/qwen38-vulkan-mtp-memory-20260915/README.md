@@ -25,6 +25,8 @@ This campaign qualified the production MTP microbatch cap in commit `5f209cac0`.
 | `prefill-resource-checks.tsv` | Per-run swap peak, OOM and OOM-kill counters. |
 | `handoff-1k.txt` | Exact 1K handoff result and bounded cgroup summary. |
 | `server-ab/` | Matched clean/candidate responses, server logs and cgroup records. |
+| `service-live-20260915.txt` | Initial embedded-UI 32K LAN allocation smoke; superseded by the failed interactive trial below. |
+| `service-rejection-20260915.txt` | Failed Qwen service measurements, cleanup state and accepted Gemma replacement checks. |
 | `focused-tests.txt` | Seven focused context/handoff tests. |
 | `constructor-clean.txt` | Clean common-constructor graph export with a 253.1348 MiB draft compute buffer. |
 | `constructor-candidate.txt` | Capped common-constructor graph export with a 63.2837 MiB draft compute buffer. |
@@ -68,4 +70,8 @@ The retained qualifier is a manual benchmark tool. Copy `test-qwen-mtp-trained-h
 
 The source wrapper expects Podman, Bun, `/dev/dri/renderD128`, the model above and an image with the build dependencies. It runs serial containers with 8 CPUs, a 24 GiB cgroup limit, no swap, a 900-second timeout and at least 6 GiB host memory available before each run. The wrapper verifies finite logits, positions, swap, OOM kills, DRM ownership and GPU cleanup.
 
-No deployment or service change is part of this campaign.
+## Rejected live service follow-up
+
+A later 32K LAN trial used the same production source with full Iris Xe offload and active embedded MTP. The initial smoke in `service-live-20260915.txt` passed health, UI, one trivial completion and resource checks. Interactive use then measured 0.81 tok/s decode and produced incoherent output. The test service was stopped, disabled and removed.
+
+A CPU-only target-only diagnosis reached 2.30 tok/s and produced coherent tokens, but it remained unsuitable for interactive use on Sigma. The accepted Gemma 4 E4B provider replaced the LAN endpoint after passing factual, arithmetic and JSON checks with two 131K slots.
