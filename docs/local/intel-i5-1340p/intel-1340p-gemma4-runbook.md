@@ -1,8 +1,8 @@
 # Intel i5-1340P Gemma 4 E4B runbook
 
-> Historical campaign settings. The current service uses [gemma-local-provider-runbook.md](gemma-local-provider-runbook.md), including the September 2026 16-thread prefill rollout. Observed OpenMP worker affinity remains CPUs 0-15; strict P-core-only decoding was requested but not enforced.
+> Historical CPU campaign and rollback settings. The current deployment is the [32K Gemma zero-copy service](gemma-local-provider-runbook.md). Observed OpenMP worker affinity for this historical profile was CPUs 0-15; strict P-core-only decoding was requested but not enforced.
 
-This runbook records the validated 128K Gemma 4 E4B model profile on the LattePanda Sigma: a separate four-block assistant model with MTP depth 3, F16 KV cache and Flash Attention disabled. The deployed two-slot Pi provider is documented in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
+This runbook records the validated 128K CPU Gemma 4 E4B profile on the LattePanda Sigma: a separate four-block assistant model with MTP depth 3, F16 KV cache and Flash Attention disabled. Its two-slot provider is disabled and retained for rollback.
 
 ## Hardware and software
 
@@ -69,7 +69,7 @@ The service launcher in this runbook is text-only. It does not pass `--mmproj`. 
 |---|---:|
 | Context per request | 131,072 |
 | Validation geometry | 1 isolated slot |
-| Deployed geometry | 2 isolated slots, 262,144 aggregate context |
+| Historical service geometry | 2 isolated slots, 262,144 aggregate context |
 | MTP depth | 3 |
 | Assistant blocks available | 4 |
 | KV type | F16 K and V |
@@ -78,7 +78,7 @@ The service launcher in this runbook is text-only. It does not pass `--mmproj`. 
 | Threads | 8 |
 | Model loading | mmap |
 | Prompt reuse | enabled |
-| Deployed RAM prompt-cache limit | 12,288 MiB, allocated on demand |
+| Historical RAM prompt-cache limit | 12,288 MiB, allocated on demand |
 
 The earlier 32K gate compared F16 KV with Flash Attention off against Q8_0 KV with Flash Attention enabled in a balanced control/candidate/candidate/control sequence:
 
@@ -149,9 +149,9 @@ The deployment profile command must contain:
 --model-draft ...gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf
 ```
 
-## Install the local-provider service
+## Restore the historical CPU provider
 
-Use the dedicated Gemma service; do not install the deployment profile through the shared `llama-candidate.service` trial unit.
+Use this only as a rollback after stopping the current zero-copy service and LAN proxy. Do not install it through the shared `llama-candidate.service` trial unit.
 
 ```bash
 cd /var/home/agent/workspace/projects/llama-cpp
@@ -159,11 +159,14 @@ install -Dm0600 tools/config/llama-gemma4-candidate.env.example \
   ~/.config/llama-gemma-local-provider/service.env
 install -Dm0644 tools/systemd/user/llama-gemma-local-provider.service \
   ~/.config/systemd/user/llama-gemma-local-provider.service
+systemctl --user disable --now \
+  llama-gemma-lan-test.socket \
+  llama-gemma-zero-copy.service
 systemctl --user daemon-reload
 systemctl --user enable --now llama-gemma-local-provider.service
 ```
 
-The tracked profile binds to `127.0.0.1:8091` and does not configure an API key. Keep it loopback-only. Pi provider registration, loginless startup and safe update procedures are in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
+The tracked historical profile binds to `127.0.0.1:8091` and does not configure an API key. Keep it loopback-only. Current operations and the rollback order are in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
 
 ## Health and API checks
 

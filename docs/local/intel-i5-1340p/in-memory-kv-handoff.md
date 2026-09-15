@@ -17,7 +17,7 @@ For optional Gemma assistant drafting after handoff:
 build/bin/llama-gemma-in-memory model.gguf 'Continue the sequence: one, two,' 16 --mtp assistant.gguf
 ```
 
-The assistant loads on CPU only after the GPU context/model are freed. The existing speculative engine drafts up to three tokens; the target's greedy sampler verifies them and rejected tails are removed from memory. `MTP drafted=... accepted=... output=...` is diagnostic, not a throughput result.
+In the diagnostic executable, the assistant loads on CPU only after the GPU context/model are freed. The production service keeps its Vulkan model owner resident but still destroys the consumed Vulkan context before binding the CPU assistant. The existing speculative engine drafts up to three tokens; the target's greedy sampler verifies them and rejected tails are removed from memory. `MTP drafted=... accepted=... output=...` is diagnostic, not a throughput result.
 
 A Vulkan-enabled build or loaded Vulkan backend is required for sharing. `--copy-only` after the token count runs both contexts on CPU and exercises the RAM-copy fallback. A CPU-only build also uses fallback. The executable prints `HANDOFF shared_bytes=... copied_bytes=...` to stderr; a successful run alone does not prove sharing. The existing TypeScript hybrid proxy and its file-state route are unchanged.
 
@@ -85,4 +85,4 @@ See [the original implementation and short-run evidence](../../../benchmarks/int
 
 The public context-parameter additions require consumers to rebuild against the updated header. The one-request diagnostic remains experimental and opt-in.
 
-The [15 September Gemma service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) adds a persistent one-slot serving caller. It passed append-only multi-turn reuse, tool-call parsing, cancellation/reset, factual, arithmetic and code requests, plus exact 4K and 32K prompts. Cold requests reported `shared_bytes > 0` and `copied_bytes == 0`; the 32K unit used no swap under a 16 GiB limit. This service does not change default allocator or scheduler placement.
+The [15 September Gemma service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) adds a persistent one-slot serving caller. It passed append-only multi-turn reuse, tool-call parsing, cancellation/reset, factual, arithmetic and code requests, plus exact 4K and 32K prompts. Cold requests reported `shared_bytes > 0` and `copied_bytes == 0`; the 32K unit used no swap under a 16 GiB limit. A later production fix retains the Vulkan model owner across cold requests while continuing to destroy each consumed source context. This service does not change default allocator or scheduler placement.

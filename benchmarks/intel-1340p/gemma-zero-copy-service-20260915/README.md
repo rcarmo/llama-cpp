@@ -30,6 +30,8 @@ After the deployment evidence commit was pushed, the old file-mediated `llama-ge
 
 The service is intentionally serial, with at most eight outstanding HTTP requests. Only an exact append to the committed history reuses K/V. A new conversation, edited branch or regenerated branch resets the resident slot and runs cold. It supports non-streaming OpenAI Chat Completions and a finite SSE response compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
 
+A post-deployment latency correction in commit `cd6c8380c` retains the Vulkan model owner between cold conversations and removes the unintended 512-token default. The final build kept zero-copy and no-swap behaviour, while a matched transplant of the historical small-batch/ATTN4/SCORE3 paths regressed and was removed. See [the post-change live verification](post-change-cd6c8380c.md).
+
 ## Reproduce
 
 Build with CPU, Vulkan, server and embedded UI enabled, then run:

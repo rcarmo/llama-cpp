@@ -4,10 +4,10 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Start with the current roles
 
-* [Gemma 4 E4B local Pi provider](gemma-local-provider-runbook.md) -- current primary local provider, including the 6 September 2026 prefill rollout notes and the limits around OpenMP affinity.
+* [Gemma 4 E4B zero-copy service](gemma-local-provider-runbook.md) -- sole enabled local model service: one 32K slot, Vulkan cold prefill, in-process CPU handoff and CPU MTP decode on LAN port 8094.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
 * [Maple Preview local provider](maple-local-provider-runbook.md) -- explicit alternative provider, not the default.
-* [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained operational references.
+* [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.
 
 ## Campaigns and design notes
 
@@ -41,4 +41,4 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 
 * CPU masks in these documents are host-specific. Several reports note that requested binding and observed OpenMP worker placement were not identical.
 * Thermal annotations exist where they were measured, but not every campaign has full thermal telemetry. Keep that distinction.
-* Some later Intel Xe and zero-copy notes are narrow workload studies, not replacements for the general runbooks. Read them as measured slices, not blanket policy.
+* The 15 September Gemma zero-copy service report is the current deployment record. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
