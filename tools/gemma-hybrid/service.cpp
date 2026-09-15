@@ -144,7 +144,13 @@ public:
     }
 
     json complete(json request, const std::string & conversation, const std::function<bool()> & should_stop) {
-        std::lock_guard<std::mutex> lock(mutex);
+        const uint64_t epoch = cancel_epoch.load();
+        const std::function<bool()> cancelled = [&] { return should_stop() || cancel_epoch.load() != epoch; };
+        std::unique_lock<std::timed_mutex> lock(mutex, std::defer_lock);
+        while (!lock.try_lock_for(std::chrono::milliseconds(100))) {
+            if (cancelled()) throw std::runtime_error("request cancelled");
+        }
+        if (cancelled()) throw std::runtime_error("request cancelled");
         gemma_hybrid::normalize_request(request);
         const auto action = gemma_hybrid::classify_request(active_conversation, conversation, committed, prior_tools, request);
         if (action == gemma_hybrid::request_action::start) {
@@ -154,7 +160,7 @@ public:
             gemma_hybrid::check_append(committed, prior_tools, request);
         }
         try {
-            return run_turn(request, should_stop);
+            return run_turn(request, cancelled);
         } catch (...) {
             reset_runtime();
             active_conversation.clear();
@@ -163,11 +169,15 @@ public:
     }
 
     json status() const {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::unique_lock<std::timed_mutex> lock(mutex, std::defer_lock);
+        if (!lock.try_lock_for(std::chrono::milliseconds(100))) {
+            return {{"status", "ok"}, {"model", cfg.alias}, {"context_size", cfg.context}, {"processing", true}};
+        }
         return {
             {"status", "ok"},
             {"model", cfg.alias},
             {"context_size", cfg.context},
+            {"processing", false},
             {"round", round},
             {"zero_copy_ready", round > 0 && total_shared_bytes > 0 && total_copied_bytes == 0},
             {"handoffs", handoffs},
@@ -177,7 +187,8 @@ public:
     }
 
     void reset(const std::string & conversation) {
-        std::lock_guard<std::mutex> lock(mutex);
+        cancel_epoch.fetch_add(1);
+        std::lock_guard<std::timed_mutex> lock(mutex);
         if (!conversation.empty() && !active_conversation.empty() && conversation != active_conversation) {
             throw std::invalid_argument("conversation does not own the resident slot");
         }
@@ -211,7 +222,8 @@ public:
 
 private:
     config cfg;
-    mutable std::mutex mutex;
+    mutable std::timed_mutex mutex;
+    std::atomic<uint64_t> cancel_epoch{0};
     model_ptr cpu_target{nullptr, llama_model_free};
     model_ptr draft_model{nullptr, llama_model_free};
     model_ptr gpu_target{nullptr, llama_model_free};
@@ -349,7 +361,7 @@ private:
         inputs.add_generation_prompt = true;
         inputs.enable_thinking = false;
         inputs.parallel_tool_calls = request.value("parallel_tool_calls", false);
-        inputs.tool_choice = COMMON_CHAT_TOOL_CHOICE_AUTO;
+        inputs.tool_choice = common_chat_tool_choice_parse_oaicompat(request.value("tool_choice", std::string("auto")));
         inputs.reasoning_format = COMMON_REASONING_FORMAT_NONE;
         return common_chat_templates_apply(templates.get(), inputs);
     }
@@ -412,7 +424,7 @@ private:
 
             context_ptr destination = make_context(cpu_target.get(), context_params(false));
             const auto handoff_started = clock_type::now();
-            const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), true, &transfer);
+            const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
             if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
                 throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
             }
@@ -612,13 +624,25 @@ int main(int argc, char ** argv) {
         auto models = safe_handler([&](const server_http_req &) {
             return response_json({{"object", "list"}, {"data", json::array({{{"id", cfg.alias}, {"name", cfg.alias}, {"object", "model"}, {"owned_by", "llamacpp"}, {"created", 0}, {"in_cache", true}, {"path", cfg.model_path}, {"status", "loaded"}}})}});
         });
+        std::atomic<int32_t> outstanding{0};
         auto completion = safe_handler([&](const server_http_req & request) {
-            if (request.body.size() > 16 * 1024 * 1024) throw std::invalid_argument("request body exceeds 16 MiB");
-            json body = json::parse(request.body);
-            const bool stream = body.value("stream", false);
-            const std::string conversation = gemma_hybrid::header_value(request.headers, "X-Conversation-Id");
-            json result = session.complete(std::move(body), conversation, request.should_stop);
-            return stream ? response_sse(result) : response_json(result);
+            const int32_t queued = outstanding.fetch_add(1);
+            if (queued >= 8) {
+                outstanding.fetch_sub(1);
+                throw std::invalid_argument("too many outstanding requests");
+            }
+            try {
+                if (request.body.size() > 16 * 1024 * 1024) throw std::invalid_argument("request body exceeds 16 MiB");
+                json body = json::parse(request.body);
+                const bool stream = body.value("stream", false);
+                const std::string conversation = gemma_hybrid::header_value(request.headers, "X-Conversation-Id");
+                json result = session.complete(std::move(body), conversation, request.should_stop);
+                outstanding.fetch_sub(1);
+                return stream ? response_sse(result) : response_json(result);
+            } catch (...) {
+                outstanding.fetch_sub(1);
+                throw;
+            }
         });
         http.get("/health", health);
         http.get("/v1/health", health);
