@@ -20,6 +20,7 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## 2026-08 Maple and Ornith/Gemma
 
+* [Gemma and Ornith agentic comparison, 22 August 2026](gemma-ornith-agentic-20260822/) -- matched direct API and real Pi tasks with latency, memory, swap, thermal and blind-review evidence.
 * [ornith-gemma-optimization/](ornith-gemma-optimization/)
 * [maple-preview/](maple-preview/)
 * [maple-qwen-campaign/](maple-qwen-campaign/)

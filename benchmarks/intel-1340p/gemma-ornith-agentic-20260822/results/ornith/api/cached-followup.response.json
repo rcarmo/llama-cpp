@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "**Release Gate — Qwen3.6 35B-A3B Vulkan/MTP promotion**\n\n**Correctness**\n- Bit-exact logits & token stream vs reference across ≥8 seeds, all MTP draft depths (1–4).\n- Partial-acceptance KV/rollback: ≥500 seeded partial-accept cases, 0 divergence.\n- Recurrent state (RoPE/attention) identical to single-pass decode at atol=0, rtol=0.\n\n**Performance**\n- CPU generation ≥ baseline (no regression from shared-LPDDR overlap).\n- Vulkan multi-column decode: N=2 gain ≥ 0%, N=4 ≥ baseline (no plateau regression).\n- New exact-row kernel: ≥ baseline on supported shapes; never slower than generic path.\n\n**Stability**\n- 0 NaN/inf, 0 OOB, 0 crash over ≥2h continuous run at 2× peak batch.\n- No weight-stream contention: per-device bandwidth ≤ LPDDR saturation ceiling.\n\n**Fallback Coverage**\n- Generic Vulkan path verified for 100% of shapes/devices outside new kernel's supported set.\n- Unsupported-shape dispatch: 100% routed to generic path, 0 silent fall-through.\n- Coverage matrix re-run on every shape change; gate fails if any untested shape slips through.",
+        "reasoning_content": "The user wants me to turn the three invariants into a release gate with measurable thresholds. Let me think about what these invariants were:\n\n1. Deterministic target logits and token acceptance\n2. Correct KV and recurrent rollback state across partial MTP acceptance\n3. Generic Vulkan path as safe fallback for unsupported shapes/devices\n\nNow I need to create a compact release gate with measurable thresholds across four dimensions: correctness, performance, stability, fallback coverage.\n\nLet me be technical and concise, matching the campaign's style. I should make thresholds concrete and measurable.\n\nLet me think about each invariant mapped to the four gate dimensions:\n\n**Correctness** (invariant 1 & 2):\n- Logit/token acceptance determinism: bit-exact match against reference across seeds\n- KV/rollback correctness: partial MTP acceptance must match reference exactly\n\n**Performance** (invariant 1 - MTP gain, Vulkan gain):\n- Must not regress vs baseline; must show gain\n- CPU generation faster than full Vulkan already established\n\n**Stability**:\n- No crashes, no OOB, no NaN, no divergence under stress\n\n**Fallback coverage**:\n- Generic Vulkan path must handle all shapes/devices not covered by new kernel\n\nLet me"
+      }
+    }
+  ],
+  "created": 1787417141,
+  "model": "ornith-1.5-35b-a3b-q4-k-m",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 545,
+    "prompt_tokens": 282,
+    "total_tokens": 827,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-UI88Lj8jhQMFArvMposEiDrkXqtX8vCF",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 282,
+    "prompt_ms": 5736.762,
+    "prompt_per_token_ms": 20.343127659574467,
+    "prompt_per_second": 49.15664969193423,
+    "predicted_n": 545,
+    "predicted_ms": 42827.111,
+    "predicted_per_token_ms": 78.58185504587155,
+    "predicted_per_second": 12.725584034841855
+  }
+}

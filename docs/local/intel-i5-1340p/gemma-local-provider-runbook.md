@@ -73,7 +73,9 @@ Gemma remains the primary local Pi provider. In the matched 5-6 August 2026 camp
 
 Gemma scored 4/6 on bounded API cases and 3/4 on real Pi tasks. It alone obeyed the requested `max_results: 3` tool limit. Its repository-retrieval answer cited the wrong source path and function, so Qwen remains an explicit alternative when repository grounding matters more than latency. The blind substantive review ranked Gemma first.
 
-Campaign report: [`../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
+The later [Gemma and Ornith agentic comparison](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/report.md) gave both models 8/10 deterministic checks. Gemma completed the matched API and Pi work 15.7% faster, used 58.6% less peak PSS and used no process swap; Ornith used 6.99 GiB process swap and received the stronger blind review only for two answers that both failed the fixed completion limit.
+
+Earlier campaign report: [`../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
 
 Repository files:
 

@@ -1,0 +1,9 @@
+Test passes. I fixed only `src/clamp.ts` by completing the clamp logic to bound both below and above:
+
+```ts
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(min, value), max);
+}
+```
+
+`bun test` reports 1 pass, 0 fails.

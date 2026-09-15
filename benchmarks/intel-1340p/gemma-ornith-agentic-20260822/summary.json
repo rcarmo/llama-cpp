@@ -1,0 +1,336 @@
+{
+  "date": "2026-08-22",
+  "workload": {
+    "api_cases": [
+      "bounded reasoning",
+      "cached follow-up",
+      "implementation diagnosis",
+      "instruction following",
+      "repository planning",
+      "required tool planning"
+    ],
+    "pi_tasks": [
+      "repository retrieval",
+      "constrained code repair",
+      "exact instruction",
+      "cancellation recovery"
+    ],
+    "thermal_gate_mC": 95000
+  },
+  "models": {
+    "ornith": {
+      "api": {
+        "passed": 4,
+        "total": 6,
+        "wall_ms": 255795.48339100002,
+        "cases": [
+          {
+            "case_id": "bounded-reasoning",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 16398.382391,
+            "prompt_tokens": 67,
+            "generated_tokens": 158,
+            "prompt_tps": 18.22333375491792,
+            "generation_tps": 12.43782073636622,
+            "reasoning_chars": 412,
+            "content_chars": 259,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "cached-followup",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 48581.424075,
+            "prompt_tokens": 282,
+            "generated_tokens": 545,
+            "prompt_tps": 49.15664969193423,
+            "generation_tps": 12.725584034841855,
+            "reasoning_chars": 1224,
+            "content_chars": 1053,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "implementation-debug",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 81741.75722199999,
+            "prompt_tokens": 210,
+            "generated_tokens": 1024,
+            "prompt_tps": 50.81715190190451,
+            "generation_tps": 13.220333052982227,
+            "reasoning_chars": 1054,
+            "content_chars": 2972,
+            "finish_reason": "length",
+            "tool_name": null,
+            "semantic_ok": false,
+            "semantic_error": "prose answer exhausted token limit"
+          },
+          {
+            "case_id": "instruction-following",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 6317.104695000016,
+            "prompt_tokens": 67,
+            "generated_tokens": 60,
+            "prompt_tps": 41.96869511183717,
+            "generation_tps": 12.740828196302186,
+            "reasoning_chars": 100,
+            "content_chars": 78,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "repository-planning",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 86096.13485300003,
+            "prompt_tokens": 234,
+            "generated_tokens": 1024,
+            "prompt_tps": 51.65087452214663,
+            "generation_tps": 12.55521905497749,
+            "reasoning_chars": 970,
+            "content_chars": 2892,
+            "finish_reason": "length",
+            "tool_name": null,
+            "semantic_ok": false,
+            "semantic_error": "prose answer exhausted token limit"
+          },
+          {
+            "case_id": "tool-planning",
+            "label": "ornith",
+            "model": "ornith-1.5-35b-a3b-q4-k-m",
+            "wall_ms": 16660.68015499998,
+            "prompt_tokens": 363,
+            "generated_tokens": 123,
+            "prompt_tps": 52.47119071442055,
+            "generation_tps": 12.641907986643568,
+            "reasoning_chars": 219,
+            "content_chars": 115,
+            "finish_reason": "tool_calls",
+            "tool_name": "search_repository",
+            "semantic_ok": true,
+            "semantic_error": null
+          }
+        ]
+      },
+      "pi": {
+        "passed": 4,
+        "total": 4,
+        "wall_ms": 381287,
+        "tasks": {
+          "label": "ornith",
+          "provider": "local-ornith",
+          "model": "ornith-1.5-35b-a3b-q4-k-m",
+          "retrieval": {
+            "exit_code": 0,
+            "wall_ms": 220971,
+            "passed": true
+          },
+          "edit": {
+            "exit_code": 0,
+            "wall_ms": 64214,
+            "independent_test_exit_code": 0,
+            "changed_files": [
+              "src/clamp.ts"
+            ],
+            "passed": true
+          },
+          "instruction": {
+            "exit_code": 0,
+            "wall_ms": 93087,
+            "passed": true
+          },
+          "cancellation": {
+            "exit_code": 124,
+            "wall_ms": 3015,
+            "server_recovered": true,
+            "passed": true
+          },
+          "passed": 4,
+          "total": 4
+        }
+      },
+      "combined": {
+        "passed": 8,
+        "total": 10,
+        "wall_ms": 637082.483391
+      },
+      "resources": {
+        "samples": 501,
+        "peak_rss_kib": 30833804,
+        "peak_pss_kib": 30829909,
+        "peak_process_swap_kib": 7327488,
+        "minimum_mem_available_kib": 13996368,
+        "minimum_swap_free_kib": 902432,
+        "maximum_package_temp_mC": 92000,
+        "maximum_workload_package_temp_mC": 92000
+      }
+    },
+    "gemma": {
+      "api": {
+        "passed": 4,
+        "total": 6,
+        "wall_ms": 165553.360779,
+        "cases": [
+          {
+            "case_id": "bounded-reasoning",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 6977.609936,
+            "prompt_tokens": 69,
+            "generated_tokens": 123,
+            "prompt_tps": 54.755777329679766,
+            "generation_tps": 21.53119344779526,
+            "reasoning_chars": 352,
+            "content_chars": 95,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "cached-followup",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 26558.251596000002,
+            "prompt_tokens": 287,
+            "generated_tokens": 441,
+            "prompt_tps": 63.09657315256202,
+            "generation_tps": 20.051034201426415,
+            "reasoning_chars": 1108,
+            "content_chars": 640,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "implementation-debug",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 63763.332809,
+            "prompt_tokens": 217,
+            "generated_tokens": 1024,
+            "prompt_tps": 64.39213086617507,
+            "generation_tps": 16.965527241533838,
+            "reasoning_chars": 1124,
+            "content_chars": 3857,
+            "finish_reason": "length",
+            "tool_name": null,
+            "semantic_ok": false,
+            "semantic_error": "prose answer exhausted token limit"
+          },
+          {
+            "case_id": "instruction-following",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 6289.51888399999,
+            "prompt_tokens": 72,
+            "generated_tokens": 145,
+            "prompt_tps": 60.910304500763914,
+            "generation_tps": 28.53004735397584,
+            "reasoning_chars": 281,
+            "content_chars": 90,
+            "finish_reason": "stop",
+            "tool_name": null,
+            "semantic_ok": true,
+            "semantic_error": null
+          },
+          {
+            "case_id": "repository-planning",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 52852.856147,
+            "prompt_tokens": 249,
+            "generated_tokens": 1024,
+            "prompt_tps": 64.94634492925543,
+            "generation_tps": 20.928465625659445,
+            "reasoning_chars": 954,
+            "content_chars": 2869,
+            "finish_reason": "length",
+            "tool_name": null,
+            "semantic_ok": false,
+            "semantic_error": "prose answer exhausted token limit"
+          },
+          {
+            "case_id": "tool-planning",
+            "label": "gemma",
+            "model": "gemma-4-e4b-qat-mtp",
+            "wall_ms": 9111.791407000012,
+            "prompt_tokens": 143,
+            "generated_tokens": 168,
+            "prompt_tps": 63.2837448399408,
+            "generation_tps": 24.657072228049735,
+            "reasoning_chars": 500,
+            "content_chars": 0,
+            "finish_reason": "tool_calls",
+            "tool_name": "search_repository",
+            "semantic_ok": true,
+            "semantic_error": null
+          }
+        ]
+      },
+      "pi": {
+        "passed": 4,
+        "total": 4,
+        "wall_ms": 371401,
+        "tasks": {
+          "label": "gemma",
+          "provider": "local-gemma",
+          "model": "gemma-4-e4b-qat-mtp",
+          "retrieval": {
+            "exit_code": 0,
+            "wall_ms": 210281,
+            "passed": true
+          },
+          "edit": {
+            "exit_code": 0,
+            "wall_ms": 79973,
+            "independent_test_exit_code": 0,
+            "changed_files": [
+              "src/clamp.ts"
+            ],
+            "passed": true
+          },
+          "instruction": {
+            "exit_code": 0,
+            "wall_ms": 78133,
+            "passed": true
+          },
+          "cancellation": {
+            "exit_code": 124,
+            "wall_ms": 3014,
+            "server_recovered": true,
+            "passed": true
+          },
+          "passed": 4,
+          "total": 4
+        }
+      },
+      "combined": {
+        "passed": 8,
+        "total": 10,
+        "wall_ms": 536954.360779
+      },
+      "resources": {
+        "samples": 475,
+        "peak_rss_kib": 12765292,
+        "peak_pss_kib": 12760829,
+        "peak_process_swap_kib": 0,
+        "minimum_mem_available_kib": 23623128,
+        "minimum_swap_free_kib": 8233984,
+        "maximum_package_temp_mC": 94000,
+        "maximum_workload_package_temp_mC": 94000
+      }
+    }
+  }
+}

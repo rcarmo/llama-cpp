@@ -1,0 +1,22 @@
+diff --git a/tests/test-backend-ops.cpp b/tests/test-backend-ops.cpp
+index 0eee43881..c335c9ec6 100644
+--- a/tests/test-backend-ops.cpp
++++ b/tests/test-backend-ops.cpp
+@@ -11123,6 +11123,17 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_perf() {
+         }
+     }
+
++    // Small-column IQ projection shapes used by 27B-class prefill. Keep N=1 in
++    // the matrix so decode regressions are visible beside the N=7 prefill case.
++    for (ggml_type type_a : {
++            GGML_TYPE_IQ1_S, GGML_TYPE_IQ1_M,
++            GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ2_S,
++            GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ3_S }) {
++        for (int64_t n : {1, 7}) {
++            test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 17408, n, 5120, {1, 1}, {1, 1}));
++        }
++    }
++
+     // SWIGLU at a 27B-class FFN width, fused [gate|up] vs split operands
+     // note: same bytes either way, so a backend that indexes them differently shows it here
+     for (ggml_type type : {GGML_TYPE_F16, GGML_TYPE_F32}) {

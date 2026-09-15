@@ -91,3 +91,7 @@ cp ~/.pi/agent/models.json.pre-ornith-20260820 ~/.pi/agent/models.json
 ```
 
 No model weight file was removed during deployment.
+
+## Later agentic comparison
+
+The [22 August 2026 Gemma and Ornith agentic campaign](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/report.md) gave both models 8/10 deterministic checks. Ornith passed all four real Pi tasks and received the stronger blind review for two truncated long-form answers. Gemma completed the combined work 15.7% faster, used 58.6% less peak PSS and avoided Ornith's 6.99 GiB process swap. The campaign restored Ornith at that date; current service selection is recorded in the Gemma runbook.

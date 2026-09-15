@@ -12,6 +12,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 ## Campaigns and design notes
 
 * [Ornith and Gemma optimisation campaign](intel-1340p-ornith-gemma-campaign.md)
+* [Gemma and Ornith agentic comparison, 22 August 2026](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md)
 * [Historical Gemma 128K runbook](intel-1340p-gemma4-runbook.md)
 * [Maple Preview design](maple-preview-design.md)
 * [Expert-I/O baseline](expert-io-adoption-baseline.md)

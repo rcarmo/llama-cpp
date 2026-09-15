@@ -1,0 +1,46 @@
+{
+  "providers": {
+    "opencode-zen": {
+      "baseUrl": "https://opencode.ai/zen/v1",
+      "modelId": "minimax-m2.5-free"
+    },
+    "local-ornith": {
+      "baseUrl": "http://127.0.0.1:8095/v1",
+      "api": "openai-completions",
+      "apiKey": "local",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false,
+        "supportsStore": false,
+        "supportsStrictMode": false,
+        "supportsOpenAIGrammarTools": false,
+        "maxTokensField": "max_tokens",
+        "thinkingFormat": "qwen-chat-template",
+        "chatTemplateKwargs": {
+          "enable_thinking": {
+            "$var": "thinking.enabled"
+          }
+        }
+      },
+      "models": [
+        {
+          "id": "ornith-1.5-35b-a3b-q4-k-m",
+          "name": "Ornith 1.5 35B-A3B Q4_K_M (Local 128K)",
+          "reasoning": true,
+          "input": [
+            "text"
+          ],
+          "contextWindow": 131072,
+          "maxTokens": 32768,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          }
+        }
+      ]
+    }
+  },
+  "activeModel": "opencode-zen/minimax-m2.5-free"
+}

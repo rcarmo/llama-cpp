@@ -16,14 +16,14 @@ The same work can be read by model family instead of by host. That matters whene
 
 * Gemma 4 E4B
   * Sigma operations: [current local provider runbook](../intel-i5-1340p/gemma-local-provider-runbook.md), [historical 128K runbook](../intel-i5-1340p/intel-1340p-gemma4-runbook.md), [concurrency benchmark](../intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md)
-  * Sigma campaigns: [Ornith/Gemma optimisation](../intel-i5-1340p/intel-1340p-ornith-gemma-campaign.md), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md), [Gemma research above 32K](../../../benchmarks/intel-1340p/gemma-hybrid-perf-20260910/report.md)
+  * Sigma campaigns: [Ornith/Gemma optimisation](../intel-i5-1340p/intel-1340p-ornith-gemma-campaign.md), [Gemma/Ornith agentic comparison](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md), [Gemma research above 32K](../../../benchmarks/intel-1340p/gemma-hybrid-perf-20260910/report.md)
   * K3 history: [dense fallback experiments](../spacemit-k3/spacemit-dense-fallback-experiments.md)
 
 ## Maple and Ornith
 
 * Maple Preview: [design](../intel-i5-1340p/maple-preview-design.md), [runbook](../intel-i5-1340p/maple-local-provider-runbook.md), [implementation evidence](../../../benchmarks/intel-1340p/maple-preview/README.md), [agentic comparison](../../../benchmarks/intel-1340p/maple-preview/agentic/report.md)
 * Ornith 1.0 35B: [campaign](../intel-i5-1340p/intel-1340p-ornith-gemma-campaign.md), [runbook](../intel-i5-1340p/intel-1340p-ornith-runbook.md)
-* Ornith 1.5 local provider: [runbook](../intel-i5-1340p/ornith-1.5-local-provider-runbook.md)
+* Ornith 1.5 local provider: [runbook](../intel-i5-1340p/ornith-1.5-local-provider-runbook.md), [agentic comparison with Gemma](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md)
 
 ## Cross-cutting implementation topics
 

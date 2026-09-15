@@ -21,6 +21,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-08-01 -- [Ornith/Gemma 128K candidate validation](../../../benchmarks/intel-1340p/ornith-gemma-optimization/validation/candidate-128k/README.md)
 * 2026-08-02 -- [Gemma local-provider concurrency benchmark](../intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md)
 * 2026-08-05 / 2026-08-06 -- [Maple Preview evidence](../../../benchmarks/intel-1340p/maple-preview/README.md), [Maple/Gemma/Qwen campaign](../../../benchmarks/intel-1340p/maple-qwen-campaign/README.md)
+* 2026-08-22 -- [Gemma and Ornith agentic comparison on Sigma](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md)
 
 ## 2026-09
 

@@ -31,6 +31,8 @@ This campaign qualified the production MTP microbatch cap in commit `5f209cac0`.
 | `constructor-clean.txt` | Clean common-constructor graph export with a 253.1348 MiB draft compute buffer. |
 | `constructor-candidate.txt` | Capped common-constructor graph export with a 63.2837 MiB draft compute buffer. |
 | `test-qwen-mtp-trained-handoff-extended.cpp` | Measurement-only qualifier source used to build the CPU and Vulkan test binaries. |
+| `test-backend-ops-small-column-iq.patch` | Measurement-only 14-case IQ N=1/N=7 performance matrix patch. |
+| `test-backend-ops-small-column-iq.txt` | Scope and disposition of the IQ performance patch. |
 | `memory-run-inner.sh` | Per-run checkpoint and memory collector. |
 | `run-prefill-matrix-source.sh` | Original workspace wrapper; paths identify the collection workspace and need adjustment after checkout. |
 | `analyse-prefill.ts` | Original parser; set its `root` constant to a directory containing full per-run checkpoint files before reuse. |
