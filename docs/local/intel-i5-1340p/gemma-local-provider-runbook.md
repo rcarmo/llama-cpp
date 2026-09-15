@@ -297,7 +297,7 @@ The stream must contain content deltas, a terminal usage object and `data: [DONE
 
 The socket-activated endpoint at `http://192.168.1.70:8094/` serves the persistent Gemma zero-copy process on `127.0.0.1:18094`. It has one 32,768-token slot, the embedded llama.cpp Web UI and no API authentication. Use it only on the trusted LAN.
 
-A cold request performs Vulkan prefill, requires `shared_bytes > 0` and `copied_bytes == 0`, destroys the Vulkan owner, then continues on CPU with the MTP assistant. Append-only requests with the same `X-Conversation-Id` reuse CPU K/V. A different conversation resets the single resident slot. The service supports non-streaming Chat Completions and finite SSE responses, but it does not retain a server-side replay buffer after a dropped stream connection.
+A cold request performs Vulkan prefill, requires `shared_bytes > 0` and `copied_bytes == 0`, destroys the Vulkan owner, then continues on CPU with the MTP assistant. Exact append-only requests reuse CPU K/V. An edited or regenerated branch resets the slot and runs cold, even when it keeps the same `X-Conversation-Id`. A different conversation also resets the single resident slot. The service supports non-streaming Chat Completions and finite SSE responses, but it does not retain a server-side replay buffer after a dropped stream connection.
 
 Tracked service files:
 

@@ -31,25 +31,20 @@ int main() {
 
     json replacement = append;
     replacement["messages"][0]["content"] = "changed";
-    bool rejected = false;
-    try {
-        gemma_hybrid::classify_request("conversation-a", "conversation-a", committed, json::array(), replacement);
-    } catch (const std::invalid_argument &) {
-        rejected = true;
-    }
-    CHECK(rejected);
+    CHECK(gemma_hybrid::classify_request("conversation-a", "conversation-a", committed, json::array(), replacement) == gemma_hybrid::request_action::start);
     CHECK(gemma_hybrid::classify_request("conversation-a", "conversation-b", committed, json::array(), replacement) == gemma_hybrid::request_action::start);
     CHECK(gemma_hybrid::classify_request("conversation-a", "", committed, json::array(), replacement) == gemma_hybrid::request_action::start);
 
     json changed_tools = append;
     changed_tools["tools"] = json::array({{{"type", "function"}, {"function", {{"name", "x"}}}}});
-    rejected = false;
+    bool rejected = false;
     try {
         gemma_hybrid::check_append(committed, json::array(), changed_tools);
     } catch (const std::invalid_argument &) {
         rejected = true;
     }
     CHECK(rejected);
+    CHECK(gemma_hybrid::classify_request("conversation-a", "conversation-a", committed, json::array(), changed_tools) == gemma_hybrid::request_action::start);
 
     json invalid_role = append;
     invalid_role["messages"].back()["role"] = "assistant";
@@ -60,6 +55,7 @@ int main() {
         rejected = true;
     }
     CHECK(rejected);
+    CHECK(gemma_hybrid::classify_request("conversation-a", "conversation-a", committed, json::array(), invalid_role) == gemma_hybrid::request_action::start);
 
     std::map<std::string, std::string> headers = {{"x-conversation-id", "conversation-a"}};
     CHECK(gemma_hybrid::header_value(headers, "X-Conversation-Id") == "conversation-a");

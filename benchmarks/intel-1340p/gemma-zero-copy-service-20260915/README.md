@@ -28,7 +28,7 @@ The LAN service was live-verified after commit `c4a30e5f178f36591e9d9426687acf2b
 
 After the deployment evidence commit was pushed, the old file-mediated `llama-gemma-local-provider.service` was disabled and stopped. Ports 8091 and 18092 closed. The only running Gemma model process was `llama-gemma-zero-copy-server` on 18094, exposed through the LAN socket on 8094. See `final-service-state-ff327e115.txt`.
 
-The service is intentionally serial, with at most eight outstanding HTTP requests. A new conversation resets the resident slot; only an append-only request with the same `X-Conversation-Id` reuses K/V. It supports non-streaming OpenAI Chat Completions and a finite SSE response compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
+The service is intentionally serial, with at most eight outstanding HTTP requests. Only an exact append to the committed history reuses K/V. A new conversation, edited branch or regenerated branch resets the resident slot and runs cold. It supports non-streaming OpenAI Chat Completions and a finite SSE response compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
 
 ## Reproduce
 

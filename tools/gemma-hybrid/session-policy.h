@@ -67,9 +67,6 @@ inline request_action classify_request(
         check_append(committed, prior_tools, request);
         return request_action::append;
     } catch (const std::invalid_argument &) {
-        if (!request_conversation.empty() && request_conversation == active_conversation) {
-            throw;
-        }
         return request_action::start;
     }
 }
