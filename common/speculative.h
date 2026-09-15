@@ -5,6 +5,8 @@
 
 struct common_speculative;
 
+constexpr uint32_t COMMON_SPECULATIVE_MTP_UBATCH_MAX = 64;
+
 // comma separated list the provided types
 std::string common_speculative_type_name_str(const std::vector<enum common_speculative_type> & types);
 

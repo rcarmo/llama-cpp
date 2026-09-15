@@ -229,6 +229,11 @@ int main(int argc, char ** argv) {
             LOG_ERR("failed to initialize MTP context\n");
             return 1;
         }
+        if (llama_n_ubatch(ctx_dft) != std::min(llama_n_ubatch(ctx), COMMON_SPECULATIVE_MTP_UBATCH_MAX)) {
+            LOG_ERR("unexpected MTP microbatch size: target=%u draft=%u\n",
+                    llama_n_ubatch(ctx), llama_n_ubatch(ctx_dft));
+            return 1;
+        }
 
         const uint32_t n_seqs_dft   = llama_n_seq_max(ctx_dft);
         const uint32_t n_tokens_dft = std::min(llama_n_ctx(ctx_dft), llama_n_ubatch(ctx_dft));

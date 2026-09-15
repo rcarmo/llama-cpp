@@ -2596,6 +2596,12 @@ common_speculative_init_result::common_speculative_init_result(
     // the draft context holds as many tokens per sequence as the target context
     cparams.n_ctx = llama_n_ctx(ctx_tgt);
 
+    // MTP prompt catch-up is already split by the draft context's microbatch size.
+    // Keep enough rows to amortize dispatch while avoiding a second target-sized compute graph.
+    if (spec_mtp) {
+        cparams.n_ubatch = std::min(cparams.n_ubatch, COMMON_SPECULATIVE_MTP_UBATCH_MAX);
+    }
+
     // note: for small models maybe we can set this to the maximum possible draft from all speculative types
     //       the extra memory for small models is likely negligible?
     cparams.n_rs_seq  = 0;
