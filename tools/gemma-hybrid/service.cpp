@@ -140,7 +140,7 @@ static config parse_args(int argc, char ** argv) {
 class persistent_session {
 public:
     explicit persistent_session(config cfg) : cfg(std::move(cfg)) {
-        load_cpu_models();
+        load_models();
     }
 
     json complete(json request, const std::string & conversation, const std::function<bool()> & should_stop) {
@@ -183,6 +183,7 @@ public:
             {"handoffs", handoffs},
             {"shared_bytes", total_shared_bytes},
             {"copied_bytes", total_copied_bytes},
+            {"vulkan_model_resident", gpu_target != nullptr},
         };
     }
 
@@ -279,9 +280,10 @@ private:
         return context;
     }
 
-    void load_cpu_models() {
+    void load_models() {
         cpu_target = load_model(cfg.model_path, false);
         draft_model = load_model(cfg.draft_path, false);
+        gpu_target = load_model(cfg.model_path, true);
         char target_arch[64] = {};
         char draft_arch[64] = {};
         llama_model_meta_val_str(cpu_target.get(), "general.architecture", target_arch, sizeof(target_arch));
@@ -296,7 +298,6 @@ private:
         speculative.reset();
         draft_ctx.reset();
         target_ctx.reset();
-        gpu_target.reset();
         history.clear();
         committed = json::array();
         prior_tools = json::array();
@@ -396,8 +397,8 @@ private:
         const common_chat_params chat = render_chat(request);
         const auto * vocab = llama_model_get_vocab(cpu_target.get());
         std::vector<llama_token> prompt = tokenize(vocab, chat.prompt);
-        const int32_t budget = request.value("max_tokens", std::min(512, cfg.max_output));
-        if (budget < 1 || budget > cfg.max_output || prompt.size() + budget + cfg.draft_max + 1 > static_cast<size_t>(cfg.context)) {
+        const int32_t budget = gemma_hybrid::output_budget(request, cfg.max_output);
+        if (prompt.size() + budget + cfg.draft_max + 1 > static_cast<size_t>(cfg.context)) {
             throw std::invalid_argument("context or output budget exceeded");
         }
 
@@ -413,7 +414,6 @@ private:
         double handoff_ms = 0;
 
         if (cold) {
-            gpu_target = load_model(cfg.model_path, true);
             target_ctx = make_context(gpu_target.get(), context_params(true));
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
@@ -430,7 +430,6 @@ private:
             }
             handoff_ms = elapsed_s(handoff_started) * 1000.0;
             target_ctx.reset();
-            gpu_target.reset();
             target_ctx = std::move(destination);
             ++handoffs;
             total_shared_bytes += transfer.shared_bytes;

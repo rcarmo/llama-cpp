@@ -17,6 +17,21 @@ int main() {
     json first = {{"messages", json::array({message("user", "one")})}};
     gemma_hybrid::normalize_request(first);
     CHECK(first.at("tools") == json::array());
+    CHECK(gemma_hybrid::output_budget(first, 2048) == 2048);
+    first["max_tokens"] = 512;
+    CHECK(gemma_hybrid::output_budget(first, 2048) == 512);
+    first["max_tokens"] = -1;
+    CHECK(gemma_hybrid::output_budget(first, 2048) == 2048);
+    first.erase("max_tokens");
+    bool invalid_budget = false;
+    try {
+        json invalid = first;
+        invalid["max_tokens"] = 2049;
+        (void) gemma_hybrid::output_budget(invalid, 2048);
+    } catch (const std::invalid_argument &) {
+        invalid_budget = true;
+    }
+    CHECK(invalid_budget);
     CHECK(gemma_hybrid::classify_request("", "conversation-a", json::array(), json::array(), first) == gemma_hybrid::request_action::start);
 
     json committed = first.at("messages");

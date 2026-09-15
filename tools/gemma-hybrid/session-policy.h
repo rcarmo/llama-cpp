@@ -30,6 +30,17 @@ inline void normalize_request(json & request) {
     }
 }
 
+inline int32_t output_budget(const json & request, int32_t configured_max) {
+    const int32_t requested = request.value("max_tokens", configured_max);
+    if (requested == -1) {
+        return configured_max;
+    }
+    if (requested < 1 || requested > configured_max) {
+        throw std::invalid_argument("max_tokens must be -1 or between 1 and the configured maximum");
+    }
+    return requested;
+}
+
 inline void check_append(const json & committed, const json & prior_tools, const json & request) {
     const auto & messages = request.at("messages");
     if (committed.empty()) {
