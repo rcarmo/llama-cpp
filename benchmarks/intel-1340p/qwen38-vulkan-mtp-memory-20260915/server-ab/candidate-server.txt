@@ -1,0 +1,24 @@
+0.00.028.588 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.028.687 I srv          init: The UI is disabled
+0.00.028.689 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.028.769 W srv  llama_server: -----------------
+0.00.028.770 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.028.771 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.028.771 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.028.771 W srv  llama_server: -----------------
+0.00.030.112 I srv    load_model: loading model 'projects/models/qwen3.8-27b-gsq-rco/Qwen3.8-27B-GSQ-RCO-IQ2_S-mtp.gguf'
+0.03.700.666 I cmn          init: llama threadpool init, n_threads = 4
+0.03.700.749 I common_speculative_init_result: creating MTP draft context against the target model 'projects/models/qwen3.8-27b-gsq-rco/Qwen3.8-27B-GSQ-RCO-IQ2_S-mtp.gguf'
+0.03.711.286 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 1280, kv_unified = 'false'
+0.03.800.064 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.03.800.095 I srv  llama_server: model loaded
+0.03.800.099 I srv  llama_server: listening on http://127.0.0.1:18092
+0.04.061.827 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.04.061.894 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.16.930.299 I slot print_timing: id  0 | task 0 | prompt eval time =    4351.54 ms /     5 tokens (  870.31 ms per token,     1.15 tokens per second)
+0.16.930.307 I slot print_timing: id  0 | task 0 |        eval time =    8516.82 ms /     8 tokens ( 1216.69 ms per token,     0.82 tokens per second)
+0.16.930.308 I slot print_timing: id  0 | task 0 |       total time =   12868.36 ms /    13 tokens
+0.16.930.311 I slot print_timing: id  0 | task 0 |    graphs reused =          1
+0.16.930.315 I slot print_timing: id  0 | task 0 | draft acceptance = 0.66667 (    4 accepted /     6 generated), mean len =  3.00
+0.16.930.384 I slot      release: id  0 | task 0 | stop processing: n_tokens = 12, truncated = 0
+0.16.934.957 I srv    operator(): operator(): cleaning up before exit...

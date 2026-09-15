@@ -10,7 +10,7 @@ The same work can be read by model family instead of by host. That matters whene
   * K3: [recurrent-path report](../../../benchmarks/qwen-recurrent-20260721/final-report.md), [parameter sweep](../../../benchmarks/qwen-parameter-sweep-20260722/final-report.md), [Q3_K_M service test](../../../benchmarks/qwen-q3km-20260722/report.md), [Q4_K_M 16K test](../../../benchmarks/qwen-q4km-16k-20260723/report.md)
 * Qwen3.8 27B
   * RTX 3060: [historical UD-Q4_K_XL campaign](../rtx3060/qwen38-27b-ud-q4-rtx3060-report.md), [GSQ-RCO report](../rtx3060/qwen38-gsq-rco-report.md)
-  * Sigma: [Qwen 3.8 campaign](../../../benchmarks/intel-1340p/qwen38-campaign/README.md), [Qwen3.8 vs Qwen3.6 Dynamic comparison](../../../benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/README.md)
+  * Sigma: [Qwen 3.8 campaign](../../../benchmarks/intel-1340p/qwen38-campaign/README.md), [Qwen3.8 vs Qwen3.6 Dynamic comparison](../../../benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/README.md), [Vulkan embedded-MTP memory qualification](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
 
 ## Gemma
 

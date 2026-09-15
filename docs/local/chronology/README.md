@@ -30,6 +30,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-10 / 2026-09-11 -- [Gemma benchmark cluster on Sigma](../../../benchmarks/intel-1340p/README.md#2026-09-10-and-2026-09-11-gemma-series), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md)
 * 2026-09-13 / 2026-09-14 -- [Intel Xe handoff and zero-copy series](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series), [in-memory KV handoff note](../intel-i5-1340p/in-memory-kv-handoff.md), [paired Q6 note](../intel-i5-1340p/cpu-q6-pair.md)
 * 2026-09-14 -- [RTX 3060 GSQ rebuild](../rtx3060/qwen38-gsq-rco-report.md)
+* 2026-09-15 -- [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
 
 ## Current runbooks and retained operational docs
 

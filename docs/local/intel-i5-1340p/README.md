@@ -19,6 +19,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md) and [audit](turbo-fieldfare-audit.md)
 * [Gemma concurrency benchmark](gemma-local-provider-benchmark-2026-08-02.md)
 * [In-memory Vulkan-to-CPU KV handoff](in-memory-kv-handoff.md)
+* [Qwen3.8 embedded-MTP microbatch cap](qwen38-vulkan-mtp-memory.md) -- 15 September 2026 Intel Iris Xe memory and prefill qualification; committed but not deployed.
 * [Paired Q6 note](cpu-q6-pair.md)
 
 ## Raw evidence and benchmark clusters
@@ -32,6 +33,7 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 * [`benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/`](../../../benchmarks/intel-1340p/qwen38-qwen36-dynamic-20260903/)
 * [`benchmarks/intel-1340p/gemma-*20260910/`](../../../benchmarks/intel-1340p/README.md#2026-09-10-and-2026-09-11-gemma-series) and [`benchmarks/intel-1340p/gemma-*20260911/`](../../../benchmarks/intel-1340p/README.md#2026-09-10-and-2026-09-11-gemma-series)
 * [`benchmarks/intel-1340p/xe-*20260913/`](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series) and [`benchmarks/intel-1340p/xe-*20260914/`](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series)
+* [Qwen3.8 Vulkan embedded-MTP memory qualification, 15 September 2026](../../../benchmarks/intel-1340p/qwen38-vulkan-mtp-memory-20260915/README.md)
 
 ## Caveats that recur across the Sigma reports
 
