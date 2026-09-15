@@ -2,7 +2,7 @@
 
 This directory contains the complete 3 September 2026 Intel Core i5-1340P campaign for Qwen3.8 27B `UD-Q4_K_XL` and Qwen3.6 35B-A3B `UD-Q2_K_XL`.
 
-Read [report.md](report.md) for the decision and measured results. Qwen3.6 is the preferred deployment profile on this host.
+Read [report.md](report.md) for the decision and measured results. Qwen3.6 was the preferred profile in this campaign. The [current Sigma service](../../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md) is Gemma zero-copy.
 
 ## Contents
 

@@ -30,6 +30,8 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## 2026-09-10 and 2026-09-11 Gemma series
 
+These directories freeze the file-mediated CPU/GPU service and decoder deployments as observed on 10-11 September. Their present-tense deployment statements are historical snapshots. The [15 September zero-copy service record](gemma-zero-copy-service-20260915/README.md) supersedes their operating state and rollback targets.
+
 * [gemma-hybrid-perf-20260910/](gemma-hybrid-perf-20260910/)
 * [gemma-context-coding-20260910/](gemma-context-coding-20260910/)
 * [gemma-cpu-fa-20260910/](gemma-cpu-fa-20260910/)
@@ -72,7 +74,7 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## 2026-09-15 Gemma service and Qwen3.8 memory
 
-* [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- persistent in-process Gemma Vulkan prefill to CPU MTP service, short/tools/multi-turn and exact 4K/32K qualification with zero copied bytes.
+* [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- current in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
 * [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.
 
 These directories mix curated `README.md` or `report.md` pages with raw JSON, stdout captures and scripts. Read the per-directory README first when one exists.

@@ -1,5 +1,7 @@
 # Shape-resolved64K CPU decode: attention dominates
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 F16 attention matrix products account for **10.79 seconds (64.06%)** of16.84 seconds instrumented node wall time on the deployed small-batch MTP baseline. Q4 projections account for3.44 seconds (20.40%). Activation packing is much smaller. The next candidate should address F16 attention loads/dot products rather than repeat thread or draft tuning.
 
 ## Diagnostic scope

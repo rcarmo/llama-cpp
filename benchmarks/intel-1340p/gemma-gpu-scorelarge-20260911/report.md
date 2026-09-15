@@ -1,5 +1,7 @@
 # Large FP32 score tile: correct, 314% slower
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The128x128 score tile is rejected for performance adoption. Four48K ABBA suffix runs measured **94.521s versus22.838s** for the retained64x64 tile, **313.88% slower**. Both arms retained FP32 accumulation, active256/max1024 allocation and the same1022-token suffix from49152 cached tokens. B0 production remains unchanged.
 
 ## Implementation and availability

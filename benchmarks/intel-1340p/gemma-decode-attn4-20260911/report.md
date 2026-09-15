@@ -1,5 +1,7 @@
 # Four-query F16 tile: 2.90% faster decode, deployed
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The `20260911-attn4` release is live on port 8091. Eight counterbalanced 64K runs measured **8.5536 to 8.8020 tok/s (+2.90%)** over the deployed small-batch decoder. Median decode-request wall time fell **2.47%**, from 16.629 to 16.219 seconds. This is one counting/recall fixture with 128 generated tokens and four runs per mode.
 
 ## What changed

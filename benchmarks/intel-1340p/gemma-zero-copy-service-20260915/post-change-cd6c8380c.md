@@ -37,15 +37,17 @@ The retained September small-batch, ATTN4 and SCORE3 CPU patches were ported tem
 | Experimental paths off | 12.79 tok/s | 14.19 s |
 | Experimental paths on | 9.02 tok/s | 18.31 s |
 
-The combined transplant reduced decode throughput by 29.5% and increased request wall time by 29.0%. It was removed before the final build. The production source and service environment do not contain or enable `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH`, `GGML_CPU_EXPERIMENTAL_ATTN4` or `GGML_CPU_EXPERIMENTAL_SCORE4_3ROW`.
+The combined transplant reduced decode throughput by 29.5% and increased request wall time by 29.0%. It was removed before the final build. The active core source and service environment do not contain or enable `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH`, `GGML_CPU_EXPERIMENTAL_ATTN4` or `GGML_CPU_EXPERIMENTAL_SCORE4_3ROW`. Retained patch snapshots remain under benchmark and tool evidence directories.
 
-## Final runtime identity
+## Runtime identity before live streaming
 
 ```text
 3299e9c5ab683a9048cc8fc7890daad99c000350cd26afa2ab2850ff8a5d11ad  llama-gemma-zero-copy-server
 d231e9d4f835a3e8151c483a9031124541d236e3cb6a321755a851300afe537e  libllama.so.0.4.0
 22ec2763eae7f57ee5b700d137501d1d5d970df48d1401b6c17ec590af0e11cf  libggml-cpu.so.0.23.0
 ```
+
+This identity covers the persistent-model and output-limit checks above. The live-stream follow-up rebuilt only the focused server executable; the linked `libllama` and CPU backend did not change.
 
 This is a bounded post-change verification, not a repeat of the exact 4K/32K qualification or a claim that the hybrid service matches the historical CPU-only 25.77 tok/s generation result.
 
@@ -64,3 +66,11 @@ Measured loopback verification for a 21-token prompt and 128-token output record
 The same verifier through trusted-LAN port 8094 recorded 132 events, two progress events and 128 content events. The first LAN event arrived in 2.8 ms, first progress in 1.374 s, first content in 2.528 s and final event in 11.829 s. A streamed `get_temperature` request assembled one tool call with arguments `{"city":"Lisbon"}` and finish reason `tool_calls`. Cancelling after three streamed content events closed the stream in 0.018 s; the next request returned `RECOVERED` through a fresh zero-copy handoff.
 
 The serial non-streaming suite then passed all seven requests, including exact append reuse and tool-result continuation. A headless Chromium check against the actual LAN UI observed `Processing 0%`, `Processing 100%`, a partial numbered response and the completed four-line response over one `text/event-stream` request. Final inspection recorded zero service restarts, `MemorySwapCurrent=0`, `MemorySwapPeak=0` and a 14,016,946,176-byte cgroup memory peak. These are bounded integration checks, not a long-context rerun.
+
+The deployed live-stream build is commit `b7492aba412639bde3deaa0e505cdecc943ca7b9`. `current-runtime-b7492aba4.txt` records its loaded paths, service state and health. Its runtime identity is:
+
+```text
+0ba23ad310513ff428dfd5fac6f7ad5288e8371362e7e5c65341695fc9428eab  llama-gemma-zero-copy-server
+d231e9d4f835a3e8151c483a9031124541d236e3cb6a321755a851300afe537e  libllama.so.0.4.0
+22ec2763eae7f57ee5b700d137501d1d5d970df48d1401b6c17ec590af0e11cf  libggml-cpu.so.0.23.0
+```

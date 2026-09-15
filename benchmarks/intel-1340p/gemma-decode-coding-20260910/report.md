@@ -1,5 +1,7 @@
 # Longer64K coding output: faster decode, task failures retained
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The deployed small-batch CPU change improves throughput on longer code output, but these fixtures did not pass the exact coding contracts. Two separate ABBA blocks produced matched output in both modes:
 
 | Fixture | Flag off | Flag on | Decode gain | Exact task passes |

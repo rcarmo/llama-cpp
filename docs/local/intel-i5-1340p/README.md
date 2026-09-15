@@ -4,7 +4,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Start with the current roles
 
-* [Gemma 4 E4B zero-copy service](gemma-local-provider-runbook.md) -- sole enabled local model service: one 32K slot, Vulkan cold prefill, in-process CPU handoff and CPU MTP decode on LAN port 8094.
+* [Gemma 4 E4B zero-copy service](gemma-local-provider-runbook.md) -- sole enabled local model service: one 32K slot, resident Vulkan model with a fresh cold-prefill context, in-process CPU handoff, CPU MTP decode and live UI progress on LAN port 8094.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
 * [Maple Preview local provider](maple-local-provider-runbook.md) -- explicit alternative provider, not the default.
 * [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.
@@ -20,7 +20,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md) and [audit](turbo-fieldfare-audit.md)
 * [Gemma concurrency benchmark](gemma-local-provider-benchmark-2026-08-02.md)
 * [In-memory Vulkan-to-CPU KV handoff](in-memory-kv-handoff.md)
-* [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) -- 15 September 2026 persistent Vulkan prefill to CPU MTP service, exact 4K/32K and tool/multi-turn evidence.
+* [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) -- 15 September 2026 Vulkan-prefill to CPU-MTP service, exact 4K/32K, tool/multi-turn, persistent-model and live-stream evidence.
 * [Qwen3.8 embedded-MTP microbatch cap](qwen38-vulkan-mtp-memory.md) -- 15 September 2026 Intel Iris Xe memory and prefill qualification; committed but not deployed.
 * [Paired Q6 note](cpu-q6-pair.md)
 
@@ -41,4 +41,4 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 
 * CPU masks in these documents are host-specific. Several reports note that requested binding and observed OpenMP worker placement were not identical.
 * Thermal annotations exist where they were measured, but not every campaign has full thermal telemetry. Keep that distinction.
-* The 15 September Gemma zero-copy service report is the current deployment record. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
+* The 15 September Gemma zero-copy service report and its post-change verification are the current deployment record. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.

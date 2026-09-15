@@ -1,5 +1,7 @@
 # FP32 attention selection in a 38.7K coding loop
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The exact-IrisXe FP32 selector reduced median cold prefill by **2.09%** and summed request-route time by **1.99%** in one ABBA block at 38666 initial tokens. All four coding tasks passed. Warm CPU request time changed by **-0.56%**, with the same four rounds and 213 generated tokens in every run.
 
 The original CPU service was restored unchanged as PID620161. Health, two131072-token slots, argv, config, nine loaded-file hashes, explicit tool results and cached append passed. Production-process swap was zero. No hybrid route or candidate library was deployed.

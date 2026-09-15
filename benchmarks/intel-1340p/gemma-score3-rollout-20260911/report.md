@@ -1,5 +1,7 @@
 # Score3 decoder deployed after resumed qualification
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The score-only 3x4 decoder is live in `20260911-score3-stopped` on port 8091. The remaining 4K prefill, finite64K, independent tool-slot and production SSE gates passed after Rui explicitly stopped both speech services. The earlier eight-run comparison is unchanged: **8.6634 to 8.9341 tok/s, +3.124% median decode**, with **2.988% lower request wall time**. No native numerical or throughput comparison was repeated.
 
 ## What resumed

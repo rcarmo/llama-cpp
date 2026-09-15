@@ -1,5 +1,7 @@
 # Inlined spill-free score kernel: no useful gain
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Inlining the explicit AVX2 score kernel removed the per-tile helper call but did not improve the saved64K workload. Generation changed from **9.2160 to 9.1371 tokens/s (-0.856%)**; request time increased **0.928%**. B0-score3 remains deployed.
 
 ## Four-run screen

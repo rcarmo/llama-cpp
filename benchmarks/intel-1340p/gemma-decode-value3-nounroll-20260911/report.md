@@ -1,5 +1,7 @@
 # Value-attention 3x4 candidates: correct, no confirmed gain
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Neither value-only candidate earned adoption. The second variant's independent eight-run confirmation measured **9.1361 to 9.1441 tok/s (+0.088%)**, while median request wall time increased **0.945%**. B0-score3 remains deployed unchanged; no B1 baseline is created.
 
 ## Candidate sequence

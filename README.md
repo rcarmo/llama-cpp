@@ -14,7 +14,7 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Gemma 4 E4B zero-copy, 32K | Sole enabled local model service | 202.60 / 128.00 prompt tok/s at 4K / 32K; 584,056,832 shared K/V bytes and zero copied bytes |
+| LattePanda Sigma | Gemma 4 E4B zero-copy, 32K | Sole enabled local model service | 202.60 / 128.00 prompt tok/s at 4K / 32K; 584,056,832 shared K/V bytes, zero copied bytes and live UI progress |
 | LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
 | LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
@@ -112,14 +112,14 @@ Operations and evidence:
 
 ### Gemma zero-copy service
 
-The selected Sigma service performs cold Gemma prefill on Iris Xe, moves the 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
+The selected Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
 
 | Workload | Prompt throughput | Handoff | Result |
 |---|---:|---:|---|
 | Exact 4K | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 | Exact 32K | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 
-Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. The Vulkan model remains resident between cold conversations; each cold request still creates and evaluates a fresh Vulkan context. Historical CPU measurements remain the sustained-generation reference.
+Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Historical CPU measurements remain the sustained-generation reference.
 
 Operations and evidence:
 

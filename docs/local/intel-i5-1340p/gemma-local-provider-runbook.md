@@ -21,6 +21,7 @@ The enabled Gemma service on `sigma` is `llama-gemma-zero-copy.service`. It list
 | Decode / prefill threads | 8 / 16 |
 | Service memory limit | 16 GiB |
 | Service swap limit | 0 |
+| Streaming | Live SSE prompt progress plus parsed content, reasoning and tool-call deltas |
 | Authentication | None; trusted LAN only |
 
 The service is workspace-coupled. The installed unit runs `tools/run-gemma-zero-copy-service.sh`; its environment file names the workspace build and GGUF paths. Moving, replacing or deleting these files changes the live service.
@@ -79,7 +80,7 @@ Both requests returned `LONG OK`, shared 584,056,832 logical K/V bytes and copie
 
 A warm append recalled the expected nonce, reused 24 prompt tokens and completed in 0.89 s. The original qualification reloaded the Vulkan target for each new conversation, so its 3.5-4.6 s short cold timings are historical. Commit `cd6c8380c` made the Vulkan model owner process-resident. A post-change second cold smoke reached first token in 1.40 s; a different 37-token prompt reached first token in 4.22 s and generated 128 tokens at 13.03 tok/s. These single runs verify the serving path, not a general latency or throughput distribution.
 
-A matched 37-prompt/128-output comparison on the current branch rejected transplantation of the retained `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH`, `GGML_CPU_EXPERIMENTAL_ATTN4` and `GGML_CPU_EXPERIMENTAL_SCORE4_3ROW` paths. Enabling all three reduced decode from 12.79 to 9.02 tok/s and increased request wall time from 14.19 to 18.31 s. They are absent from the current source and service environment.
+A matched 37-prompt/128-output comparison on the current branch rejected transplantation of the retained `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH`, `GGML_CPU_EXPERIMENTAL_ATTN4` and `GGML_CPU_EXPERIMENTAL_SCORE4_3ROW` paths. Enabling all three reduced decode from 12.79 to 9.02 tok/s and increased request wall time from 14.19 to 18.31 s. They are absent from the active core source and service environment; retained patch snapshots remain under benchmark and tool evidence directories.
 
 Historical matched CPU measurements remain the best sustained-generation reference: 25.77 generation tok/s and 60.96/44.32 prompt tok/s at exact 4K/32K. The current synthetic long prompts measured 202.60/128.00 prompt tok/s, but the prompt contents and output lengths differ. Treat the ratios as indicative, not matched speedups.
 
@@ -201,6 +202,15 @@ curl -fsS http://192.168.1.70:8094/v1/chat/completions \
     .zero_copy.copied_bytes == 0 and
     .zero_copy.zero_copy == true)'
 ```
+
+Live stream and progress verification:
+
+```bash
+GEMMA_ZERO_COPY_URL=http://192.168.1.70:8094 \
+  bun tools/gemma-hybrid/verify-stream.ts
+```
+
+The verifier requires at least one `prompt_progress` event, multiple content deltas before the terminal event, final zero-copy telemetry and zero copied bytes. Use `verify-stream-tool.ts` for streamed tool-call assembly.
 
 Required tool-call request:
 

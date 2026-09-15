@@ -15,7 +15,7 @@ The same work can be read by model family instead of by host. That matters whene
 ## Gemma
 
 * Gemma 4 E4B
-  * Sigma operations: [current 32K zero-copy service](../intel-i5-1340p/gemma-local-provider-runbook.md), [service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [historical 128K CPU runbook](../intel-i5-1340p/intel-1340p-gemma4-runbook.md), [historical concurrency benchmark](../intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md)
+  * Sigma operations: [current 32K zero-copy service](../intel-i5-1340p/gemma-local-provider-runbook.md), [qualification and post-change live verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [historical 128K CPU runbook](../intel-i5-1340p/intel-1340p-gemma4-runbook.md), [historical concurrency benchmark](../intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md)
   * Sigma campaigns: [in-memory K/V handoff](../intel-i5-1340p/in-memory-kv-handoff.md), [Ornith/Gemma optimisation](../intel-i5-1340p/intel-1340p-ornith-gemma-campaign.md), [Gemma/Ornith agentic comparison](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md), [Gemma research above 32K](../../../benchmarks/intel-1340p/gemma-hybrid-perf-20260910/report.md)
   * K3 history: [dense fallback experiments](../spacemit-k3/spacemit-dense-fallback-experiments.md)
 

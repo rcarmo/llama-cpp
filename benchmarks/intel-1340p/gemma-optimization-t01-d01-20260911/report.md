@@ -1,5 +1,7 @@
 # B0 test foundation and refreshed decode profile
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 B0-score3 remains deployed unchanged. The test harness now has strict resource and case-file preflight, reviewed quality fixtures have native baseline outcomes, and one saved64K profile identifies the next decode target. No new performance baseline was validated in this stage.
 
 ## T01: inputs and guarded execution

@@ -1,5 +1,7 @@
 # Gemma acceleration deployed
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The existing `http://127.0.0.1:8091` endpoint now serves GPU cold prefill followed by retained CPU/MTP decoding. Rui approved rollout at21:45UTC. Final release `20260910-sse1` passed production checks at22:25UTC on10September2026.
 
 | Setting | Deployed value |
