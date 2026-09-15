@@ -1,6 +1,27 @@
-# Gemma hybrid adapter
+# Gemma hybrid tools
 
-For the separate opt-in same-process native KV path, see [in-memory KV handoff](../../docs/in-memory-kv-handoff.md). `llama-gemma-in-memory` keeps target history/sampling in RAM and reports shared/copied bytes. It does not replace or deploy the TypeScript adapter below.
+`llama-gemma-zero-copy-server` owns a persistent single-slot Gemma session. A cold chat request prefills with Vulkan, moves the K/V cache into a CPU context in process, destroys the Vulkan owner, creates the CPU MTP borrower and generates the response. The request fails unless `shared_bytes > 0` and `copied_bytes == 0`.
+
+Build and run it with:
+
+```sh
+cmake --build build --target llama-gemma-zero-copy-server
+build/bin/llama-gemma-zero-copy-server \
+  --model target.gguf --draft assistant.gguf \
+  --host 127.0.0.1 --port 18094 --ctx-size 32768
+```
+
+The server provides the embedded UI, `/health`, `/props`, `/v1/models` and `/v1/chat/completions`. It accepts OpenAI messages and tools, parses tool calls and reuses K/V only for an append-only request with the same `X-Conversation-Id`. It is serial and replaces the resident conversation when a different conversation starts. Client disconnects abort the active decode and clear the slot. `DELETE /v1/stream` also clears the owning slot.
+
+The service accepts non-streaming requests and finite SSE responses. It does not retain server-side replay data after a stream disconnect. Maximum request JSON is 16 MiB. Context and output limits come from `--ctx-size` and `--max-output`. Use an external supervisor for memory, swap and process limits. The Sigma profile uses `MemoryMax=16G`, `MemorySwapMax=0` and one 32K slot.
+
+See [the Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md).
+
+`llama-gemma-in-memory` is the one-request native diagnostic. It retains target history and sampling in RAM and reports shared/copied bytes.
+
+The TypeScript adapter below is the older file-mediated loopback implementation. It is retained for historical reproduction and is not used by the zero-copy LAN service.
+
+## File-mediated adapter
 
 Opt-in loopback adapter for the tested Intel Gemma configuration. GPU cold text prefill uses the pinned Vulkan FP32 selector with microbatch256; generation and warm turns use the retained CPU8/prefill16, MTP3, F16 KV, FA-off worker.
 

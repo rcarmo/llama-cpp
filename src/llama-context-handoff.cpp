@@ -12,7 +12,6 @@ bool llama_context::kv_handoff_cpu(llama_context & src, bool allow_copy, llama_k
         kv_borrowers || src.kv_borrowers || kv_borrowed_from || src.kv_borrowed_from || cparams.ctx_other || src.cparams.ctx_other ||
         model.shared_residency_enabled() || src.model.shared_residency_enabled() ||
         model.n_gpu_layers()!=0 || cparams.offload_kqv || cparams.op_offload ||
-        (!kv_handoff_strict && (src.model.n_gpu_layers()!=0 || src.cparams.offload_kqv || src.cparams.op_offload)) ||
         (kv_handoff_strict && (src.model.n_gpu_layers()==0 || !src.cparams.offload_kqv || !src.cparams.op_offload)) ||
         model.has_tensor_overrides() || src.model.has_tensor_overrides() ||
         opt_ctx || src.opt_ctx || kv_cvec_modified || src.kv_cvec_modified ||

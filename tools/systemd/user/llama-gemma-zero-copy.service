@@ -1,0 +1,24 @@
+[Unit]
+Description=Gemma 4 E4B Vulkan prefill to CPU MTP zero-copy service
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/local/intel-i5-1340p/gemma-local-provider-runbook.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/llama-gemma-zero-copy/service.env
+ExecStart=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-gemma-zero-copy-service.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillSignal=SIGTERM
+MemoryMax=16G
+MemorySwapMax=0
+TasksMax=256
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+[Install]
+WantedBy=default.target

@@ -70,8 +70,9 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 * [xe-master-agentic-20260914/](xe-master-agentic-20260914/)
 * [xe-zero-copy-throughput-20260914/](xe-zero-copy-throughput-20260914/)
 
-## 2026-09-15 Qwen3.8 Vulkan embedded-MTP memory
+## 2026-09-15 Gemma service and Qwen3.8 memory
 
+* [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- persistent in-process Gemma Vulkan prefill to CPU MTP service, short/tools/multi-turn and exact 4K/32K qualification with zero copied bytes.
 * [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.
 
 These directories mix curated `README.md` or `report.md` pages with raw JSON, stdout captures and scripts. Read the per-directory README first when one exists.

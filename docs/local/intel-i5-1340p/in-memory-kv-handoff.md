@@ -83,4 +83,6 @@ See [the original implementation and short-run evidence](../../../benchmarks/int
 - Process-to-first-token stayed near 6.9 s on the short 309/128 workload; its 20.55 ms handoff saving is small relative to model loading and prefill.
 - Creating a sharing assistant previously reset populated target cells. The constructor now preserves and validates existing shared cells; the failed whitespace-only MTP result and corrected run are both retained.
 
-The feature is experimental and opt-in. Public context-parameter additions require consumers to rebuild against the updated header. Long-context capacity, broad quality, a clean all-shaders release build and production serving are unqualified. No default allocator/scheduler placement or deployed service is changed.
+The public context-parameter additions require consumers to rebuild against the updated header. The one-request diagnostic remains experimental and opt-in.
+
+The [15 September Gemma service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) adds a persistent one-slot serving caller. It passed append-only multi-turn reuse, tool-call parsing, cancellation/reset, factual, arithmetic and code requests, plus exact 4K and 32K prompts. Cold requests reported `shared_bytes > 0` and `copied_bytes == 0`; the 32K unit used no swap under a 16 GiB limit. This service does not change default allocator or scheduler placement.
