@@ -1,0 +1,34 @@
+captured_utc=2026-09-15T21:03:48Z
+source_commit=ff327e11539e038496439641373d0373e7ba71c6
+remote_commit=ff327e11539e038496439641373d0373e7ba71c6
+
+OLD_FILE_MEDIATED_UNIT
+ActiveState=inactive
+SubState=dead
+UnitFileState=disabled
+MainPID=0
+NRestarts=0
+
+ACTIVE_GEMMA_UNITS
+  llama-gemma-lan-test.service  loaded active running LAN proxy for the Gemma 4 E4B zero-copy service
+  llama-gemma-zero-copy.service loaded active running Gemma 4 E4B Vulkan prefill to CPU MTP zero-copy service
+
+LISTENERS
+LISTEN 0      512        127.0.0.1:18094      0.0.0.0:*    users:(("llama-gemma-zer",pid=1809454,fd=5))
+LISTEN 0      4096    192.168.1.70:8094       0.0.0.0:*    users:(("systemd-socket-",pid=1809456,fd=3))
+
+PROCESSES
+1809454     111 551996 /var/home/agent/workspace/projects/llama-cpp/build-gemma-zero-copy-vulkan/bin/llama-gemma-zero-copy-server --model /var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf --draft /var/home/agent/workspace/projects/models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf --alias gemma-4-e4b-qat-mtp-zero-copy --host 127.0.0.1 --port 18094 --ctx-size 32768 --batch-size 256 --ubatch-size 256 --threads 8 --threads-batch 16 --draft-max 3 --max-output 2048
+
+LAN_HEALTH
+{"status":"ok","model":"gemma-4-e4b-qat-mtp-zero-copy","context_size":32768,"processing":false,"round":1,"zero_copy_ready":true,"handoffs":1,"shared_bytes":584056832,"copied_bytes":0}
+ZERO_COPY_UNIT
+ActiveState=active
+SubState=running
+UnitFileState=enabled
+MainPID=1809454
+NRestarts=0
+MemoryCurrent=7501508608
+MemoryPeak=13912920064
+MemorySwapCurrent=0
+MemorySwapPeak=0
