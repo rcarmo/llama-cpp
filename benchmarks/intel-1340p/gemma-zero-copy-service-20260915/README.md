@@ -28,9 +28,9 @@ The LAN service was live-verified after commit `c4a30e5f178f36591e9d9426687acf2b
 
 After the deployment evidence commit was pushed, the old file-mediated `llama-gemma-local-provider.service` was disabled and stopped. Ports 8091 and 18092 closed. The only running Gemma model process was `llama-gemma-zero-copy-server` on 18094, exposed through the LAN socket on 8094. See `final-service-state-ff327e115.txt`.
 
-The service is intentionally serial, with at most eight outstanding HTTP requests. Only an exact append to the committed history reuses K/V. A new conversation, edited branch or regenerated branch resets the resident slot and runs cold. It supports non-streaming OpenAI Chat Completions and a finite SSE response compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
+The service is intentionally serial, with at most eight outstanding HTTP requests. Only an exact append to the committed history reuses K/V. A new conversation, edited branch or regenerated branch resets the resident slot and runs cold. It supports non-streaming OpenAI Chat Completions and live SSE progress/content/tool-call deltas compatible with the embedded UI. It does not implement server-side stream replay after a dropped connection.
 
-A post-deployment latency correction in commit `cd6c8380c` retains the Vulkan model owner between cold conversations and removes the unintended 512-token default. The final build kept zero-copy and no-swap behaviour, while a matched transplant of the historical small-batch/ATTN4/SCORE3 paths regressed and was removed. See [the post-change live verification](post-change-cd6c8380c.md).
+A post-deployment latency correction in commit `cd6c8380c` retains the Vulkan model owner between cold conversations and removes the unintended 512-token default. The final build kept zero-copy and no-swap behaviour, while a matched transplant of the historical small-batch/ATTN4/SCORE3 paths regressed and was removed. See [the post-change live verification](post-change-cd6c8380c.md). A later frontend correction replaced the buffered finite SSE response with live prompt-progress and parsed generation deltas; its measured verification is appended to that record.
 
 ## Reproduce
 

@@ -49,7 +49,7 @@ The transfer does not write a K/V state file. The response includes a `zero_copy
 
 Only an exact append to the committed message/tool history reuses CPU K/V. An edited message, regenerated branch, changed tool list or different conversation resets the slot and performs another cold Vulkan prefill. The request can keep the same `X-Conversation-Id`; divergent history is a cold start, not an error.
 
-A client disconnect aborts active inference and clears the resident slot. `DELETE /v1/stream` with the owning `X-Conversation-Id` explicitly cancels and clears it. The service supports finite SSE responses for the embedded UI, but it does not keep a server-side replay buffer after a dropped stream connection.
+A client disconnect aborts active inference and clears the resident slot. `DELETE /v1/stream` with the owning `X-Conversation-Id` explicitly cancels and clears it. The service streams prompt progress, content/reasoning and tool-call deltas to the embedded UI as they become available, but it does not keep a server-side replay buffer after a dropped stream connection.
 
 ## API surface
 
@@ -62,7 +62,7 @@ The current service provides:
 - `DELETE /v1/stream` for cancellation/reset;
 - the embedded llama.cpp Web UI.
 
-It accepts OpenAI-compatible messages, tools and `tool_choice` values `auto`, `none` and `required`. It parses Gemma tool calls and supports tool-result continuation. Request JSON is limited to 16 MiB. An omitted `max_tokens`, or the UI's `max_tokens: -1`, uses the configured 2,048-token service maximum; an explicit value from 1 through 2,048 is honoured.
+It accepts OpenAI-compatible messages, tools and `tool_choice` values `auto`, `none` and `required`. It parses Gemma tool calls and supports tool-result continuation. With `stream: true`, it returns an initial OpenAI chunk immediately, emits `prompt_progress` after each prompt batch and sends parsed content/reasoning/tool-call deltas during generation. The final chunk carries usage, timings and zero-copy telemetry. Request JSON is limited to 16 MiB. An omitted `max_tokens`, or the UI's `max_tokens: -1`, uses the configured 2,048-token service maximum; an explicit value from 1 through 2,048 is honoured.
 
 This focused server does not provide the full `llama-server` route set. In particular, `/slots`, `/metrics`, `/tokenize`, `/detokenize`, stream lookup/replay, embeddings and multimodal input are unavailable.
 

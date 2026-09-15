@@ -1,6 +1,6 @@
 # Gemma hybrid tools
 
-`llama-gemma-zero-copy-server` owns a persistent single-slot Gemma session. A cold chat request prefills with Vulkan, moves the K/V cache into a CPU context in process, destroys the Vulkan owner, creates the CPU MTP borrower and generates the response. The request fails unless `shared_bytes > 0` and `copied_bytes == 0`.
+`llama-gemma-zero-copy-server` owns a persistent single-slot Gemma session. A cold chat request prefills with Vulkan, moves the K/V cache into a CPU context in process, destroys the consumed Vulkan context while retaining the Vulkan model owner, creates the CPU MTP borrower and generates the response. The request fails unless `shared_bytes > 0` and `copied_bytes == 0`.
 
 Build and run it with:
 
@@ -13,7 +13,9 @@ build/bin/llama-gemma-zero-copy-server \
 
 The server provides the embedded UI, `/health`, `/props`, `/v1/models` and `/v1/chat/completions`. It accepts OpenAI messages and tools, parses tool calls and reuses K/V only when the request exactly appends to the committed history. An edited, regenerated or otherwise divergent branch resets the slot and runs cold, including requests with the same `X-Conversation-Id`. It is serial and replaces the resident conversation when a different conversation starts. Client disconnects abort the active decode and clear the slot. `DELETE /v1/stream` also clears the owning slot.
 
-The service accepts non-streaming requests and finite SSE responses. It does not retain server-side replay data after a stream disconnect. Maximum request JSON is 16 MiB and at most eight HTTP requests may wait for the serial owner. Context and output limits come from `--ctx-size` and `--max-output`. Use an external supervisor for memory, swap and process limits. The Sigma profile uses `MemoryMax=16G`, `MemorySwapMax=0` and one 32K slot.
+The service accepts non-streaming requests and live SSE responses. Streaming sends an initial OpenAI chunk immediately, `prompt_progress` after each prompt batch, parsed content/reasoning/tool-call deltas during generation, then final usage, timings and zero-copy telemetry. It does not retain server-side replay data after a stream disconnect. Maximum request JSON is 16 MiB and at most eight HTTP requests may wait for the serial owner. Context and output limits come from `--ctx-size` and `--max-output`. Use an external supervisor for memory, swap and process limits. The Sigma profile uses `MemoryMax=16G`, `MemorySwapMax=0` and one 32K slot.
+
+Run `bun tools/gemma-hybrid/verify-stream.ts` for incremental content/progress verification and `bun tools/gemma-hybrid/verify-stream-tool.ts` for streamed tool-call assembly. Set `GEMMA_ZERO_COPY_URL` to check a non-default endpoint such as the LAN proxy.
 
 See [the Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md).
 

@@ -48,3 +48,19 @@ d231e9d4f835a3e8151c483a9031124541d236e3cb6a321755a851300afe537e  libllama.so.0.
 ```
 
 This is a bounded post-change verification, not a repeat of the exact 4K/32K qualification or a claim that the hybrid service matches the historical CPU-only 25.77 tok/s generation result.
+
+## Live frontend streaming follow-up
+
+The original focused server buffered inference and converted the completed response into two SSE chunks. The embedded UI therefore showed neither prompt progress nor generated text while work was running. The follow-up implementation uses the HTTP layer's chunked response mechanism and retains serial ownership until stream completion or cancellation.
+
+Measured loopback verification for a 21-token prompt and 128-token output recorded:
+
+- first SSE event at 2.5 ms;
+- first `prompt_progress` event at 7.1 ms;
+- first content delta at 4.160 s;
+- 128 separate content events before the final event at 14.166 s;
+- 584,056,832 shared bytes and zero copied bytes.
+
+The same verifier through trusted-LAN port 8094 recorded 132 events, two progress events and 128 content events. The first LAN event arrived in 2.8 ms, first progress in 1.374 s, first content in 2.528 s and final event in 11.829 s. A streamed `get_temperature` request assembled one tool call with arguments `{"city":"Lisbon"}` and finish reason `tool_calls`. Cancelling after three streamed content events closed the stream in 0.018 s; the next request returned `RECOVERED` through a fresh zero-copy handoff.
+
+The serial non-streaming suite then passed all seven requests, including exact append reuse and tool-result continuation. A headless Chromium check against the actual LAN UI observed `Processing 0%`, `Processing 100%`, a partial numbered response and the completed four-line response over one `text/event-stream` request. Final inspection recorded zero service restarts, `MemorySwapCurrent=0`, `MemorySwapPeak=0` and a 14,016,946,176-byte cgroup memory peak. These are bounded integration checks, not a long-context rerun.

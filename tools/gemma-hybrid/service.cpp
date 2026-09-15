@@ -12,13 +12,16 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <condition_variable>
 #include <csignal>
 #include <cstdio>
 #include <ctime>
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <vector>
 
 using gemma_hybrid::json;
@@ -27,6 +30,7 @@ using context_ptr = std::unique_ptr<llama_context, decltype(&llama_free)>;
 using clock_type = std::chrono::steady_clock;
 
 static std::atomic<bool> g_stop(false);
+static std::atomic<uint64_t> g_completion_id(0);
 static server_http_context * g_http = nullptr;
 
 static void signal_handler(int) {
@@ -50,6 +54,36 @@ static std::vector<llama_token> tokenize(const llama_vocab * vocab, const std::s
         throw std::runtime_error("tokenization failed");
     }
     return result;
+}
+
+static json chat_delta(const common_chat_msg_diff & diff) {
+    json delta = json::object();
+    if (!diff.reasoning_content_delta.empty()) {
+        delta["reasoning_content"] = diff.reasoning_content_delta;
+    }
+    if (!diff.content_delta.empty()) {
+        delta["content"] = diff.content_delta;
+    }
+    if (diff.tool_call_index != std::string::npos) {
+        json call;
+        call["index"] = diff.tool_call_index;
+        if (!diff.tool_call_delta.id.empty()) {
+            call["id"] = diff.tool_call_delta.id;
+            call["type"] = "function";
+        }
+        if (!diff.tool_call_delta.name.empty() || !diff.tool_call_delta.arguments.empty()) {
+            json function = json::object();
+            if (!diff.tool_call_delta.name.empty()) {
+                function["name"] = diff.tool_call_delta.name;
+            }
+            if (!diff.tool_call_delta.arguments.empty()) {
+                function["arguments"] = diff.tool_call_delta.arguments;
+            }
+            call["function"] = function;
+        }
+        delta["tool_calls"] = json::array({call});
+    }
+    return delta;
 }
 
 static std::string token_piece(const llama_vocab * vocab, llama_token token) {
@@ -137,13 +171,23 @@ static config parse_args(int argc, char ** argv) {
     return result;
 }
 
+struct stream_callbacks {
+    std::function<void(size_t, size_t, size_t, double)> prompt_progress;
+    std::function<void(const std::vector<common_chat_msg_diff> &, size_t, double)> token_deltas;
+};
+
 class persistent_session {
 public:
     explicit persistent_session(config cfg) : cfg(std::move(cfg)) {
         load_models();
     }
 
-    json complete(json request, const std::string & conversation, const std::function<bool()> & should_stop) {
+    json complete(
+            json request,
+            const std::string & conversation,
+            const std::function<bool()> & should_stop,
+            const stream_callbacks * callbacks = nullptr,
+            const std::string & completion_id = {}) {
         const uint64_t epoch = cancel_epoch.load();
         const std::function<bool()> cancelled = [&] { return should_stop() || cancel_epoch.load() != epoch; };
         std::unique_lock<std::timed_mutex> lock(mutex, std::defer_lock);
@@ -160,7 +204,7 @@ public:
             gemma_hybrid::check_append(committed, prior_tools, request);
         }
         try {
-            return run_turn(request, cancelled);
+            return run_turn(request, cancelled, callbacks, completion_id);
         } catch (...) {
             reset_runtime();
             active_conversation.clear();
@@ -195,6 +239,10 @@ public:
         }
         reset_runtime();
         active_conversation.clear();
+    }
+
+    const std::string & alias() const {
+        return cfg.alias;
     }
 
     json props() const {
@@ -391,7 +439,11 @@ private:
         return params;
     }
 
-    json run_turn(const json & request, const std::function<bool()> & should_stop) {
+    json run_turn(
+            const json & request,
+            const std::function<bool()> & should_stop,
+            const stream_callbacks * callbacks,
+            const std::string & completion_id) {
         const auto started = clock_type::now();
         const bool cold = !target_ctx;
         const common_chat_params chat = render_chat(request);
@@ -412,12 +464,19 @@ private:
         llama_kv_handoff_result transfer {};
         double prefill_s = 0;
         double handoff_ms = 0;
+        if (callbacks && callbacks->prompt_progress) {
+            callbacks->prompt_progress(prompt.size(), reused, reused, 0);
+        }
 
         if (cold) {
             target_ctx = make_context(gpu_target.get(), context_params(true));
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
-                evaluate(target_ctx.get(), prompt, i, std::min<size_t>(cfg.batch, prompt.size() - i), nullptr, should_stop);
+                const size_t count = std::min<size_t>(cfg.batch, prompt.size() - i);
+                evaluate(target_ctx.get(), prompt, i, count, nullptr, should_stop);
+                if (callbacks && callbacks->prompt_progress) {
+                    callbacks->prompt_progress(prompt.size(), 0, i + count, elapsed_s(prefill_started) * 1000.0);
+                }
             }
             llama_synchronize(target_ctx.get());
             prefill_s = elapsed_s(prefill_started);
@@ -446,7 +505,11 @@ private:
             }
             const auto prefill_started = clock_type::now();
             for (size_t i = reused; i < prompt.size(); i += cfg.batch) {
-                evaluate(target_ctx.get(), prompt, i, std::min<size_t>(cfg.batch, prompt.size() - i), speculative.get(), should_stop);
+                const size_t count = std::min<size_t>(cfg.batch, prompt.size() - i);
+                evaluate(target_ctx.get(), prompt, i, count, speculative.get(), should_stop);
+                if (callbacks && callbacks->prompt_progress) {
+                    callbacks->prompt_progress(prompt.size(), reused, i + count, elapsed_s(prefill_started) * 1000.0);
+                }
             }
             prefill_s = elapsed_s(prefill_started);
             history = prompt;
@@ -467,18 +530,39 @@ private:
         double first_token_s = -1;
         double last_token_s = -1;
         bool eog = false;
-        llama_token last = common_sampler_sample(sampler.get(), target_ctx.get(), -1);
-        common_sampler_accept(sampler.get(), last, true);
+        common_chat_parser_params parser(chat);
+        parser.reasoning_format = COMMON_REASONING_FORMAT_NONE;
+        parser.parse_tool_calls = true;
+        parser.parser.load(chat.parser);
+        common_chat_msg partial_message;
+        std::vector<std::string> tool_call_ids;
         auto emit = [&](llama_token token) {
             if (llama_vocab_is_eog(vocab, token)) {
                 eog = true;
                 return;
             }
-            raw += token_piece(vocab, token);
+            const std::string piece = token_piece(vocab, token);
+            raw += piece;
             generated.push_back(token);
             if (first_token_s < 0) first_token_s = elapsed_s(started);
             last_token_s = elapsed_s(started);
+            if (callbacks && callbacks->token_deltas) {
+                common_chat_msg parsed = common_chat_parse(raw, true, parser);
+                if (!parsed.empty()) {
+                    parsed.set_tool_call_ids(tool_call_ids, [] {
+                        static std::atomic<uint64_t> next_id{0};
+                        return "call_gemma_" + std::to_string(next_id.fetch_add(1));
+                    });
+                    const auto diffs = common_chat_msg_diff::compute_diffs(partial_message, parsed);
+                    partial_message = std::move(parsed);
+                    if (!diffs.empty()) {
+                        callbacks->token_deltas(diffs, generated.size(), std::max(0.0, last_token_s - first_token_s) * 1000.0);
+                    }
+                }
+            }
         };
+        llama_token last = common_sampler_sample(sampler.get(), target_ctx.get(), -1);
+        common_sampler_accept(sampler.get(), last, true);
         emit(last);
 
         while (!eog && generated.size() < static_cast<size_t>(budget)) {
@@ -528,11 +612,17 @@ private:
             }
         }
 
-        common_chat_parser_params parser(chat);
-        parser.reasoning_format = COMMON_REASONING_FORMAT_NONE;
-        parser.parse_tool_calls = true;
-        parser.parser.load(chat.parser);
         common_chat_msg message = common_chat_parse(raw, false, parser);
+        if (callbacks && callbacks->token_deltas) {
+            message.set_tool_call_ids(tool_call_ids, [] {
+                static std::atomic<uint64_t> next_id{0};
+                return "call_gemma_" + std::to_string(next_id.fetch_add(1));
+            });
+            const auto diffs = common_chat_msg_diff::compute_diffs(partial_message, message);
+            if (!diffs.empty()) {
+                callbacks->token_deltas(diffs, generated.size(), elapsed_s(started) * 1000.0);
+            }
+        }
         if (message.role.empty()) message.role = "assistant";
         json assistant_message = json::parse(message.to_json_oaicompat(true).dump());
         committed = request.at("messages");
@@ -551,7 +641,7 @@ private:
             {"prefill_s", prefill_s}, {"handoff_ms", handoff_ms}, {"first_token_s", first_token_s}, {"wall_s", wall_s}, {"decode_tps", std::isfinite(decode_tps) ? decode_tps : 0},
         };
         return {
-            {"id", "chatcmpl-gemma-zero-copy-" + std::to_string(round)}, {"object", "chat.completion"}, {"created", std::time(nullptr)},
+            {"id", completion_id.empty() ? "chatcmpl-gemma-zero-copy-" + std::to_string(round) : completion_id}, {"object", "chat.completion"}, {"created", std::time(nullptr)},
             {"model", cfg.alias}, {"system_fingerprint", llama_build_info()},
             {"choices", json::array({{{"index", 0}, {"message", assistant_message}, {"finish_reason", finish_reason}}})},
             {"usage", {{"prompt_tokens", prompt.size()}, {"completion_tokens", generated.size()}, {"total_tokens", prompt.size() + generated.size()}, {"prompt_tokens_details", {{"cached_tokens", reused}}}}},
@@ -568,21 +658,127 @@ static server_http_res_ptr response_json(const json & value, int status = 200) {
     return response;
 }
 
-static server_http_res_ptr response_sse(const json & completion) {
-    auto response = std::make_unique<server_http_res>();
-    response->content_type = "text/event-stream; charset=utf-8";
-    const auto & choice = completion.at("choices").at(0);
-    json first = {
-        {"id", completion.at("id")}, {"object", "chat.completion.chunk"}, {"created", completion.at("created")},
-        {"model", completion.at("model")}, {"choices", json::array({{{"index", 0}, {"delta", choice.at("message")}, {"finish_reason", nullptr}}})},
+static std::string sse(const json & value) {
+    return "data: " + value.dump() + "\n\n";
+}
+
+struct live_stream_state {
+    std::mutex mutex;
+    std::condition_variable ready;
+    std::deque<std::string> chunks;
+    std::atomic<bool> cancelled{false};
+    bool finished = false;
+};
+
+class live_stream_response final : public server_http_res {
+public:
+    live_stream_response(std::shared_ptr<live_stream_state> state, std::thread worker)
+        : state(std::move(state)), worker(std::move(worker)) {
+        content_type = "text/event-stream; charset=utf-8";
+        headers["Cache-Control"] = "no-cache";
+        next = [stream_state = this->state](std::string & output) {
+            std::unique_lock<std::mutex> lock(stream_state->mutex);
+            stream_state->ready.wait(lock, [&] { return !stream_state->chunks.empty() || stream_state->finished; });
+            if (!stream_state->chunks.empty()) {
+                output = std::move(stream_state->chunks.front());
+                stream_state->chunks.pop_front();
+                return true;
+            }
+            output = "data: [DONE]\n\n";
+            return false;
+        };
+    }
+
+    void on_complete() override {
+        state->cancelled.store(true);
+        state->ready.notify_all();
+        if (worker.joinable()) {
+            worker.join();
+        }
+    }
+
+    ~live_stream_response() override {
+        on_complete();
+    }
+
+private:
+    std::shared_ptr<live_stream_state> state;
+    std::thread worker;
+};
+
+static server_http_res_ptr response_sse(
+        persistent_session & session,
+        json request,
+        const std::string & conversation,
+        const std::function<bool()> & connection_stopped,
+        std::function<void()> release_outstanding) {
+    auto state = std::make_shared<live_stream_state>();
+    const std::string completion_id = "chatcmpl-gemma-zero-copy-stream-" +
+        std::to_string(std::time(nullptr)) + "-" + std::to_string(g_completion_id.fetch_add(1));
+    const std::time_t created = std::time(nullptr);
+    const std::string model = session.alias();
+    auto enqueue = [state](json chunk) {
+        std::lock_guard<std::mutex> lock(state->mutex);
+        state->chunks.push_back(sse(chunk));
+        state->ready.notify_one();
     };
-    json final = {
-        {"id", completion.at("id")}, {"object", "chat.completion.chunk"}, {"created", completion.at("created")},
-        {"model", completion.at("model")}, {"choices", json::array({{{"index", 0}, {"delta", json::object()}, {"finish_reason", choice.at("finish_reason")}}})},
-        {"usage", completion.at("usage")}, {"timings", completion.at("timings")}, {"zero_copy", completion.at("zero_copy")},
-    };
-    response->data = "data: " + first.dump() + "\n\ndata: " + final.dump() + "\n\ndata: [DONE]\n\n";
-    return response;
+    enqueue({
+        {"id", completion_id}, {"object", "chat.completion.chunk"}, {"created", created},
+        {"model", model}, {"choices", json::array({{{"index", 0}, {"delta", {{"role", "assistant"}, {"content", nullptr}}}, {"finish_reason", nullptr}}})},
+    });
+
+    std::thread worker([state, request = std::move(request), conversation, completion_id, created, model,
+                        connection_stopped, release_outstanding = std::move(release_outstanding), &session]() mutable {
+        auto finish = [&] {
+            {
+                std::lock_guard<std::mutex> lock(state->mutex);
+                state->finished = true;
+            }
+            state->ready.notify_all();
+            release_outstanding();
+        };
+        auto enqueue_worker = [state](json chunk) {
+            std::lock_guard<std::mutex> lock(state->mutex);
+            state->chunks.push_back(sse(chunk));
+            state->ready.notify_one();
+        };
+        const std::function<bool()> stopped = [state, connection_stopped] {
+            return state->cancelled.load() || connection_stopped();
+        };
+        try {
+            stream_callbacks callbacks;
+            callbacks.prompt_progress = [&, state](size_t total, size_t cache, size_t processed, double time_ms) {
+                enqueue_worker({
+                    {"id", completion_id}, {"object", "chat.completion.chunk"}, {"created", created}, {"model", model},
+                    {"choices", json::array({{{"index", 0}, {"delta", json::object()}, {"finish_reason", nullptr}}})},
+                    {"prompt_progress", {{"total", total}, {"cache", cache}, {"processed", processed}, {"time_ms", time_ms}}},
+                });
+            };
+            callbacks.token_deltas = [&, state](const std::vector<common_chat_msg_diff> & diffs, size_t generated, double elapsed_ms) {
+                for (const auto & diff : diffs) {
+                    enqueue_worker({
+                        {"id", completion_id}, {"object", "chat.completion.chunk"}, {"created", created}, {"model", model},
+                        {"choices", json::array({{{"index", 0}, {"delta", chat_delta(diff)}, {"finish_reason", nullptr}}})},
+                        {"timings", {{"predicted_n", generated}, {"predicted_ms", elapsed_ms}}},
+                    });
+                }
+            };
+            json completion = session.complete(std::move(request), conversation, stopped, &callbacks, completion_id);
+            const auto & choice = completion.at("choices").at(0);
+            enqueue_worker({
+                {"id", completion_id}, {"object", "chat.completion.chunk"}, {"created", created}, {"model", model},
+                {"choices", json::array({{{"index", 0}, {"delta", json::object()}, {"finish_reason", choice.at("finish_reason")}}})},
+                {"usage", completion.at("usage")}, {"timings", completion.at("timings")}, {"zero_copy", completion.at("zero_copy")},
+            });
+        } catch (const std::exception & error) {
+            if (!state->cancelled.load()) {
+                const bool cancelled = std::string(error.what()) == "request cancelled";
+                enqueue_worker({{"error", {{"message", error.what()}, {"type", cancelled ? "cancelled" : "server_error"}, {"code", cancelled ? 499 : 500}}}});
+            }
+        }
+        finish();
+    });
+    return std::make_unique<live_stream_response>(state, std::move(worker));
 }
 
 static server_http_context::handler_t safe_handler(server_http_context::handler_t handler) {
@@ -635,9 +831,14 @@ int main(int argc, char ** argv) {
                 json body = json::parse(request.body);
                 const bool stream = body.value("stream", false);
                 const std::string conversation = gemma_hybrid::header_value(request.headers, "X-Conversation-Id");
+                if (stream) {
+                    return response_sse(session, std::move(body), conversation, request.should_stop, [&outstanding] {
+                        outstanding.fetch_sub(1);
+                    });
+                }
                 json result = session.complete(std::move(body), conversation, request.should_stop);
                 outstanding.fetch_sub(1);
-                return stream ? response_sse(result) : response_json(result);
+                return response_json(result);
             } catch (...) {
                 outstanding.fetch_sub(1);
                 throw;
