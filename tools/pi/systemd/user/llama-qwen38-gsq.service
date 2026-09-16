@@ -1,0 +1,16 @@
+[Unit]
+Description=Qwen3.8 GSQ IQ2_S 64K MTP4 LAN server
+
+[Service]
+Type=simple
+WorkingDirectory=/workspace/projects/llama.cpp/llama.cpp
+ExecStart=/workspace/projects/llama.cpp/llama.cpp/tools/pi/bin/run-qwen38-gsq-cuda.sh
+Environment=HOST=0.0.0.0
+Environment=PORT=11434
+Environment=CTX_SIZE=65536
+Environment=MTP_DEPTH=4
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
