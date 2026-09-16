@@ -131,7 +131,7 @@ struct config {
     int32_t draft_max = 3;
     int32_t draft_min = 1;
     int32_t max_output = 2048;
-    bool threadpools = true;
+    bool threadpools = false;
     bool model_sampling = true;
 };
 

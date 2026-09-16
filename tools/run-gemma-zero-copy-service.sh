@@ -21,4 +21,7 @@ exec "$LLAMA_BUILD/bin/llama-gemma-zero-copy-server" \
     --threads "${LLAMA_THREADS:-8}" \
     --threads-batch "${LLAMA_THREADS_BATCH:-16}" \
     --draft-max "${LLAMA_MTP_DEPTH:-3}" \
+    --draft-min "${LLAMA_MTP_MIN:-1}" \
+    --threadpools "${LLAMA_THREADPOOLS:-0}" \
+    --model-sampling "${LLAMA_MODEL_SAMPLING:-1}" \
     --max-output "${LLAMA_MAX_OUTPUT:-2048}"
