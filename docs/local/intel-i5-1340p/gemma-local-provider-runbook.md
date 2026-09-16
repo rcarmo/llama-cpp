@@ -132,6 +132,8 @@ The next test order is attached target/draft threadpools, isolated small-target-
 
 ## Build
 
+Use the rootless Podman procedure in [Fedora Intel build container](intel-build-container.md). It records how `localhost/llama-intel-build:fedora44` is built, mounted and identified, and why Vulkan inference runs on the host. Use a separate build directory for unqualified candidates; do not overwrite the live tree during screening.
+
 Use a single Vulkan-enabled build for the executable and all linked llama/ggml libraries:
 
 ```bash

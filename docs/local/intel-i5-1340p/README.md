@@ -20,6 +20,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [TurboFieldfare adoption report](turbo-fieldfare-adoption-report.md) and [audit](turbo-fieldfare-audit.md)
 * [Gemma concurrency benchmark](gemma-local-provider-benchmark-2026-08-02.md)
 * [In-memory Vulkan-to-CPU KV handoff](in-memory-kv-handoff.md)
+* [Fedora Intel build container](intel-build-container.md) -- reproducible rootless Podman toolchain for native CPU and Vulkan builds, including image identity, ccache and host-runtime boundaries.
 * [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) -- 15 September 2026 Vulkan-prefill to CPU-MTP service, exact 4K/32K, tool/multi-turn, persistent-model and live-stream evidence.
 * [Qwen3.8 embedded-MTP microbatch cap](qwen38-vulkan-mtp-memory.md) -- 15 September 2026 Intel Iris Xe memory and prefill qualification; committed but not deployed.
 * [Paired Q6 note](cpu-q6-pair.md)

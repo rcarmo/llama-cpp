@@ -1,7 +1,9 @@
 FROM docker.io/library/fedora:44
 RUN dnf -y install \
-    binutils ccache clang cmake file gcc gcc-c++ git lld llvm ninja-build \
+    binutils ccache clang cmake file gcc gcc-c++ git lld llvm make ninja-build \
     libomp-devel numactl perf hwloc \
+    vulkan-headers vulkan-loader vulkan-loader-devel mesa-vulkan-drivers \
+    libshaderc-devel glslc spirv-headers-devel vulkan-tools \
     curl-devel openssl-devel && \
     dnf clean all
 ENV CCACHE_DIR=/ccache
