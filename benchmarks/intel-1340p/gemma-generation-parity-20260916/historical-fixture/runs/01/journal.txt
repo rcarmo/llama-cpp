@@ -1,0 +1,41 @@
+Sep 16 21:20:45 sigma systemd[1238]: Started gemma-parity-historical-1.service - [systemd-run] /var/home/agent/workspace/projects/llama-cpp/build-gemma-generation-parity/bin/llama-server --model /var/home/agent/workspace/projects/llama-cpp/../models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf --model-draft /var/home/agent/workspace/projects/llama-cpp/../models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf --alias gemma-parity-historical --load-mode mmap --gpu-layers 0 --threads 8 --threads-batch 16 --ctx-size 32768 --parallel 1 --batch-size 256 --ubatch-size 256 --cache-type-k f16 --cache-type-v f16 --flash-attn off --spec-type draft-mtp --spec-draft-n-min 1 --spec-draft-n-max 3 --spec-draft-threads 8 --spec-draft-threads-batch 16 --spec-draft-type-k f16 --spec-draft-type-v f16 --no-warmup --no-ui --host 127.0.0.1 --port 18301.
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.266 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.348 I srv          init: The UI is disabled
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.348 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.392 W srv  llama_server: -----------------
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.392 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.393 W srv  llama_server: this can be a security risk (cross-origin attacks)
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.393 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.031.393 W srv  llama_server: -----------------
+Sep 16 21:20:45 sigma llama-server[1870226]: 0.00.032.635 I srv    load_model: loading model '/var/home/agent/workspace/projects/llama-cpp/../models/gemma-4-e4b-qat-mtp/gemma-4-E4B_q4_0-it.gguf'
+Sep 16 21:20:46 sigma llama-server[1870226]: 0.01.157.626 E llama_init_from_model: failed to initialize the context: Gemma4Assistant requires ctx_other to be set (this warning is normal during memory fitting)
+Sep 16 21:20:46 sigma llama-server[1870226]: 0.01.222.800 W operator(): failed to measure the memory of the extra model, fitting without it: failed to create llama_context from model
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.01.659.476 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.01.660.044 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.01.693.126 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.01.822.230 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.01.998.444 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.02.018.678 I cmn          init: llama threadpool init, n_threads = 8
+Sep 16 21:20:47 sigma llama-server[1870226]: 0.02.018.731 I common_speculative_init_result: loading draft model '/var/home/agent/workspace/projects/llama-cpp/../models/gemma-4-e4b-qat-mtp/gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf'
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.469.081 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.469.594 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.471.250 W load: control-looking token:    106 '<turn|>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.499.823 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.902 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.909 W llama_kv_cache: layer   3: sharing with layer 41. k = 0x7f7719916040, v = 0x7f771d916040
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.917 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 1024
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.918 W llama_kv_cache: layer   0: sharing with layer 40. k = 0x7f78635be040, v = 0x7f786367e040
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.919 W llama_kv_cache: layer   1: sharing with layer 40. k = 0x7f78635be040, v = 0x7f786367e040
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.543.919 W llama_kv_cache: layer   2: sharing with layer 40. k = 0x7f78635be040, v = 0x7f786367e040
+Sep 16 21:20:48 sigma llama-server[1870226]: 0.02.943.141 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 32768, kv_unified = 'false'
+Sep 16 21:20:49 sigma llama-server[1870226]: 0.03.334.660 I srv  llama_server: model loaded
+Sep 16 21:20:49 sigma llama-server[1870226]: 0.03.334.668 I srv  llama_server: listening on http://127.0.0.1:18301
+Sep 16 21:20:49 sigma llama-server[1870226]: 0.04.032.716 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+Sep 16 21:20:49 sigma llama-server[1870226]: 0.04.032.789 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+Sep 16 21:20:53 sigma llama-server[1870226]: 0.07.470.078 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =    508, progress = 0.99, t =   3.44 s / 147.82 tokens per second
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.105.363 I slot print_timing: id  0 | task 0 | prompt eval time =    3684.54 ms /   512 tokens (    7.20 ms per token,   138.96 tokens per second)
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.105.374 I slot print_timing: id  0 | task 0 |        eval time =    6387.99 ms /    64 tokens (  101.40 ms per token,     9.86 tokens per second)
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.105.375 I slot print_timing: id  0 | task 0 |       total time =   10072.53 ms /   576 tokens
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.105.378 I slot print_timing: id  0 | task 0 |    graphs reused =         17
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.105.384 I slot print_timing: id  0 | task 0 | draft acceptance = 0.78182 (   43 accepted /    55 generated), mean len =  3.26
+Sep 16 21:20:59 sigma llama-server[1870226]: 0.14.112.520 I slot      release: id  0 | task 0 | stop processing: n_tokens = 575, truncated = 0

@@ -1,0 +1,90 @@
+{
+  "campaign": "gemma-generation-parity-20260916",
+  "source_commit": "ddb93ad19bfb6536f9f4ab6a8819527097de44ee",
+  "deployed": {
+    "server_sha256": "7871f50260b2d4491f719fefe64f768ded8fceb22248177418d349a3c237f314",
+    "deployment_root": "runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502",
+    "rollback_root": "runtime/deployments/gemma-zero-copy-rollback-0ba23ad3",
+    "model_sampling": true,
+    "top_k": 64,
+    "draft_min": 1,
+    "attached_threadpools": false,
+    "backend_sampling": false
+  },
+  "accepted": [
+    {
+      "factor": "model_sampling_metadata",
+      "reason": "restores GGUF defaults for unspecified request fields; frozen coding fixture passed 4/4 across live and candidate"
+    },
+    {
+      "factor": "speculative_n_min_1",
+      "decode_change_pct": -0.103225415,
+      "wall_change_pct": -0.037246913,
+      "reason": "neutral timing and historical policy parity"
+    }
+  ],
+  "rejected": [
+    {
+      "factor": "attached_threadpools",
+      "combined_confirm_decode_change_pct": -1.9781,
+      "reason": "eight-run deployed-binary comparison was slower"
+    },
+    {
+      "factor": "small_target_batch",
+      "decode_change_pct": -35.27921823,
+      "wall_change_pct": 51.5507,
+      "reason": "decisive isolated regression with identical output and MTP work"
+    },
+    {
+      "factor": "attn4_score3_children",
+      "reason": "not run because their required small-target-batch parent failed"
+    }
+  ],
+  "final_sustained_ab": {
+    "live_decode_tps": 23.0665666875,
+    "candidate_decode_tps": 23.046555993,
+    "decode_change_pct": -0.086751942,
+    "live_wall_s": 23.509866406,
+    "candidate_wall_s": 23.4842206555,
+    "wall_change_pct": -0.109085054,
+    "generated_tokens": 512,
+    "drafted_tokens": 385,
+    "accepted_tokens": 382,
+    "output_sha256": "082a0bab6078b427556b7c2f77bcac945d32e90dbaeca9ddd11331431a4301e6",
+    "swap_peak": 0
+  },
+  "historical_fixture": {
+    "prompt_tokens": 512,
+    "generated_tokens": 64,
+    "drafted_tokens": 55,
+    "accepted_tokens": 43,
+    "output_sha256": "35f6d4194c1e9170ab5104d67b191ce47cee554fb21463d3f7d61cf86c2beddf",
+    "current_generic_server_tps": 9.8974325925,
+    "current_historical_topology_tps": 7.6688431815,
+    "retained_historical_build_tps": 25.7671566989
+  },
+  "qualification": {
+    "nonstream_requests": 7,
+    "stream_progress_events": 2,
+    "stream_content_events": 128,
+    "tool_stream_pass": true,
+    "cancellation_content_events": 3,
+    "reset_ms": 19.587727,
+    "serial_queue_ms": 11960.48585,
+    "peak_memory_bytes": 13796917248,
+    "swap_peak": 0,
+    "passed": true
+  },
+  "live_verification": {
+    "pid": 1876352,
+    "handoffs": 2,
+    "shared_bytes": 1168113664,
+    "copied_bytes": 0,
+    "vulkan_model_resident": true,
+    "peak_memory_bytes": 13914943488,
+    "restarts": 0,
+    "swap_peak": 0,
+    "loopback": true,
+    "lan": true
+  }
+}

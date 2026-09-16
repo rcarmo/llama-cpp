@@ -1,0 +1,73 @@
+{
+  "id": "ZC1-generation-parity",
+  "status": "deployed",
+  "architecture": "resident Vulkan model, fresh Vulkan prefill context, in-process zero-copy CPU handoff, CPU MTP decode",
+  "comparison_parent": "zero-copy-b7492aba4",
+  "historical_baseline_relation": "B0/B1 use the superseded file-mediated service and remain historical records",
+  "deployed_at": "2026-09-16T21:05:32Z",
+  "source_commit": "ddb93ad19bfb6536f9f4ab6a8819527097de44ee",
+  "server_sha256": "7871f50260b2d4491f719fefe64f768ded8fceb22248177418d349a3c237f314",
+  "deployment_root": "runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502",
+  "rollback_root": "runtime/deployments/gemma-zero-copy-rollback-0ba23ad3",
+  "settings": {
+    "model_sampling_metadata": true,
+    "top_k_default": 64,
+    "speculative_n_min": 1,
+    "speculative_n_max": 3,
+    "attached_threadpools": false,
+    "backend_sampling": false,
+    "context": 32768,
+    "batch": 256,
+    "ubatch": 256,
+    "threads": 8,
+    "threads_batch": 16,
+    "kv": "F16",
+    "flash_attention": false,
+    "vulkan_attention": "f32"
+  },
+  "performance": {
+    "scope": "sustained 512-output focused Chat Completions fixture",
+    "live_decode_tps": 23.0665666875,
+    "candidate_decode_tps": 23.046555993,
+    "decode_change_pct": -0.08675194176532841,
+    "wall_change_pct": -0.10908505415178071,
+    "generated_tokens": 512,
+    "drafted_tokens": 385,
+    "accepted_tokens": 382,
+    "same_output": true,
+    "swap_peak": 0,
+    "claim": "throughput neutral"
+  },
+  "accepted": [
+    "model-derived sampling defaults for unspecified fields",
+    "speculative n_min=1"
+  ],
+  "rejected": [
+    "attached target and draft threadpools: eight-run comparison -1.98% decode",
+    "small-target-batch dispatch: -35.28% decode and +51.55% wall",
+    "ATTN4 and SCORE3 on this branch: not run because required small-target-batch parent failed"
+  ],
+  "qualification": {
+    "nonstream_requests": 7,
+    "stream_progress_events": 2,
+    "stream_content_events": 128,
+    "streamed_tool_call": true,
+    "cancellation_recovery": true,
+    "serial_queue_ms": 11960.48585,
+    "candidate_peak_memory_bytes": 13796917248,
+    "candidate_swap_peak": 0
+  },
+  "live": {
+    "loopback": "127.0.0.1:18094",
+    "lan": "192.168.1.70:8094",
+    "pid_at_verification": 1876352,
+    "handoffs": 2,
+    "shared_bytes": 1168113664,
+    "copied_bytes": 0,
+    "vulkan_model_resident": true,
+    "peak_memory_bytes": 13914943488,
+    "restarts": 0,
+    "swap_peak": 0
+  },
+  "evidence": "../../gemma-generation-parity-20260916/README.md"
+}

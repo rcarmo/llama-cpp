@@ -1,0 +1,5 @@
+Stage: candidate trained smoke transient service launch
+Outcome: no candidate service or inference started
+Error: systemd-run: option '--wait' doesn't allow an argument
+Effect: the wrapper had stopped the live service, then its EXIT trap immediately restored it.
+Correction: omit --wait=false; transient services are asynchronous unless --wait is supplied.

@@ -8,8 +8,12 @@ Build and run it with:
 cmake --build build --target llama-gemma-zero-copy-server
 build/bin/llama-gemma-zero-copy-server \
   --model target.gguf --draft assistant.gguf \
-  --host 127.0.0.1 --port 18094 --ctx-size 32768
+  --host 127.0.0.1 --port 18094 --ctx-size 32768 \
+  --draft-max 3 --draft-min 1 \
+  --threadpools 0 --model-sampling 1
 ```
+
+`--model-sampling 1` reads GGUF sampling defaults for request fields the client does not set. Request overrides still win. `--draft-min 1` matches the retained MTP policy. `--threadpools 0` is the Sigma production setting: attached target/draft pools are implemented for diagnostics, but the current eight-run comparison measured 1.98% lower decode throughput when they were enabled.
 
 The server provides the embedded UI, `/health`, `/props`, `/v1/models` and `/v1/chat/completions`. It accepts OpenAI messages and tools, parses tool calls and reuses K/V only when the request exactly appends to the committed history. An edited, regenerated or otherwise divergent branch resets the slot and runs cold, including requests with the same `X-Conversation-Id`. It is serial and replaces the resident conversation when a different conversation starts. Client disconnects abort the active decode and clear the slot. `DELETE /v1/stream` also clears the owning slot.
 
@@ -17,7 +21,7 @@ The service accepts non-streaming requests and live SSE responses. Streaming sen
 
 Run `bun tools/gemma-hybrid/verify-stream.ts` for incremental content/progress verification and `bun tools/gemma-hybrid/verify-stream-tool.ts` for streamed tool-call assembly. Set `GEMMA_ZERO_COPY_URL` to check a non-default endpoint such as the LAN proxy.
 
-See [the Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md). Before changing generation code or settings, follow the [generation inheritance contract](../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract); it records the accepted historical stack, measured exclusions and isolated retest order.
+See [the original Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), the [deployed generation-parity campaign](../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md). Before changing generation code or settings, follow the [generation inheritance contract](../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract); it records the accepted historical stack and current exclusions.
 
 `llama-gemma-in-memory` is the one-request native diagnostic. It retains target history and sampling in RAM and reports shared/copied bytes.
 

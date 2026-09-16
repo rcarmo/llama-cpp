@@ -1,0 +1,5 @@
+Stage: live/candidate ABBA, live arm 1
+Outcome: no model load or inference
+Error: missing value for --max-output
+Cause: runner omitted whitespace before stdout redirection, so Bash parsed 2048 as a file descriptor.
+Recovery: transient unit exited; restoration trap restarted the unchanged production service at zero swap.

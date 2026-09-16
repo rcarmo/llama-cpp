@@ -1,0 +1,406 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "name": "append-first",
+      "status": 200,
+      "wall_ms": 1410.5754650000001,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-1",
+        "object": "chat.completion",
+        "created": 1789592375,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "remembered"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 22,
+          "completion_tokens": 2,
+          "total_tokens": 24,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "prompt_n": 22,
+          "prompt_ms": 371.673718,
+          "predicted_n": 2,
+          "predicted_ms": 829.5627939999998
+        },
+        "zero_copy": {
+          "route": "vulkan_prefill_cpu_mtp",
+          "cold": true,
+          "round": 1,
+          "shared_bytes": 584056832,
+          "copied_bytes": 0,
+          "zero_copy": true,
+          "prompt_tokens": 22,
+          "cached_tokens": 0,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 2,
+          "verified_tokens": 4,
+          "drafted": 3,
+          "accepted": 3,
+          "prefill_s": 0.371673718,
+          "handoff_ms": 53.282857,
+          "first_token_s": 0.993467258,
+          "wall_s": 1.408379298,
+          "decode_tps": 2.4109085104412245
+        }
+      }
+    },
+    {
+      "name": "append-second",
+      "status": 200,
+      "wall_ms": 1229.6347020000003,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-2",
+        "object": "chat.completion",
+        "created": 1789592376,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "7319"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 4,
+          "total_tokens": 52,
+          "prompt_tokens_details": {
+            "cached_tokens": 24
+          }
+        },
+        "timings": {
+          "prompt_n": 24,
+          "prompt_ms": 1028.1806060000001,
+          "predicted_n": 4,
+          "predicted_ms": 260.09220799999997
+        },
+        "zero_copy": {
+          "route": "cpu_mtp_reuse",
+          "cold": false,
+          "round": 2,
+          "shared_bytes": 0,
+          "copied_bytes": 0,
+          "zero_copy": false,
+          "prompt_tokens": 48,
+          "cached_tokens": 24,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 4,
+          "verified_tokens": 4,
+          "drafted": 3,
+          "accepted": 3,
+          "prefill_s": 1.028180606,
+          "handoff_ms": 0,
+          "first_token_s": 1.033761454,
+          "wall_s": 1.228922943,
+          "decode_tps": 15.379161224237832
+        }
+      }
+    },
+    {
+      "name": "tool-call",
+      "status": 200,
+      "wall_ms": 1926.8665520000004,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-1",
+        "object": "chat.completion",
+        "created": 1789592378,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_temperature",
+                    "arguments": "{\"city\":\"Lisbon\"}"
+                  }
+                }
+              ]
+            },
+            "finish_reason": "tool_calls"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 69,
+          "completion_tokens": 15,
+          "total_tokens": 84,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "prompt_n": 69,
+          "prompt_ms": 604.0529359999999,
+          "predicted_n": 15,
+          "predicted_ms": 739.5439853571429
+        },
+        "zero_copy": {
+          "route": "vulkan_prefill_cpu_mtp",
+          "cold": true,
+          "round": 1,
+          "shared_bytes": 584056832,
+          "copied_bytes": 0,
+          "zero_copy": true,
+          "prompt_tokens": 69,
+          "cached_tokens": 0,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 15,
+          "verified_tokens": 16,
+          "drafted": 12,
+          "accepted": 11,
+          "prefill_s": 0.604052936,
+          "handoff_ms": 53.945301,
+          "first_token_s": 1.235983778,
+          "wall_s": 1.926367152,
+          "decode_tps": 20.28276924293577
+        }
+      }
+    },
+    {
+      "name": "tool-result",
+      "status": 200,
+      "wall_ms": 1310.534611,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-2",
+        "object": "chat.completion",
+        "created": 1789592379,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "The temperature in Lisbon is 22°C."
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 105,
+          "completion_tokens": 11,
+          "total_tokens": 116,
+          "prompt_tokens_details": {
+            "cached_tokens": 84
+          }
+        },
+        "timings": {
+          "prompt_n": 21,
+          "prompt_ms": 634.220105,
+          "predicted_n": 11,
+          "predicted_ms": 552.6558851000001
+        },
+        "zero_copy": {
+          "route": "cpu_mtp_reuse",
+          "cold": false,
+          "round": 2,
+          "shared_bytes": 0,
+          "copied_bytes": 0,
+          "zero_copy": false,
+          "prompt_tokens": 105,
+          "cached_tokens": 84,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 11,
+          "verified_tokens": 16,
+          "drafted": 12,
+          "accepted": 9,
+          "prefill_s": 0.634220105,
+          "handoff_ms": 0,
+          "first_token_s": 0.642515332,
+          "wall_s": 1.310007243,
+          "decode_tps": 19.903886480842612
+        }
+      }
+    },
+    {
+      "name": "factual",
+      "status": 200,
+      "wall_ms": 1323.7801979999995,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-1",
+        "object": "chat.completion",
+        "created": 1789592381,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Lisbon"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 22,
+          "completion_tokens": 2,
+          "total_tokens": 24,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "prompt_n": 22,
+          "prompt_ms": 332.88397199999997,
+          "predicted_n": 2,
+          "predicted_ms": 390.8040579999998
+        },
+        "zero_copy": {
+          "route": "vulkan_prefill_cpu_mtp",
+          "cold": true,
+          "round": 1,
+          "shared_bytes": 584056832,
+          "copied_bytes": 0,
+          "zero_copy": true,
+          "prompt_tokens": 22,
+          "cached_tokens": 0,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 2,
+          "verified_tokens": 8,
+          "drafted": 6,
+          "accepted": 2,
+          "prefill_s": 0.332883972,
+          "handoff_ms": 53.868721,
+          "first_token_s": 0.961675631,
+          "wall_s": 1.323293987,
+          "decode_tps": 5.11765412630388
+        }
+      }
+    },
+    {
+      "name": "arithmetic",
+      "status": 200,
+      "wall_ms": 1430.896205,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-1",
+        "object": "chat.completion",
+        "created": 1789592382,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "323"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 3,
+          "total_tokens": 26,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "prompt_n": 23,
+          "prompt_ms": 438.29895000000005,
+          "predicted_n": 3,
+          "predicted_ms": 546.0553125
+        },
+        "zero_copy": {
+          "route": "vulkan_prefill_cpu_mtp",
+          "cold": true,
+          "round": 1,
+          "shared_bytes": 584056832,
+          "copied_bytes": 0,
+          "zero_copy": true,
+          "prompt_tokens": 23,
+          "cached_tokens": 0,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 3,
+          "verified_tokens": 8,
+          "drafted": 6,
+          "accepted": 3,
+          "prefill_s": 0.43829895,
+          "handoff_ms": 52.848163,
+          "first_token_s": 1.066255332,
+          "wall_s": 1.430381565,
+          "decode_tps": 5.4939489303109745
+        }
+      }
+    },
+    {
+      "name": "coding",
+      "status": 200,
+      "wall_ms": 2036.9541759999993,
+      "data": {
+        "id": "chatcmpl-gemma-zero-copy-1",
+        "object": "chat.completion",
+        "created": 1789592384,
+        "model": "gemma-4-e4b-qat-mtp-zero-copy",
+        "system_fingerprint": "b11501-ddb93ad19",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```javascript\nfunction add(a, b) {\n  return a + b;\n}\n```"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 27,
+          "completion_tokens": 22,
+          "total_tokens": 49,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "prompt_n": 27,
+          "prompt_ms": 384.07393099999996,
+          "predicted_n": 22,
+          "predicted_ms": 1074.7459506666667
+        },
+        "zero_copy": {
+          "route": "vulkan_prefill_cpu_mtp",
+          "cold": true,
+          "round": 1,
+          "shared_bytes": 584056832,
+          "copied_bytes": 0,
+          "zero_copy": true,
+          "prompt_tokens": 27,
+          "cached_tokens": 0,
+          "canonical_replay_tokens": 0,
+          "generated_tokens": 22,
+          "verified_tokens": 24,
+          "drafted": 18,
+          "accepted": 17,
+          "prefill_s": 0.384073931,
+          "handoff_ms": 51.369674999999994,
+          "first_token_s": 1.010395813,
+          "wall_s": 2.036377523,
+          "decode_tps": 20.469953840117626
+        }
+      }
+    }
+  ]
+}

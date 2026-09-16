@@ -1,0 +1,31 @@
+captured_utc=2026-09-16T19:51:15Z
+source_head=9a4ae80754ec2f64a8a712e0ef1fc1bc1b54b863
+source_status<<EOF
+ M common/common.cpp
+ M common/common.h
+ M tests/test-gemma-hybrid-session-policy.cpp
+ M tools/gemma-hybrid/service.cpp
+ M tools/gemma-hybrid/session-policy.h
+?? benchmarks/intel-1340p/gemma-generation-parity-20260916/
+EOF
+source_diff_sha256=b9cb60bc93183d1bfdc1310cf487a84dfb99862f72b2e01b94676d145630254d
+build_image=id=85cf6fbe2b036bbba59ea14839832c0ae38e587584c27015a90fc92ea6d3a97d digest=sha256:c762e077ecece1e8945b0d5c867d81182a1f6a9b23c46e4c5c11a214703750d9 created=2026-07-30 23:58:02.297227244 +0000 UTC
+containerfile_sha256=2adb5626dcfc21763eee326114a4ce09b64229aff2c21505684d08cfe8390bb7
+
+CMAKE
+CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_C_COMPILER:STRING=/usr/lib64/ccache/clang
+CMAKE_CXX_COMPILER:STRING=/usr/lib64/ccache/clang++
+GGML_BACKEND_DL:BOOL=OFF
+GGML_NATIVE:BOOL=ON
+GGML_OPENMP:BOOL=ON
+GGML_VULKAN:BOOL=ON
+LLAMA_BUILD_SERVER:BOOL=ON
+LLAMA_BUILD_TESTS:BOOL=ON
+LLAMA_BUILD_UI:BOOL=ON
+
+BINARY_HASHES
+0be3093e8c781ebbc7513a1dc401f59fea86ecef6c304fc1aaf88357a4cd967c  build-gemma-generation-parity/bin/llama-gemma-zero-copy-server
+9da86a7f483f4a5d5fcf724e6768dadf185ad5d076952e005d352cafd5c9a030  build-gemma-generation-parity/bin/libllama.so.0.4.0
+103b4db7d18e044cd81c48a3f26c1898753aafb2e05e790ed00d4424b3a35d6f  build-gemma-generation-parity/bin/libggml-cpu.so.0.23.0
+1a9423b59f55c2ea6fde5f0d7863b3c6b3938c9f0dab30332695b2857c7a0146  build-gemma-generation-parity/bin/libggml-vulkan.so.0.23.0

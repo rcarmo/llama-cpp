@@ -1,0 +1,12 @@
+{
+  "model": "gemma-4-e4b-qat-mtp-zero-copy",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a JavaScript module. Return only one fenced ```js code block.\nExport exactly:\nexport function normaliseTags(tags)\nRequirements:\n- tags must be an array and every item must be a string; otherwise throw Error.\n- Never mutate the input array.\n- For each tag: trim outer whitespace, lowercase it, replace runs of spaces or underscores with '-', collapse repeated '-', then remove leading and trailing '-'.\n- Drop empty results.\n- Deduplicate while preserving first occurrence order.\n- Return a new array.\n- No imports, no external libraries, no explanation."
+    }
+  ],
+  "seed": 43,
+  "max_tokens": 512,
+  "stream": false
+}

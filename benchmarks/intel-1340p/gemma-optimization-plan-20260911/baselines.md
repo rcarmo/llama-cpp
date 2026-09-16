@@ -1,8 +1,26 @@
 # Baseline ledger
 
-**Current production: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** B1 is not deployed. The original bounded plan closed without a successor; the later attention data-reuse plan qualified B1 with a small observed benefit and explicit lifecycle limits. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
+**Current production: ZC1-generation-parity. Historical file-mediated reference: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** ZC1 uses the zero-copy Vulkan-prefill service and does not inherit B0's old execution topology. B1 is not deployed. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
 
-## B0-score3: adopted at the planning reset
+## ZC1-generation-parity: deployed zero-copy profile
+
+Full machine-readable settings, deployment identity and results: [baselines/ZC1-generation-parity.json](baselines/ZC1-generation-parity.json). The [16 September campaign](../gemma-generation-parity-20260916/README.md) restored model-derived sampling defaults and `n_min=1`, rejected attached pools and small-target-batch dispatch, and deployed an immutable closure.
+
+| Field | Value |
+|---|---|
+| State | Deployed and live-verified |
+| Source | `ddb93ad19bfb6536f9f4ab6a8819527097de44ee` |
+| Server SHA-256 | `7871f50260b2d4491f719fefe64f768ded8fceb22248177418d349a3c237f314` |
+| Generation | Model metadata on (`top_k=64` default); request overrides preserved; MTP3, `n_min=1`; backend sampling off |
+| CPU | Decode 8; large batch 16; attached pools off |
+| Rejected | Attached pools (-1.98% eight-run comparison); small-target-batch (-35.28% decode); ATTN4/SCORE3 children not run |
+| Sustained A/B | 23.0666 live versus 23.0466 candidate tok/s (-0.09%); wall -0.11%; identical output/work; zero swap |
+| Service | One 32K slot; resident Vulkan owner; in-process zero-copy CPU handoff; live SSE/tools/cancellation/serial admission |
+| Live verification | Two handoffs; 1,168,113,664 shared bytes; zero copied bytes; zero restarts/swap; peak 13,914,943,488 B |
+| Rollback | Immutable `runtime/deployments/gemma-zero-copy-rollback-0ba23ad3` closure |
+
+
+## B0-score3: historical file-mediated baseline
 
 Full machine-readable runtime/flags/hashes: [baselines/B0-score3.json](baselines/B0-score3.json). Live identity was rechecked at 06:47:05 UTC on 11 September 2026; no inference was run for this planning task.
 

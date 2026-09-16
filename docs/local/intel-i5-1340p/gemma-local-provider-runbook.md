@@ -90,7 +90,7 @@ Retained evidence: [Gemma zero-copy service qualification](../../../benchmarks/i
 
 A replacement Gemma serving path must preserve the accepted generation baseline or record an isolated matched reason for each difference. On 16 September 2026, the current-service audit reread all 48 `README.md` and `report.md` files under the indexed Gemma benchmark campaigns, the August [completion audit](../../../benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md), the September [B0 baseline ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md), the historical [512-prompt/64-output result](../../../benchmarks/intel-1340p/maple-qwen-campaign/performance/gemma/response-generation.json), and the current source, build and live process state. Future work starts from this table instead of reconstructing the decisions from chat history.
 
-Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `retest` means earlier evidence was favourable but the current service has not qualified the factor; `excluded` means measured evidence does not support enabling it; `research` means the result is too small or narrow for the current default.
+Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `excluded` means measured evidence does not support enabling it; `conditional-not-run` means a required parent failed before the candidate was reached; `research` means the result is too small or narrow for the current default. The [16 September generation-parity campaign](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) is the current deployment record.
 
 | Factor | Retained evidence | Current zero-copy state | Required action |
 |---|---|---|---|
@@ -103,17 +103,17 @@ Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-
 | F16 K/V, compact SWA, Flash Attention off | August completion audit and [CPU FA report](../../../benchmarks/intel-1340p/gemma-cpu-fa-20260910/report.md) | Live | Preserve; the improved CPU-FA branch still trailed FA-off |
 | mmap model loading and advice off | August completion audit | Live through default model parameters; no expert-advice flag | Preserve and record explicitly in future manifests |
 | Backend sampling off | Historical response identity and current `service.cpp` | Live | Preserve |
-| Standard attached target and draft threadpools | `common_init_from_params()` creates 8/16 pools; the historical `llama-server` used that path | Missing from focused server | Retest in isolation. With OpenMP this removes per-graph pool-state allocation but does not prove a generation gain |
-| CPU Gemma target batches `<=4` use the 8-thread decode pool | [Small-target-batch report](../../../benchmarks/intel-1340p/gemma-decode-smallbatch-20260910/report.md) | Missing; only tested in a three-patch bundle | Retest first as an isolated source change; earlier 64K confirmation was +16.52%, and longer generation screens were +23.34% and +23.95% |
-| ATTN4 2x4 F16 tile | [ATTN4 report](../../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md) | Missing; bundled transplant lost | Retest only after small-target-batch parity; earlier isolated increment was +2.90% with overlapping ranges |
-| SCORE3 3x4 score tile | [SCORE3 rollout](../../../benchmarks/intel-1340p/gemma-score3-rollout-20260911/report.md) | Missing; bundled transplant lost | Retest only over a qualified current ATTN4 parent; earlier isolated increment was +3.124% |
-| Model sampling metadata | Historical model default included `top_k=64`; `common_init_from_params()` reads GGUF sampling metadata | Focused server constructs generic defaults directly, including `top_k=40` | Restore metadata initialisation or compare it explicitly. Measure output quality and MTP acceptance; do not assume a kernel speed effect |
-| Minimum draft length | Historical workers used `--spec-draft-n-min 1` | Current default is 0 | Match or A/B explicitly. This only discards draft groups shorter than the threshold; no speed gain has been established |
+| Standard attached target and draft threadpools | `common_init_from_params()` creates 8/16 pools; [current campaign](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) | Implemented but live-disabled | Excluded from the live profile: the eight-run comparison measured -1.98% decode. The code remains available through `--threadpools 1` for diagnostics |
+| CPU Gemma target batches `<=4` use the 8-thread decode pool | Historical [small-target-batch report](../../../benchmarks/intel-1340p/gemma-decode-smallbatch-20260910/report.md); current isolated screen | Not present in current source | Excluded: current zero-copy decode fell 23.66 to 15.31 tok/s (-35.28%) and wall time rose 51.55%. The candidate patch is retained only in the campaign evidence |
+| ATTN4 2x4 F16 tile | [ATTN4 report](../../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md) | Not present | Conditional-not-run: its required current small-target-batch parent failed |
+| SCORE3 3x4 score tile | [SCORE3 rollout](../../../benchmarks/intel-1340p/gemma-score3-rollout-20260911/report.md) | Not present | Conditional-not-run: its required current ATTN4 parent was not reached |
+| Model sampling metadata | Historical model default included `top_k=64`; current unspecified-sampling fixture | Live through `--model-sampling 1` | Preserve. Request overrides still win; model-default and generic-default arms both passed the frozen coding fixture, 4/4 total sandbox passes |
+| Minimum draft length | Historical workers used `--spec-draft-n-min 1`; current factor screen | Live through `--draft-min 1` | Preserve for policy parity. The current screen measured -0.10% decode and -0.04% wall, with identical work |
 | Query reuse | [Query-reuse report](../../../benchmarks/intel-1340p/gemma-query-reuse-20260911/report.md) | Missing | Research only: confirmed saved-64K gain was 0.70%, and the combined release later failed its swap gate during GPU startup |
 | CPU affinity and static score scheduling | Hybrid screens and [static scheduling](../../../benchmarks/intel-1340p/gemma-score-static-20260911/report.md) | No strict binding; dynamic scheduling | Excluded: strict binding reduced throughput and static score scheduling lost 9.97% |
 | Other SIMD/value candidates | [B0 ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md) | Missing | Excluded until a new mechanism exists: paired F16, value3, no-unroll, register, inline and packed-Q4 candidates did not improve the matched workload |
 
-The three-patch 37-prompt/128-output transplant establishes only that its combination was slower on the current branch. It does not revoke the isolated small-target-batch, ATTN4 or SCORE3 results. Each factor must be ported and compared in dependency order. The current parent remains active after every unsuccessful stage.
+The historical three-patch transplant established that its combination was slower. The 16 September campaign then isolated small-target-batch on the current parent and rejected it. This closes the dependent ATTN4 and SCORE3 path for the current zero-copy branch without changing their historical file-mediated results.
 
 ### Generation parity gate
 
@@ -128,7 +128,7 @@ Before changing the live service:
 7. Compare old 25.767 tok/s only when the exact historical fixture, sampling and timing boundaries match. The current 12-13 tok/s short checks use different work and cannot diagnose a regression by themselves.
 8. Append accepted and rejected results to the B0-style ledger before the next candidate. A combined candidate names every parent and cannot assign its result to one component.
 
-The next test order is attached target/draft threadpools, isolated small-target-batch, ATTN4, SCORE3, then sampling and `n_min` parity. Query reuse follows only if the larger factors retain their benefits. No candidate may weaken Vulkan residency, zero-copy ownership, streaming, cancellation, serial admission or `MemorySwapMax=0`.
+The deployed ZC1 profile uses model metadata, `n_min=1`, MTP depth 3 and no attached pools. The final sustained A/B was throughput-neutral: 23.0666 live versus 23.0466 candidate tok/s (-0.09%), with identical work/output and zero swap. Future generation work starts from ZC1 and must preserve Vulkan residency, zero-copy ownership, streaming, cancellation, serial admission and `MemorySwapMax=0`.
 
 ## Build
 
@@ -162,6 +162,15 @@ Do not combine a new executable with an older `libllama` or Vulkan plugin. The i
 
 ## Install or update
 
+The live 16 September deployment uses an immutable local closure. Git stores the closure hashes and dependencies in the [generation-parity deployment evidence](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/deployment/); `.gitignore` excludes `runtime/deployments/` binaries. The current paths are:
+
+```text
+candidate: runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502
+rollback:  runtime/deployments/gemma-zero-copy-rollback-0ba23ad3
+```
+
+The candidate environment explicitly sets `LLAMA_MTP_MIN=1`, `LLAMA_THREADPOOLS=0` and `LLAMA_MODEL_SAMPLING=1`. `tools/run-gemma-zero-copy-service.sh` emits these newer flags only when the installed environment defines them, which keeps the immutable rollback binary launchable.
+
 Tracked files:
 
 - `tools/run-gemma-zero-copy-service.sh`;
@@ -170,7 +179,7 @@ Tracked files:
 - `tools/systemd/user/llama-gemma-lan-test.socket`;
 - `tools/systemd/user/llama-gemma-lan-test.service`.
 
-Install them after a successful build:
+For a normal tracked-file installation after a successful build:
 
 ```bash
 set -euo pipefail

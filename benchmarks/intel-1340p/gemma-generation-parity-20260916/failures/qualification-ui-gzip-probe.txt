@@ -1,0 +1,6 @@
+Stage: candidate qualification after startup and props parity checks
+Outcome: stopped before model-behaviour verification
+Error: UI root returned HTTP 415 to curl without Accept-Encoding
+Cause: the embedded UI is gzip-compressed and server-http.cpp intentionally requires Accept-Encoding: gzip.
+Recovery: candidate transient unit stopped; production restored active with zero restarts and zero swap.
+Correction: send the browser-equivalent Accept-Encoding: gzip header and verify Content-Encoding: gzip.

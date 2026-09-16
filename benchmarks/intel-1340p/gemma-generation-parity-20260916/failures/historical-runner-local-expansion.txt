@@ -1,0 +1,5 @@
+Stage: exact historical 512/64 runner, before run 1 launch
+Outcome: no candidate service or inference started
+Error: line 46: seq: unbound variable
+Cause: Bash expanded seq in a compound local declaration under set -u.
+Correction: split local declarations so seq is assigned before port/unit use.

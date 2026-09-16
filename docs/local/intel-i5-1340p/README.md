@@ -22,6 +22,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [In-memory Vulkan-to-CPU KV handoff](in-memory-kv-handoff.md)
 * [Fedora Intel build container](intel-build-container.md) -- reproducible rootless Podman toolchain for native CPU and Vulkan builds, including image identity, ccache and host-runtime boundaries.
 * [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) -- 15 September 2026 Vulkan-prefill to CPU-MTP service, exact 4K/32K, tool/multi-turn, persistent-model and live-stream evidence.
+* [Gemma generation parity](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) -- current ZC1 deployment: model-derived defaults and `n_min=1`, rejected pool/small-batch paths, sustained and historical fixtures, full serving qualification and immutable rollback.
 * [Qwen3.8 embedded-MTP microbatch cap](qwen38-vulkan-mtp-memory.md) -- 15 September 2026 Intel Iris Xe memory and prefill qualification; committed but not deployed.
 * [Paired Q6 note](cpu-q6-pair.md)
 
@@ -42,4 +43,4 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 
 * CPU masks in these documents are host-specific. Several reports note that requested binding and observed OpenMP worker placement were not identical.
 * Thermal annotations exist where they were measured, but not every campaign has full thermal telemetry. Keep that distinction.
-* The 15 September Gemma zero-copy service report and its post-change verification are the current deployment record. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
+* The 16 September Gemma generation-parity campaign is the current deployment record. The 15 September service report defines the original zero-copy architecture. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.

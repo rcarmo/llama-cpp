@@ -1,0 +1,5 @@
+Stage: restoration after semantic live/candidate ABBA
+Outcome: benchmark rows completed; initial production restoration failed
+Cause: tracked launcher supplied --draft-min, --threadpools and --model-sampling defaults to the still-installed old binary, which did not recognise them. Restart=on-failure reached 19 retries.
+Repair: launcher now emits each new option only when its environment variable is explicitly defined. The old installed environment omits all three, so the old binary resumed with its original argv. The new deployment environment will define all three.
+Final state: old production binary active, NRestarts reset to 0, MemorySwapCurrent/Peak 0.

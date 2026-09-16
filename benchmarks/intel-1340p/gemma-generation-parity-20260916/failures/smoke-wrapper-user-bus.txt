@@ -1,0 +1,5 @@
+Stage: candidate trained smoke outer wrapper
+Outcome: no stage work started
+Error: Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined
+Effect: the live service was not stopped; no candidate process or model inference started.
+Correction: export the user bus environment before invoking the outer systemd scope.

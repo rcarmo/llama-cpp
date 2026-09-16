@@ -1,0 +1,27 @@
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index 61275bced..ba41aeb57 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -15,6 +15,7 @@
+
+ #include <cinttypes>
+ #include <cmath>
++#include <cstdlib>
+ #include <cstring>
+ #include <limits>
+ #include <stdexcept>
+@@ -1537,7 +1538,13 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
+         //LLAMA_LOG_INFO("graph set inputs time: %.3f ms\n", (ggml_time_us() - t_start_us)/1000.0);
+     }
+
+-    const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1);
++    static const bool small_target_batch = [] {
++        const char * value = std::getenv("LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH");
++        return value != nullptr && std::strcmp(value, "1") == 0;
++    }();
++    const bool use_decode_pool = small_target_batch && model.arch == LLM_ARCH_GEMMA4 &&
++        model.n_gpu_layers() == 0 && ubatch.n_tokens <= 4;
++    const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1 && !use_decode_pool);
+     if (strict_guard.mem) {
+         synchronize();
+         strict_guard.success = status == GGML_STATUS_SUCCESS;
