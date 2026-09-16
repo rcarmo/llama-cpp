@@ -1,0 +1,9 @@
+Candidate: GGML_CPU_EXPERIMENTAL_Q4_BIAS4 in arch/x86/repack.cpp
+Result: rejected before timing; current ZC1 did not enter the CPU-repack template or architecture kernel.
+Evidence observed during the failed probe:
+- process environment contained GGML_CPU_EXPERIMENTAL_Q4_BIAS4=1 and both trace controls;
+- /proc/<pid>/maps selected build-gemma-zc-speed/bin/libggml-cpu.so.0.23.0 containing both trace strings;
+- frozen 512-token inference completed with work 385/382/512, shared_bytes=584056832, copied_bytes=0;
+- neither the repack template trace nor architecture dispatch trace appeared;
+- loader reported target weights in Vulkan_Host buffers.
+The implementation and its incomplete two-observation screen were removed. No performance result was accepted.

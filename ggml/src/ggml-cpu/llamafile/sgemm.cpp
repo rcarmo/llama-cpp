@@ -56,6 +56,10 @@
 
 #include <array>
 #include <type_traits>
+#include <atomic>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _MSC_VER
 #define NOINLINE __declspec(noinline)
@@ -1369,6 +1373,23 @@ class tinyBLAS_Q0_AVX {
     }
 
     void matmul(int64_t m, int64_t n) {
+#if defined(__AVX2__) && defined(__F16C__)
+        static const bool q4n4_schedule = [] {
+            const char * value = std::getenv("GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE");
+            return value != nullptr && std::strcmp(value, "1") == 0;
+        }();
+        if constexpr (std::is_same_v<TA, block_q4_0> && std::is_same_v<TB, block_q8_0>) {
+            if (q4n4_schedule && n == 4 && m >= 2 && m % 2 == 0 && k > 0) {
+                static std::atomic_flag traced = ATOMIC_FLAG_INIT;
+                if (std::getenv("GGML_CPU_Q4_N4_SCHEDULE_TRACE") != nullptr && ith == 0 && !traced.test_and_set()) {
+                    std::fprintf(stderr, "Q4_N4_SCHEDULE m=%lld n=%lld kblocks=%lld\n",
+                        (long long) m, (long long) n, (long long) k);
+                }
+                gemmMx4Scheduled<2>(0, m, 0, n);
+                return;
+            }
+        }
+#endif
         mnpack(0, m, 0, n);
     }
 
@@ -1569,6 +1590,46 @@ class tinyBLAS_Q0_AVX {
 
             for (int64_t j = 0; j < RN; ++j)
                 for (int64_t i = 0; i < 4; ++i)
+                    C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
+        }
+    }
+
+    // Equivalent Mx4 arithmetic with shorter B-vector lifetimes. The two A
+    // vectors are loaded once per block, then each B column is loaded and
+    // consumed before the next. This preserves load, shuffle and dot counts.
+    template <int RM>
+    NOINLINE void gemmMx4Scheduled(int64_t m0, int64_t m, int64_t n0, int64_t n) {
+        static_assert(RM == 2);
+        static_assert(std::is_same_v<TA, block_q4_0> && std::is_same_v<TB, block_q8_0>);
+        int64_t ytiles = (m - m0) / RM;
+        int64_t xtiles = (n - n0) / 4;
+        int64_t tiles = xtiles * ytiles;
+        int64_t duty = (tiles + nth - 1) / nth;
+        int64_t start = duty * ith;
+        int64_t end = MIN(start + duty, tiles);
+        for (int64_t job = start; job < end; ++job) {
+            int64_t ii = m0 + job / xtiles * RM;
+            int64_t jj = n0 + job % xtiles * 4;
+            __m256 Cv[4][RM] = {};
+            for (int64_t l = 0; l < k; ++l) {
+                const block_q4_0 * a0 = A + lda * (ii + 0) + l;
+                const block_q4_0 * a1 = A + lda * (ii + 1) + l;
+                const __m256i avec0 = load(a0);
+                const __m256i avec1 = load(a1);
+                const __m256i aabs0 = _mm256_sign_epi8(avec0, avec0);
+                const __m256i aabs1 = _mm256_sign_epi8(avec1, avec1);
+                const __m256 da0 = _mm256_set1_ps(unhalf(a0->d));
+                const __m256 da1 = _mm256_set1_ps(unhalf(a1->d));
+                for (int64_t j = 0; j < 4; ++j) {
+                    const block_q8_0 * bj = B + ldb * (jj + j) + l;
+                    const __m256i bvec = load(bj);
+                    const __m256 db = _mm256_set1_ps(unhalf(bj->d));
+                    Cv[j][0] = madd(_mm256_mul_ps(da0, db), updot(aabs0, _mm256_sign_epi8(bvec, avec0)), Cv[j][0]);
+                    Cv[j][1] = madd(_mm256_mul_ps(da1, db), updot(aabs1, _mm256_sign_epi8(bvec, avec1)), Cv[j][1]);
+                }
+            }
+            for (int64_t j = 0; j < 4; ++j)
+                for (int64_t i = 0; i < RM; ++i)
                     C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
         }
     }

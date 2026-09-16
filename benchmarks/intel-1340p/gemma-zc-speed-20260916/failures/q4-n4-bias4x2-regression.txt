@@ -1,0 +1,8 @@
+Candidate: GGML_CPU_EXPERIMENTAL_Q4_N4_BIAS4X2 in llamafile/sgemm.cpp
+Mechanism: retain parent 4x2 tile/reuse; unsigned Q4 VPDPBUSD with exact +8*sum(Q8) correction.
+Correctness: test-x86-quant-dot passed; focused backend Q4_0 n=4 cases passed OFF/ON; frozen output/work identical.
+Actual dispatch: real trace Q4_N4_BIAS4X2 m=2048 n=4 kblocks=80.
+OFF/ON/ON/OFF tok/s: 24.065903538 / 22.266686506 / 21.706653224 / 23.035552627.
+Means: OFF 23.550728083, ON 21.986669865, change -6.6412%.
+All runs: 385/382/512 work, shared_bytes=584056832, copied_bytes=0, swap_peak=0, identical hash 082a0bab6078b427556b7c2f77bcac945d32e90dbaeca9ddd11331431a4301e6.
+Decision: rejected and implementation removed; no confirmation/deployment.

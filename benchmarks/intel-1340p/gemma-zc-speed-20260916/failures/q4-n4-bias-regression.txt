@@ -1,0 +1,8 @@
+Candidate: GGML_CPU_EXPERIMENTAL_Q4_N4_BIAS in llamafile/sgemm.cpp
+Mechanism: unsigned Q4 nibble VPDPBUSD with exact +8*sum(Q8) correction for n=4, m-even tiles.
+Correctness: test-x86-quant-dot passed; focused backend Q4_0 n=4 cases passed OFF and ON; frozen output hash/work identical.
+Actual dispatch: Q4_N4_BIAS trace observed on real model (first traced shape m=2048,n=4,kblocks=80).
+OFF/ON/ON/OFF sustained screen (tok/s): 22.694127081 / 19.517591457 / 20.093001605 / 22.879908774.
+Means: OFF 22.787017928, ON 19.805296531, change -13.0852%.
+All runs: drafted/accepted/generated=385/382/512, shared_bytes=584056832, copied_bytes=0, swap_peak=0, hash=082a0bab6078b427556b7c2f77bcac945d32e90dbaeca9ddd11331431a4301e6.
+Decision: rejected and implementation removed; no confirmation or deployment.
