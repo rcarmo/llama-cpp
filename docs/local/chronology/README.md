@@ -38,3 +38,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * [Maple local provider on Sigma](../intel-i5-1340p/maple-local-provider-runbook.md)
 * [Ornith 1.0 and 1.5 runbooks](../intel-i5-1340p/intel-1340p-ornith-runbook.md), [Ornith 1.5 provider](../intel-i5-1340p/ornith-1.5-local-provider-runbook.md)
 * [SpaceMIT K3 build notes](../spacemit-k3/build-riscv64-spacemit.md)
+
+## September 16 serving update
+
+* 2026-09-16 -- [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.

@@ -121,3 +121,40 @@ The context runner requires64K. Evaluation records failed assertions in its summ
 Temporary raw-logit instrumentation at sampling confirms a target-ranking change at the first divergent token in the q8 probe. Plain evaluation: token561 (` The`) logit22.2424011 versus token357 (` A`)22.2401543, margin0.00224686. Speculative target verification: token357 logit22.3276176 versus token56122.2993927, margin0.02822495. MTP emits its target's top token. This observed divergence is therefore not a draft acceptance mismatch: target evaluation itself differs under speculative execution. It does not establish whether the underlying difference is purely floating-point accumulation or an erroneous state update. That lower-level distinction remains unresolved. Instrumentation was removed and the standard binary rebuilt.
 
 The divergence also persists with f16 KV and Flash Attention disabled. Neither q4 KV nor Flash Attention alone explains it. Exact parity must not be promised for this tested model/configuration.
+
+## Persistent serving: 2026-09-16
+
+The unsupervised process stopped on September 15. Its log ended with graceful
+cleanup, but did not identify the trigger; this was not established as a CUDA
+crash. A transient user service restored serving. On September 16 it was
+replaced with the persistent `llama-qwen38-gsq.service`, enabled under
+`default.target`, with `Restart=always` and a five-second restart delay.
+User `agent` already has lingering enabled, allowing startup without login.
+No reboot was performed to test boot recovery.
+
+The tracked unit is `tools/pi/systemd/user/llama-qwen38-gsq.service`. It invokes
+the repository launcher directly at `/workspace/projects/llama.cpp/llama.cpp`;
+adjust both unit paths when installing elsewhere. Install only this unit:
+
+```sh
+install -m 644 tools/pi/systemd/user/llama-qwen38-gsq.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now llama-qwen38-gsq.service
+systemctl --user status llama-qwen38-gsq.service
+journalctl --user -u llama-qwen38-gsq.service -n 100
+loginctl show-user "$USER" -p Linger
+```
+
+If lingering is disabled, an administrator must enable it with
+`loginctl enable-linger <user>`. Stop any competing model server before startup;
+the 64K configuration needs most of the RTX 3060's VRAM. Explicit systemctl stop
+still stops the service despite the restart policy. The older model services
+remain stopped; they were not re-enabled.
+
+Validation: systemd unit verification passed; the installed fragment is under
+`~/.config/systemd/user/`, reports enabled and active, and `/health` returns OK.
+An OpenAI-compatible chat request generated tokens successfully (its 16-token
+cap exhausted during reasoning, so this is an API smoke test, not an answer
+quality test). This deployment check is not a new throughput benchmark. The API
+reports fingerprint `b1712-639fa9a10`; do not use that build metadata alone as
+proof of source equivalence to the historical benchmark commit.
