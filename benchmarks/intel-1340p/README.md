@@ -75,7 +75,8 @@ These directories freeze the file-mediated CPU/GPU service and decoder deploymen
 ## 2026-09-15 and 2026-09-16 Gemma service and Qwen3.8 memory
 
 * [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- original in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
-* [gemma-generation-parity-20260916/](gemma-generation-parity-20260916/) -- current deployed ZC1 record: model sampling metadata and `n_min=1` restored; attached pools and small-target-batch rejected; sustained A/B, quality, full serving qualification, immutable rollback and live LAN/loopback verification.
+* [gemma-generation-parity-20260916/](gemma-generation-parity-20260916/) -- ZC1 baseline record: model sampling metadata and `n_min=1` restored; attached pools and small-target-batch rejected; sustained A/B, quality and full serving qualification.
+* [gemma-zc-speed-20260916/](gemma-zc-speed-20260916/) -- current ZC1 successor: shorter-lived Q4 four-row temporaries improved sustained decode by 11.56% over eight confirmation runs and the historical 512/64 fixture by 5.58%; full zero-copy/UI qualification and immutable deployment passed.
 * [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.
 
 These directories mix curated `README.md` or `report.md` pages with raw JSON, stdout captures and scripts. Read the per-directory README first when one exists.

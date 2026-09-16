@@ -1,14 +1,31 @@
 # Baseline ledger
 
-**Current production: ZC1-generation-parity. Historical file-mediated reference: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** ZC1 uses the zero-copy Vulkan-prefill service and does not inherit B0's old execution topology. B1 is not deployed. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
+**Current production: ZC2-q4-n4-schedule. Historical file-mediated reference: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** ZC2 inherits ZC1's zero-copy Vulkan-prefill service and generation semantics, and adds a measured CPU Q4 scheduling change. B1 is not deployed. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
 
-## ZC1-generation-parity: deployed zero-copy profile
+## ZC2-q4-n4-schedule: deployed zero-copy profile
+
+Full machine-readable settings, deployment identity and results: [baselines/ZC2-q4-n4-schedule.json](baselines/ZC2-q4-n4-schedule.json). The [speed campaign](../gemma-zc-speed-20260916/README.md) confirmed an equivalent four-row Q4 schedule, rejected two biased-nibble alternatives, passed the full serving suite, and deployed an immutable closure.
+
+| Field | Value |
+|---|---|
+| State | Deployed and live-verified |
+| Source | `2768e715cfb52354a6390a8e24e2e8298b9dbdef` |
+| Server SHA-256 | `1c5ba7000b324ada041e58f0ef76d3e3fce44ea65ee4ac68ef0882d6a92fa702` |
+| Generation | ZC1 semantics unchanged; MTP3, `n_min=1`, model metadata on, backend sampling and attached pools off |
+| CPU change | `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1`; two A vectors loaded once, each B column consumed before the next |
+| Sustained confirmation | 23.1749 control versus 25.8539 candidate tok/s (+11.56%); eight runs; all candidate observations above controls |
+| Historical 512/64 | 10.0924 control versus 10.6557 candidate tok/s (+5.58%); identical `512/64/55/43` work and output |
+| Service | Full UI/nonstream/SSE/tools/append/cancellation/serial qualification; resident Vulkan owner and zero-copy handoff |
+| Live verification | Two handoffs; 1,168,113,664 shared bytes; zero copied bytes; zero restarts/swap |
+| Rollback | Immutable `runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502` closure |
+
+## ZC1-generation-parity: superseded zero-copy baseline
 
 Full machine-readable settings, deployment identity and results: [baselines/ZC1-generation-parity.json](baselines/ZC1-generation-parity.json). The [16 September campaign](../gemma-generation-parity-20260916/README.md) restored model-derived sampling defaults and `n_min=1`, rejected attached pools and small-target-batch dispatch, and deployed an immutable closure.
 
 | Field | Value |
 |---|---|
-| State | Deployed and live-verified |
+| State | Superseded by ZC2; retained as immutable rollback |
 | Source | `ddb93ad19bfb6536f9f4ab6a8819527097de44ee` |
 | Server SHA-256 | `7871f50260b2d4491f719fefe64f768ded8fceb22248177418d349a3c237f314` |
 | Generation | Model metadata on (`top_k=64` default); request overrides preserved; MTP3, `n_min=1`; backend sampling off |

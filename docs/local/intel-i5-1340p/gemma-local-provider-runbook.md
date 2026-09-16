@@ -16,6 +16,7 @@ The enabled Gemma service on `sigma` is `llama-gemma-zero-copy.service`. It list
 | Admission | Serial, at most eight outstanding HTTP requests |
 | Cold prefill | Vulkan on Intel Iris Xe |
 | Generation | CPU target with MTP depth 3 |
+| Q4 four-row kernel | Equivalent 2x4 schedule with shorter temporary lifetimes |
 | K/V and Flash Attention | F16, Flash Attention off |
 | Batch / microbatch | 256 / 256 |
 | Decode / prefill threads | 8 / 16 |
@@ -84,13 +85,15 @@ A matched 37-prompt/128-output comparison on the current branch rejected transpl
 
 Historical matched CPU measurements remain the best sustained-generation reference: 25.77 generation tok/s and 60.96/44.32 prompt tok/s at exact 4K/32K. The current synthetic long prompts measured 202.60/128.00 prompt tok/s, but the prompt contents and output lengths differ. Treat the ratios as indicative, not matched speedups.
 
-Retained evidence: [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md).
+The current Q4 scheduling release improved the frozen 512-output decode mean from 23.1749 to 25.8539 tok/s (+11.56%) over eight counterbalanced observations. All candidate runs exceeded all controls with identical `385/382/512` MTP work and output hash. The historical 512-prompt/64-output fixture improved from 10.0924 to 10.6557 tok/s (+5.58%) with identical `512/64/55/43` work and output hash.
+
+Retained evidence: [original zero-copy qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), and [Q4 scheduling release](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md).
 
 ## Generation inheritance contract
 
 A replacement Gemma serving path must preserve the accepted generation baseline or record an isolated matched reason for each difference. On 16 September 2026, the current-service audit reread all 48 `README.md` and `report.md` files under the indexed Gemma benchmark campaigns, the August [completion audit](../../../benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md), the September [B0 baseline ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md), the historical [512-prompt/64-output result](../../../benchmarks/intel-1340p/maple-qwen-campaign/performance/gemma/response-generation.json), and the current source, build and live process state. Future work starts from this table instead of reconstructing the decisions from chat history.
 
-Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `excluded` means measured evidence does not support enabling it; `conditional-not-run` means a required parent failed before the candidate was reached; `research` means the result is too small or narrow for the current default. The [16 September generation-parity campaign](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) is the current deployment record.
+Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `excluded` means measured evidence does not support enabling it; `conditional-not-run` means a required parent failed before the candidate was reached; `research` means the result is too small or narrow for the current default. The [16 September Q4 scheduling campaign](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) is the current deployment record; generation parity is its baseline.
 
 | Factor | Retained evidence | Current zero-copy state | Required action |
 |---|---|---|---|
@@ -103,7 +106,8 @@ Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-
 | F16 K/V, compact SWA, Flash Attention off | August completion audit and [CPU FA report](../../../benchmarks/intel-1340p/gemma-cpu-fa-20260910/report.md) | Live | Preserve; the improved CPU-FA branch still trailed FA-off |
 | mmap model loading and advice off | August completion audit | Live through default model parameters; no expert-advice flag | Preserve and record explicitly in future manifests |
 | Backend sampling off | Historical response identity and current `service.cpp` | Live | Preserve |
-| Standard attached target and draft threadpools | `common_init_from_params()` creates 8/16 pools; [current campaign](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) | Implemented but live-disabled | Excluded from the live profile: the eight-run comparison measured -1.98% decode. The code remains available through `--threadpools 1` for diagnostics |
+| Q4_0 x Q8_0 four-row temporary scheduling | [Q4 scheduling release](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) | Live through `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1` | Preserve the measured 2x4 arithmetic and exact output; sustained confirmation measured +11.56% |
+| Standard attached target and draft threadpools | `common_init_from_params()` creates 8/16 pools; [generation-parity campaign](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) | Implemented but live-disabled | Excluded from the live profile: the eight-run comparison measured -1.98% decode. The code remains available through `--threadpools 1` for diagnostics |
 | CPU Gemma target batches `<=4` use the 8-thread decode pool | Historical [small-target-batch report](../../../benchmarks/intel-1340p/gemma-decode-smallbatch-20260910/report.md); current isolated screen | Not present in current source | Excluded: current zero-copy decode fell 23.66 to 15.31 tok/s (-35.28%) and wall time rose 51.55%. The candidate patch is retained only in the campaign evidence |
 | ATTN4 2x4 F16 tile | [ATTN4 report](../../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md) | Not present | Conditional-not-run: its required current small-target-batch parent failed |
 | SCORE3 3x4 score tile | [SCORE3 rollout](../../../benchmarks/intel-1340p/gemma-score3-rollout-20260911/report.md) | Not present | Conditional-not-run: its required current ATTN4 parent was not reached |
@@ -128,7 +132,7 @@ Before changing the live service:
 7. Compare old 25.767 tok/s only when the exact historical fixture, sampling and timing boundaries match. The current 12-13 tok/s short checks use different work and cannot diagnose a regression by themselves.
 8. Append accepted and rejected results to the B0-style ledger before the next candidate. A combined candidate names every parent and cannot assign its result to one component.
 
-The deployed ZC1 profile uses model metadata, `n_min=1`, MTP depth 3 and no attached pools. The final sustained A/B was throughput-neutral: 23.0666 live versus 23.0466 candidate tok/s (-0.09%), with identical work/output and zero swap. Future generation work starts from ZC1 and must preserve Vulkan residency, zero-copy ownership, streaming, cancellation, serial admission and `MemorySwapMax=0`.
+The deployed successor keeps the ZC1 model metadata, `n_min=1`, MTP depth 3 and detached pools. It adds only `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1`. Future generation work starts from this release and must preserve Vulkan residency, zero-copy ownership, streaming, cancellation, serial admission and `MemorySwapMax=0`.
 
 ## Build
 
@@ -162,14 +166,14 @@ Do not combine a new executable with an older `libllama` or Vulkan plugin. The i
 
 ## Install or update
 
-The live 16 September deployment uses an immutable local closure. Git stores the closure hashes and dependencies in the [generation-parity deployment evidence](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/deployment/); `.gitignore` excludes `runtime/deployments/` binaries. The current paths are:
+The live 16 September deployment uses an immutable local closure. Git stores its hashes and dependencies in the [Q4 scheduling deployment evidence](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/deployment/); `.gitignore` excludes `runtime/deployments/` binaries. The current paths are:
 
 ```text
-candidate: runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502
-rollback:  runtime/deployments/gemma-zero-copy-rollback-0ba23ad3
+candidate: runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700
+rollback:  runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502
 ```
 
-The candidate environment explicitly sets `LLAMA_MTP_MIN=1`, `LLAMA_THREADPOOLS=0` and `LLAMA_MODEL_SAMPLING=1`. `tools/run-gemma-zero-copy-service.sh` emits these newer flags only when the installed environment defines them, which keeps the immutable rollback binary launchable.
+The candidate environment retains `LLAMA_MTP_MIN=1`, `LLAMA_THREADPOOLS=0` and `LLAMA_MODEL_SAMPLING=1`, and adds `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1`. `tools/run-gemma-zero-copy-service.sh` emits the newer command-line flags only when the installed environment defines them, which keeps the immutable rollback binary launchable.
 
 Tracked files:
 

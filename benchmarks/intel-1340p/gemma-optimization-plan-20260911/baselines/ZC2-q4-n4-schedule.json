@@ -1,0 +1,83 @@
+{
+  "id": "ZC2-q4-n4-schedule",
+  "status": "deployed",
+  "architecture": "resident Vulkan model, fresh Vulkan prefill context, in-process zero-copy CPU handoff, CPU MTP decode",
+  "comparison_parent": "ZC1-generation-parity",
+  "deployed_at": "2026-09-16T23:58:00Z",
+  "source_commit": "2768e715cfb52354a6390a8e24e2e8298b9dbdef",
+  "server_sha256": "1c5ba7000b324ada041e58f0ef76d3e3fce44ea65ee4ac68ef0882d6a92fa702",
+  "deployment_root": "runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700",
+  "rollback_root": "runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502",
+  "settings": {
+    "q4_n4_schedule": true,
+    "model_sampling_metadata": true,
+    "top_k_default": 64,
+    "speculative_n_min": 1,
+    "speculative_n_max": 3,
+    "attached_threadpools": false,
+    "backend_sampling": false,
+    "context": 32768,
+    "batch": 256,
+    "ubatch": 256,
+    "threads": 8,
+    "threads_batch": 16,
+    "kv": "F16",
+    "flash_attention": false,
+    "vulkan_attention": "f32"
+  },
+  "mechanism": "For Q4_0 x Q8_0 target batches of exactly four rows, load two A vectors once per block and consume each B column before the next. Arithmetic, loads, shuffles, dots, accumulation and output layout are unchanged.",
+  "performance": {
+    "scope": "sustained 512-output focused Chat Completions fixture",
+    "control_decode_tps": 23.174874978,
+    "candidate_decode_tps": 25.853925529,
+    "decode_change_pct": 11.5602,
+    "observations_per_arm": 4,
+    "candidate_above_all_controls": true,
+    "generated_tokens": 512,
+    "drafted_tokens": 385,
+    "accepted_tokens": 382,
+    "content_sha256": "082a0bab6078b427556b7c2f77bcac945d32e90dbaeca9ddd11331431a4301e6",
+    "shared_bytes": 584056832,
+    "copied_bytes": 0,
+    "swap_peak": 0
+  },
+  "historical_fixture": {
+    "prompt_tokens": 512,
+    "generated_tokens": 64,
+    "drafted_tokens": 55,
+    "accepted_tokens": 43,
+    "control_generation_tps": 10.092375,
+    "candidate_generation_tps": 10.655675376,
+    "generation_change_pct": 5.5814,
+    "content_sha256": "35f6d4194c1e9170ab5104d67b191ce47cee554fb21463d3f7d61cf86c2beddf"
+  },
+  "rejected": [
+    "packed biased-nibble kernel: current Vulkan_Host topology bypassed CPU-repack dispatch",
+    "biased-nibble correction with new 2x4 tile: -13.09% sustained decode",
+    "biased-nibble correction with parent 4x2 tile: -6.64% sustained decode"
+  ],
+  "qualification": {
+    "nonstream_requests": 7,
+    "append_reuse": true,
+    "stream_progress_events": 2,
+    "stream_content_events": 128,
+    "streamed_tool_call": true,
+    "cancellation_recovery": true,
+    "serial_admission": true,
+    "embedded_ui_assets": 70,
+    "candidate_peak_memory_bytes": 13932978176,
+    "candidate_swap_peak": 0
+  },
+  "live": {
+    "loopback": "127.0.0.1:18094",
+    "lan": "192.168.1.70:8094",
+    "pid_at_verification": 1896594,
+    "handoffs": 2,
+    "shared_bytes": 1168113664,
+    "copied_bytes": 0,
+    "vulkan_model_resident": true,
+    "restarts": 0,
+    "swap_peak": 0
+  },
+  "evidence": "../../gemma-zc-speed-20260916/README.md"
+}
