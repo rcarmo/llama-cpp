@@ -259,6 +259,13 @@ extern "C" {
     //               - if not:        only the last token is output
     //            )
     //
+    struct llama_hidden_state_span {
+        const void * storage;
+        uint32_t row;
+        uint32_t n_rows;
+        uint64_t generation;
+    };
+
     typedef struct llama_batch {
         int32_t n_tokens;
 
@@ -406,6 +413,8 @@ extern "C" {
         bool op_offload;  // offload host tensor operations to device
         bool sched_async_cpu; // run CPU graph splits on a worker thread so independent GPU splits overlap them
         bool kv_cpu_shared; // opt-in cached coherent Vulkan KV allocation for in-process CPU handoff
+        bool kv_handoff_strict; // one-sequence Qwen35 shared state; fail without mapped allocations
+        bool kv_handoff_destination; // headers only; cannot execute until strict handoff commits
         bool swa_full;    // use full-size SWA cache (https://github.com/ggml-org/llama.cpp/pull/13194#issuecomment-2868343055)
                           // NOTE: setting to false when n_seq_max > 1 can cause bad performance in some cases
                           //       ref: https://github.com/ggml-org/llama.cpp/pull/13845#issuecomment-2924800573
@@ -576,6 +585,16 @@ extern "C" {
     LLAMA_API uint32_t llama_n_ubatch   (const struct llama_context * ctx);
     LLAMA_API uint32_t llama_n_seq_max  (const struct llama_context * ctx);
     LLAMA_API uint32_t llama_n_rs_seq   (const struct llama_context * ctx);
+    LLAMA_API bool     llama_is_handoff_strict(const struct llama_context * ctx);
+
+    LLAMA_API bool llama_set_hidden_state_peer(struct llama_context * ctx, struct llama_context * peer);
+    LLAMA_API bool llama_hidden_state_span_current(
+            struct llama_context * ctx, uint32_t row, uint32_t n_rows, struct llama_hidden_state_span * span);
+    LLAMA_API bool llama_hidden_state_span_previous(
+            struct llama_context * ctx, struct llama_hidden_state_span * span);
+    LLAMA_API bool llama_hidden_state_select(struct llama_context * ctx, uint32_t row);
+    LLAMA_API int32_t llama_decode_hidden(
+            struct llama_context * ctx, struct llama_batch batch, const struct llama_hidden_state_span * span);
 
     DEPRECATED(LLAMA_API int32_t llama_n_ctx_train(const struct llama_model * model), "use llama_model_n_ctx_train instead");
     DEPRECATED(LLAMA_API int32_t llama_n_embd     (const struct llama_model * model), "use llama_model_n_embd instead");
@@ -830,6 +849,10 @@ extern "C" {
     // Caller retains token history and must evaluate a token on dst before sampling its outputs.
     LLAMA_API bool llama_kv_handoff_cpu(struct llama_context * dst, struct llama_context * src,
                                       bool allow_copy, struct llama_kv_handoff_result * result);
+    LLAMA_API bool llama_kv_handoff_cpu_mtp(
+            struct llama_context * dst_tgt, struct llama_context * dst_mtp,
+            struct llama_context * src_tgt, struct llama_context * src_mtp,
+            struct llama_kv_handoff_result * result);
     LLAMA_API DEPRECATED(size_t llama_get_state_size(struct llama_context * ctx),
         "use llama_state_get_size instead");
 

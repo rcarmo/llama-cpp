@@ -9,6 +9,7 @@ The upstream llama.cpp documentation is still rooted here. Fork-local reports an
 * [Model navigation](local/models/README.md)
 * [Chronology](local/chronology/README.md)
 * [Benchmark tree](../benchmarks/README.md)
+* [Current Sigma Gemma zero-copy service](local/intel-i5-1340p/gemma-local-provider-runbook.md)
 
 ## Core upstream docs
 

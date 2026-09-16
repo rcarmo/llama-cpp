@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "# Ranked Diagnosis: Q2_K Vulkan Decode, N=3 Wrong Logits on Xe1\n\n## The Core Symptom\n\nCorrect at N=1, N=2; *occasional* wrong logits at N=3; Xe1-only; no OOB; N=3 costs register pressure and loses the speedup. \"Occasional\" + \"N=3\" + \"register pressure\" is the tell. I'm ranking by probability of being the actual root cause, not by how interesting each is.\n\n---\n\n## Ranked Causes\n\n### 1. Subgroup-size invariant violated by the N=3 dispatch (most likely)\nXe1 (Iris Xe / Gen12) advertises `subgroupSize` = **16** but its *hardware* subgroup width is **32 lanes**. The spec permits a logical subgroup size smaller than the physical width; lanes above the logical size are **inactive** and their behavior is implementation-defined.\n\nThe classic trap: code that assumes `lane < subgroupSize` covers all active lanes, or that `subgroupBroadcast`/`subgroupReduce`/`subgroupBarrier` behave identically across inactive lanes. At N=1/N=2 the tail of the reduction is masked out by construction; at N=3 the third accumulator path crosses a lane boundary that lands on an inactive lane, so a broadcast reads a **garbage lane value** and a reduction produces a wrong partial. \"Occasional\" = depends on which output row maps to which lane.\n\n**Invariant to check:** every `subgroup*` call must be valid for the *logical* size 16, and no code path may read a lane value from a lane that is inactive under size-16 semantics.\n\n### 2. Missing or misplaced `memoryBarrierShared` / `barrier` around the shared-scale stage\nScales are written to shared memory by some lanes and read by others. If the N=3 path adds a shared-memory stage (or a second reduction) that the N=1/2 paths don't, and there's no `barrier()` between the write and the read, you get a **race**: some rows read stale/zeroed scales → wrong logits, nondeterministically. Xe1's shared-memory pipeline has a real write→read hazard; it is not free.\n\n**Invariant to check:** every producer→consumer pair across shared memory is bracketed by `barrier()` on the *same* invocation, and the barrier is inside the code path that N=3 actually takes.\n\n### 3. Register spill / occupancy collapse at N=3 (the \"3% faster\" symptom)\nThree accumulators × wider Q2_K unpacking (Q2_K unpacks 8 nibbles per byte → 3× the register traffic of Q8_1's single value) blows the register file. On Xe1 this doesn't just slow you down — **spilled temporaries can be reloaded from wrong addresses if the spill slot is also used for a live-across-barrier value**, or the compiler reorders the scale-load past the barrier. The 18%→3% regression is the fingerprint: you're paying for spills and possibly mis-ordered loads.\n\n**Invariant to check:** no live-across-`barrier()` value lives in a register that can spill; confirm the scale-load ordering is preserved under `-O2`/`-Os`.\n\n### 4. Q8_1 activation layout assumption (row stride / padding)\nQ8_1 stores activations as `{int8_t scale; int8_t data[8]}` per group of 8. If the N=3 path assumes a different",
+        "reasoning_content": "Let me carefully parse this problem. We have a Vulkan backend for a performance-sensitive matmul-quantized (MMVQ) decode shader. The context is llama.cpp-style quantized inference (Q2_K, Q8_1, etc.). Let me break down the specifics.\n\nThe shader:\n- Decodes weight scales in shared memory\n- Uses subgroup size 16\n- Has three activation-row accumulators per output row\n- Correct at N=1 and N=2, but N=3 produces occasional wrong logits only on Intel Xe1\n- N=2 is 18% faster than generic MMVQ\n- N=3 is only 3% faster and increases register pressure\n- Generic fallback remains correct\n- Validation reports no out-of-bounds accesses\n\nThe question asks:\n1. Ranked diagnosis (most likely causes)\n2. Which assumptions must be checked in shader and dispatch code\n3. A bounded debugging sequence covering: subgroup control, barriers, tail rows, shared-memory indexing, register spills, Q8_1 activation layout, and deterministic logits\n4. Explicit accept/reject criteria\n\nLet me think about the technical details deeply.\n\nFirst, some background on the domain:\n- MMVQ"
+      }
+    }
+  ],
+  "created": 1787417222,
+  "model": "ornith-1.5-35b-a3b-q4-k-m",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 210,
+    "total_tokens": 1234,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-Z5dQvB3tkSyR12H4soTMvXz5i8Ruoq2W",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 210,
+    "prompt_ms": 4132.463,
+    "prompt_per_token_ms": 19.678395238095238,
+    "prompt_per_second": 50.81715190190451,
+    "predicted_n": 1024,
+    "predicted_ms": 77456.445,
+    "predicted_per_token_ms": 75.6410595703125,
+    "predicted_per_second": 13.220333052982227
+  }
+}

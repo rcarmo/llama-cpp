@@ -1,0 +1,37 @@
+{
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "# Intel Xe Exact-Row Q2_K Kernel — Two-Phase Implementation Plan\n\n## 0. Scope & Assumption Flags\n\nBefore writing code, I'm surfacing three facts you stated that constrain the design. I'm treating them as ground truth for the plan; if any is wrong, the rollback points in §6–7 apply.\n\n| # | Claim | Design consequence | Rollback trigger |\n|---|-------|--------------------|------------------|\n| A | Qwen3.6 35B-A3B is a MoE (35B total / 3B active) | Kernel must handle expert routing + grouped dispatch; correctness is per-expert | If the model is dense, drop routing gates |\n| B | Q2_K_XL is a 2-bit layout with per-group scale + optional per-token extra bits | Exact-row kernel must reproduce the dequant exactly, including the XL extra-bit path | Any dequant mismatch vs. reference |\n| C | Iris Xe Vulkan: FP16 + integer dot-product, **no cooperative matrices**, 48 KiB shared | Compute the GEMM with integer-DP over unpacked 2-bit lanes, not MMA; shared mem is the binding constraint | If a device advertises cooperative matrices, switch to that path |\n\n> ⚠️ **Note on \"Qwen3.6 35B-A3B\"**: this identifier does not match any released Qwen checkpoint I can verify. Treat the *architecture class* (MoE, 3B active) as the operative assumption and gate the plan on actually loading the artifact. If the artifact fails to load, the whole plan is void until the model spec is confirmed.\n\n---\n\n## 1. Two-Phase Architecture\n\n**Phase 1 — Kernel (exactness-first).** Produce a Vulkan compute shader that computes one output row of a Q2_K matmul exactly, matching the reference GGML dequant bit-for-bit. No perf optimization yet.\n\n**Phase 2 — Integration (verification-first).** Wire the kernel into the Qwen MTP inference path with dispatch gates, correctness tests, telemetry, and fallback. Perf tuning is explicitly *out of scope* for Phase 2; we only assert the gates.\n\nThe reason for this split: your own data says \"CPU target-only is faster than full Vulkan.\" That means the *win condition* is not \"beat CPU\" — it is \"prove the exact-row kernel is correct and integrates cleanly, with a safe fallback.\" Optimizing past CPU is a separate effort gated on Phase 1 correctness.\n\n---\n\n## 2. Kernel Design (Phase 1)\n\n### 2.1 Math: exact-row Q2_K\n\nQ2_K packs 8 qubits (2-bit) per 32-bit lane. The exact-row kernel computes, for a single output row `i`:\n\n```\ny[i] = Σ_k  W[i,k] · x[k]\n     = Σ_groups  s_group · Σ_{k∈group} (unpack(q2[k]) · x[k])\n```\n\nWhere `unpack` applies the Q2_K bit-reversal/permute and the XL extra-bit correction. The kernel must:\n\n1. **Load the group scale `s_group`** (fp16 or fp32 per spec).\n2. **Iterate over columns `k`** in the group, unpacking 2-bit values from the packed lane.\n3. **Accumulate with integer dot product** (since no cooperative matrices): convert unpacked qubits and fp16 inputs to a common fixed-point domain, then `ip` (integer dot product) instructions",
+        "reasoning_content": "Let me carefully analyze this request. The user is asking me to design a focused two-phase implementation plan for an Intel Xe exact-row Q2_K kernel and its integration into Qwen MTP verification.\n\nLet me parse the technical context carefully:\n\n1. **Model**: Qwen3.6 35B-A3B (MoE, 35B total, 3B active) - this is a Mixture of Experts model\n2. **Quantization**: Q2_K_XL - this is a GGML quantization format. Q2_K is a 2-bit quantization scheme. The \"XL\" suffix refers to a variant.\n3. **Hardware**: Intel Core i5-1340P with Iris Xe unified memory (iGPU, integrated graphics)\n4. **Compute backend**: Vulkan\n   - Has FP16 and integer dot product\n   - No cooperative matrix support\n   - 48 KiB shared memory\n5. **Performance observations**:\n   - CPU target-only generation is faster than full Vulkan\n   - Native MTP (Multi-Token Prediction / Multi-Token Preprocessing?) improves CPU generation\n   - Vulkan has multi-column decode that improves throughput at N=2 but plateaus"
+      }
+    }
+  ],
+  "created": 1787417315,
+  "model": "ornith-1.5-35b-a3b-q4-k-m",
+  "system_fingerprint": "b10579-abdbeadfb",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1024,
+    "prompt_tokens": 234,
+    "total_tokens": 1258,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "id": "chatcmpl-mAXnwUt0DInhVHXiNeqpieRJQUN2IDiU",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 234,
+    "prompt_ms": 4530.417,
+    "prompt_per_token_ms": 19.36075641025641,
+    "prompt_per_second": 51.65087452214663,
+    "predicted_n": 1024,
+    "predicted_ms": 81559.708,
+    "predicted_per_token_ms": 79.64815234375,
+    "predicted_per_second": 12.55521905497749
+  }
+}

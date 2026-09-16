@@ -1,0 +1,6 @@
+**Source path:** `tools/run-intel-candidate.sh`
+**Variable:** `LLAMA_USE_MTP` (assigned to local `use_mtp`)
+
+**How it selects target-only:** A single `if [[ $use_mtp == 1 ]]` gate (around the `spec=()` block) controls whether the speculative-decoding flag array is populated. When `LLAMA_USE_MTP=0`, that block is skipped, `spec` stays empty, and the server is launched with no `--spec-*`/`--model-draft` flags, so inference runs target-only.
+
+When disabled, the MTP speculative arguments (`--spec-type draft-mtp`, `--spec-draft-n-min/--max`, `--spec-draft-threads`, `--spec-draft-threads-batch`, `--spec-draft-type-k/v`, and `--model-draft`) are all omitted.

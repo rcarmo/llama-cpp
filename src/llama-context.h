@@ -74,7 +74,12 @@ struct llama_context {
     uint32_t n_threads_batch() const;
 
     llama_memory_t get_memory() const;
+    bool is_handoff_strict() const;
+    bool set_hidden_state_peer(llama_context * peer);
     bool kv_handoff_cpu(llama_context & src, bool allow_copy, llama_kv_handoff_result & result);
+    bool kv_handoff_cpu_mtp(
+            llama_context & dst_mtp, llama_context & src_tgt, llama_context & src_mtp,
+            llama_kv_handoff_result & result);
 
     // return true if the memory was updated
     bool memory_update(bool optimize);
@@ -145,6 +150,10 @@ struct llama_context {
 
     int encode(const llama_batch & batch_inp);
     int decode(const llama_batch & batch_inp);
+    int decode_hidden(const llama_batch & batch_inp, const llama_hidden_state_span & span);
+    bool hidden_state_span_current(uint32_t row, uint32_t n_rows, llama_hidden_state_span & span) const;
+    bool hidden_state_span_previous(llama_hidden_state_span & span) const;
+    bool hidden_state_select(uint32_t row);
 
     //
     // state save/load
@@ -291,7 +300,15 @@ private:
 
     llama_memory_ptr memory;
     bool kv_consumed = false;
+    bool kv_handoff_strict = false;
+    bool kv_handoff_pending = false;
     bool kv_cvec_modified = false;
+    llama_hidden_state_ptr hidden_state_write;
+    llama_hidden_state_ptr hidden_state_peer;
+    llama_context * hidden_state_peer_owner = nullptr;
+    uint32_t hidden_state_peer_count = 0;
+    llama_hidden_state_span hidden_state_decode_span {};
+    bool hidden_state_decode_active = false;
     uint32_t kv_borrowers = 0;
     llama_context * kv_borrowed_from = nullptr;
 

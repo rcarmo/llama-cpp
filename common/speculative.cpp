@@ -171,6 +171,9 @@ struct common_speculative_impl {
 
     virtual void accept(llama_seq_id seq_id, uint16_t n_accepted, bool is_other) = 0;
 
+    virtual bool can_handoff_contexts(llama_context *, llama_context *, llama_context *, llama_context *) const { return false; }
+    virtual void handoff_contexts(llama_context *, llama_context *) noexcept {}
+
     // (optional) serialize/restore per-seq internal state (e.g. eagle3's deferred boundary).
     virtual bool get_state(llama_seq_id /*seq_id*/, std::vector<uint8_t> & /*data*/) const { return false; }
     virtual void set_state(llama_seq_id /*seq_id*/, const std::vector<uint8_t> & /*data*/) {}
@@ -1346,6 +1349,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
     int32_t n_mtp_layers  = 1;
     bool    is_mem_shared = false;   // gemma4
     bool    chain_heads   = false;   // derived in the ctor: n_mtp_layers > 1 && !is_mem_shared
+    bool    strict_hidden = false;
 
     // Per-sequence cross-batch carryover: pair (h_p, x_{p+1}) at MTP pos p+1.
     // The last h-row of one process() call needs the first token of the NEXT
@@ -1359,6 +1363,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
     // Row 0 corresponds to the sampled token, row N to the Nth accepted draft token.
     std::vector<std::vector<float>> verify_h;
     std::vector<int32_t> verify_h_rows;
+    std::vector<llama_pos> verify_pos_first;
 
     std::vector<int>                i_last;
     std::vector<std::vector<float>> chain_h;
@@ -1401,9 +1406,15 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
             s.reset(common_sampler_init(llama_get_model(ctx_dft), sparams));
         }
 
-        // offload draft sampling to the backend
+        strict_hidden = llama_is_handoff_strict(ctx_tgt) && llama_is_handoff_strict(ctx_dft) &&
+            llama_set_hidden_state_peer(ctx_dft, ctx_tgt);
+        if (llama_is_handoff_strict(ctx_tgt) && !strict_hidden) {
+            throw std::runtime_error("strict MTP hidden-state peer unavailable");
+        }
+
+        // Strict handoff keeps sampling in the controller so no backend sampler owns context state.
         backend_chains.assign(n_seq, nullptr);
-        if (this->params.backend_sampling) {
+        if (this->params.backend_sampling && !strict_hidden) {
             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
                 llama_sampler * chain = llama_sampler_chain_init(llama_sampler_chain_default_params());
                 llama_sampler_chain_add(chain, llama_sampler_init_top_k(10));
@@ -1441,6 +1452,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
 
         verify_h.assign(n_seq, {});
         verify_h_rows.assign(n_seq, 0);
+        verify_pos_first.assign(n_seq, -1);
     }
 
     ~common_speculative_impl_draft_mtp() override {
@@ -1526,27 +1538,20 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                 common_batch_add(batch, batch_in.token[k], batch_in.pos[k], { batch_in.seq_id[k][0] }, 0);
             }
 
-            // shift the tgt embeddings to the right by one position
-            // assumes that the tokens in the batch are sequential for each sequence
-            // i.e. we cannot have seq_id like this: [0, 0, 0, 1, 1, 0, 1, 1]
-            //                                                       ^--- this is a problem
-            // TODO:this is generally true, but would be nice to assert it
-            {
+            llama_hidden_state_span catchup_span {};
+            if (strict_hidden) {
+                if (n_seq != 1 || !llama_hidden_state_span_current(ctx_tgt, (uint32_t) batch_in.pos[0], n_tokens, &catchup_span)) {
+                    return false;
+                }
+            } else {
+                // shift the target embeddings to align h_p with token p+1
                 const float * h_tgt = llama_get_embeddings_nextn(ctx_tgt);
                 std::memcpy(batch.embd + (size_t) 1 * n_embd, h_tgt, row_bytes * (n_tokens-1));
-            }
-
-            // fill the pending embeddings from a previous run
-            auto set_h = [&](int idx, const float * h_row) {
-                std::memcpy(batch.embd + (size_t) idx * n_embd, h_row, row_bytes);
-            };
-
-            for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
-                if (i_batch_beg[seq_id] < 0) {
-                    continue;
+                for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+                    if (i_batch_beg[seq_id] >= 0) {
+                        std::memcpy(batch.embd + (size_t) i_batch_beg[seq_id] * n_embd, pending_h[seq_id].data(), row_bytes);
+                    }
                 }
-
-                set_h(i_batch_beg[seq_id], pending_h[seq_id].data());
             }
 
             auto * mem_dft = llama_get_memory(ctx_dft);
@@ -1564,7 +1569,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                     llama_set_nextn_layer_offset(ctx_dft, head);
                 }
 
-                const int32_t rc = llama_decode(ctx_dft, batch);
+                const int32_t rc = strict_hidden ? llama_decode_hidden(ctx_dft, batch, &catchup_span) : llama_decode(ctx_dft, batch);
                 if (rc != 0) {
                     SPC_ERR("llama_decode(ctx_dft) head=%d failed rc=%d (pos=%d)\n",
                             head, (int) rc, (int) batch_in.pos[0]);
@@ -1593,15 +1598,18 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
 
             const int32_t n_rows = i_batch_end[seq_id] - i_batch_beg[seq_id] + 1;
             verify_h_rows[seq_id] = n_rows;
-            verify_h[seq_id].resize((size_t) n_rows * n_embd);
-
-            for (int32_t i = 0; i < n_rows; ++i) {
-                const float * h = llama_get_embeddings_nextn_ith(ctx_tgt, i_batch_beg[seq_id] + i);
-                std::memcpy(verify_h[seq_id].data() + (size_t) i * n_embd, h, row_bytes);
+            verify_pos_first[seq_id] = batch_in.pos[i_batch_beg[seq_id]];
+            if (strict_hidden) {
+                if (!llama_hidden_state_select(ctx_tgt, (uint32_t) batch_in.pos[i_batch_end[seq_id]] + 1)) return false;
+            } else {
+                verify_h[seq_id].resize((size_t) n_rows * n_embd);
+                for (int32_t i = 0; i < n_rows; ++i) {
+                    const float * h = llama_get_embeddings_nextn_ith(ctx_tgt, i_batch_beg[seq_id] + i);
+                    std::memcpy(verify_h[seq_id].data() + (size_t) i * n_embd, h, row_bytes);
+                }
+                std::memcpy(pending_h[seq_id].data(),
+                        verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
             }
-
-            std::memcpy(pending_h[seq_id].data(),
-                    verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
         }
         if (profile) {
             SPC_INF("GGML_SPECULATIVE_PROFILE phase=hidden_extract rows=%d us=%lld\n",
@@ -1634,7 +1642,9 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
             common_sampler_reset(smpls[seq_id].get());
 
             common_batch_add(batch, dp.id_last, dp.pos0, { seq_id }, true);
-            std::memcpy(batch.embd + (size_t) (batch.n_tokens - 1) * n_embd, pending_h[seq_id].data(), row_bytes);
+            if (!strict_hidden) {
+                std::memcpy(batch.embd + (size_t) (batch.n_tokens - 1) * n_embd, pending_h[seq_id].data(), row_bytes);
+            }
 
             i_last[seq_id] = batch.n_tokens - 1;
 
@@ -1644,6 +1654,8 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
         }
 
         int i = 0;
+        llama_hidden_state_span draft_span {};
+        if (strict_hidden && !llama_hidden_state_span_previous(params.ctx_tgt, &draft_span)) return;
 
         while (n_drafting > 0) {
             // each step decodes under a different head, i.e. a different decoder layer, and
@@ -1662,7 +1674,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                 llama_set_nextn_layer_offset(ctx_dft, i);
             }
 
-            int ret = llama_decode(ctx_dft, batch);
+            int ret = strict_hidden ? llama_decode_hidden(ctx_dft, batch, &draft_span) : llama_decode(ctx_dft, batch);
             if (ret != 0) {
                 SPC_ERR("llama_decode[%d] returned %d\n", i, ret);
                 break;
@@ -1681,7 +1693,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                 auto * smpl = smpls[seq_id].get();
 
                 common_sampler_sample(smpl, ctx_dft, i_last[seq_id], true);
-                const float * h_row = llama_get_embeddings_nextn_ith(ctx_dft, i_last[seq_id]);
+                const float * h_row = strict_hidden ? nullptr : llama_get_embeddings_nextn_ith(ctx_dft, i_last[seq_id]);
 
                 const auto * cur_p = common_sampler_get_candidates(smpl, true);
 
@@ -1733,7 +1745,11 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                     std::memcpy(batch.embd + (size_t) (batch.n_tokens - 1) * n_embd, h_row, row_bytes);
                 } else {
                     common_batch_add(batch, id, dp.pos0 + i + 1, { seq_id }, true);
-                    std::memcpy(batch.embd + (size_t) (batch.n_tokens - 1) * n_embd, h_row, row_bytes);
+                    if (strict_hidden) {
+                        if (!llama_hidden_state_span_current(ctx_dft, (uint32_t) dp.pos0 + i + 1, 1, &draft_span)) return;
+                    } else {
+                        std::memcpy(batch.embd + (size_t) (batch.n_tokens - 1) * n_embd, h_row, row_bytes);
+                    }
                 }
 
                 i_last[seq_id] = batch.n_tokens - 1;
@@ -1762,6 +1778,19 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
         }
     }
 
+    bool can_handoff_contexts(llama_context * dst_tgt, llama_context * dst_dft,
+            llama_context * src_tgt, llama_context * src_dft) const override {
+        return strict_hidden && params.ctx_tgt == src_tgt && params.ctx_dft == src_dft && dst_tgt && dst_dft &&
+            llama_is_handoff_strict(dst_tgt) && llama_is_handoff_strict(dst_dft);
+    }
+
+    void handoff_contexts(llama_context * dst_tgt, llama_context * dst_dft) noexcept override {
+        params.ctx_tgt = dst_tgt;
+        params.ctx_dft = dst_dft;
+        std::fill(verify_h_rows.begin(), verify_h_rows.end(), 0);
+        std::fill(verify_pos_first.begin(), verify_pos_first.end(), -1);
+    }
+
     void accept(llama_seq_id seq_id, uint16_t n_accepted, bool /*is_other*/) override {
         if (seq_id < 0 || seq_id >= (llama_seq_id) n_seq) {
             return;
@@ -1773,8 +1802,14 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
         }
 
         const int32_t i_h = std::min<int32_t>(n_accepted, n_rows - 1);
-        const size_t row_bytes = (size_t) n_embd * sizeof(float);
-        std::memcpy(pending_h[seq_id].data(), verify_h[seq_id].data() + (size_t) i_h * n_embd, row_bytes);
+        if (strict_hidden) {
+            if (verify_pos_first[seq_id] < 0 || !llama_hidden_state_select(params.ctx_tgt, (uint32_t) verify_pos_first[seq_id] + i_h + 1)) {
+                SPC_ERR("invalid strict MTP accept row for seq_id=%d\n", (int) seq_id);
+            }
+        } else {
+            const size_t row_bytes = (size_t) n_embd * sizeof(float);
+            std::memcpy(pending_h[seq_id].data(), verify_h[seq_id].data() + (size_t) i_h * n_embd, row_bytes);
+        }
     }
 };
 
@@ -2561,10 +2596,21 @@ common_speculative_init_result::common_speculative_init_result(
     // the draft context holds as many tokens per sequence as the target context
     cparams.n_ctx = llama_n_ctx(ctx_tgt);
 
+    // MTP prompt catch-up is already split by the draft context's microbatch size.
+    // Keep enough rows to amortize dispatch while avoiding a second target-sized compute graph.
+    if (spec_mtp) {
+        cparams.n_ubatch = std::min(cparams.n_ubatch, COMMON_SPECULATIVE_MTP_UBATCH_MAX);
+    }
+
     // note: for small models maybe we can set this to the maximum possible draft from all speculative types
     //       the extra memory for small models is likely negligible?
     cparams.n_rs_seq  = 0;
-    cparams.ctx_other = ctx_tgt;
+    if (spec_mtp && llama_is_handoff_strict(ctx_tgt)) {
+        cparams.kv_handoff_strict = true;
+        cparams.ctx_other = nullptr;
+    } else {
+        cparams.ctx_other = ctx_tgt;
+    }
 
     std::string model_path;
     if (has_draft) {
@@ -2917,6 +2963,21 @@ void common_speculative_draft(common_speculative * spec) {
             dp.drafting = false;
         }
     }
+}
+
+bool common_speculative_handoff_cpu(
+        common_speculative * spec,
+        llama_context * dst_tgt, llama_context * dst_mtp,
+        llama_context * src_tgt, llama_context * src_mtp,
+        llama_kv_handoff_result * result) {
+    if (result) *result = {};
+    if (!spec || spec->impls.size() != 1 ||
+        !spec->impls[0]->can_handoff_contexts(dst_tgt, dst_mtp, src_tgt, src_mtp)) return false;
+    llama_kv_handoff_result value {};
+    if (!llama_kv_handoff_cpu_mtp(dst_tgt, dst_mtp, src_tgt, src_mtp, &value)) return false;
+    spec->impls[0]->handoff_contexts(dst_tgt, dst_mtp);
+    if (result) *result = value;
+    return true;
 }
 
 void common_speculative_accept(common_speculative * spec, llama_seq_id seq_id, uint16_t n_accepted) {

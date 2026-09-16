@@ -1,6 +1,7 @@
 #pragma once
 
 #include "llama.h"
+#include "llama-hidden-state.h"
 
 #include <cstdint>
 #include <vector>
@@ -65,4 +66,7 @@ struct llama_cparams {
     void * cb_eval_user_data;
 
     llama_context * ctx_other;
+
+    llama_hidden_state_ptr hidden_state_read;
+    llama_hidden_state_ptr hidden_state_write;
 };

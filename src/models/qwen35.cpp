@@ -206,7 +206,11 @@ llama_model_qwen35::graph::graph(const llama_model & model, const llm_graph_para
     cur = build_norm(cur, model.output_norm, nullptr, LLM_NORM_RMS, -1);
 
     cb(cur, "h_nextn", -1);
-    res->t_h_nextn = cur;
+    if (hidden_state_write) {
+        build_hidden_state_write(cur);
+    } else {
+        res->t_h_nextn = cur;
+    }
 
     if (!cparams.embeddings_nextn_masked && inp_out_ids) {
         cur = ggml_get_rows(ctx0, cur, inp_out_ids);
@@ -524,11 +528,15 @@ llama_model_qwen35::graph_mtp::graph_mtp(const llama_model & model, const llm_gr
     }
     cb(tok_embd, "mtp_tok_embd", il);
 
-    inp->h = ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, hparams.n_embd, n_tokens);
-    ggml_set_input(inp->h);
-    ggml_set_name(inp->h, "mtp_h_input");
-
-    ggml_tensor * h_embd = inp->h;
+    ggml_tensor * h_embd;
+    if (ubatch.hidden_span) {
+        h_embd = build_hidden_state_read();
+    } else {
+        inp->h = ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, hparams.n_embd, n_tokens);
+        ggml_set_input(inp->h);
+        ggml_set_name(inp->h, "mtp_h_input");
+        h_embd = inp->h;
+    }
 
     res->add_input(std::move(inp));
 
@@ -628,7 +636,11 @@ llama_model_qwen35::graph_mtp::graph_mtp(const llama_model & model, const llm_gr
     cur = build_norm(cur, head_norm_w, nullptr, LLM_NORM_RMS, -1);
 
     cb(cur, "h_nextn", -1);
-    res->t_h_nextn = cur;
+    if (hidden_state_write) {
+        build_hidden_state_write(cur);
+    } else {
+        res->t_h_nextn = cur;
+    }
 
     cur = ggml_get_rows(ctx0, cur, inp_out_ids);
     cb(cur, "mtp_shared_head_norm", -1);

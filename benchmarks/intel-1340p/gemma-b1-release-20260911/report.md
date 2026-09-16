@@ -1,5 +1,7 @@
 # Gemma B1 release hold and CPU attribution
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 **B0-score3 stays in production.** The CPU save/restore repair passes the exact failing sequence on B0 and B1, but combined-release staging exceeded the worker swap limit during GPU startup. No cutover occurred. The bounded 17-step plan closes with this hold and no new optimisation candidate.
 
 ## Save/restore cause and repair

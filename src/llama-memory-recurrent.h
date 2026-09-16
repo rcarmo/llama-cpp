@@ -24,7 +24,8 @@ public:
                      uint32_t   mem_size,
                      uint32_t   n_seq_max,
                      uint32_t   n_rs_seq,
-        const layer_filter_cb & filter);
+        const layer_filter_cb & filter,
+        const llama_memory_init & init = {});
 
     ~llama_memory_recurrent() = default;
 
@@ -78,6 +79,12 @@ public:
 
     void set_rs_idx(llama_seq_id seq_id, uint32_t idx);
 
+    llama_memory_transfer_ptr prepare_handoff(llama_memory_i &, const llama_memory_view_cb &, bool, size_t &, size_t &) override;
+    bool handoff_begin_compute() override;
+    void handoff_end_compute(const llama_ubatch &, bool) override;
+    bool handoff_state_valid() const;
+
+
     // computed before each graph build
     uint32_t n = 0;
 
@@ -122,6 +129,14 @@ private:
 
     // ggml contexts for the KV cache along with the allocated backend buffers:
     std::vector<std::pair<ggml_context_ptr, ggml_backend_buffer_ptr>> ctxs_bufs;
+
+    struct handoff;
+    bool handoff_strict = false;
+    bool handoff_deferred = false;
+    bool handoff_committed = true;
+    uint32_t handoff_valid_depth = 0;
+    uint64_t handoff_generation = 0;
+    std::vector<ggml_backend_buffer_ptr> handoff_buffers;
 
     size_t total_size() const;
 

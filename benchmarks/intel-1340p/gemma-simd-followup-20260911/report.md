@@ -1,5 +1,7 @@
 # SIMD follow-up: both candidates slower, B0 retained
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Neither new SIMD candidate improved the saved64K workload. Score3 no-unroll reduced generation speed by **1.65%**; the packed-Q4 streamed-dot candidate reduced it by **4.15%**. Both passed their numerical controls, but neither proceeds to independent confirmation or deployment. The earlier **+3.124% score3 improvement remains deployed**.
 
 ## Matched screens

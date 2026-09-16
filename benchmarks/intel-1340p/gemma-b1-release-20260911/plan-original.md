@@ -1,6 +1,6 @@
 # Original Gemma B1 release-readiness and attribution plan
 
-Reset requested on 11 September 2026 at15:34UTC. This turn changes planning documents only; no maintenance, benchmark or deployment starts. The completed18-step attention plan is preserved in [its dated archive](gemma-attention-plan-archive-20260911-1534.md). The earlier30-item archive remains linked there.
+Reset requested on 11 September 2026 at15:34UTC. This turn changes planning documents only; no maintenance, benchmark or deployment starts. The completed 18-step attention plan and its earlier 30-item archive were retained in the source workspace but are not included in this export.
 
 ## Starting position
 

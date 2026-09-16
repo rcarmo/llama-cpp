@@ -106,6 +106,15 @@ llama_context::llama_context(
         throw std::runtime_error("n_seq_max must be <= " + std::to_string(LLAMA_MAX_SEQ));
     }
 
+    kv_handoff_strict = params.kv_handoff_strict || params.kv_handoff_destination;
+    kv_handoff_pending = params.kv_handoff_destination;
+    if (kv_handoff_strict && (model.arch != LLM_ARCH_QWEN35 || cparams.n_seq_max != 1 ||
+        (params.ctx_type != LLAMA_CONTEXT_TYPE_DEFAULT && params.ctx_type != LLAMA_CONTEXT_TYPE_MTP) || params.ctx_other || hparams.no_alloc ||
+        model.shared_residency_enabled() || hparams.swa_type != LLAMA_SWA_TYPE_NONE ||
+        (params.ctx_type == LLAMA_CONTEXT_TYPE_MTP && cparams.n_rs_seq != 0) ||
+        (kv_handoff_pending && (model.n_gpu_layers() != 0 || params.offload_kqv || params.op_offload)))) {
+        throw std::runtime_error("unsupported strict Qwen handoff context");
+    }
     cparams.n_rs_seq = params.n_rs_seq;
     if (cparams.n_rs_seq > 0 && !llm_arch_supports_rs_rollback(model.arch)) {
         LLAMA_LOG_DEBUG("%s: n_rs_seq=%u requested but model does not support recurrent partial rollback; clamping to 0\n",
@@ -310,6 +319,14 @@ llama_context::llama_context(
         }
     }
 
+    if (kv_handoff_strict) {
+        hidden_state_write = std::make_shared<llama_hidden_state_storage>();
+        hidden_state_write->n_embd = hparams.n_embd_out();
+        hidden_state_write->n_rows = cparams.n_ctx + 1;
+        hidden_state_write->deferred = kv_handoff_pending;
+        cparams.hidden_state_write = hidden_state_write;
+    }
+
     LLAMA_LOG_INFO("%s: n_seq_max             = %u\n",   __func__, cparams.n_seq_max);
     LLAMA_LOG_INFO("%s: n_ctx                 = %u\n",   __func__, cparams.n_ctx);
     LLAMA_LOG_INFO("%s: n_ctx_seq             = %u\n",   __func__, cparams.n_ctx_seq);
@@ -377,6 +394,25 @@ llama_context::llama_context(
 
         llama_set_abort_callback(this, params.abort_callback, params.abort_callback_data);
 
+        if (kv_handoff_strict && !kv_handoff_pending) {
+            if (hidden_state_write->n_embd > SIZE_MAX / hidden_state_write->n_rows / sizeof(float)) {
+                throw std::runtime_error("strict hidden-state size overflow");
+            }
+            const size_t bytes = (size_t) hidden_state_write->n_embd * hidden_state_write->n_rows * sizeof(float);
+            for (const auto & backend : backends) {
+                auto * dev = ggml_backend_get_device(backend.get());
+                if (!dev) continue;
+                using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
+                auto fn = (alloc_fn) ggml_backend_reg_get_proc_address(ggml_backend_dev_backend_reg(dev), "ggml_backend_vk_alloc_cpu_shared_buffer");
+                if (fn) {
+                    hidden_state_write->buffer.reset(fn(backend.get(), bytes));
+                    if (hidden_state_write->buffer) break;
+                }
+            }
+            if (!hidden_state_write->buffer) throw std::runtime_error("strict shared hidden-state allocation unavailable");
+            ggml_backend_buffer_clear(hidden_state_write->buffer.get(), 0);
+        }
+
         // graph outputs buffer
         {
             if (output_reserve(params.n_seq_max) < params.n_seq_max) {
@@ -397,10 +433,24 @@ llama_context::llama_context(
             /*.swa_full  =*/ params.swa_full,
             /*.ctx_type  =*/ cparams.ctx_type,
             /*.mem_other =*/ llama_get_memory(cparams.ctx_other),
+            /*.init      =*/ {},
         };
 
+        params_mem.init.strict = kv_handoff_strict;
+        params_mem.init.deferred = kv_handoff_pending;
+        params_mem.init.alloc = [&](ggml_backend_buffer_type_t buft, size_t size) -> ggml_backend_buffer_t {
+            using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
+            for (const auto & backend : backends) {
+                if (ggml_backend_get_default_buffer_type(backend.get()) != buft) continue;
+                auto * dev = ggml_backend_get_device(backend.get());
+                if (!dev) continue;
+                auto fn = (alloc_fn) ggml_backend_reg_get_proc_address(ggml_backend_dev_backend_reg(dev), "ggml_backend_vk_alloc_cpu_shared_buffer");
+                if (fn) return fn(backend.get(), size);
+            }
+            return nullptr;
+        };
         memory.reset(model.create_memory(params_mem, cparams));
-        if (memory && params.kv_cpu_shared) {
+        if (memory && params.kv_cpu_shared && !kv_handoff_strict) {
             memory->init_cpu_shared([&](ggml_backend_buffer_type_t buft, size_t size) -> ggml_backend_buffer_t {
                 using alloc_fn = ggml_backend_buffer_t (*)(ggml_backend_t, size_t);
                 for (const auto & backend : backends) {
@@ -508,9 +558,10 @@ llama_context::~llama_context() {
     synchronize();
     model.unregister_residency_context(this);
     if (kv_borrowed_from) --kv_borrowed_from->kv_borrowers;
+    if (hidden_state_peer_owner) --hidden_state_peer_owner->hidden_state_peer_count;
 
     // when training, ggml_opt allocates extra buffers through the scheduler, so the sizes no longer match the expectation
-    if (!model.hparams.no_alloc && !opt_ctx) {
+    if (!model.hparams.no_alloc && !opt_ctx && sched) {
         for (size_t i = 0; i < backend_ptrs.size(); ++i) {
             ggml_backend_t             backend = backend_ptrs[i];
             ggml_backend_buffer_type_t buft    = backend_buft[i];
@@ -607,7 +658,7 @@ void llama_context::resolve_fused_ops(const llama_memory_context_i * mctx, uint3
 }
 
 void llama_context::sched_reserve() {
-    if (!sched_need_reserve) {
+    if (kv_handoff_pending || !sched_need_reserve) {
         return;
     }
 
@@ -843,7 +894,23 @@ uint32_t llama_context::n_threads_batch() const {
 }
 
 llama_memory_t llama_context::get_memory() const {
-    return kv_consumed ? nullptr : memory.get();
+    return kv_consumed || kv_handoff_pending ? nullptr : memory.get();
+}
+
+bool llama_context::is_handoff_strict() const {
+    return kv_handoff_strict;
+}
+
+bool llama_context::set_hidden_state_peer(llama_context * peer) {
+    if (!kv_handoff_strict || kv_handoff_pending || cparams.ctx_type != LLAMA_CONTEXT_TYPE_MTP || !peer ||
+        !peer->kv_handoff_strict || peer->kv_handoff_pending || peer->model.arch != model.arch ||
+        peer->hidden_state_write->n_embd != model.hparams.n_embd_out()) return false;
+    if (hidden_state_peer_owner) --hidden_state_peer_owner->hidden_state_peer_count;
+    hidden_state_peer_owner = peer;
+    ++peer->hidden_state_peer_count;
+    hidden_state_peer = peer->hidden_state_write;
+    cparams.hidden_state_read = hidden_state_peer;
+    return true;
 }
 
 bool llama_context::memory_update(bool optimize) {
@@ -1400,6 +1467,17 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
         ret = GGML_STATUS_ALLOC_FAILED;
         return nullptr;
     }
+    struct strict_compute_guard {
+        llama_memory_i * mem;
+        const llama_ubatch & batch;
+        bool success = false;
+        ~strict_compute_guard() { if (mem) mem->handoff_end_compute(batch, success); }
+    } strict_guard { kv_handoff_strict && mctx ? memory.get() : nullptr, ubatch };
+    if (strict_guard.mem && !strict_guard.mem->handoff_begin_compute()) {
+        strict_guard.mem = nullptr;
+        ret = GGML_STATUS_FAILED;
+        return nullptr;
+    }
     if (mctx && !mctx->apply()) {
         LLAMA_LOG_ERROR("%s: failed to apply memory context\n", __func__);
         ret = GGML_STATUS_FAILED;
@@ -1460,6 +1538,10 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
     }
 
     const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1);
+    if (strict_guard.mem) {
+        synchronize();
+        strict_guard.success = status == GGML_STATUS_SUCCESS;
+    }
     if (status != GGML_STATUS_SUCCESS) {
         LLAMA_LOG_ERROR("%s: failed to compute graph, compute status: %d\n", __func__, status);
         ret = status;
@@ -1472,7 +1554,7 @@ llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, ll
 }
 
 int llama_context::encode(const llama_batch & batch_inp) {
-    if (kv_consumed) return -1;
+    if (kv_consumed || kv_handoff_pending) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -1712,8 +1794,37 @@ static bool needs_raw_logits(const llama_ubatch & ubatch, const std::map<llama_s
     return false; // all sequences use backend sampling
 }
 
+int llama_context::decode_hidden(const llama_batch & batch_inp, const llama_hidden_state_span & span) {
+    if (!kv_handoff_strict || kv_handoff_pending || cparams.ctx_type != LLAMA_CONTEXT_TYPE_MTP || !cparams.hidden_state_read) return -1;
+    auto storage = span.storage == hidden_state_peer.get() ? hidden_state_peer :
+        span.storage == hidden_state_write.get() ? hidden_state_write : llama_hidden_state_ptr();
+    if (!storage || span.generation != storage->generation || span.n_rows != (uint32_t) batch_inp.n_tokens ||
+        span.row > storage->valid_rows || span.n_rows > storage->valid_rows - span.row) return -1;
+    cparams.hidden_state_read = std::move(storage);
+    struct span_guard {
+        bool & active;
+        ~span_guard() { active = false; }
+    } guard { hidden_state_decode_active };
+    hidden_state_decode_span = span;
+    hidden_state_decode_active = true;
+    return decode(batch_inp);
+}
+
+bool llama_context::hidden_state_span_current(uint32_t row, uint32_t n_rows, llama_hidden_state_span & span) const {
+    return llama_hidden_state_span_make(hidden_state_write, row, n_rows, span);
+}
+
+bool llama_context::hidden_state_span_previous(llama_hidden_state_span & span) const {
+    if (!hidden_state_write || hidden_state_write->valid_rows == 0) return false;
+    return hidden_state_span_current(hidden_state_write->selected_row, 1, span);
+}
+
+bool llama_context::hidden_state_select(uint32_t row) {
+    return llama_hidden_state_select_row(hidden_state_write, row);
+}
+
 int llama_context::decode(const llama_batch & batch_inp) {
-    if (kv_consumed) return -1;
+    if (kv_consumed || kv_handoff_pending) return -1;
     auto residency_lock = model.shared_residency_enabled()
         ? model.lock_residency() : std::unique_lock<std::recursive_mutex>();
     // MTP hook batches carry both token (next-token id) and embd (h_nextn row),
@@ -1776,7 +1887,8 @@ int llama_context::decode(const llama_batch & batch_inp) {
         }
     }
 
-    if (!balloc->init(batch_inp, vocab, memory.get(), n_embd, n_seq_max, output_all)) {
+    if (!balloc->init(batch_inp, vocab, memory.get(), n_embd, n_seq_max, output_all,
+            hidden_state_decode_active ? &hidden_state_decode_span : nullptr)) {
         LLAMA_LOG_ERROR("%s: failed to initialize batch\n", __func__);
         return -1;
     }
@@ -1899,6 +2011,12 @@ int llama_context::decode(const llama_batch & batch_inp) {
         ggml_status status;
 
         const auto * res = process_ubatch(ubatch, ctx_type_to_graph_type(cparams.ctx_type), mctx.get(), status);
+
+        if (res && kv_handoff_strict && hidden_state_write) {
+            const uint32_t last = (uint32_t) ubatch.pos[ubatch.n_tokens - 1] + 2;
+            hidden_state_write->valid_rows = std::max(hidden_state_write->valid_rows, last);
+            hidden_state_write->selected_row = last - 1;
+        }
 
         if (!res) {
             // the last ubatch failed or was aborted -> remove all positions of that ubatch from the memory module
@@ -3729,6 +3847,8 @@ llama_context_params llama_context_default_params() {
         /*.op_offload                  =*/ true,
         /*.sched_async_cpu             =*/ false,
         /*.kv_cpu_shared               =*/ false,
+        /*.kv_handoff_strict           =*/ false,
+        /*.kv_handoff_destination      =*/ false,
         /*.swa_full                    =*/ true,
         /*.kv_unified                  =*/ false,
         /*.sampler                     =*/ nullptr,
@@ -3881,6 +4001,10 @@ uint32_t llama_n_rs_seq(const llama_context * ctx) {
     return ctx->get_cparams().n_rs_seq;
 }
 
+bool llama_is_handoff_strict(const llama_context * ctx) {
+    return ctx && ctx->is_handoff_strict();
+}
+
 const llama_model * llama_get_model(const llama_context * ctx) {
     return &ctx->get_model();
 }
@@ -3988,6 +4112,26 @@ llama_memory_t llama_get_memory(const struct llama_context * ctx) {
     }
 
     return ctx->get_memory();
+}
+
+bool llama_set_hidden_state_peer(llama_context * ctx, llama_context * peer) {
+    return ctx && ctx->set_hidden_state_peer(peer);
+}
+
+bool llama_hidden_state_span_current(llama_context * ctx, uint32_t row, uint32_t n_rows, llama_hidden_state_span * span) {
+    return ctx && span && ctx->hidden_state_span_current(row, n_rows, *span);
+}
+
+bool llama_hidden_state_span_previous(llama_context * ctx, llama_hidden_state_span * span) {
+    return ctx && span && ctx->hidden_state_span_previous(*span);
+}
+
+bool llama_hidden_state_select(llama_context * ctx, uint32_t row) {
+    return ctx && ctx->hidden_state_select(row);
+}
+
+int32_t llama_decode_hidden(llama_context * ctx, llama_batch batch, const llama_hidden_state_span * span) {
+    return ctx && span ? ctx->decode_hidden(batch, *span) : -1;
 }
 
 float * llama_get_embeddings_nextn(llama_context * ctx) {

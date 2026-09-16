@@ -1,5 +1,7 @@
 # Small Gemma target batches:16.52% faster64K decode, deployed
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Selecting the8-thread decode pool for CPU Gemma target batches of at most four tokens improved median64K generation from **7.3035 to8.5099 tok/s (+16.52%)** across eight counterbalanced runs. Request time fell **13.48%**. Large prefill still uses16 threads; the assistant is unchanged.
 
 The qualified candidate is deployed on the existing hybrid8091 endpoint in immutable release `20260910-smallbatch`. Final smoke passed at22:56:31UTC on10September2026: supervisor639650, CPU639670, no restarts, zero CPU swap. GPU prefill remains the previously deployed FP32/256 configuration.

@@ -3026,7 +3026,10 @@ private:
                 const bool use_ckpt_tgt = force_spec_ckpt_for_test || ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
                 const bool use_ckpt_dft = force_spec_ckpt_for_test || ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL;
 
-                const int n_draft_max = slot.get_n_draft_max();
+                int n_draft_max = slot.get_n_draft_max();
+                if (llama_is_handoff_strict(ctx_tgt)) {
+                    n_draft_max = std::min(n_draft_max, (int) llama_n_rs_seq(ctx_tgt));
+                }
 
                 if (n_draft_max > 0) {
                     GGML_ASSERT(slot.can_speculate());
@@ -3093,9 +3096,9 @@ private:
             }
 
             if (!draft.empty()) {
-                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
+                const bool use_ckpt_tgt = !llama_is_handoff_strict(ctx_tgt) && (force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
-                   (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_tgt));
+                   (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_tgt)));
 
                 const bool use_ckpt_dft = force_spec_ckpt_for_test ||
                    (ctx_dft_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && draft.size() > llama_n_rs_seq(ctx_dft));
@@ -3956,9 +3959,9 @@ private:
 
                 const uint32_t n_rollback = slot.spec_draft.size() + 1 - accepted.size();
 
-                const bool use_ckpt_tgt = force_spec_ckpt_for_test ||
+                const bool use_ckpt_tgt = !llama_is_handoff_strict(ctx_tgt) && (force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
-                    (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && n_rollback > llama_n_rs_seq(ctx_tgt));
+                    (ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_RS && n_rollback > llama_n_rs_seq(ctx_tgt)));
 
                 // check for partial draft acceptance
                 if (n_rollback > 0) {

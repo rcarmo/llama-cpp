@@ -118,9 +118,9 @@ Qwen3.6 `UD-Q2_K_XL` is the preferred candidate of the two for this host. Its ad
 
 Qwen3.8 `UD-Q4_K_XL` achieved one additional API corpus pass and loaded its embedded Dynamic MTP layer correctly. Its speed, memory use and thermal behaviour make it unsuitable as the default local provider on this host.
 
-## Restored state
+## Restored state on 3 September 2026
 
-Ornith is enabled, active and healthy on port 8095. Its process reports 0 KiB `VmSwap`. `/dev/zram0` is active at 8 GiB, priority 100, with 0 bytes used. Qwen3.8, Qwen3.6, Gemma and Maple provider services are disabled and inactive.
+The campaign restored Ornith as active and healthy on port 8095. Its process reported 0 KiB `VmSwap`. `/dev/zram0` was active at 8 GiB, priority 100, with 0 bytes used. Qwen3.8, Qwen3.6, Gemma and Maple provider services were disabled and inactive. The [current Sigma service](../../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md) is Gemma zero-copy.
 
 ## Result locations
 

@@ -1,5 +1,7 @@
 > Bounded 20-step plan closed. B0-score3 remains deployed. Completed means the step's experiment or conditional decision is closed, not that every proposed gate passed. Near128K, broad long quality and production prompt-cache pressure remain unqualified. Original test definitions: README.md; append-only outcomes: baselines.md; prior38items: previous-plan.md.
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 - [x] Reset: archived38items and adopted verified B0-score3-stopped. No benchmarks repeated for reset; exact hashes/argv/flags and rollback distinction retained.
 - [x] T01: frozen target/assistant/model/state inputs, tested parser/guards/owned cleanup, pinned current restoration target. Live quality-worker maps captured; missing profiler maps retained as a limit.
 - [x] T02: normaliseTags/chunk two seeds each, retrieval2/2 and tool rounds8/8 pass with sandbox controls. Original mergeIntervals export failures retained. Short baseline only.

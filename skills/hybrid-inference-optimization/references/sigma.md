@@ -6,8 +6,8 @@ This is a host-specific reference, not a universal performance recommendation. C
 
 - Sigma: Intel i5-1340P, Iris Xe, approximately 31 GiB usable shared RAM; observed PCI vendor/device `8086:a7a0`.
 - P-core logical CPUs 0-7, E-core logical CPUs 8-15. Verify current topology and worker placement; process masks alone do not establish OpenMP thread affinity.
-- Gemma E4B QAT Q4_0 target, Q8_0 MTP assistant. The retained CPU profile has decode 8 / prefill 16 threads, MTP depth 3, batch/microbatch 1024/256, F16 KV, FA off, compact SWA and two 131072-token slots.
-- The source checkout, experimental candidate and retained service binary can be different revisions. Record loaded-library hashes and exact argv.
+- The deployed Gemma service uses the E4B QAT Q4_0 target, Q8_0 MTP assistant, one 32,768-token slot, Vulkan batch/microbatch 256/256, CPU decode/prefill threads 8/16, MTP depth 3, F16 K/V and Flash Attention off. It retains CPU and Vulkan model owners, creates a fresh Vulkan context for each cold conversation, hands K/V to CPU in process and streams prompt progress plus generated deltas on port 8094.
+- The historical file-mediated CPU profile used batch/microbatch 1024/256, compact SWA and two 131,072-token slots. It is disabled. The source checkout, experimental candidate and retained service binary can be different revisions. Record loaded-library hashes and exact argv.
 
 ## Approved campaign controls, 10 September 2026
 
@@ -16,7 +16,7 @@ This is a host-specific reference, not a universal performance recommendation. C
 - Maintain at least 6 GiB available RAM and at most 16 MiB swap per trial process. Stop only experiments if speech/native work begins. These are the campaign's limits, not automatic permission for future maintenance.
 - Temperatures at or above 95 C are annotations under this campaign's approval. Preserve hardware throttling/protection and record thermal context.
 - Production Gemma may be stopped only within the approved maintenance window. Use a bounded systemd user unit/process group and `ExecStopPost` restoration; containers need explicit trial ownership and cleanup too.
-- Verify original binary/config/unit/library identity, health, two slots, tools, growing-prefix cache and process swap after restoration. Do not deploy a hybrid route implicitly.
+- For dated file-mediated experiments, verify the saved binary/config/unit/library identity, two slots, tools and growing-prefix cache against that campaign's restoration record. For current maintenance, restore `llama-gemma-zero-copy.service` and `llama-gemma-lan-test.socket`, then verify the resident Vulkan model, one slot, live stream progress, tools, append reuse, positive shared bytes, zero copied bytes and zero cgroup swap.
 
 ## Scoring and interpretation
 
@@ -54,4 +54,4 @@ Historical local campaign roots under the workspace `reports/`:
 - `gemma-context-coding-20260910`: aligned compact-SWA state conversion, 64K recall and counterbalanced coding.
 - `gemma-hybrid-perf-20260910`: CPU/attention/batch/split-K screens, confirmed tails, fresh64K finalist, retained opportunities and review notes.
 
-Version-controlled exports belong under `benchmarks/intel-1340p/`, with source manifests and explicit experimental/deployed status. Large slot files and runtimes stay local. Re-read current reports before quoting a dated number as the latest best result.
+Version-controlled exports belong under `benchmarks/intel-1340p/`, with source manifests and explicit experimental/deployed status. Large slot files and runtimes stay local. The current deployment record is `benchmarks/intel-1340p/gemma-zero-copy-service-20260915/`; dated 10-11 September reports preserve historical deployment state and are not restoration instructions for the current service.

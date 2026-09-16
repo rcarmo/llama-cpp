@@ -20,6 +20,7 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## 2026-08 Maple and Ornith/Gemma
 
+* [Gemma and Ornith agentic comparison, 22 August 2026](gemma-ornith-agentic-20260822/) -- matched direct API and real Pi tasks with latency, memory, swap, thermal and blind-review evidence.
 * [ornith-gemma-optimization/](ornith-gemma-optimization/)
 * [maple-preview/](maple-preview/)
 * [maple-qwen-campaign/](maple-qwen-campaign/)
@@ -28,6 +29,8 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 * [qwen35moe-overlap/](qwen35moe-overlap/)
 
 ## 2026-09-10 and 2026-09-11 Gemma series
+
+These directories freeze the file-mediated CPU/GPU service and decoder deployments as observed on 10-11 September. Their present-tense deployment statements are historical snapshots. The [15 September zero-copy service record](gemma-zero-copy-service-20260915/README.md) supersedes their operating state and rollback targets.
 
 * [gemma-hybrid-perf-20260910/](gemma-hybrid-perf-20260910/)
 * [gemma-context-coding-20260910/](gemma-context-coding-20260910/)
@@ -68,5 +71,10 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 * [xe-long-agentic-v2-20260914/](xe-long-agentic-v2-20260914/)
 * [xe-master-agentic-20260914/](xe-master-agentic-20260914/)
 * [xe-zero-copy-throughput-20260914/](xe-zero-copy-throughput-20260914/)
+
+## 2026-09-15 Gemma service and Qwen3.8 memory
+
+* [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- current in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
+* [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.
 
 These directories mix curated `README.md` or `report.md` pages with raw JSON, stdout captures and scripts. Read the per-directory README first when one exists.

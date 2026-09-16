@@ -79,12 +79,14 @@ llama_kv_cache::llama_kv_cache(
     const layer_filter_cb & filter,
     const  layer_reuse_cb & reuse,
     const  layer_share_cb & share,
-             const char *   name_tag) :
+        const char * name_tag,
+        const llama_memory_init & init) :
     model(model), hparams(hparams), v_trans(v_trans),
     n_seq_max(n_seq_max), n_stream(unified ? 1 : n_seq_max), n_pad(n_pad), n_swa(n_swa), swa_type(swa_type),
     other(static_cast<llama_kv_cache *>(mem_other)),
     v_cells_impl(other ? other->v_cells_impl : std::make_shared<llama_kv_cells_vec>()),
     v_cells(*v_cells_impl) {
+    handoff_deferred = init.deferred;
 
     // shared cells view the source cache's K/V tensors, so the cell count
     // follows the source allocation: a fitted target can be smaller than the
@@ -284,6 +286,10 @@ llama_kv_cache::llama_kv_cache(
 
     // allocate tensors and initialize the buffers to avoid NaNs in the padding
     for (auto & [buft, ctx] : ctx_map) {
+        if (init.deferred) {
+            ctxs_bufs.emplace_back(std::move(ctx), nullptr);
+            continue;
+        }
         ggml_backend_buffer_t buf;
         if (hparams.no_alloc) {
             buf = ggml_backend_buft_alloc_buffer(buft, /*size =*/ 0); // dummy buffer
@@ -291,7 +297,7 @@ llama_kv_cache::llama_kv_cache(
                 t->buffer = buf; // set dummy buffer for KV cache so that the backend scheduler won't try to allocate it
             }
         } else {
-            buf = ggml_backend_alloc_ctx_tensors_from_buft(ctx.get(), buft); // real buffer
+            buf = llama_memory_alloc(ctx.get(), buft, init);
         }
         if (!buf) {
             throw std::runtime_error("failed to allocate buffer for kv cache");
@@ -1253,6 +1259,12 @@ ggml_tensor * llama_kv_cache::get_k_storage(int32_t il) const {
     const int32_t ikv = map_layer_ids.at(il);
 
     return layers[ikv].k;
+}
+
+ggml_tensor * llama_kv_cache::get_v_storage(int32_t il) const {
+    const int32_t ikv = map_layer_ids.at(il);
+
+    return layers[ikv].v;
 }
 
 const llama_kv_cells & llama_kv_cache::get_cells(llama_seq_id seq_id) const {

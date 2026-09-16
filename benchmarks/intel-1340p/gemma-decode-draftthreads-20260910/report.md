@@ -1,5 +1,7 @@
 # Independent MTP draft threads: retain8
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Reducing only the MTP assistant's decode threads from8 to4 made64K generation **4.10% slower**: median **8.505 to8.156 tok/s** across eight counterbalanced runs. Request wall time increased3.46%. Keep the deployed8-thread draft setting.
 
 This is a new independent factor. Earlier thread screens changed target and draft settings together; this comparison held the deployed target small-batch rule and both prefill pools fixed. No new binary or production setting was installed.

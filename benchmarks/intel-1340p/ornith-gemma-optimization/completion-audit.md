@@ -17,7 +17,7 @@ The Ornith/Gemma campaign and follow-up hardening are complete against the sessi
 | Near-capacity Gemma 128K | Passed | 124,112 prompt tokens, 44 generated, 22.49/4.49 tok/s, 29/42 accepted, 11,141 MiB peak PSS, 90 C peak |
 | Strict output/headroom/config acceptance | Passed | exact context/geometry/profile, frozen request hashes, reserved headroom, exactly one schema-valid `search_repository` call, MTP activity, no thermal marker |
 | Independent promotion/revert decisions | Passed | `final-decisions.json`; rejected source/SYCL/Vulkan/advice/chunk candidates remain archived or disabled |
-| Service profiles and rollback | Passed | both tracked candidate configs now use 128K/1024/256; Qwen remains deployed rollback baseline; no candidate service installed by campaign |
+| Service profiles and rollback | Passed | both tracked candidate configs used 128K/1024/256; Qwen was the deployed rollback baseline when the campaign ended; no candidate service was installed by the campaign |
 | Intel SYCL/Vulkan evaluation | Passed | isolated toolchain, device/correctness/model evidence, rejected deployment decision |
 | Final regression suite | Passed | `validation/final-hardening/result.txt`, semantic CTest, full native replays twice, batch/tail, recurrent rollback, forced checkpoint, live candidate checks, scripts/units/docs |
 

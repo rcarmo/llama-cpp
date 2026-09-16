@@ -1,0 +1,8 @@
+diff -ru /tmp/gemma-ornith-agentic-fixture-base-ornith/src/clamp.ts /tmp/gemma-ornith-agentic-fixture-ornith/src/clamp.ts
+--- /tmp/gemma-ornith-agentic-fixture-base-ornith/src/clamp.ts	2026-08-22 17:48:53.104236623 +0100
++++ /tmp/gemma-ornith-agentic-fixture-ornith/src/clamp.ts	2026-08-22 17:53:23.716374644 +0100
+@@ -1,3 +1,3 @@
+ export function clamp(value: number, min: number, max: number): number {
+-  return Math.max(min, value);
++  return Math.min(Math.max(min, value), max);
+ }

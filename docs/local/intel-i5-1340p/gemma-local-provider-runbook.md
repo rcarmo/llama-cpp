@@ -1,390 +1,288 @@
-# Gemma 4 E4B local Pi provider
+# Gemma 4 E4B zero-copy service on Sigma
 
-The user service `llama-gemma-local-provider.service` exposes Gemma 4 E4B through the OpenAI Chat Completions API on `127.0.0.1:8091`. Pi registers it as `local-gemma/gemma-4-e4b-qat-mtp`. The hosted default remains unchanged.
+The enabled Gemma service on `sigma` is `llama-gemma-zero-copy.service`. It listens on `127.0.0.1:18094` and is exposed without authentication on the trusted LAN at `http://192.168.1.70:8094/`. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
 
-## Deployed configuration
+## Current deployment
 
 | Item | Value |
 |---|---|
-| Pi provider/model | `local-gemma/gemma-4-e4b-qat-mtp` |
-| API | `openai-completions` |
-| Endpoint | `http://127.0.0.1:8091/v1` |
-| Context per request | 131,072 tokens |
-| Aggregate server context | 262,144 tokens |
-| Maximum output advertised by Pi | 32,768 tokens |
-| Concurrent slots | 2 independent KV streams |
-| Admission behaviour | 2 live requests; further requests enter llama.cpp's deferred queue |
-| Continuous batching | Enabled |
-| Prompt-state cache limit | 12,288 MiB, allocated on demand |
-| Idle-slot cache admission | Enabled |
-| Chunk-shift hint | 256 tokens; disabled by this Gemma context, not a cache-hit guarantee |
-| Decode / prefill threads | 8 / 16, for target and MTP assistant |
-| Requested decode / prefill CPU ranges | 0-7 / 0-15; OpenMP affinity limitation below |
-| MTP depth | 3 |
-| KV / Flash Attention | F16 / off |
-| Batch / microbatch | 1024 / 256 |
-| Context checkpoints | 32, spaced by at least 8,192 tokens |
-| Server socket timeout | 10,800 seconds |
-| Slot-state directory | `~/.cache/llama-candidates/gemma4/slots/` |
+| Model | Gemma 4 E4B QAT Q4_0 |
+| MTP assistant | Gemma 4 E4B assistant Q8_0 |
+| Service | `llama-gemma-zero-copy.service` |
+| Loopback API | `http://127.0.0.1:18094/v1` |
+| LAN UI and API | `http://192.168.1.70:8094/` |
+| Context | 32,768 tokens, one resident slot |
+| Maximum output | 2,048 tokens |
+| Admission | Serial, at most eight outstanding HTTP requests |
+| Cold prefill | Vulkan on Intel Iris Xe |
+| Generation | CPU target with MTP depth 3 |
+| K/V and Flash Attention | F16, Flash Attention off |
+| Batch / microbatch | 256 / 256 |
+| Decode / prefill threads | 8 / 16 |
+| Service memory limit | 16 GiB |
+| Service swap limit | 0 |
+| Streaming | Live SSE prompt progress plus parsed content, reasoning and tool-call deltas |
+| Authentication | None; trusted LAN only |
 
-`LLAMA_CTX=262144` is the total context for two non-unified streams. Each slot is 131,072 tokens, so Pi's model registry must retain `contextWindow: 131072`. The 32,768-token output cap is enforced by Pi's `models.json` entry; llama-server does not set a lower global generation cap.
+The service is workspace-coupled. The installed unit runs `tools/run-gemma-zero-copy-service.sh`; its environment file names the workspace build and GGUF paths. Moving, replacing or deleting these files changes the live service.
 
-Two requests execute concurrently. Three or four callers run in two-request waves. llama.cpp defers excess tasks until a slot is free; this build does not document a finite deferred-queue limit. Clients should set request deadlines and cancellation rules. `LLAMA_HTTP_TIMEOUT=10800` controls socket reads and writes; it is not a queue-admission deadline.
+Model identities:
 
-The service is workspace-coupled: the installed unit executes `tools/run-intel-candidate.sh`, while the environment file names the workspace build and GGUF files. Moving, rebuilding or deleting those paths changes the live service.
-
-Current deployment was verified on 6 September 2026. The prefill change retains the existing binary and both GGUFs; it does not deploy the experimental GPU handoff or async scheduling paths.
-
-Validated artefacts:
-
-| Artefact | Identity |
+| Artefact | SHA-256 |
 |---|---|
-| Deployed llama.cpp binary | `b10579-abdbeadfb`; retained during the September rollout |
-| Workspace source | merge `4e9740248`, including origin `8697affbf`; not the deployed binary revision |
-| Target GGUF | `gemma-4-E4B_q4_0-it.gguf`, SHA-256 `676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee` |
-| MTP assistant GGUF | `gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf`, SHA-256 `49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc` |
-| Original August Pi CLI validation | 0.83.0; not rerun during the September rollout |
+| `gemma-4-E4B_q4_0-it.gguf` | `676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee` |
+| `gemma-4-E4B-it-qat-assistant-MTP-Q8_0.gguf` | `49d8367f8e1a507ef6196a7eeed790b2797bc649568f431c10bce03f574f6ffc` |
 
-The model directory also contains an `mmproj` file, but this provider is registered for text input only and does not load it.
+The optional multimodal projector is not loaded. This deployment accepts text only.
 
-## Prefill tuning (6 September 2026)
+## Request lifecycle
 
-The installed profile sets `LLAMA_THREADS_BATCH=16` and `LLAMA_CPUS_BATCH=0-15`, retaining `LLAMA_THREADS=8`, `LLAMA_CPUS=0-7` and process affinity `0-15`. Both target and assistant use the separate batch-thread count. Profiles without batch overrides inherit their decode settings.
+The process loads CPU target, CPU assistant and Vulkan target model owners once at startup. A cold request then:
 
-The launcher converts the batch range to the assistant's hexadecimal CPU mask. This binary accepts `--spec-draft-cpu-mask-batch` but rejects `--spec-draft-cpu-range-batch` for the server. Verify both the generated arguments and the real parser without loading weights:
+1. creates a fresh Vulkan context from the resident Vulkan target model;
+2. renders and evaluates the chat prompt in that context;
+3. requires `shared_bytes > 0` and `copied_bytes == 0` from `llama_kv_handoff_cpu`;
+4. destroys the consumed Vulkan context while retaining the Vulkan model owner;
+5. binds a CPU MTP assistant to the destination context;
+6. re-evaluates the final prompt token and generates on CPU.
+
+The transfer does not write a K/V state file. The response includes a `zero_copy` object with the route, byte counters and timings. The health endpoint reports cumulative handoff counters.
+
+Only an exact append to the committed message/tool history reuses CPU K/V. An edited message, regenerated branch, changed tool list or different conversation resets the slot and performs another cold Vulkan prefill. The request can keep the same `X-Conversation-Id`; divergent history is a cold start, not an error.
+
+A client disconnect aborts active inference and clears the resident slot. `DELETE /v1/stream` with the owning `X-Conversation-Id` explicitly cancels and clears it. The service streams prompt progress, content/reasoning and tool-call deltas to the embedded UI as they become available, but it does not keep a server-side replay buffer after a dropped stream connection.
+
+## API surface
+
+The current service provides:
+
+- `GET /health` and `GET /v1/health`;
+- `GET /props`;
+- `GET /models` and `GET /v1/models`;
+- `POST /chat/completions` and `POST /v1/chat/completions`;
+- `DELETE /v1/stream` for cancellation/reset;
+- the embedded llama.cpp Web UI.
+
+It accepts OpenAI-compatible messages, tools and `tool_choice` values `auto`, `none` and `required`. It parses Gemma tool calls and supports tool-result continuation. With `stream: true`, it returns an initial OpenAI chunk immediately, emits `prompt_progress` after each prompt batch and sends parsed content/reasoning/tool-call deltas during generation. The final chunk carries usage, timings and zero-copy telemetry. Request JSON is limited to 16 MiB. An omitted `max_tokens`, or the UI's `max_tokens: -1`, uses the configured 2,048-token service maximum; an explicit value from 1 through 2,048 is honoured.
+
+This focused server does not provide the full `llama-server` route set. In particular, `/slots`, `/metrics`, `/tokenize`, `/detokenize`, stream lookup/replay, embeddings and multimodal input are unavailable.
+
+## Performance
+
+The trained qualification on 15 September 2026 recorded:
+
+| Workload | Prompt tokens | Prompt throughput | Handoff | First token | Request wall |
+|---|---:|---:|---:|---:|---:|
+| Exact 4K | 4,090 | 202.60 tok/s | 88.1 ms | 22.95 s | 23.16 s |
+| Exact 32K | 31,994 | 128.00 tok/s | 74.8 ms | 252.88 s | 253.19 s |
+
+Both requests returned `LONG OK`, shared 584,056,832 logical K/V bytes and copied zero bytes. The 32K qualification peaked at 14,344,970,240 bytes and used no process swap under the 16 GiB/zero-swap unit limits. Thermal data was not captured.
+
+A warm append recalled the expected nonce, reused 24 prompt tokens and completed in 0.89 s. The original qualification reloaded the Vulkan target for each new conversation, so its 3.5-4.6 s short cold timings are historical. Commit `cd6c8380c` made the Vulkan model owner process-resident. A post-change second cold smoke reached first token in 1.40 s; a different 37-token prompt reached first token in 4.22 s and generated 128 tokens at 13.03 tok/s. These single runs verify the serving path, not a general latency or throughput distribution.
+
+A matched 37-prompt/128-output comparison on the current branch rejected transplantation of the retained `LLAMA_EXPERIMENTAL_SMALL_TARGET_BATCH`, `GGML_CPU_EXPERIMENTAL_ATTN4` and `GGML_CPU_EXPERIMENTAL_SCORE4_3ROW` paths. Enabling all three reduced decode from 12.79 to 9.02 tok/s and increased request wall time from 14.19 to 18.31 s. They are absent from the active core source and service environment; retained patch snapshots remain under benchmark and tool evidence directories.
+
+Historical matched CPU measurements remain the best sustained-generation reference: 25.77 generation tok/s and 60.96/44.32 prompt tok/s at exact 4K/32K. The current synthetic long prompts measured 202.60/128.00 prompt tok/s, but the prompt contents and output lengths differ. Treat the ratios as indicative, not matched speedups.
+
+Retained evidence: [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md).
+
+## Build
+
+Use a single Vulkan-enabled build for the executable and all linked llama/ggml libraries:
 
 ```bash
-bash tools/test-intel-candidate-launcher.sh --installed-parser
+cmake -S . -B build-gemma-zero-copy-vulkan -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
+  -DBUILD_SHARED_LIBS=ON \
+  -DGGML_VULKAN=ON \
+  -DGGML_BACKEND_DL=OFF \
+  -DGGML_NATIVE=ON \
+  -DLLAMA_BUILD_TESTS=ON \
+  -DLLAMA_BUILD_SERVER=ON \
+  -DLLAMA_BUILD_UI=ON
+
+cmake --build build-gemma-zero-copy-vulkan --target \
+  llama-gemma-zero-copy-server llama-gemma-in-memory \
+  test-context-handoff test-gemma-hybrid-session-policy -j6
+
+ctest --test-dir build-gemma-zero-copy-vulkan \
+  -R '^test-(gemma-hybrid-session-policy|context-handoff(-gemma)?)$' \
+  --output-on-failure
 ```
 
-CPU masks express requested placement, not proven worker binding. Observed threads retained CPUs 0-15, and this server path does not attach the configured common threadpools. The OpenMP backend therefore does not establish strict P-core-only decode affinity. The measured improvement validates the 8/16 thread-count configuration as deployed, not a claim of enforced per-worker placement. Do not enable new binding policies without another matched test.
+Do not combine a new executable with an older `libllama` or Vulkan plugin. The initial deployment attempt failed because the older runtime did not export `llama_kv_handoff_cpu`.
 
-The live before/after 4K pair improved prefill from 61.35 to 70.68 tok/s and request time from 74.04 to 65.44 seconds, with identical generated tokens. This is rollout verification, not a new balanced benchmark: the older process paged in swapped memory. The earlier balanced campaign measured 13.8% less prefill time and 12.4% less request time. A subsequent live edit/test loop passed two independent tests and six assertions, retaining prefix reuse on all four follow-up rounds.
+## Install or update
 
-Rollback of thread tuning alone: set `LLAMA_THREADS_BATCH=8` and `LLAMA_CPUS_BATCH=0-7` in the installed environment, wait for idle slots and restart. For the exact prior launcher/environment, use the verified backups under `/var/home/agent/workspace/reports/gemma-deployment-20260906/rollback/`; do not overwrite unrelated later configuration changes. The binary was not replaced.
+Tracked files:
 
-The live 32K check at two-slot production geometry reached 50.34 tok/s prefill and 8.61 tok/s decode. Its append reused 32,895 tokens and evaluated eight in 425 ms of prefill. Peak temperature was 97 C, retained as annotation-only; process swap and throttle-counter increments were zero. This did not test a full 128K prompt.
+- `tools/run-gemma-zero-copy-service.sh`;
+- `tools/config/llama-gemma-zero-copy.env.example`;
+- `tools/systemd/user/llama-gemma-zero-copy.service`;
+- `tools/systemd/user/llama-gemma-lan-test.socket`;
+- `tools/systemd/user/llama-gemma-lan-test.service`.
 
-Deployment evidence: `/var/home/agent/workspace/reports/gemma-deployment-20260906/`.
-
-## Selected role
-
-Gemma remains the primary local Pi provider. In the matched 5-6 August 2026 campaign it generated at 25.77 tok/s, faster than Maple at 18.77 tok/s and Qwen at 11.40 tok/s. Prompt throughput was 65.24, 60.96 and 44.32 tok/s at exact 512, 4,096 and 32,768-token inputs.
-
-Gemma scored 4/6 on bounded API cases and 3/4 on real Pi tasks. It alone obeyed the requested `max_results: 3` tool limit. Its repository-retrieval answer cited the wrong source path and function, so Qwen remains an explicit alternative when repository grounding matters more than latency. The blind substantive review ranked Gemma first.
-
-Campaign report: [`../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md`](../../../benchmarks/intel-1340p/maple-qwen-campaign/report.md).
-
-Repository files:
-
-- `tools/run-intel-candidate.sh`
-- `tools/config/llama-gemma4-candidate.env.example`
-- `tools/systemd/user/llama-gemma-local-provider.service`
-- `docs/local/intel-i5-1340p/gemma-local-provider-runbook.md`
-- `docs/local/intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md`
-
-Installed files:
-
-- `~/.config/llama-gemma-local-provider/service.env`
-- `~/.config/systemd/user/llama-gemma-local-provider.service`
-- `$PI_CODING_AGENT_DIR/models.json`, currently `~/.pi/agent/models.json`
-
-## Install or update the service
-
-Build llama.cpp and place both GGUF files at the paths in `tools/config/llama-gemma4-candidate.env.example` before installing the service.
+Install them after a successful build:
 
 ```bash
 set -euo pipefail
 root=/var/home/agent/workspace/projects/llama-cpp
-mkdir -p ~/.config/llama-gemma-local-provider ~/.config/systemd/user
-if [[ -f ~/.config/llama-gemma-local-provider/service.env ]]; then
-  cp -a ~/.config/llama-gemma-local-provider/service.env \
-    ~/.config/llama-gemma-local-provider/service.env.bak-$(date +%Y%m%dT%H%M%S)
-fi
-install -m 0600 \
-  "$root/tools/config/llama-gemma4-candidate.env.example" \
-  ~/.config/llama-gemma-local-provider/service.env
-install -m 0644 \
-  "$root/tools/systemd/user/llama-gemma-local-provider.service" \
-  ~/.config/systemd/user/llama-gemma-local-provider.service
+
+install -d -m 0700 ~/.config/llama-gemma-zero-copy
+install -d -m 0755 ~/.config/systemd/user
+install -m 0600 "$root/tools/config/llama-gemma-zero-copy.env.example" \
+  ~/.config/llama-gemma-zero-copy/service.env
+install -m 0644 "$root/tools/systemd/user/llama-gemma-zero-copy.service" \
+  ~/.config/systemd/user/
+install -m 0644 "$root/tools/systemd/user/llama-gemma-lan-test.socket" \
+  ~/.config/systemd/user/
+install -m 0644 "$root/tools/systemd/user/llama-gemma-lan-test.service" \
+  ~/.config/systemd/user/
 
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
 systemctl --user daemon-reload
-systemctl --user enable --now llama-gemma-local-provider.service
+systemctl --user enable --now llama-gemma-zero-copy.service \
+  llama-gemma-lan-test.socket
 ```
 
-For unattended startup after reboot, verify user lingering:
+The validated host has `Linger=yes`, which allows the user service to start without an interactive login. Check it with:
 
 ```bash
 loginctl show-user "$(id -un)" -p Linger
 ```
 
-The validated host reports `Linger=yes`. Enabling it on another host requires host administrator privileges:
-
-```bash
-sudo loginctl enable-linger "$(id -un)"
-```
-
-Before updating a running service, inspect `/slots` and avoid interrupting active requests:
-
-```bash
-curl -fsS http://127.0.0.1:8091/slots \
-  | jq '[.[] | {id, is_processing, task_id}]'
-```
-
-Install updated files, run `systemctl --user daemon-reload`, then restart the unit only when both slots are idle:
-
-```bash
-curl -fsS http://127.0.0.1:8091/slots \
-  | jq -e 'all(.[]; (.is_processing // false) == false)'
-systemctl --user restart llama-gemma-local-provider.service
-```
-
-## Register the Pi provider
-
-`PI_CODING_AGENT_DIR` is authoritative for this runtime:
-
-```bash
-printf '%s\n' "$PI_CODING_AGENT_DIR"
-# /var/home/agent/.pi/agent
-```
-
-Back up the registry, then merge only the `local-gemma` provider. This preserves every unrelated provider and does not modify either settings file.
-
-```bash
-set -euo pipefail
-models="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/models.json"
-cp -a "$models" "$models.bak-local-gemma-$(date +%Y%m%dT%H%M%S)"
-tmp=$(mktemp "${models}.tmp.XXXXXX")
-trap 'rm -f "$tmp"' EXIT
-
-jq '.providers["local-gemma"] = {
-  "baseUrl": "http://127.0.0.1:8091/v1",
-  "api": "openai-completions",
-  "apiKey": "local",
-  "compat": {
-    "supportsDeveloperRole": false,
-    "supportsReasoningEffort": false,
-    "supportsStore": false,
-    "supportsStrictMode": false,
-    "supportsOpenAIGrammarTools": false,
-    "maxTokensField": "max_tokens",
-    "thinkingFormat": "chat-template",
-    "chatTemplateKwargs": {
-      "enable_thinking": {"$var": "thinking.enabled"}
-    }
-  },
-  "models": [{
-    "id": "gemma-4-e4b-qat-mtp",
-    "name": "Gemma 4 E4B QAT MTP (Local 128K)",
-    "reasoning": true,
-    "input": ["text"],
-    "contextWindow": 131072,
-    "maxTokens": 32768,
-    "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}
-  }]
-}' "$models" > "$tmp"
-
-jq empty "$tmp"
-chmod --reference="$models" "$tmp"
-chown --reference="$models" "$tmp"
-mv "$tmp" "$models"
-trap - EXIT
-```
-
-Check the provider and hosted-default invariants:
-
-```bash
-jq '.providers["local-gemma"]' \
-  "${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/models.json"
-jq '{defaultProvider, defaultModel}' \
-  "${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/settings.json"
-pi --list-models local-gemma
-```
-
-On the validated host, the authoritative default must remain `github-copilot/gpt-5.6-terra`. The workspace settings file remains `openai-codex/gpt-5.4`; it is not authoritative while `PI_CODING_AGENT_DIR=/var/home/agent/.pi/agent`.
-
-## Operate and diagnose
+## Operate and verify
 
 ```bash
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
 
-systemctl --user status llama-gemma-local-provider.service
-systemctl --user show llama-gemma-local-provider.service \
-  -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p TasksCurrent
-journalctl --user -u llama-gemma-local-provider.service -f
+systemctl --user status \
+  llama-gemma-zero-copy.service \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service
+systemctl --user show llama-gemma-zero-copy.service \
+  -p MainPID -p NRestarts \
+  -p MemoryCurrent -p MemoryPeak \
+  -p MemorySwapCurrent -p MemorySwapPeak
+journalctl --user -u llama-gemma-zero-copy.service -f
 ```
 
-Check the HTTP service and slot geometry:
+Health must report a resident Vulkan model, positive shared bytes and zero copied bytes after at least one cold request:
 
 ```bash
-curl -fsS http://127.0.0.1:8091/health | jq .
-curl -fsS http://127.0.0.1:8091/v1/models | jq .
-curl -fsS http://127.0.0.1:8091/slots \
-  | jq '[.[] | {id, n_ctx, is_processing, task_id, speculative}]'
+curl -fsS http://192.168.1.70:8094/health \
+  | jq -e 'select(
+      .status == "ok" and
+      .vulkan_model_resident == true and
+      .zero_copy_ready == true and
+      .shared_bytes > 0 and
+      .copied_bytes == 0)'
 ```
 
-Healthy output contains two slots with `n_ctx: 131072` and `speculative: true`. Both `is_processing` values are `true` at saturation. Excess callers may not appear in `/slots` because they are still deferred.
-
-Inspect host headroom:
+Live zero-copy request:
 
 ```bash
-free -h
-cat /proc/pressure/cpu
-cat /proc/pressure/memory
-cat /proc/pressure/io
-awk '{printf "package temperature: %.1f C\n", $1/1000}' \
-  /sys/class/thermal/thermal_zone1/temp
-```
-
-## Validate the API
-
-Basic Chat Completions:
-
-```bash
-curl -fsS http://127.0.0.1:8091/v1/chat/completions \
+curl -fsS http://192.168.1.70:8094/v1/chat/completions \
   -H 'Content-Type: application/json' \
+  -H 'X-Conversation-Id: zero-copy-smoke' \
   -d '{
-    "model":"gemma-4-e4b-qat-mtp",
-    "messages":[{"role":"user","content":"Reply with exactly LOCAL_GEMMA_OK"}],
+    "model":"gemma-4-e4b-qat-mtp-zero-copy",
+    "messages":[{"role":"user","content":"Reply with exactly ZERO_COPY_OK"}],
     "temperature":0,
     "max_tokens":32,
-    "chat_template_kwargs":{"enable_thinking":false}
-  }' | jq '{content:.choices[0].message.content, usage, timings}'
+    "stream":false
+  }' | jq -e 'select(
+    .choices[0].message.content == "ZERO_COPY_OK" and
+    .zero_copy.route == "vulkan_prefill_cpu_mtp" and
+    .zero_copy.shared_bytes > 0 and
+    .zero_copy.copied_bytes == 0 and
+    .zero_copy.zero_copy == true)'
 ```
 
-Required function calling:
+Live stream and progress verification:
 
 ```bash
-curl -fsS http://127.0.0.1:8091/v1/chat/completions \
+GEMMA_ZERO_COPY_URL=http://192.168.1.70:8094 \
+  bun tools/gemma-hybrid/verify-stream.ts
+```
+
+The verifier requires at least one `prompt_progress` event, multiple content deltas before the terminal event, final zero-copy telemetry and zero copied bytes. Use `verify-stream-tool.ts` for streamed tool-call assembly.
+
+Required tool-call request:
+
+```bash
+curl -fsS http://192.168.1.70:8094/v1/chat/completions \
   -H 'Content-Type: application/json' \
+  -H 'X-Conversation-Id: zero-copy-tool' \
   -d '{
-    "model":"gemma-4-e4b-qat-mtp",
-    "messages":[{"role":"user","content":"Get Lisbon weather in Celsius"}],
+    "model":"gemma-4-e4b-qat-mtp-zero-copy",
+    "messages":[{"role":"user","content":"Call get_weather for Lisbon."}],
     "tools":[{"type":"function","function":{
-      "name":"get_weather","description":"Get weather",
+      "name":"get_weather",
+      "description":"Get weather",
       "parameters":{"type":"object","properties":{
-        "city":{"type":"string"},
-        "unit":{"type":"string","enum":["celsius","fahrenheit"]}
-      },"required":["city","unit"],"additionalProperties":false}
+        "city":{"type":"string"}
+      },"required":["city"]}
     }}],
-    "tool_choice":"required","temperature":0,"max_tokens":256,
-    "chat_template_kwargs":{"enable_thinking":false}
+    "tool_choice":"required",
+    "temperature":0,
+    "max_tokens":96,
+    "stream":false
   }' | jq '.choices[0].message.tool_calls'
 ```
 
-SSE streaming:
+## Pi registration
+
+The repository's historical `local-gemma` registration uses `http://127.0.0.1:8091/v1`, a 131,072-token context and a 32,768-token output limit. That registration belongs to the disabled CPU provider and is not valid for the current 32K zero-copy service.
+
+To use this service through Pi, update the provider deliberately to:
+
+- base URL `http://127.0.0.1:18094/v1`;
+- model ID `gemma-4-e4b-qat-mtp-zero-copy`;
+- context window 32,768;
+- maximum output 2,048;
+- text input only.
+
+Do not advertise the historical 128K limits for this service. The hosted default remains independent and does not need to change.
+
+## Historical CPU provider and rollback
+
+The disabled `llama-gemma-local-provider.service` is the accepted CPU/MTP rollback profile. It used two independent 131,072-token slots, aggregate context 262,144, batch/uBatch 1024/256, a 12,288 MiB prompt-state cache and the file-mediated hybrid supervisor. Its loopback API was `127.0.0.1:8091`; its CPU worker listened on 18092.
+
+Historical measurements and procedures are retained in:
+
+- [Gemma 128K profile](intel-1340p-gemma4-runbook.md);
+- [Gemma concurrency benchmark, 2 August 2026](gemma-local-provider-benchmark-2026-08-02.md);
+- [September CPU prefill and decode experiments](../../../benchmarks/intel-1340p/README.md#2026-09-10-and-2026-09-11-gemma-series);
+- [`tools/gemma-hybrid/README.md`](../../../tools/gemma-hybrid/README.md), which labels the TypeScript adapter as historical.
+
+Restore the CPU provider only after stopping the zero-copy service and LAN proxy:
 
 ```bash
-curl -fsS -N http://127.0.0.1:8091/v1/chat/completions \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "model":"gemma-4-e4b-qat-mtp",
-    "messages":[{"role":"user","content":"Reply with exactly STREAM_OK"}],
-    "temperature":0,"max_tokens":32,"stream":true,
-    "stream_options":{"include_usage":true},
-    "chat_template_kwargs":{"enable_thinking":false}
-  }'
+systemctl --user disable --now \
+  llama-gemma-lan-test.socket \
+  llama-gemma-zero-copy.service
+systemctl --user enable --now llama-gemma-local-provider.service
+curl -fsS http://127.0.0.1:8091/health
 ```
 
-The stream must contain content deltas, a terminal usage object and `data: [DONE]`.
+This restores the loopback rollback endpoint. The tracked LAN proxy now targets 18094; do not start it against the CPU rollback without changing and reviewing that target.
 
-## Select the model in Pi
-
-List the model without changing the current session:
+## Remove the zero-copy service
 
 ```bash
-pi --list-models local-gemma
-```
-
-Start a new interactive session explicitly with Gemma:
-
-```bash
-pi --provider local-gemma --model gemma-4-e4b-qat-mtp
-```
-
-Run an isolated smoke request:
-
-```bash
-pi -p --provider local-gemma --model gemma-4-e4b-qat-mtp \
-  --thinking off --no-session --tools '' \
-  'Reply with exactly PI_CONCURRENT_GEMMA_OK'
-```
-
-In Piclaw, select `local-gemma/gemma-4-e4b-qat-mtp` for the intended chat. Do not edit `defaultProvider` or `defaultModel` when the hosted default must remain in place.
-
-## Roll back concurrency only
-
-To restore the original single-slot geometry while retaining the provider, edit the installed environment file:
-
-```bash
-sed -i \
-  -e 's/^LLAMA_CTX=262144$/LLAMA_CTX=131072/' \
-  -e 's/^LLAMA_PARALLEL=2$/LLAMA_PARALLEL=1/' \
-  ~/.config/llama-gemma-local-provider/service.env
-```
-
-Wait for both slots to become idle, then restart the service. When an existing environment file is replaced, the install/update procedure creates a timestamped `service.env.bak-*` file; a first installation has no prior file to back up. A full-file restore may discard later environment changes, so inspect the selected backup before installing it.
-
-## Remove the provider
-
-Stop and disable the local server:
-
-```bash
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
-export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
-systemctl --user disable --now llama-gemma-local-provider.service
-```
-
-Remove only the Pi provider entry:
-
-```bash
-set -euo pipefail
-models="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/models.json"
-cp -a "$models" "$models.bak-before-local-gemma-removal-$(date +%Y%m%dT%H%M%S)"
-tmp=$(mktemp "${models}.tmp.XXXXXX")
-trap 'rm -f "$tmp"' EXIT
-jq 'del(.providers["local-gemma"])' "$models" > "$tmp"
-jq empty "$tmp"
-chmod --reference="$models" "$tmp"
-chown --reference="$models" "$tmp"
-mv "$tmp" "$models"
-trap - EXIT
-```
-
-Timestamped `models.json.bak-local-gemma-*` files exist from installation. Restoring a full backup can discard unrelated provider edits made later; prefer the targeted deletion.
-
-Remove installed service files:
-
-```bash
-rm -f ~/.config/systemd/user/llama-gemma-local-provider.service
-rm -rf ~/.config/llama-gemma-local-provider
+systemctl --user disable --now \
+  llama-gemma-lan-test.socket \
+  llama-gemma-zero-copy.service
+rm -f ~/.config/systemd/user/llama-gemma-lan-test.socket
+rm -f ~/.config/systemd/user/llama-gemma-lan-test.service
+rm -f ~/.config/systemd/user/llama-gemma-zero-copy.service
+rm -rf ~/.config/llama-gemma-zero-copy
 systemctl --user daemon-reload
 ```
 
-The prompt-cache limit is in RAM. `~/.cache/llama-candidates/gemma4/slots/` stores only explicitly saved slot-state files and is empty on the validated host. Remove it only after the service stops and only when saved states are no longer needed:
-
-```bash
-rm -rf ~/.cache/llama-candidates/gemma4/slots/
-```
-
-Removing the provider does not remove workspace builds, model GGUF files or repository changes.
-
-## Acceptance evidence
-
-Validated on 2 August 2026:
-
-- health, model discovery and two-slot geometry passed;
-- basic generation, required function calling and SSE passed;
-- a repeated 5,747-token prompt reused 5,741 tokens and processed 6;
-- two isolated 131,072-token slots admitted two live requests with no swap activity;
-- fixed-workload c2 wall time changed from 55.45 s queued to 54.69 s concurrent;
-- fixed-workload c4 wall time changed from 108.30 s to 105.37 s in two waves;
-- the accepted c4 run peaked at 12,400,510 KiB PSS and 88 C, with no swap-in, swap-out or major faults;
-- `pi --list-models local-gemma` discovered the model;
-- an isolated Pi request returned `PI_CONCURRENT_GEMMA_OK`;
-- the service remained active with zero restarts and the hosted defaults stayed unchanged.
-
-Detailed workload and candidate results are in [gemma-local-provider-benchmark-2026-08-02.md](gemma-local-provider-benchmark-2026-08-02.md).
+Removing the service does not remove model files, build outputs, historical state files or repository evidence.

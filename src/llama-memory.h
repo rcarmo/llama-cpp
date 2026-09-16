@@ -26,6 +26,15 @@ struct llama_memory_transfer_i {
 };
 using llama_memory_transfer_ptr = std::unique_ptr<llama_memory_transfer_i>;
 
+struct llama_memory_init {
+    bool strict = false;
+    bool deferred = false;
+    llama_memory_alloc_cb alloc;
+};
+
+// Allocate once, before any graph can write state. Deferred contexts own headers only.
+ggml_backend_buffer_t llama_memory_alloc(ggml_context * ctx, ggml_backend_buffer_type_t buft, const llama_memory_init & init);
+
 struct llama_memory_params {
     // kv cache
     ggml_type type_k;
@@ -37,6 +46,7 @@ struct llama_memory_params {
     llama_context_type ctx_type;
 
     llama_memory_t mem_other;
+    llama_memory_init init;
 };
 
 enum llama_memory_status {
@@ -93,6 +103,10 @@ struct llama_memory_i {
     using layer_share_cb = std::function<int32_t(int32_t il)>;
 
     virtual ~llama_memory_i() = default;
+
+    virtual bool handoff_begin_compute() { return true; }
+    virtual void handoff_end_compute(const llama_ubatch &, bool) {}
+
 
     // Only before first use; unsupported allocations retain their normal buffers.
     virtual void init_cpu_shared(const llama_memory_alloc_cb &) {}

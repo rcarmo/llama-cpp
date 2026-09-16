@@ -1,5 +1,7 @@
 # Gemma plan closeout: retain B0-score3
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The bounded optimisation plan is closed. **B0-score3 remains deployed; no B1 or B2 qualified.** The new decode and prefill candidates did not demonstrate a useful confirmed improvement. Recovery coverage increased, and two CPU slots passed real state reuse at 16K, 32K and 64,663 tokens each. The near-128K attempt timed out and remains unqualified.
 
 ## Optimisation decisions

@@ -14,13 +14,15 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Sole enabled local provider | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
+| LattePanda Sigma | Gemma 4 E4B zero-copy, 32K | Sole enabled local model service | 202.60 / 128.00 prompt tok/s at 4K / 32K; 584,056,832 shared K/V bytes, zero copied bytes and live UI progress |
+| LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
 | LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
 | LattePanda Sigma | Ornith 1.0 35B, 128K | Historical validation | 124,341-token prompt completed |
-| LattePanda Sigma | Gemma 4 E4B, 128K | Validated; service disabled | Best overall matched quality; 25.77 generation tok/s |
+| LattePanda Sigma | Gemma 4 E4B CPU, 128K | Validated rollback; service disabled | Best overall matched quality; 25.77 generation tok/s |
 | LattePanda Sigma | Maple Preview exact TQ2/F32, 128K | Validated; service disabled | 76.03 / 71.79 / 56.91 prompt tok/s at 512 / 4K / 32K |
-| LattePanda Sigma | Iris Xe SYCL/Vulkan | Rejected | Correctness or local wins did not survive end-to-end gates |
+| LattePanda Sigma | Iris Xe full-generation SYCL/Vulkan | Rejected | Correctness or local wins did not survive end-to-end gates |
+| LattePanda Sigma | Iris Xe cold prefill to CPU handoff | Selected for Gemma 32K | Persistent service passed tools, multi-turn, cancellation and exact 4K/32K checks with zero K/V copies |
 | SpaceMIT K3 | RVV/IME CPU backend | Selected | Qwen and Gemma live-verified |
 | SpaceMIT K3 | Direct recurrent-state writes | Selected service option | 5.05% mean Qwen generation gain |
 | SpaceMIT K3 | Compact-IQ IME2 tile cache | Opt-in | Valid under a bounded shared cache, not the service default |
@@ -61,8 +63,9 @@ Key entrypoints:
 - `tools/build-intel-1340p.sh` - selected CPU build;
 - `tools/run-intel-qwen-longctx.sh` - Qwen 128K service;
 - `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
-- `tools/run-intel-candidate.sh` - Ornith and Gemma profiles;
-- `tools/validate-intel-candidate.sh` - no-install candidate validation;
+- `tools/run-intel-candidate.sh` - historical CPU Ornith and Gemma profiles;
+- `tools/run-gemma-zero-copy-service.sh` - selected 32K Gemma Vulkan-prefill/CPU-MTP service;
+- `tools/validate-intel-candidate.sh` - no-install historical candidate validation;
 - `tools/systemd/user/` - tracked user services.
 
 ### CPU baseline and model selection
@@ -107,6 +110,23 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md`](benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md)
 - [`docs/expert-io-adoption-baseline.md`](docs/expert-io-adoption-baseline.md)
 
+### Gemma zero-copy service
+
+The selected Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
+
+| Workload | Prompt throughput | Handoff | Result |
+|---|---:|---:|---|
+| Exact 4K | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
+| Exact 32K | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
+
+Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Historical CPU measurements remain the sustained-generation reference.
+
+Operations and evidence:
+
+- [`docs/local/intel-i5-1340p/gemma-local-provider-runbook.md`](docs/local/intel-i5-1340p/gemma-local-provider-runbook.md)
+- [`benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md`](benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md)
+- [`tools/gemma-hybrid/README.md`](tools/gemma-hybrid/README.md)
+
 ### Ornith and Gemma 128K validation
 
 The final candidate profiles use F16 KV, Flash Attention off, mmap loading, batch 1024, ubatch 256 and eight model threads.
@@ -136,9 +156,9 @@ Campaign records:
 - [`docs/intel-1340p-ornith-runbook.md`](docs/intel-1340p-ornith-runbook.md)
 - [`docs/intel-1340p-gemma4-runbook.md`](docs/intel-1340p-gemma4-runbook.md)
 
-### Ornith 1.5 local Pi provider
+### Ornith 1.5 retained provider
 
-The deployed Sigma profile exposes `local-ornith/ornith-1.5-35b-a3b-q4-k-m` on loopback at `127.0.0.1:8095`.
+The validated Ornith profile is disabled. When explicitly enabled, it exposes `local-ornith/ornith-1.5-35b-a3b-q4-k-m` on loopback at `127.0.0.1:8095`.
 
 | Setting | Value |
 |---|---|
@@ -159,7 +179,7 @@ curl -fsS http://127.0.0.1:8095/health
 pi --provider local-ornith --model ornith-1.5-35b-a3b-q4-k-m
 ```
 
-The Gemma, Maple, Qwen3.6 and Qwen 3.8 services are disabled. Their weight files remain available for rollback.
+The Gemma zero-copy service is the sole enabled local model service. Ornith, Maple, Qwen3.6, Qwen3.8 and the historical two-slot Gemma CPU service are disabled. Their weight files remain available for rollback.
 
 Installation, Pi registration, diagnostics, measurements and rollback:
 
@@ -181,9 +201,9 @@ The 5-6 August 2026 campaign used exact per-tokenizer 512, 4,096 and 32,768-toke
 
 The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwen3.6 second and Maple third. Qwen3.6 alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
 
-Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. The disabled service on `127.0.0.1:8094` is suitable only for manual compatibility or vision checks.
+Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. That Qwen service is disabled; LAN port 8094 now exposes Gemma zero-copy.
 
-These role assignments record the 5-6 August comparison. The 20 August Ornith 1.5 deployment superseded them: Ornith is the sole enabled local provider, while the Maple, Gemma and Qwen services are disabled with their weights preserved.
+These role assignments record the 5-6 August comparison. Ornith 1.5 superseded them on 20 August. The Gemma zero-copy deployment superseded Ornith on 15 September; it is the sole enabled local model service, while historical CPU profiles remain available for rollback.
 
 Full reports, raw responses, telemetry, identities and validators:
 
@@ -214,7 +234,7 @@ After the later small-patch merge, the selected CPU build reported `b10579-abdbe
 
 ### Iris Xe: measured and rejected
 
-Iris Xe remains a validation target, not the deployed inference backend.
+Iris Xe remains rejected for full generation offload. The selected Gemma service uses it only for cold prefill before an in-process zero-copy handoff to CPU MTP decoding.
 
 The July Vulkan campaign passed 1,544/1,544 focused `MUL_MAT_ID`, `RMS_NORM`, `ROPE` and `SOFT_MAX` cases. Full Q2 offload generated 9.90 tok/s versus 14.90 tok/s on CPU; a Q4 10-layer split generated 7.62 tok/s versus 13.17 tok/s on CPU. The August result-checker failures and Maple device loss above prevent promotion of the newer upstream Vulkan paths.
 

@@ -1,0 +1,66 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- llama.cpp version: 0.4.0-dev
+CMAKE_BUILD_TYPE=Release
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native
+-- Vulkan found
+-- GL_KHR_cooperative_matrix supported by glslc
+-- GL_NV_cooperative_matrix2 supported by glslc
+-- GL_NV_cooperative_matrix_decode_vector not supported by glslc
+-- GL_EXT_integer_dot_product supported by glslc
+-- GL_EXT_bfloat16 supported by glslc
+-- GL_EXT_float_e2m1 not supported by glslc
+-- GL_EXT_float_e4m3 supported by glslc
+-- Including Vulkan backend
+-- ggml version: 0.23.0
+-- ggml commit:  bb0401449
+-- Generating embedded license file for target: llama-app
+-- Configuring done (0.9s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/home/agent/workspace/reports/qwen38-gsq-rco-model-20260914/build-vulkan-synthetic
+[0/4] Re-checking globbed directories...
+[1/20] Performing build step for 'vulkan-shaders-gen'
+ninja: no work to do.
+[2/20] Performing install step for 'vulkan-shaders-gen'
+-- Up-to-date: /var/home/agent/workspace/reports/qwen38-gsq-rco-model-20260914/build-vulkan-synthetic/Release/./vulkan-shaders-gen
+[3/20] Completed 'vulkan-shaders-gen'
+[4/20] Building CXX object common/CMakeFiles/llama-common.dir/common.cpp.o
+[5/20] Building CXX object common/CMakeFiles/llama-common.dir/speculative.cpp.o
+[6/20] Building CXX object tests/CMakeFiles/test-kv-handoff.dir/test-kv-handoff.cpp.o
+[7/20] Building CXX object tests/CMakeFiles/test-hybrid-handoff.dir/test-hybrid-handoff.cpp.o
+[8/20] Building CXX object tests/CMakeFiles/test-hidden-state.dir/test-hidden-state.cpp.o
+[9/20] Building CXX object tests/CMakeFiles/test-export-graph-ops.dir/test-export-graph-ops.cpp.o
+[10/20] Building CXX object common/CMakeFiles/llama-common.dir/arg.cpp.o
+[11/20] Linking CXX shared library bin/libllama-common.so.0.4.0
+[12/20] Creating library symlink bin/libllama-common.so.0 bin/libllama-common.so
+[13/20] Linking CXX executable bin/test-kv-handoff
+[14/20] Linking CXX executable bin/test-hybrid-handoff
+[15/20] Linking CXX executable bin/test-context-handoff
+[16/20] Linking CXX executable bin/test-hidden-state
+[17/20] Linking CXX executable bin/test-export-graph-ops
+Test project /var/home/agent/workspace/reports/qwen38-gsq-rco-model-20260914/build-vulkan-synthetic
+    Start 48: test-kv-handoff
+1/7 Test #48: test-kv-handoff ................................   Passed    0.01 sec
+    Start 49: test-hybrid-handoff
+2/7 Test #49: test-hybrid-handoff ............................   Passed    0.01 sec
+    Start 50: test-hidden-state
+3/7 Test #50: test-hidden-state ..............................   Passed    0.01 sec
+    Start 51: test-context-handoff
+4/7 Test #51: test-context-handoff ...........................   Passed    0.05 sec
+    Start 52: test-context-handoff-gemma
+5/7 Test #52: test-context-handoff-gemma .....................   Passed    0.05 sec
+    Start 53: test-context-handoff-qwen-strict-destination
+6/7 Test #53: test-context-handoff-qwen-strict-destination ...   Passed    0.03 sec
+    Start 54: test-context-handoff-qwen-mtp-roundtrip
+7/7 Test #54: test-context-handoff-qwen-mtp-roundtrip ........   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+main    =   0.19 sec*proc (7 tests)
+
+Total Test time (real) =   0.19 sec

@@ -1,5 +1,7 @@
 # Register-assigned score kernel: spill-free, 2.52% slower
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The explicit AVX2 score3 kernel removed inner-loop spills but reduced saved64K generation speed from **9.2872 to 9.0536 tokens/s (-2.52%)**. Request time increased **2.25%**. Both candidate runs were slower than both controls. B0-score3 remains deployed, including its previously confirmed +3.124% improvement.
 
 ## Matched screen

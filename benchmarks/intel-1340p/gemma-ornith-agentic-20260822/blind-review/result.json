@@ -1,0 +1,67 @@
+{
+  "deterministic_pass_fail": "unchanged: both candidates remain benchmark failures because they reached the 1024-token completion cap",
+  "tasks": {
+    "implementation-debug": {
+      "candidate_A": {
+        "scores": {
+          "technical_correctness": 3,
+          "task_constraint_adherence": 2,
+          "actionability": 2,
+          "useful_completeness_despite_truncation": 2
+        },
+        "issues": [
+          "Unsupported Xe1 subgroup-width and inactive-lane claims",
+          "Incorrect or doubtful Q2_K nibble packing claim",
+          "Doubtful register-spill and barrier-reordering correctness claims"
+        ]
+      },
+      "candidate_B": {
+        "scores": {
+          "technical_correctness": 2,
+          "task_constraint_adherence": 2,
+          "actionability": 1,
+          "useful_completeness_despite_truncation": 1
+        },
+        "issues": [
+          "Incorrect suggestion that shared memory passes data between workgroups",
+          "Unsupported register-spill correctness claim",
+          "Misframed atomic accumulator invariant"
+        ]
+      },
+      "winner": "candidate_A",
+      "reason": "Candidate A was more specific about Vulkan invariants; neither response reached the requested experiment matrix or acceptance criteria."
+    },
+    "repository-planning": {
+      "candidate_A": {
+        "scores": {
+          "technical_correctness": 3,
+          "task_constraint_adherence": 3,
+          "actionability": 3,
+          "useful_completeness_despite_truncation": 2
+        },
+        "issues": [
+          "Speculative MoE routing and Q2_K_XL format claims",
+          "Incorrect or doubtful Q2_K lane-packing claim",
+          "Unproved fixed-point equivalence for an exactness-first path"
+        ]
+      },
+      "candidate_B": {
+        "scores": {
+          "technical_correctness": 2,
+          "task_constraint_adherence": 2,
+          "actionability": 2,
+          "useful_completeness_despite_truncation": 2
+        },
+        "issues": [
+          "Generic and likely incorrect graph shapes",
+          "Tautological dispatch gate",
+          "Missing repository evidence and rollback points"
+        ]
+      },
+      "winner": "candidate_A",
+      "reason": "Candidate A had clearer phases, rollback thinking and a stronger correctness-first structure, but still overreached beyond the supplied facts."
+    }
+  },
+  "overall_qualitative_winner": "candidate_A",
+  "overall_reason": "Candidate A produced the stronger visible portions of both truncated answers. Both responses remain deterministic failures."
+}

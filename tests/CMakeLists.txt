@@ -300,6 +300,8 @@ set_tests_properties(test-thread-safety PROPERTIES FIXTURES_REQUIRED test-downlo
 
 llama_build_and_test(test-arg-parser.cpp)
 llama_build_and_test(test-model-resolution.cpp)
+llama_build_and_test(test-gemma-hybrid-session-policy.cpp)
+target_include_directories(test-gemma-hybrid-session-policy PRIVATE ${CMAKE_SOURCE_DIR}/tools/gemma-hybrid)
 # the test serves its repos from an httplib server, and the library links it privately
 target_link_libraries(test-model-resolution PRIVATE cpp-httplib)
 
@@ -319,8 +321,14 @@ if (TARGET ggml-cpu AND NOT GGML_BACKEND_DL)
 endif()
 if (NOT WIN32 OR NOT BUILD_SHARED_LIBS)
     llama_build_and_test(test-kv-handoff.cpp)
+    llama_build_and_test(test-hybrid-handoff.cpp)
+    llama_build_and_test(test-hidden-state.cpp)
     llama_build_and_test(test-context-handoff.cpp)
+    # Manual exact-model qualification harness; built on demand and never registered with CTest.
+    llama_build(test-qwen-mtp-trained-handoff.cpp)
     llama_test(test-context-handoff NAME test-context-handoff-gemma ARGS --gemma)
+    llama_test(test-context-handoff NAME test-context-handoff-qwen-strict-destination ARGS --qwen-strict-destination)
+    llama_test(test-context-handoff NAME test-context-handoff-qwen-mtp-roundtrip ARGS --qwen-mtp-roundtrip)
 endif()
 if (GGML_VULKAN AND NOT GGML_BACKEND_DL)
     llama_build_and_test(test-vulkan-cpu-view.cpp LABEL "vulkan")

@@ -1,6 +1,6 @@
 # Ornith 1.0 35B and Gemma 4 E4B on Intel Core i5-1340P
 
-The campaign validates 128K CPU runtime profiles for both models. Gemma 4 E4B is the throughput finalist. The existing Qwen3.6 35B-A3B Q2_K_XL service remains the deployed rollback baseline.
+This historical campaign validated 128K CPU runtime profiles for both models. Gemma 4 E4B was the throughput finalist. Qwen3.6 35B-A3B Q2_K_XL was the deployed rollback baseline when the campaign ended; the current Sigma service state is in the [Gemma zero-copy runbook](gemma-local-provider-runbook.md).
 
 Measurements use source commit `603f26c869b6700eaa5c6d52068ed583419eeacf`, the `build-intel-clang` Clang 22.1.8 build, model workers on logical CPUs 0–7 and a 2% repeated end-to-end promotion gate. Raw results and machine-readable decisions are under [`benchmarks/intel-1340p/ornith-gemma-optimization/`](../../../benchmarks/intel-1340p/ornith-gemma-optimization/).
 

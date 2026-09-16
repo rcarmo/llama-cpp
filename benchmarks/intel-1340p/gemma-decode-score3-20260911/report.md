@@ -1,5 +1,7 @@
 # Score-only 3x4 tile: 3.12% faster decode, not deployed
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Eight counterbalanced 64K runs measured **8.6634 to 8.9341 tok/s (+3.12%)** for a score-only 3-row/4-query tile over the deployed ATTN4 decoder. Median request wall time fell **2.99%**, from 16.560 to 16.066 seconds. Qualification was interrupted by queued speech traffic during the baseline 4K prefill. Production remains `20260911-attn4`; no cutover was attempted.
 
 ## Candidate and saved profile

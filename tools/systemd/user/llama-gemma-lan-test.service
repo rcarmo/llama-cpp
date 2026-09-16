@@ -1,0 +1,13 @@
+[Unit]
+Description=LAN proxy for the Gemma 4 E4B zero-copy service
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/local/intel-i5-1340p/gemma-local-provider-runbook.md
+Requires=llama-gemma-zero-copy.service
+BindsTo=llama-gemma-zero-copy.service
+After=llama-gemma-zero-copy.service
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:18094
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true

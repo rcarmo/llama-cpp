@@ -1,5 +1,7 @@
 # F16 paired-dot candidate: correct, no decode gain
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 The opt-in two-row F16 helper produced **8.4285 tok/s** versus **8.4995 tok/s** for the same runtime with the flag off: **0.84% slower** in eight counterbalanced64K runs. Request wall was1.01% slower. Production remains unchanged.
 
 ## Candidate and evidence

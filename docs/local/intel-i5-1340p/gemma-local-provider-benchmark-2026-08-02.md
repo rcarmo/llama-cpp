@@ -1,6 +1,6 @@
 # Gemma local-provider concurrency benchmark - 2 August 2026
 
-Two isolated 131,072-token KV streams gave the best measured concurrent service on the Intel Core i5-1340P. This page records the frozen workload, candidates, results and acceptance limits used to select the deployed profile.
+Two isolated 131,072-token KV streams gave the best measured concurrent CPU service on the Intel Core i5-1340P. This page records the frozen workload, candidates, results and acceptance limits used to select the profile deployed in August 2026. That provider is now disabled and retained for rollback; the [current service is Gemma zero-copy](gemma-local-provider-runbook.md).
 
 ## Host and workload
 

@@ -1,5 +1,7 @@
 # Conditional branch decisions
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 ## H01/H02: two PMU profiles completed, attribution limited
 
 The host exposes separate core/atom PMUs. User-space event groups opened successfully without security changes. Two fresh-worker saved64K profiles captured all34 native threads using separate core/atom groups (68 groups per run), four events/group: cycles, instructions, cache references and cache misses. Thread inventories were unchanged, each request completed with the frozen work counts, and production was restored afterwards.

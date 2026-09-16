@@ -1,5 +1,7 @@
 # FP32 attention and microbatch interaction
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Microbatch1024 improved the saved64K FP32-attention tail by **7.11%**, but a fresh64663-token hybrid request took **715.246 seconds**, versus **691.385 seconds** with microbatch256: **3.45% slower** in a single temporal comparison. Keep256 for whole prefill and retain1024 as a measured tail-only option.
 
 All eight tail requests passed recall/cache checks. Both the final tail state and the fresh64K state were finite, with a768-cell maximum sliding-window export. Native handoff into the unchanged CPU256 decoder reused64662 tokens and evaluated one; recall and append passed. Production was restored unchanged as PID626449, with configuration, argv, nine loaded-file hashes, tools, slots and cached append verified. No experimental deployment occurred.

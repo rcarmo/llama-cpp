@@ -19,6 +19,7 @@ set(LLAMA_CORE_SOURCES
     llama-cparams.cpp
     llama-grammar.cpp
     llama-graph.cpp
+    llama-hidden-state.cpp
     llama-hparams.cpp
     llama-impl.cpp
     llama-io.cpp
@@ -34,6 +35,7 @@ set(LLAMA_CORE_SOURCES
     llama-memory-hybrid-iswa.cpp
     llama-memory-hybrid-idx.cpp
     llama-memory-recurrent.cpp
+    llama-memory-recurrent-handoff.cpp
     llama-mmap.cpp
     llama-model-loader.cpp
     llama-model-saver.cpp

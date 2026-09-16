@@ -108,6 +108,7 @@ Quantised KV can reduce resident capacity but add conversion and attention costs
 - Avoid moving an established CPU-owned conversation back to GPU for a tiny append.
 - Commit ownership only after a complete compatible transfer; failures drain or invalidate affected slots. Poison admission when cleanup cannot establish a safe state.
 - Test cancellation at every phase, queued cancellation, eviction, independent slots and abandoned transfer files.
+- For user-facing SSE, verify prompt-progress events, incremental parsed content/reasoning/tool-call deltas, terminal usage/timings, disconnect cleanup and cancellation. A `text/event-stream` content type alone does not prove that output is live; record event arrival times and check the actual frontend.
 - Distinguish mocked failures, controller SIGKILL and native-worker/driver crashes. File-journal tests alone do not prove native crash recovery or exactly-once tool execution.
 - Validate fallback at its claimed size and latency. Unloading all workers can fit memory while destroying warm ownership; make that cost visible.
 

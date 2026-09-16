@@ -1,5 +1,7 @@
 # Iris Xe long-attention precision selection
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 FP32 accumulation reduced 64K-tail prefill time by **8.10%** in eight counterbalanced runs. A fresh 64,663-token hybrid request completed in **691.385 seconds**, versus the retained 746.817-second control (**7.42% less time**). The latter is one temporal pair, not a balanced fresh-prefill series.
 
 The original CPU service was restored unchanged as PID 612228. Configuration, argv, nine loaded-file hashes, health, two 131072-token slots, explicit tools and cached append passed verification. Process swap was zero. No experimental library or route was deployed.

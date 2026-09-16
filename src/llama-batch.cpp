@@ -28,10 +28,12 @@ bool llama_batch_allocr::init(
         const llama_memory_i * memory,
         uint32_t n_embd,
         uint32_t n_seq_max,
-        bool output_all) {
+        bool output_all,
+        const llama_hidden_state_span * hidden_span) {
     clear();
 
     batch = batch_inp;
+    this->hidden_span = hidden_span;
 
     this->vocab = &vocab;
 
@@ -225,6 +227,7 @@ bool llama_batch_allocr::init(
             /*.seq_idx      =*/ this->seq_idx.data(),
             /*.output       =*/ batch.logits,
             /*.data         =*/ {},
+            /*.hidden_span  =*/ hidden_span,
         };
 
         ubatch_print(ubatch, debug);
@@ -431,6 +434,7 @@ llama_ubatch llama_batch_allocr::ubatch_reserve(uint32_t n_seq_tokens, uint32_t 
         /*.seq_idx      =*/ udata->seq_idx.data(),
         /*.output       =*/ udata->output.data(),
         /*.data         =*/ std::move(udata),
+        /*.hidden_span  =*/ nullptr,
     };
 
     return res;
@@ -753,7 +757,7 @@ llama_ubatch llama_batch_allocr::ubatch_add(const std::vector<int32_t> & idxs, u
 
     auto udata = std::make_shared<llama_ubatch::data_t>();
 
-    const int64_t n_embd_all = batch.embd ? (int64_t) n_tokens*n_embd : 0;
+    const int64_t n_embd_all = batch.embd && !hidden_span ? (int64_t) n_tokens*n_embd : 0;
     const int64_t n_pos_all  =              (int64_t) n_tokens*n_pos_per_embd;
 
     udata->token     .resize(n_tokens);
@@ -774,7 +778,7 @@ llama_ubatch llama_batch_allocr::ubatch_add(const std::vector<int32_t> & idxs, u
             udata->token[i] = batch.token[idxs[i]];
         }
 
-        if (batch.embd) {
+        if (batch.embd && !hidden_span) {
             memcpy(udata->embd.data() + i*n_embd, batch.embd + (int64_t) idxs[i]*n_embd, n_embd*sizeof(float));
         }
 
@@ -824,7 +828,7 @@ llama_ubatch llama_batch_allocr::ubatch_add(const std::vector<int32_t> & idxs, u
         /*.n_pos        =*/ n_pos_per_embd,
 
         /*.token        =*/ batch.token ? udata->token.data() : nullptr,
-        /*.embd         =*/ batch.embd ? udata->embd.data() : nullptr,
+        /*.embd         =*/ batch.embd && !hidden_span ? udata->embd.data() : nullptr,
         /*.pos          =*/ udata->pos.data(),
         /*.n_seq_id     =*/ udata->n_seq_id.data(),
         /*.seq_id       =*/ udata->seq_id.data(),
@@ -832,6 +836,7 @@ llama_ubatch llama_batch_allocr::ubatch_add(const std::vector<int32_t> & idxs, u
         /*.seq_idx      =*/ udata->seq_idx.data(),
         /*.output       =*/ udata->output.data(),
         /*.data         =*/ std::move(udata),
+        /*.hidden_span  =*/ hidden_span,
     };
 
     if (debug > 0) {

@@ -1,0 +1,56 @@
+{
+  "label": "exact-32k",
+  "requested_tokens": 32000,
+  "wall_ms": 253202.811269,
+  "response": {
+    "id": "chatcmpl-gemma-zero-copy-1",
+    "object": "chat.completion",
+    "created": 1789505366,
+    "model": "gemma-4-e4b-qat-mtp-zero-copy",
+    "system_fingerprint": "b11484-1669734ef",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "LONG OK"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 31994,
+      "completion_tokens": 2,
+      "total_tokens": 31996,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "timings": {
+      "prompt_n": 31994,
+      "prompt_ms": 249952.257824,
+      "predicted_n": 2,
+      "predicted_ms": 628.4734019999973
+    },
+    "zero_copy": {
+      "route": "vulkan_prefill_cpu_mtp",
+      "cold": true,
+      "round": 1,
+      "shared_bytes": 584056832,
+      "copied_bytes": 0,
+      "zero_copy": true,
+      "prompt_tokens": 31994,
+      "cached_tokens": 0,
+      "canonical_replay_tokens": 0,
+      "generated_tokens": 2,
+      "verified_tokens": 4,
+      "drafted": 3,
+      "accepted": 3,
+      "prefill_s": 249.952257824,
+      "handoff_ms": 74.793569,
+      "first_token_s": 252.876077307,
+      "wall_s": 253.19059856,
+      "decode_tps": 3.182314468099015
+    }
+  }
+}

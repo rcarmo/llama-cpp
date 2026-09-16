@@ -5,7 +5,7 @@ This index is for the local fork's benchmark evidence, not for upstream benchmar
 ## Hardware entry points
 
 * [SpaceMIT K3](k3/README.md)
-* [LattePanda Sigma / Intel Core i5-1340P](intel-1340p/README.md)
+* [LattePanda Sigma / Intel Core i5-1340P](intel-1340p/README.md) -- current Gemma zero-copy service record plus dated Qwen, Ornith, Maple, Gemma and Intel Xe evidence.
 * [RTX 3060 12 GB](rtx3060/README.md)
 
 ## Cross-links back into docs

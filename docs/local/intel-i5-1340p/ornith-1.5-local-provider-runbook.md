@@ -1,6 +1,6 @@
 # Ornith 1.5 local provider on LattePanda Sigma
 
-Ornith 1.5 35B-A3B Q4_K_M is the sole enabled local model service on Sigma. It listens on `127.0.0.1:8095` and exposes a 131,072-token context through `local-ornith/ornith-1.5-35b-a3b-q4-k-m`.
+Ornith 1.5 35B-A3B Q4_K_M is a validated but disabled Sigma profile. When enabled, it listens on `127.0.0.1:8095` and exposes a 131,072-token context through `local-ornith/ornith-1.5-35b-a3b-q4-k-m`. The current service is [Gemma zero-copy](gemma-local-provider-runbook.md).
 
 ## Selected profile
 
@@ -66,7 +66,7 @@ The service conflicts with the Gemma, Maple, Qwen3.6 and Qwen 3.8 units. Their w
 
 ## Validated API behaviour
 
-The deployed profile passed these checks on 20 August 2026:
+The profile passed these checks when deployed on 20 August 2026:
 
 - OpenAI chat completion returned exactly `OK`;
 - a required `get_weather` function produced one schema-valid tool call with `{"city":"Lisbon"}`;
@@ -81,7 +81,7 @@ Stop Ornith before enabling an older service:
 
 ```bash
 systemctl --user disable --now llama-ornith-local-provider.service
-systemctl --user enable --now llama-gemma-local-provider.service
+systemctl --user enable --now llama-gemma-zero-copy.service llama-gemma-lan-test.socket
 ```
 
 The pre-Ornith Pi model registration is saved at `~/.pi/agent/models.json.pre-ornith-20260820`. Restore it only when an older service is available:
@@ -91,3 +91,7 @@ cp ~/.pi/agent/models.json.pre-ornith-20260820 ~/.pi/agent/models.json
 ```
 
 No model weight file was removed during deployment.
+
+## Later agentic comparison
+
+The [22 August 2026 Gemma and Ornith agentic campaign](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/report.md) gave both models 8/10 deterministic checks. Ornith passed all four real Pi tasks and received the stronger blind review for two truncated long-form answers. Gemma completed the combined work 15.7% faster, used 58.6% less peak PSS and avoided Ornith's 6.99 GiB process swap. The campaign restored Ornith at that date. The 15 September Gemma zero-copy deployment superseded it; current service selection is recorded in the Gemma runbook.

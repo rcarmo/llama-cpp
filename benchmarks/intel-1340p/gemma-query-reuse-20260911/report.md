@@ -1,5 +1,7 @@
 # Query reuse: a small qualified experimental gain, B0 still live
 
+> Historical deployment snapshot (10-11 September 2026). The [15 September in-process zero-copy service](../gemma-zero-copy-service-20260915/README.md) supersedes the service identity, ports, active flags and rollback targets below. Commands in this snapshot are not current operating procedures.
+
 Reusing rounded attention queries improved the independent saved64K confirmation by **0.70% in median generation speed** and **1.03% in request time**. A separate512-token screen improved generation by **1.36%**. The candidate is recorded as **B1-query-reuse, qualified for a bounded experimental decode scope**. It has not been deployed; production remains B0-score3.
 
 The 18-step attention plan is closed through the measured query-reuse branch and explicit conditional decisions. Two hardware-counter profiles did not attribute a shared-KV or intermediate-buffer bottleneck. Head-sharing and fused-attention prototypes were not opened. Their requirements and the reasons are retained in `branch-decisions.md`.

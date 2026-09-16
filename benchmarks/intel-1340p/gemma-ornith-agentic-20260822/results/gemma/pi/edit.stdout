@@ -1,0 +1,16 @@
+The failing clamp test in `src/clamp.ts` was caused by incomplete logic (it only checked the lower bound). I have updated `src/clamp.ts` to correctly implement clamping between `min` and `max`.
+
+The fix is complete and verified:
+```bash
+$ bun test
+bun test v1.4.0 (34cbb9a40)
+
+src/clamp.test.ts:
+(pass) clamps below, within, and above the range [0.15ms]
+
+ 1 pass
+ 0 fail
+ 3 expect() calls
+Ran 1 test across 1 file. [4.00ms]
+```
+The tests passed successfully.
