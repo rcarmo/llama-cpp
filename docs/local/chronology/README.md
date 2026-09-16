@@ -30,7 +30,8 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-10 / 2026-09-11 -- [Gemma benchmark cluster on Sigma](../../../benchmarks/intel-1340p/README.md#2026-09-10-and-2026-09-11-gemma-series), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md)
 * 2026-09-13 / 2026-09-14 -- [Intel Xe handoff and zero-copy series](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series), [in-memory KV handoff note](../intel-i5-1340p/in-memory-kv-handoff.md), [paired Q6 note](../intel-i5-1340p/cpu-q6-pair.md)
 * 2026-09-14 -- [RTX 3060 GSQ rebuild](../rtx3060/qwen38-gsq-rco-report.md)
-* 2026-09-15 -- [Gemma 32K zero-copy service qualification, persistent-model and live-stream verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md), [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
+* 2026-09-15 -- [Gemma 32K zero-copy service qualification, persistent-model and live-stream verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
+* 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [ZC2 Q4 scheduling release and deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
 
 ## Current runbooks and retained operational docs
 
@@ -40,6 +41,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * [Ornith 1.0 and 1.5 retained runbooks](../intel-i5-1340p/intel-1340p-ornith-runbook.md), [Ornith 1.5 disabled profile](../intel-i5-1340p/ornith-1.5-local-provider-runbook.md)
 * [SpaceMIT K3 build notes](../spacemit-k3/build-riscv64-spacemit.md)
 
-## September 16 serving update
+## September 16 serving updates
 
-* 2026-09-16 -- [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.
+* [Gemma ZC2 Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md): shorter temporary lifetimes improved confirmed sustained CPU+MTP decode by 11.56%; full zero-copy/UI qualification and deployment passed.
+* [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.

@@ -1,8 +1,10 @@
 # Gemma zero-copy generation parity, 16 September 2026
 
-The deployed zero-copy Gemma service now uses model-derived sampling defaults and speculative `n_min=1`. Attached CPU threadpools and the historical small-target-batch dispatch are disabled. The accepted semantic changes were throughput-neutral on the sustained fixture and passed the full serving qualification.
+> Superseded deployment record. ZC2 retains these generation semantics and uses this deployment root as its verified rollback. See the [Q4 scheduling release](../gemma-zc-speed-20260916/README.md) for current live identity and performance.
 
-## Live state
+This ZC1 release restored model-derived sampling defaults and speculative `n_min=1`. Attached CPU threadpools and the historical small-target-batch dispatch were disabled. The accepted semantic changes were throughput-neutral on the sustained fixture and passed the full serving qualification.
+
+## ZC1 deployment state
 
 | Field | Value |
 |---|---|

@@ -14,7 +14,7 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Gemma 4 E4B zero-copy, 32K | Sole enabled local model service | 202.60 / 128.00 prompt tok/s at 4K / 32K; 584,056,832 shared K/V bytes, zero copied bytes and live UI progress |
+| LattePanda Sigma | Gemma 4 E4B ZC2 zero-copy, 32K | Sole enabled local model service | 25.85 sustained decode tok/s; +11.56% over ZC1 across eight runs; 584,056,832 shared K/V bytes per handoff, zero copied bytes and live UI progress |
 | LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
 | LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
@@ -51,6 +51,8 @@ pre-launch executable allocation failures without replaying launched kernels.
 These results do not change the Sigma or SpaceMIT selections above.
 
 ## Build the selected CPU backend
+
+This command builds the general CPU-only benchmark backend. It does not build the live Gemma Vulkan-prefill service; use the [Gemma runbook](docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#build) for that deployment.
 
 ```bash
 BUILD_JOBS=2 tools/build-intel-1340p.sh
@@ -116,14 +118,16 @@ The selected Sigma service keeps CPU and Vulkan model owners resident. Each cold
 
 | Workload | Prompt throughput | Handoff | Result |
 |---|---:|---:|---|
-| Exact 4K | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
-| Exact 32K | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
+| Exact 4K (15 September architecture qualification) | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
+| Exact 32K (15 September architecture qualification) | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 
-Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Historical CPU measurements remain the sustained-generation reference.
+These prompt-side figures were not remeasured for ZC2. Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. ZC2 shortens temporary lifetimes in the four-row Q4 target kernel. Eight counterbalanced runs improved sustained decode from 23.1749 to 25.8539 tok/s (+11.56%); the exact historical 512/64 fixture improved 5.58% with identical output and MTP work.
 
 Operations and evidence:
 
 - [`docs/local/intel-i5-1340p/gemma-local-provider-runbook.md`](docs/local/intel-i5-1340p/gemma-local-provider-runbook.md)
+- [`benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md`](benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md)
+- [`benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md`](benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md)
 - [`benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md`](benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md)
 - [`tools/gemma-hybrid/README.md`](tools/gemma-hybrid/README.md)
 

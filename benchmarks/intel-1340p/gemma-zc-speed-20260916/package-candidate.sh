@@ -18,7 +18,7 @@ ln -s libllama.so.0.4.0 "$target/bin/libllama.so.0";ln -s libllama.so.0 "$target
 ln -s libllama-common.so.0.4.0 "$target/bin/libllama-common.so.0";ln -s libllama-common.so.0 "$target/bin/libllama-common.so"
 ln -s libmtmd.so.0.4.0 "$target/bin/libmtmd.so.0";ln -s libmtmd.so.0 "$target/bin/libmtmd.so"
 old="$root/runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502/service.env"
-sed -e "s|^GEMMA_ZERO_COPY_BUILD=.*|GEMMA_ZERO_COPY_BUILD=$target|" -e '/^GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=/d' "$old">"$target/service.env"
+sed -e "s|^LLAMA_BUILD=.*|LLAMA_BUILD=$target|" -e '/^GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=/d' "$old">"$target/service.env"
 printf '\nGGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1\n'>>"$target/service.env"
 chmod 0600 "$target/service.env"
 cat >"$target/provenance.txt" <<EOF

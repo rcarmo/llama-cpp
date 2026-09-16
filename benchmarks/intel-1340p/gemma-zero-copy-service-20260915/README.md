@@ -1,8 +1,10 @@
 # Gemma zero-copy service qualification, 15 September 2026
 
+> Historical architecture record. The [ZC1 generation-parity release](../gemma-generation-parity-20260916/README.md) superseded its generation settings, and the [ZC2 Q4 scheduling release](../gemma-zc-speed-20260916/README.md) is the current deployment.
+
 ## Result
 
-The persistent single-slot service passed the trained qualification and is deployed on the LAN endpoint. The process retains its CPU target, CPU assistant and Vulkan target model owners. A cold request creates a fresh Vulkan context, evaluates the chat prompt, transfers its Gemma ISWA K/V cache into the CPU context in process, destroys the consumed Vulkan context, creates the CPU Gemma MTP borrower and continues generation without a state file.
+The persistent single-slot service passed the trained qualification and was deployed on the LAN endpoint. The process retained its CPU target, CPU assistant and Vulkan target model owners. A cold request created a fresh Vulkan context, evaluated the chat prompt, transferred its Gemma ISWA K/V cache into the CPU context in process, destroyed the consumed Vulkan context, created the CPU Gemma MTP borrower and continued generation without a state file.
 
 The defect was a Qwen strict-handoff guard added after the original general handoff. It rejected every non-strict GPU/offloaded source, including Gemma. Removing that guard restores the original Gemma contract while leaving the strict Qwen checks unchanged.
 
