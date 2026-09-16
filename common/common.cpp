@@ -1210,7 +1210,7 @@ bool tty_can_use_colors() {
 //
 
 // TODO: move to common/sampling
-static void common_init_sampler_from_model(
+void common_params_sampling_init_from_model(
     const llama_model * model,
     common_params_sampling & sparams) {
 
@@ -1360,7 +1360,7 @@ common_init_result::common_init_result(common_params & params, bool model_only) 
 
     // updates params.sampling
     // TODO: fix naming
-    common_init_sampler_from_model(model, params.sampling);
+    common_params_sampling_init_from_model(model, params.sampling);
 
     if (params.sampling.ignore_eos && llama_vocab_eos(vocab) == LLAMA_TOKEN_NULL) {
         COM_WRN("%s", "vocab does not have an EOS token, ignoring --ignore-eos\n");
@@ -1787,6 +1787,10 @@ common_threadpools::~common_threadpools() {
     }
     free_fn(threadpool);
     free_fn(threadpool_batch);
+}
+
+bool common_threadpools::initialized() const {
+    return threadpool != nullptr;
 }
 
 void common_threadpools::init(llama_context * ctx, const common_params & params) {

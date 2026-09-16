@@ -950,6 +950,7 @@ private:
 using common_init_result_ptr = std::unique_ptr<common_init_result>;
 
 common_init_result_ptr common_init_from_params(common_params & params, bool model_only = false);
+void common_params_sampling_init_from_model(const llama_model * model, common_params_sampling & sparams);
 
 struct llama_model_params   common_model_params_to_llama  (      common_params & params);
 struct llama_context_params common_context_params_to_llama(const common_params & params);
@@ -977,6 +978,7 @@ struct common_threadpools {
     common_threadpools & operator=(const common_threadpools &) = delete;
 
     void init(llama_context * ctx, const common_params & params);
+    bool initialized() const;
 
 private:
     ggml_threadpool * threadpool       = nullptr;

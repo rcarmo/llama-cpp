@@ -129,11 +129,14 @@ struct config {
     int32_t threads = 8;
     int32_t threads_batch = 16;
     int32_t draft_max = 3;
+    int32_t draft_min = 1;
     int32_t max_output = 2048;
+    bool threadpools = true;
+    bool model_sampling = true;
 };
 
 static void usage(const char * name) {
-    std::fprintf(stderr, "usage: %s --model MODEL.gguf --draft ASSISTANT.gguf [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--max-output N]\n", name);
+    std::fprintf(stderr, "usage: %s --model MODEL.gguf --draft ASSISTANT.gguf [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--draft-min N] [--threadpools 0|1] [--model-sampling 0|1] [--max-output N]\n", name);
 }
 
 static config parse_args(int argc, char ** argv) {
@@ -159,13 +162,22 @@ static config parse_args(int argc, char ** argv) {
         else if (key == "--threads") result.threads = std::stoi(value);
         else if (key == "--threads-batch") result.threads_batch = std::stoi(value);
         else if (key == "--draft-max") result.draft_max = std::stoi(value);
-        else if (key == "--max-output") result.max_output = std::stoi(value);
+        else if (key == "--draft-min") result.draft_min = std::stoi(value);
+        else if (key == "--threadpools") {
+            const int parsed = std::stoi(value);
+            if (parsed != 0 && parsed != 1) throw std::invalid_argument("--threadpools must be 0 or 1");
+            result.threadpools = parsed == 1;
+        } else if (key == "--model-sampling") {
+            const int parsed = std::stoi(value);
+            if (parsed != 0 && parsed != 1) throw std::invalid_argument("--model-sampling must be 0 or 1");
+            result.model_sampling = parsed == 1;
+        } else if (key == "--max-output") result.max_output = std::stoi(value);
         else throw std::invalid_argument("unknown option " + key);
     }
     if (result.model_path.empty() || result.draft_path.empty()) {
         throw std::invalid_argument("--model and --draft are required");
     }
-    if (result.port < 1 || result.port > 65535 || result.context < 1024 || result.batch < 32 || result.ubatch < 32 || result.ubatch > result.batch || result.threads < 1 || result.threads_batch < 1 || result.draft_max < 1 || result.draft_max > 16 || result.max_output < 1) {
+    if (result.port < 1 || result.port > 65535 || result.context < 1024 || result.batch < 32 || result.ubatch < 32 || result.ubatch > result.batch || result.threads < 1 || result.threads_batch < 1 || result.draft_max < 1 || result.draft_max > 16 || result.draft_min < 0 || result.draft_min > result.draft_max || result.max_output < 1) {
         throw std::invalid_argument("invalid numeric option");
     }
     return result;
@@ -246,17 +258,22 @@ public:
     }
 
     json props() const {
-        common_params_sampling sampling;
+        std::vector<std::string> samplers;
+        samplers.reserve(sampling_defaults.samplers.size());
+        for (const auto sampler : sampling_defaults.samplers) {
+            samplers.push_back(common_sampler_type_to_str(sampler));
+        }
         return {
             {"default_generation_settings", {
                 {"id", 0}, {"id_task", 0}, {"n_ctx", cfg.context}, {"speculative", true}, {"is_processing", false},
                 {"params", {
-                    {"n_predict", cfg.max_output}, {"max_tokens", cfg.max_output}, {"seed", sampling.seed},
-                    {"temperature", sampling.temp}, {"top_k", sampling.top_k}, {"top_p", sampling.top_p}, {"min_p", sampling.min_p},
-                    {"repeat_last_n", sampling.penalty_last_n}, {"repeat_penalty", sampling.penalty_repeat},
-                    {"presence_penalty", sampling.penalty_present}, {"frequency_penalty", sampling.penalty_freq},
-                    {"stream", false}, {"samplers", json::array({"penalties", "dry", "top_k", "typ_p", "top_p", "min_p", "temperature"})},
-                    {"backend_sampling", false}, {"speculative.n_max", cfg.draft_max}, {"timings_per_token", false}
+                    {"n_predict", cfg.max_output}, {"max_tokens", cfg.max_output}, {"seed", sampling_defaults.seed},
+                    {"temperature", sampling_defaults.temp}, {"top_k", sampling_defaults.top_k}, {"top_p", sampling_defaults.top_p}, {"min_p", sampling_defaults.min_p},
+                    {"repeat_last_n", sampling_defaults.penalty_last_n}, {"repeat_penalty", sampling_defaults.penalty_repeat},
+                    {"presence_penalty", sampling_defaults.penalty_present}, {"frequency_penalty", sampling_defaults.penalty_freq},
+                    {"ignore_eos", sampling_defaults.ignore_eos}, {"stream", false}, {"samplers", samplers},
+                    {"backend_sampling", false}, {"speculative.n_max", cfg.draft_max}, {"speculative.n_min", cfg.draft_min},
+                    {"threadpools", cfg.threadpools}, {"model_sampling", cfg.model_sampling}, {"timings_per_token", false}
                 }},
                 {"prompt", ""}, {"next_token", {{"has_next_token", false}, {"has_new_line", false}, {"n_remain", 0}, {"n_decoded", 0}, {"stopping_word", ""}}}
             }},
@@ -276,10 +293,14 @@ private:
     model_ptr cpu_target{nullptr, llama_model_free};
     model_ptr draft_model{nullptr, llama_model_free};
     model_ptr gpu_target{nullptr, llama_model_free};
+    std::unique_ptr<common_threadpools> target_threadpools;
+    std::unique_ptr<common_threadpools> draft_threadpools;
     context_ptr target_ctx{nullptr, llama_free};
     context_ptr draft_ctx{nullptr, llama_free};
     common_speculative_ptr speculative;
     common_chat_templates_ptr templates;
+    common_params_sampling sampling_defaults;
+    std::vector<llama_logit_bias> logit_bias_eog;
     std::vector<llama_token> history;
     json committed = json::array();
     json prior_tools = json::array();
@@ -320,12 +341,37 @@ private:
         return params;
     }
 
-    static context_ptr make_context(llama_model * model, llama_context_params params) {
+    common_params threadpool_params() const {
+        common_params params;
+        params.cpuparams.n_threads = cfg.threads;
+        params.cpuparams_batch.n_threads = cfg.threads_batch;
+        return params;
+    }
+
+    context_ptr make_context(llama_model * model, llama_context_params params, std::unique_ptr<common_threadpools> & threadpools) const {
         context_ptr context(llama_init_from_model(model, params), llama_free);
         if (!context) {
             throw std::runtime_error("context creation failed");
         }
+        threadpools.reset();
+        if (cfg.threadpools) {
+            threadpools = std::make_unique<common_threadpools>();
+            threadpools->init(context.get(), threadpool_params());
+            if (!threadpools->initialized()) {
+                llama_detach_threadpool(context.get());
+                threadpools.reset();
+                throw std::runtime_error("threadpool initialization failed");
+            }
+        }
         return context;
+    }
+
+    void reset_context(context_ptr & context, std::unique_ptr<common_threadpools> & threadpools) {
+        if (context && threadpools) {
+            llama_detach_threadpool(context.get());
+        }
+        context.reset();
+        threadpools.reset();
     }
 
     void load_models() {
@@ -340,12 +386,17 @@ private:
             throw std::runtime_error("service requires Gemma4 target and assistant models");
         }
         templates = common_chat_templates_init(cpu_target.get(), "", "");
+        if (cfg.model_sampling) {
+            common_params_sampling_init_from_model(cpu_target.get(), sampling_defaults);
+        }
+        sampling_defaults.backend_sampling = false;
+        logit_bias_eog = gemma_hybrid::eog_biases(llama_model_get_vocab(cpu_target.get()));
     }
 
     void reset_runtime() {
         speculative.reset();
-        draft_ctx.reset();
-        target_ctx.reset();
+        reset_context(draft_ctx, draft_threadpools);
+        reset_context(target_ctx, target_threadpools);
         history.clear();
         committed = json::array();
         prior_tools = json::array();
@@ -390,12 +441,13 @@ private:
         llama_context_params params = context_params(false);
         params.ctx_type = LLAMA_CONTEXT_TYPE_MTP;
         params.ctx_other = target_ctx.get();
-        draft_ctx = make_context(draft_model.get(), params);
+        draft_ctx = make_context(draft_model.get(), params, draft_threadpools);
         common_params_speculative spec_params;
         spec_params.types = {COMMON_SPECULATIVE_TYPE_DRAFT_MTP};
         spec_params.draft.ctx_tgt = target_ctx.get();
         spec_params.draft.ctx_dft = draft_ctx.get();
         spec_params.draft.n_max = cfg.draft_max;
+        spec_params.draft.n_min = cfg.draft_min;
         spec_params.draft.backend_sampling = false;
         speculative.reset(common_speculative_init(spec_params, 1));
         if (!speculative) {
@@ -416,7 +468,8 @@ private:
     }
 
     common_params_sampling sampling_params(const json & request, const common_chat_params & chat) const {
-        common_params_sampling params;
+        common_params_sampling params = sampling_defaults;
+        params.user_sampling_config |= gemma_hybrid::sampling_override_mask(request);
         params.temp = request.value("temperature", params.temp);
         params.top_k = request.value("top_k", params.top_k);
         params.top_p = request.value("top_p", params.top_p);
@@ -427,6 +480,14 @@ private:
         params.penalty_present = request.value("presence_penalty", params.penalty_present);
         params.penalty_freq = request.value("frequency_penalty", params.penalty_freq);
         params.seed = request.value("seed", params.seed);
+        params.ignore_eos = request.value("ignore_eos", params.ignore_eos);
+        if (params.ignore_eos) {
+            params.logit_bias.insert(params.logit_bias.end(), logit_bias_eog.begin(), logit_bias_eog.end());
+        }
+        if (request.contains("samplers")) {
+            if (!request.at("samplers").is_array()) throw std::invalid_argument("samplers must be an array");
+            params.samplers = common_sampler_types_from_names(request.at("samplers").get<std::vector<std::string>>());
+        }
         params.grammar = chat.grammar.empty() ? common_grammar() : common_grammar(COMMON_GRAMMAR_TYPE_TOOL_CALLS, chat.grammar);
         params.grammar_lazy = chat.grammar_lazy;
         params.grammar_triggers = chat.grammar_triggers;
@@ -469,7 +530,7 @@ private:
         }
 
         if (cold) {
-            target_ctx = make_context(gpu_target.get(), context_params(true));
+            target_ctx = make_context(gpu_target.get(), context_params(true), target_threadpools);
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
                 const size_t count = std::min<size_t>(cfg.batch, prompt.size() - i);
@@ -481,15 +542,17 @@ private:
             llama_synchronize(target_ctx.get());
             prefill_s = elapsed_s(prefill_started);
 
-            context_ptr destination = make_context(cpu_target.get(), context_params(false));
+            std::unique_ptr<common_threadpools> destination_threadpools;
+            context_ptr destination = make_context(cpu_target.get(), context_params(false), destination_threadpools);
             const auto handoff_started = clock_type::now();
             const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
             if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
                 throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
             }
             handoff_ms = elapsed_s(handoff_started) * 1000.0;
-            target_ctx.reset();
+            reset_context(target_ctx, target_threadpools);
             target_ctx = std::move(destination);
+            target_threadpools = std::move(destination_threadpools);
             ++handoffs;
             total_shared_bytes += transfer.shared_bytes;
             total_copied_bytes += transfer.copied_bytes;

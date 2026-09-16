@@ -14,6 +14,9 @@ static json message(const char * role, const char * content) {
 }
 
 int main() {
+    common_threadpools empty_threadpools;
+    CHECK(!empty_threadpools.initialized());
+
     json first = {{"messages", json::array({message("user", "one")})}};
     gemma_hybrid::normalize_request(first);
     CHECK(first.at("tools") == json::array());
@@ -33,6 +36,35 @@ int main() {
     }
     CHECK(invalid_budget);
     CHECK(gemma_hybrid::classify_request("", "conversation-a", json::array(), json::array(), first) == gemma_hybrid::request_action::start);
+
+    json sampling = {
+        {"samplers", json::array({"top_k", "temperature"})},
+        {"top_k", 1},
+        {"top_p", 0.9},
+        {"min_p", 0.0},
+        {"xtc_probability", 0.1},
+        {"xtc_threshold", 0.2},
+        {"temperature", 0.0},
+        {"repeat_last_n", 32},
+        {"repeat_penalty", 1.1},
+        {"mirostat", 1},
+        {"mirostat_tau", 4.0},
+        {"mirostat_eta", 0.2},
+    };
+    const uint64_t sampling_mask = gemma_hybrid::sampling_override_mask(sampling);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_SAMPLERS) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_TOP_K) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_TOP_P) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIN_P) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_XTC_PROBABILITY) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_XTC_THRESHOLD) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_TEMP) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_PENALTY_LAST_N) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_PENALTY_REPEAT) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_TAU) != 0);
+    CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_ETA) != 0);
+    CHECK(gemma_hybrid::sampling_override_mask(json::object()) == 0);
 
     json committed = first.at("messages");
     committed.push_back(message("assistant", "answer"));

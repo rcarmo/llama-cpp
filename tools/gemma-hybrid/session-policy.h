@@ -1,10 +1,15 @@
 #pragma once
 
+#include "common.h"
+
 #include <nlohmann/json.hpp>
 
+#include <cmath>
+#include <cstdint>
 #include <map>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace gemma_hybrid {
 
@@ -28,6 +33,33 @@ inline void normalize_request(json & request) {
     if (!request.at("tools").is_array()) {
         throw std::invalid_argument("tools must be an array");
     }
+}
+
+inline uint64_t sampling_override_mask(const json & request) {
+    uint64_t result = 0;
+    if (request.contains("samplers")) result |= COMMON_PARAMS_SAMPLING_CONFIG_SAMPLERS;
+    if (request.contains("top_k")) result |= COMMON_PARAMS_SAMPLING_CONFIG_TOP_K;
+    if (request.contains("top_p")) result |= COMMON_PARAMS_SAMPLING_CONFIG_TOP_P;
+    if (request.contains("min_p")) result |= COMMON_PARAMS_SAMPLING_CONFIG_MIN_P;
+    if (request.contains("xtc_probability")) result |= COMMON_PARAMS_SAMPLING_CONFIG_XTC_PROBABILITY;
+    if (request.contains("xtc_threshold")) result |= COMMON_PARAMS_SAMPLING_CONFIG_XTC_THRESHOLD;
+    if (request.contains("temperature")) result |= COMMON_PARAMS_SAMPLING_CONFIG_TEMP;
+    if (request.contains("repeat_last_n")) result |= COMMON_PARAMS_SAMPLING_CONFIG_PENALTY_LAST_N;
+    if (request.contains("repeat_penalty")) result |= COMMON_PARAMS_SAMPLING_CONFIG_PENALTY_REPEAT;
+    if (request.contains("mirostat")) result |= COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT;
+    if (request.contains("mirostat_tau")) result |= COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_TAU;
+    if (request.contains("mirostat_eta")) result |= COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_ETA;
+    return result;
+}
+
+inline std::vector<llama_logit_bias> eog_biases(const llama_vocab * vocab) {
+    std::vector<llama_logit_bias> result;
+    for (llama_token token = 0; token < llama_vocab_n_tokens(vocab); ++token) {
+        if (llama_vocab_is_eog(vocab, token)) {
+            result.push_back({token, -INFINITY});
+        }
+    }
+    return result;
 }
 
 inline int32_t output_budget(const json & request, int32_t configured_max) {
