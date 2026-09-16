@@ -9,6 +9,11 @@ export LD_LIBRARY_PATH="$LLAMA_BUILD/bin${LLAMA_RUNTIME:+:$LLAMA_RUNTIME}${LD_LI
 export GGML_VK_VISIBLE_DEVICES=${GGML_VK_VISIBLE_DEVICES:-0}
 export GGML_VK_EXPERIMENTAL_ATTN_MODE=${GGML_VK_EXPERIMENTAL_ATTN_MODE:-f32}
 
+parity=()
+[[ -n ${LLAMA_MTP_MIN:-} ]] && parity+=(--draft-min "$LLAMA_MTP_MIN")
+[[ -n ${LLAMA_THREADPOOLS:-} ]] && parity+=(--threadpools "$LLAMA_THREADPOOLS")
+[[ -n ${LLAMA_MODEL_SAMPLING:-} ]] && parity+=(--model-sampling "$LLAMA_MODEL_SAMPLING")
+
 exec "$LLAMA_BUILD/bin/llama-gemma-zero-copy-server" \
     --model "$LLAMA_MODEL" \
     --draft "$LLAMA_DRAFT_MODEL" \
@@ -21,7 +26,5 @@ exec "$LLAMA_BUILD/bin/llama-gemma-zero-copy-server" \
     --threads "${LLAMA_THREADS:-8}" \
     --threads-batch "${LLAMA_THREADS_BATCH:-16}" \
     --draft-max "${LLAMA_MTP_DEPTH:-3}" \
-    --draft-min "${LLAMA_MTP_MIN:-1}" \
-    --threadpools "${LLAMA_THREADPOOLS:-0}" \
-    --model-sampling "${LLAMA_MODEL_SAMPLING:-1}" \
+    "${parity[@]}" \
     --max-output "${LLAMA_MAX_OUTPUT:-2048}"
