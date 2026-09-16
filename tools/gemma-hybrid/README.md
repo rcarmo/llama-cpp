@@ -17,7 +17,7 @@ The service accepts non-streaming requests and live SSE responses. Streaming sen
 
 Run `bun tools/gemma-hybrid/verify-stream.ts` for incremental content/progress verification and `bun tools/gemma-hybrid/verify-stream-tool.ts` for streamed tool-call assembly. Set `GEMMA_ZERO_COPY_URL` to check a non-default endpoint such as the LAN proxy.
 
-See [the Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md).
+See [the Gemma zero-copy service qualification](../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) and [the in-process K/V handoff contract](../../docs/local/intel-i5-1340p/in-memory-kv-handoff.md). Before changing generation code or settings, follow the [generation inheritance contract](../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract); it records the accepted historical stack, measured exclusions and isolated retest order.
 
 `llama-gemma-in-memory` is the one-request native diagnostic. It retains target history and sampling in RAM and reports shared/copied bytes.
 

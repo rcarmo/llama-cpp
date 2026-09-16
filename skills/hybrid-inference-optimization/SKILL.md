@@ -16,8 +16,10 @@ Read [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md) f
 3. Record source revision, loaded binary/library hashes, build flags, compiler, model/tokeniser/quantisation, assistant model, driver/device ID and exact arguments/environment. A checkout revision is not the running binary revision.
 4. Record actual prompt length, context per stream, stream count, populated slots, FA/KV layout, batch/microbatch, thread pools and cache/checkpoint settings. Allocated capacity is not validated populated capacity.
 5. Separate experimental, tested, accepted and deployed status. A commit, available CLI flag or passing smoke does not establish deployment.
+6. Build a configuration-inheritance matrix before replacing an existing serving path. Include every accepted thread, batch, speculative, sampler, K/V, attention, model-loading, backend and build setting, plus accepted source patches and measured exclusions. For each item, mark `preserved`, `changed with evidence`, `retest` or `excluded`. An undocumented difference blocks performance deployment.
+7. Use the previous accepted stack as the first candidate, in dependency order. Do not test several inherited optimisations as one transplant and use the combined result to reject the components. A combined loss leaves each isolated factor unresolved unless the interaction itself was the declared question.
 
-For the current shared-memory Intel host, read [Sigma controls and lessons](references/sigma.md). Do not apply those limits blindly to another machine.
+For the current shared-memory Intel host, read [Sigma controls and lessons](references/sigma.md). For Gemma work, also read the [generation inheritance contract](../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract) before changing or benchmarking the service. Do not apply those limits blindly to another machine.
 
 ## Prespecify a bounded experiment
 
@@ -25,12 +27,12 @@ Write a small plan before inference:
 
 - Hypothesis, expected expensive operation and which change could improve it.
 - Exact baseline/candidate manifest and factors held constant.
-- Fixtures, seeds, sampling, output budget and independent expected results.
+- Fixtures, seeds, complete sampling chain and model-derived defaults, speculative minimum/maximum draft lengths, output budget and independent expected results.
 - Resource ceilings, abort/timeout ownership and automatic restoration.
 - Screening budget, confirmation order and decision criteria.
 - Known failures and what remains untested.
 
-Change one factor for causal claims. If testing a combined design, label its factors and avoid assigning the gain to one component. Select a practical baseline, not an obsolete weak control that exaggerates benefit.
+Change one factor for causal claims. If testing a combined design, label its factors and avoid assigning the gain to one component. Select a practical baseline, not an obsolete weak control that exaggerates benefit. Reproduce at least one retained fixture from the previous accepted stack before introducing a new fixture; if an API or template change prevents exact reproduction, record the changed token stream and treat the measurements as a new series.
 
 ## Guard the host
 
@@ -51,6 +53,7 @@ Use device timing or operator profiling to locate work, then disable intrusive i
 Useful controls:
 
 - Restore an already validated long state to test decoding or tail prefill without recomputing the whole prompt.
+- Check whether the replacement executable still uses standard initialisation side effects such as model-derived sampling defaults and attached decode/batch threadpools. Setting context thread counts alone does not establish execution parity.
 - Separate request wall time, evaluated tokens, cached tokens, generated tokens and MTP drafted/accepted counts. A faster short answer is not proof of a faster kernel.
 - Verify actual worker affinity; command-line masks and OpenMP variables do not establish placement.
 - Check workload-specific backend dispatch, precision, shape gates, device capabilities and split/reduction rules. An environment variable being set does not prove the desired kernel ran.
@@ -119,5 +122,6 @@ Quantised KV can reduce resident capacity but add conversion and attention costs
 3. Stage only task-owned files. Exclude secrets, user data, model weights, multi-GB slot files, mutable service state and build products. Store hashes/manifests and compact raw evidence instead.
 4. Verify the remote is the owner's fork; fetch and merge without rewriting history, push the checkpoint, then compare local and remote commit IDs. Report any conflict or transport failure directly.
 5. Publish the chosen configuration and retained alternatives with exact measurements, uncertainty, restoration status, remaining gates and rollback. Do not call an optimisation deployed or globally maximal without the corresponding evidence.
+6. Update the configuration-inheritance matrix and append-only baseline ledger. Future work must be able to identify the current parent, accepted increments, negative controls and next isolated test without reading chat history.
 
 Relevant technical references: [build](../../docs/build.md), [server](../../tools/server/README.md), [GPU prefill staging](../../docs/gpu-prefill-staging.md), [shared VRAM relocation](../../docs/shared-vram-relocation.md). Existing staging features still require measured backend/model compatibility; documentation alone does not qualify a new route.

@@ -86,6 +86,50 @@ Historical matched CPU measurements remain the best sustained-generation referen
 
 Retained evidence: [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md).
 
+## Generation inheritance contract
+
+A replacement Gemma serving path must preserve the accepted generation baseline or record an isolated matched reason for each difference. On 16 September 2026, the current-service audit reread all 48 `README.md` and `report.md` files under the indexed Gemma benchmark campaigns, the August [completion audit](../../../benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md), the September [B0 baseline ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md), the historical [512-prompt/64-output result](../../../benchmarks/intel-1340p/maple-qwen-campaign/performance/gemma/response-generation.json), and the current source, build and live process state. Future work starts from this table instead of reconstructing the decisions from chat history.
+
+Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `retest` means earlier evidence was favourable but the current service has not qualified the factor; `excluded` means measured evidence does not support enabling it; `research` means the result is too small or narrow for the current default.
+
+| Factor | Retained evidence | Current zero-copy state | Required action |
+|---|---|---|---|
+| Resident Vulkan model, fresh cold context and in-process K/V handoff | Current service qualification | Live; positive shared bytes, zero copied bytes | Preserve as an invariant |
+| Iris Xe FP32 long-attention selection, GPU microbatch 256 | [GPU attention](../../../benchmarks/intel-1340p/gemma-gpu-attention-20260910/report.md); [batch interaction](../../../benchmarks/intel-1340p/gemma-f32-batch-20260910/report.md) | Live | Preserve; 1024 was tail-specific and slower for fresh whole prefill |
+| Clang Release, `-O3`, `-march=native`, AVX2/F16C/FMA, libomp | Current `build-gemma-zero-copy-vulkan` compile commands and loaded libraries | Live | Preserve exact build and loaded-library identity |
+| CPU target decode 8, large-batch/prefill 16 | [Hybrid performance](../../../benchmarks/intel-1340p/gemma-hybrid-perf-20260910/report.md) | Live | Preserve |
+| MTP assistant decode 8, batch 16 | [Draft-thread comparison](../../../benchmarks/intel-1340p/gemma-decode-draftthreads-20260910/report.md) | Live | Preserve; four draft threads were 4.10% slower |
+| MTP depth 3 | [August decisions](../../../benchmarks/intel-1340p/ornith-gemma-optimization/final-decisions.json) | Live | Preserve; depth 4 was 2.31% slower, and later depth 1/5 screens also lost |
+| F16 K/V, compact SWA, Flash Attention off | August completion audit and [CPU FA report](../../../benchmarks/intel-1340p/gemma-cpu-fa-20260910/report.md) | Live | Preserve; the improved CPU-FA branch still trailed FA-off |
+| mmap model loading and advice off | August completion audit | Live through default model parameters; no expert-advice flag | Preserve and record explicitly in future manifests |
+| Backend sampling off | Historical response identity and current `service.cpp` | Live | Preserve |
+| Standard attached target and draft threadpools | `common_init_from_params()` creates 8/16 pools; the historical `llama-server` used that path | Missing from focused server | Retest in isolation. With OpenMP this removes per-graph pool-state allocation but does not prove a generation gain |
+| CPU Gemma target batches `<=4` use the 8-thread decode pool | [Small-target-batch report](../../../benchmarks/intel-1340p/gemma-decode-smallbatch-20260910/report.md) | Missing; only tested in a three-patch bundle | Retest first as an isolated source change; earlier 64K confirmation was +16.52%, and longer generation screens were +23.34% and +23.95% |
+| ATTN4 2x4 F16 tile | [ATTN4 report](../../../benchmarks/intel-1340p/gemma-decode-attn4-20260911/report.md) | Missing; bundled transplant lost | Retest only after small-target-batch parity; earlier isolated increment was +2.90% with overlapping ranges |
+| SCORE3 3x4 score tile | [SCORE3 rollout](../../../benchmarks/intel-1340p/gemma-score3-rollout-20260911/report.md) | Missing; bundled transplant lost | Retest only over a qualified current ATTN4 parent; earlier isolated increment was +3.124% |
+| Model sampling metadata | Historical model default included `top_k=64`; `common_init_from_params()` reads GGUF sampling metadata | Focused server constructs generic defaults directly, including `top_k=40` | Restore metadata initialisation or compare it explicitly. Measure output quality and MTP acceptance; do not assume a kernel speed effect |
+| Minimum draft length | Historical workers used `--spec-draft-n-min 1` | Current default is 0 | Match or A/B explicitly. This only discards draft groups shorter than the threshold; no speed gain has been established |
+| Query reuse | [Query-reuse report](../../../benchmarks/intel-1340p/gemma-query-reuse-20260911/report.md) | Missing | Research only: confirmed saved-64K gain was 0.70%, and the combined release later failed its swap gate during GPU startup |
+| CPU affinity and static score scheduling | Hybrid screens and [static scheduling](../../../benchmarks/intel-1340p/gemma-score-static-20260911/report.md) | No strict binding; dynamic scheduling | Excluded: strict binding reduced throughput and static score scheduling lost 9.97% |
+| Other SIMD/value candidates | [B0 ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md) | Missing | Excluded until a new mechanism exists: paired F16, value3, no-unroll, register, inline and packed-Q4 candidates did not improve the matched workload |
+
+The three-patch 37-prompt/128-output transplant establishes only that its combination was slower on the current branch. It does not revoke the isolated small-target-batch, ATTN4 or SCORE3 results. Each factor must be ported and compared in dependency order. The current parent remains active after every unsuccessful stage.
+
+### Generation parity gate
+
+Before changing the live service:
+
+1. Freeze current and candidate source, executable, loaded libraries, model files, sampler values, threadpool state, request and rendered-token hashes. Record the exact Vulkan selector and require the same zero-copy route in both arms.
+2. Run the historical 512-token/64-output fixture identified by prompt SHA-256 `8553ca8562fbc2ced6af4580cedb400df75e137035f14cce41769cd58c86148f` and payload SHA-256 `62bbb1aad57b5d2241badd1ce2bf6bffa718f5865c21d28d052c1f8fa9853c2f`. If the focused Chat Completions API cannot reproduce the raw completion request exactly, use a local direct harness and label the endpoint difference.
+3. Freeze a sustained current-service fixture with at least 512 generated tokens. Use the same rendered prompt tokens, output budget, sampler, seed and conversation state in every arm.
+4. Screen one factor in off/on/on/off order. Confirm a useful candidate with eight counterbalanced observations. Keep profiling disabled during timing.
+5. Record prompt, handoff, first-token, generation and whole-request times separately. Record generated, verified, drafted and accepted token counts and calculate acceptance from the same boundaries.
+6. Require coherent output or the frozen task result, live incremental SSE, cancellation recovery, exact-append reuse, `shared_bytes > 0`, `copied_bytes == 0`, resident Vulkan ownership and zero process/cgroup swap.
+7. Compare old 25.767 tok/s only when the exact historical fixture, sampling and timing boundaries match. The current 12-13 tok/s short checks use different work and cannot diagnose a regression by themselves.
+8. Append accepted and rejected results to the B0-style ledger before the next candidate. A combined candidate names every parent and cannot assign its result to one component.
+
+The next test order is attached target/draft threadpools, isolated small-target-batch, ATTN4, SCORE3, then sampling and `n_min` parity. Query reuse follows only if the larger factors retain their benefits. No candidate may weaken Vulkan residency, zero-copy ownership, streaming, cancellation, serial admission or `MemorySwapMax=0`.
+
 ## Build
 
 Use a single Vulkan-enabled build for the executable and all linked llama/ggml libraries:

@@ -6,7 +6,7 @@ This is a host-specific reference, not a universal performance recommendation. C
 
 - Sigma: Intel i5-1340P, Iris Xe, approximately 31 GiB usable shared RAM; observed PCI vendor/device `8086:a7a0`.
 - P-core logical CPUs 0-7, E-core logical CPUs 8-15. Verify current topology and worker placement; process masks alone do not establish OpenMP thread affinity.
-- The deployed Gemma service uses the E4B QAT Q4_0 target, Q8_0 MTP assistant, one 32,768-token slot, Vulkan batch/microbatch 256/256, CPU decode/prefill threads 8/16, MTP depth 3, F16 K/V and Flash Attention off. It retains CPU and Vulkan model owners, creates a fresh Vulkan context for each cold conversation, hands K/V to CPU in process and streams prompt progress plus generated deltas on port 8094.
+- The deployed Gemma service uses the E4B QAT Q4_0 target, Q8_0 MTP assistant, one 32,768-token slot, Vulkan batch/microbatch 256/256, CPU decode/prefill threads 8/16, MTP depth 3, F16 K/V and Flash Attention off. It retains CPU and Vulkan model owners, creates a fresh Vulkan context for each cold conversation, hands K/V to CPU in process and streams prompt progress plus generated deltas on port 8094. Its full generation inheritance and parity gate are in the [Gemma runbook](../../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract).
 - The historical file-mediated CPU profile used batch/microbatch 1024/256, compact SWA and two 131,072-token slots. It is disabled. The source checkout, experimental candidate and retained service binary can be different revisions. Record loaded-library hashes and exact argv.
 
 ## Approved campaign controls, 10 September 2026
@@ -37,6 +37,20 @@ A failed provisional timing gate can still justify a retained branch or an expli
 | Split-K4: confirmed 64K-tail median effectively neutral (+0.06% time) | Native synthetic default/F32 long reductions improve from 2/4 baseline passes to 4/4; retain as opt-in numerical candidate |
 | CPU four-core/16-thread/bound-OpenMP and MTP1/5 screens did not beat 8-thread/MTP3 | Sequential bounded screens, not proof of the global optimum |
 | GPU FA-on 64K tail slower with invalid output | Exact offline layout roundtrip does not isolate the native FA failure; no promotion |
+
+## Gemma generation baseline inheritance
+
+The 16 September audit read all 48 indexed Gemma campaign summaries, the August decision manifest, the September B0 ledger, the historical 512/64 result and the current code/build/live process. Use the runbook matrix for per-setting evidence. The durable decisions are:
+
+- Preserve Clang Release `-O3 -march=native`, AVX2/F16C/FMA, libomp, target 8/16 threads, assistant 8/16 threads, MTP3, F16 compact K/V, Flash Attention off, mmap, advice off, Vulkan FP32/256 and backend sampling off.
+- The focused zero-copy server constructs contexts and samplers directly. It does not attach `common_threadpools`, and it does not call the standard model-metadata sampler initialiser. Current generic `top_k=40` therefore differs from the historical model-derived `top_k=64`; current speculative `n_min=0` differs from historical `--spec-draft-n-min 1`.
+- Historical workers used attached 8/16 threadpools. The OpenMP backend still creates an OpenMP team for graph compute, but an unattached context allocates and frees ggml threadpool state for each graph. This is a measured code-path difference, not a measured speed regression.
+- Retest small-target-batch first and alone. It improved saved-64K generation by 16.52% and two longer output screens by 23.34% and 23.95%. The latter tasks failed their shared output contracts, so they support timing generality only.
+- Retest ATTN4 only after a current small-target-batch parent qualifies, then SCORE3 only after ATTN4. Their historical isolated increments were 2.90% and 3.124%. A current three-patch bundle lost 29.5%; that interaction result does not revoke the isolated gains.
+- Query reuse is a lower-priority research item: its independent saved-64K confirmation was +0.70%. Draft4, strict binding, static scheduling, CPU FA as the general default and the recorded value/paired/Q4/register variants stay excluded unless a new mechanism or workload changes the question.
+- Compare generation only with identical rendered tokens, sampling, draft policy, output length and timing boundaries. The historical 512-prompt/64-output result was 25.767 tok/s with 43/55 accepted drafts and model-derived sampling. Current 12-13 tok/s checks used different prompts and output work.
+
+Every future Gemma serving replacement must update the inheritance matrix before deployment. `Preserved`, `changed with evidence`, `retest` and `excluded` are the only accepted per-factor states. An undocumented difference blocks a performance cutover.
 
 ## State-layout and tuning lessons
 

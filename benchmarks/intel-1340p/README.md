@@ -30,7 +30,7 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## 2026-09-10 and 2026-09-11 Gemma series
 
-These directories freeze the file-mediated CPU/GPU service and decoder deployments as observed on 10-11 September. Their present-tense deployment statements are historical snapshots. The [15 September zero-copy service record](gemma-zero-copy-service-20260915/README.md) supersedes their operating state and rollback targets.
+These directories freeze the file-mediated CPU/GPU service and decoder deployments as observed on 10-11 September. Their present-tense deployment statements are historical snapshots. The [15 September zero-copy service record](gemma-zero-copy-service-20260915/README.md) supersedes their operating state and rollback targets. The current [generation inheritance contract](../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#generation-inheritance-contract) consolidates the accepted settings, exclusions and matched retest order from the complete indexed campaign set; use it before replacing or tuning the zero-copy service.
 
 * [gemma-hybrid-perf-20260910/](gemma-hybrid-perf-20260910/)
 * [gemma-context-coding-20260910/](gemma-context-coding-20260910/)
