@@ -9,7 +9,7 @@ This directory records the temporary Huihui Gemma 4 12B profile on `sigma`. **Ge
 | Target | Huihui Gemma 4 12B It QAT Q4_0-unquantized Abliterated, Q4_K |
 | Assistant | Matching Gemma 4 12B QAT BF16 MTP |
 | Service | `huihui-gemma4-security-audit.service` |
-| LAN UI/API | `http://192.168.1.70:8094/` |
+| LAN UI/API | `http://192.168.1.70:11434/` |
 | Context / output limit | 8,192 / 2,048 tokens |
 | CPU threads / batch threads | 8 / 16 |
 | MTP depth / minimum | 1 / 1 |

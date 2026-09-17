@@ -16,7 +16,7 @@ exec "$LLAMA_BUILD/bin/llama-gemma-zero-copy-server" \
   --draft "$LLAMA_DRAFT_MODEL" \
   --alias "${LLAMA_ALIAS:-huihui-gemma-4-12b-abliterated-zero-copy}" \
   --host "${LLAMA_HOST:-192.168.1.70}" \
-  --port "${LLAMA_PORT:-8094}" \
+  --port "${LLAMA_PORT:-11434}" \
   --ctx-size "${LLAMA_CTX:-8192}" \
   --batch-size "${LLAMA_BATCH:-256}" \
   --ubatch-size "${LLAMA_UBATCH:-256}" \

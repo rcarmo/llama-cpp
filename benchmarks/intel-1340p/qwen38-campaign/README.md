@@ -45,7 +45,7 @@ The commands above describe the August campaign layout. They are not current res
 systemctl --user stop llama-qwen38-local-provider.service
 gemma-profile primary
 gemma-profile status
-curl -fsS http://192.168.1.70:8094/health
+curl -fsS http://192.168.1.70:11434/health
 ```
 
 Gemma 4 E4B QAT + MTP zero-copy is the current primary deployment. Maple and Qwen 3.6 are retained disabled profiles; do not start them as part of normal Qwen 3.8 cleanup.

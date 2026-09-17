@@ -17,7 +17,7 @@ This ZC1 release restored model-derived sampling defaults and speculative `n_min
 | Speculative policy | MTP depth 3, `n_min=1`, backend sampling off |
 | Attached CPU pools | disabled |
 | Context | 32,768; batch/uBatch 256/256; target threads 8/16 |
-| Live endpoints | loopback `127.0.0.1:18094`; LAN `192.168.1.70:8094` |
+| Live endpoints | loopback `127.0.0.1:18094`; LAN `192.168.1.70:11434` |
 
 The immutable deployment closure contains the executable and seven llama/ggml libraries. `libomp.so` remains in the separately hashed `runtime/gemma-vulkan-f32-0bdd7cd8b/runtime` directory. Local deployment binaries are ignored by Git; [deployment manifests](deployment/) retain their hashes, dependencies, environment and live loaded paths.
 

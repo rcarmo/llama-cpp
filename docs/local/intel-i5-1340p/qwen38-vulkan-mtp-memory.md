@@ -74,4 +74,4 @@ CPU-only target-only diagnosis improved decode to 2.30 tok/s and produced a cohe
 
 The Qwen test unit was stopped and disabled. Its installed profile, versioned UI runtime, container and unit file were removed; port 8094 closed and the render device had no owner. The MTP microbatch cap remains a valid allocation optimisation, but this Qwen model/backend combination is not an interactive Sigma service.
 
-The selected Gemma 4 E4B zero-copy service now supplies the LAN UI and API on port 8094. See the [Gemma provider runbook](gemma-local-provider-runbook.md).
+The selected Gemma 4 E4B zero-copy service now supplies the LAN UI and API on port 11434. See the [Gemma provider runbook](gemma-local-provider-runbook.md).

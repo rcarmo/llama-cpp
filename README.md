@@ -116,9 +116,9 @@ Operations and evidence:
 
 ### Gemma local profiles
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP uses a static, inactive unit for local security audits. Use `gemma-profile primary|audit|status` to switch them; both use the same LAN URL and cannot run together safely.
+Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP uses a static, inactive unit for local security audits. Use `gemma-profile primary|audit|status` to switch them; both use `192.168.1.70:11434`, the standard Ollama port, and cannot run together safely. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes.
 
-The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
+The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 11434.
 
 | Workload | Prompt throughput | Handoff | Result |
 |---|---:|---:|---|
@@ -210,7 +210,7 @@ The 5-6 August 2026 campaign used exact per-tokenizer 512, 4,096 and 32,768-toke
 
 The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwen3.6 second and Maple third. Qwen3.6 alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
 
-Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. That Qwen service is disabled; LAN port 8094 now exposes Gemma zero-copy.
+Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. That Qwen service is disabled; LAN port 11434 now exposes Gemma zero-copy.
 
 These role assignments record the 5-6 August comparison. Ornith 1.5 superseded them on 20 August. Gemma 4 E4B QAT + MTP zero-copy superseded Ornith on 15 September and is the sole boot-enabled local model service. Historical CPU profiles remain disabled, and the static Huihui security-audit profile remains available for explicit selection.
 

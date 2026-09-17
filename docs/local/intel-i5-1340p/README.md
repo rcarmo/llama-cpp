@@ -4,7 +4,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Start with the current roles
 
-* [Gemma local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment and explicit Huihui Gemma 4 12B security-audit profile, with a health-checked local switch and one LAN UI/API on port 8094.
+* [Gemma local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment and explicit Huihui Gemma 4 12B security-audit profile, with a health-checked local switch and one LAN UI/API on port 11434.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
 * [Maple Preview local provider](maple-local-provider-runbook.md) -- explicit alternative provider, not the default.
 * [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.

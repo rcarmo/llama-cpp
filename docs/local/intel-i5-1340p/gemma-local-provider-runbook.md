@@ -2,7 +2,7 @@
 
 **Gemma 4 E4B QAT + MTP zero-copy** is the primary local deployment on `sigma`. Its service is enabled at boot and its immutable runtime is `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
 
-**Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** is an explicit local security-audit profile. Its service is static and cannot become the boot default. Both profiles use `http://192.168.1.70:8094/`, without authentication, and are mutually exclusive because they do not fit safely in memory together. The audit process binds only `192.168.1.70`; the primary binds loopback and reaches that address through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
+**Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** is an explicit local security-audit profile. Its service is static and cannot become the boot default. Both profiles use `http://192.168.1.70:11434/`, without authentication, and are mutually exclusive because they do not fit safely in memory together. The audit process binds only `192.168.1.70`; the primary binds loopback and reaches that address through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
 
 ## Switch profiles
 
@@ -14,15 +14,17 @@ gemma-profile audit
 gemma-profile primary
 ```
 
-`audit` stops the primary LAN socket and proxy before stopping the primary model, then starts Huihui on `192.168.1.70:8094`. This ordering prevents socket activation from restarting the primary during a switch. The command waits for the expected model identity, resident Vulkan ownership, reachable LAN endpoint and zero process swap. If audit startup fails, it attempts to restore the primary and exits non-zero. A failed restore is reported as fatal and can leave no active profile.
+`audit` stops the primary LAN socket and proxy before stopping the primary model, then starts Huihui on `192.168.1.70:11434`. This ordering prevents socket activation from restarting the primary during a switch. The command waits for the expected model identity, resident Vulkan ownership, reachable LAN endpoint and zero process swap. If audit startup fails, it attempts to restore the primary and exits non-zero. A failed restore is reported as fatal and can leave no active profile.
 
-`primary` stops all known Huihui trial units, starts Gemma 4 E4B QAT + MTP on loopback port 18094, then starts the LAN socket proxy on port 8094. If the primary fails its gate after an audit-to-primary switch, the command attempts to restore the audit profile. `status` checks the expected local and LAN model identities, mutually exclusive unit state, LAN socket state, restart count, memory and swap. It exits non-zero for an inconsistent state. If either rollback reports `FATAL`, inspect `gemma-profile status` and the two unit journals before retrying.
+`primary` stops all known Huihui trial units, starts Gemma 4 E4B QAT + MTP on loopback port 18094, then starts the LAN socket proxy on port 11434. If the primary fails its gate after an audit-to-primary switch, the command attempts to restore the audit profile. `status` checks the expected local and LAN model identities, mutually exclusive unit state, LAN socket state, restart count, memory and swap. It exits non-zero for an inconsistent state. If either rollback reports `FATAL`, inspect `gemma-profile status` and the two unit journals before retrying.
 
-The LAN URL does not change:
+Both profiles use the standard Ollama TCP port:
 
 ```text
-http://192.168.1.70:8094/
+http://192.168.1.70:11434/
 ```
+
+The service remains the focused llama.cpp OpenAI-compatible API. Port selection does not add Ollama-native routes such as `/api/generate` or `/api/chat`; clients should use `/v1/chat/completions`.
 
 The primary unit remains enabled. The audit unit has no `[Install]` section and reports `UnitFileState=static`; do not enable it. Return to the primary after audit work:
 
@@ -47,7 +49,7 @@ The installed command is `~/.local/bin/gemma-profile`, symlinked to the tracked 
 | MTP assistant | Gemma 4 E4B assistant Q8_0 |
 | Service | `llama-gemma-zero-copy.service` |
 | Loopback API | `http://127.0.0.1:18094/v1` |
-| LAN UI and API | `http://192.168.1.70:8094/` |
+| LAN UI and API | `http://192.168.1.70:11434/` |
 | Context | 32,768 tokens, one resident slot |
 | Maximum output | 2,048 tokens |
 | Admission | Serial, at most eight outstanding HTTP requests |
@@ -80,7 +82,7 @@ The optional multimodal projector is not loaded. This deployment accepts text on
 | Purpose | Local security audits and model-behaviour tests |
 | Boot status | Static unit; explicit selection only |
 | Service | `huihui-gemma4-security-audit.service` |
-| LAN UI and API | `http://192.168.1.70:8094/` |
+| LAN UI and API | `http://192.168.1.70:11434/` |
 | Model | Huihui Gemma 4 12B It QAT Q4_0-unquantized Abliterated, Q4_K |
 | MTP assistant | Matching Gemma 4 12B QAT BF16 assistant |
 | Context / maximum output | 8,192 / 2,048 tokens |
@@ -317,7 +319,7 @@ journalctl --user -u llama-gemma-zero-copy.service -f
 Health must report a resident Vulkan model, positive shared bytes and zero copied bytes after at least one cold request:
 
 ```bash
-curl -fsS http://192.168.1.70:8094/health \
+curl -fsS http://192.168.1.70:11434/health \
   | jq -e 'select(
       .status == "ok" and
       .vulkan_model_resident == true and
@@ -329,7 +331,7 @@ curl -fsS http://192.168.1.70:8094/health \
 Live zero-copy request:
 
 ```bash
-curl -fsS http://192.168.1.70:8094/v1/chat/completions \
+curl -fsS http://192.168.1.70:11434/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -H 'X-Conversation-Id: zero-copy-smoke' \
   -d '{
@@ -349,7 +351,7 @@ curl -fsS http://192.168.1.70:8094/v1/chat/completions \
 Live stream and progress verification:
 
 ```bash
-GEMMA_ZERO_COPY_URL=http://192.168.1.70:8094 \
+GEMMA_ZERO_COPY_URL=http://192.168.1.70:11434 \
   bun tools/gemma-hybrid/verify-stream.ts
 ```
 
@@ -358,7 +360,7 @@ The verifier requires at least one `prompt_progress` event, multiple content del
 Required tool-call request:
 
 ```bash
-curl -fsS http://192.168.1.70:8094/v1/chat/completions \
+curl -fsS http://192.168.1.70:11434/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -H 'X-Conversation-Id: zero-copy-tool' \
   -d '{
