@@ -14,7 +14,8 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Gemma 4 E4B ZC2 zero-copy, 32K | Sole enabled local model service | 25.85 sustained decode tok/s; +11.56% over ZC1 across eight runs; 584,056,832 shared K/V bytes per handoff, zero copied bytes and live UI progress |
+| LattePanda Sigma | Gemma 4 E4B QAT + MTP zero-copy, 32K | Primary boot deployment | 25.85 sustained decode tok/s; +11.56% over the ZC1 baseline across eight runs; 584,056,832 shared K/V bytes per handoff, zero copied bytes and live UI progress |
+| LattePanda Sigma | Huihui Gemma 4 12B QAT Q4_K + MTP, 8K | Explicit local security-audit profile; boot-disabled | 8.07 decode tok/s on the selected 256-token audit fixture; 754,974,720 shared K/V bytes, zero copied bytes, full embedded chat UI |
 | LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
 | LattePanda Sigma | Qwen 3.8 27B Q4_K_M, 8K | Manual compatibility and vision only; service disabled | 3.47 generation tok/s with MTP; 4/6 API and 2/4 Pi |
@@ -66,7 +67,8 @@ Key entrypoints:
 - `tools/run-intel-qwen-longctx.sh` - Qwen 128K service;
 - `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
 - `tools/run-intel-candidate.sh` - historical CPU Ornith and Gemma profiles;
-- `tools/run-gemma-zero-copy-service.sh` - selected 32K Gemma Vulkan-prefill/CPU-MTP service;
+- `tools/run-gemma-zero-copy-service.sh` - primary 32K Gemma Vulkan-prefill/CPU-MTP service;
+- `tools/gemma-profile` - switch between the primary model and the Huihui security-audit profile;
 - `tools/validate-intel-candidate.sh` - no-install historical candidate validation;
 - `tools/systemd/user/` - tracked user services.
 
@@ -112,16 +114,18 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md`](benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md)
 - [`docs/expert-io-adoption-baseline.md`](docs/expert-io-adoption-baseline.md)
 
-### Gemma zero-copy service
+### Gemma local profiles
 
-The selected Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
+Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP is a boot-disabled profile for local security audits. Use `gemma-profile primary|audit|status` to switch them; both use the same LAN URL and cannot run together safely.
+
+The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 8094.
 
 | Workload | Prompt throughput | Handoff | Result |
 |---|---:|---:|---|
 | Exact 4K (15 September architecture qualification) | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 | Exact 32K (15 September architecture qualification) | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 
-These prompt-side figures were not remeasured for ZC2. Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. ZC2 shortens temporary lifetimes in the four-row Q4 target kernel. Eight counterbalanced runs improved sustained decode from 23.1749 to 25.8539 tok/s (+11.56%); the exact historical 512/64 fixture improved 5.58% with identical output and MTP work.
+These prompt-side figures were not remeasured for the current Gemma 4 E4B QAT + MTP deployment. Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Its Q4 scheduling optimisation, historically labelled ZC2, shortens temporary lifetimes in the four-row Q4 target kernel. Eight counterbalanced runs improved sustained decode from 23.1749 to 25.8539 tok/s (+11.56%); the exact historical 512/64 fixture improved 5.58% with identical output and MTP work.
 
 Operations and evidence:
 
@@ -129,6 +133,7 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md`](benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md)
 - [`benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md`](benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md)
 - [`benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md`](benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md)
+- [`benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md`](benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md)
 - [`tools/gemma-hybrid/README.md`](tools/gemma-hybrid/README.md)
 
 ### Ornith and Gemma 128K validation

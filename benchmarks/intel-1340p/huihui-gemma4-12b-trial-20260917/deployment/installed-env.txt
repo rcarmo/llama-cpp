@@ -1,0 +1,22 @@
+# Huihui Gemma 4 12B local security-audit profile.
+# This is an explicit alternative profile; Gemma 4 E4B QAT + MTP remains primary.
+LLAMA_BUILD=/var/home/agent/workspace/projects/llama-cpp/runtime/deployments/huihui-gemma4-security-audit-a4629719f-2a8ac52d
+LLAMA_RUNTIME_DIR=/var/home/agent/workspace/projects/llama-cpp/runtime/gemma-vulkan-f32-0bdd7cd8b/runtime
+LLAMA_MODEL=/var/home/agent/workspace/projects/models/huihui-gemma-4-12b-abliterated-qat/Huihui-gemma-4-12B-it-qat-q4_0-unquantized-abliterated-Q4_K.gguf
+LLAMA_DRAFT_MODEL=/var/home/agent/workspace/projects/models/huihui-gemma-4-12b-abliterated-qat/mtp-ggml-model-bf16.gguf
+LLAMA_ALIAS=huihui-gemma-4-12b-abliterated-zero-copy
+LLAMA_HOST=192.168.1.70
+LLAMA_PORT=8094
+LLAMA_CTX=8192
+LLAMA_BATCH=256
+LLAMA_UBATCH=256
+LLAMA_THREADS=8
+LLAMA_THREADS_BATCH=16
+LLAMA_MTP_DEPTH=1
+LLAMA_MTP_MIN=1
+LLAMA_THREADPOOLS=0
+LLAMA_MODEL_SAMPLING=1
+LLAMA_MAX_OUTPUT=2048
+GGML_VK_VISIBLE_DEVICES=0
+GGML_VK_EXPERIMENTAL_ATTN_MODE=f32
+GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1

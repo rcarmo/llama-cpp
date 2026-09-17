@@ -1,0 +1,19 @@
+Sep 17 01:03:33 sigma systemd[1238]: Started huihui-gemma4-12b-trial.service - [systemd-run] /var/home/agent/workspace/projects/llama-cpp/build-gemma-zc-speed/bin/llama-server --model /var/home/agent/workspace/projects/models/huihui-gemma-4-12b-abliterated/Huihui-gemma-4-12B-it-abliterated.i1-Q4_K_M.gguf --alias huihui-gemma-4-12b-abliterated-q4km --load-mode mmap --gpu-layers 0 --threads 8 --threads-batch 16 --ctx-size 8192 --parallel 1 --batch-size 512 --ubatch-size 256 --cache-type-k f16 --cache-type-v f16 --flash-attn off --no-warmup --no-ui --host 127.0.0.1 --port 20112.
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.077.945 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.100 I srv          init: The UI is disabled
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.101 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.167 W srv  llama_server: -----------------
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.168 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.168 W srv  llama_server: this can be a security risk (cross-origin attacks)
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.168 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.078.168 W srv  llama_server: -----------------
+Sep 17 01:03:33 sigma llama-server[1908725]: 0.00.079.800 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/huihui-gemma-4-12b-abliterated/Huihui-gemma-4-12B-it-abliterated.i1-Q4_K_M.gguf'
+Sep 17 01:03:34 sigma llama-server[1908725]: 0.01.132.750 W load: control-looking token:    212 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 17 01:03:34 sigma llama-server[1908725]: 0.01.133.280 W load: control-looking token:     50 '<|tool_response>' was not control-type; this is probably a bug in the model. its type will be overridden
+Sep 17 01:03:34 sigma llama-server[1908725]: 0.01.164.316 W load: special_eog_ids contains '<|tool_response>', removing '</s>' token from EOG list
+Sep 17 01:03:37 sigma llama-server[1908725]: 0.03.983.367 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 2048
+Sep 17 01:03:37 sigma llama-server[1908725]: 0.04.093.500 W llama_kv_cache: the V embeddings have different sizes across layers and FA is not enabled - padding V cache to 2048
+Sep 17 01:03:37 sigma llama-server[1908725]: 0.04.243.698 I cmn          init: llama threadpool init, n_threads = 8
+Sep 17 01:03:39 sigma llama-server[1908725]: 0.06.014.546 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8192, kv_unified = 'false'
+Sep 17 01:03:39 sigma llama-server[1908725]: 0.06.026.554 I srv  llama_server: model loaded
+Sep 17 01:03:39 sigma llama-server[1908725]: 0.06.026.690 I srv  llama_server: listening on http://127.0.0.1:20112

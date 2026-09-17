@@ -31,7 +31,8 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-13 / 2026-09-14 -- [Intel Xe handoff and zero-copy series](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series), [in-memory KV handoff note](../intel-i5-1340p/in-memory-kv-handoff.md), [paired Q6 note](../intel-i5-1340p/cpu-q6-pair.md)
 * 2026-09-14 -- [RTX 3060 GSQ rebuild](../rtx3060/qwen38-gsq-rco-report.md)
 * 2026-09-15 -- [Gemma 32K zero-copy service qualification, persistent-model and live-stream verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
-* 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [ZC2 Q4 scheduling release and deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
+* 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [Gemma 4 E4B QAT + MTP Q4 scheduling release and primary deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
+* 2026-09-17 -- [Huihui Gemma 4 12B local security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md), including matched MTP zero-copy, speed tuning, full UI checks and local profile switching
 
 ## Current runbooks and retained operational docs
 
@@ -43,5 +44,6 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 
 ## September 16 serving updates
 
-* [Gemma ZC2 Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md): shorter temporary lifetimes improved confirmed sustained CPU+MTP decode by 11.56%; full zero-copy/UI qualification and deployment passed.
+* [Gemma 4 E4B QAT + MTP Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md): primary deployment, historically labelled ZC2; shorter temporary lifetimes improved confirmed sustained CPU+MTP decode by 11.56%; full zero-copy/UI qualification passed.
+* [Huihui Gemma 4 12B security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md): explicit local alternative with zero-copy, matched MTP, full embedded chat UI and `gemma-profile` switching.
 * [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.

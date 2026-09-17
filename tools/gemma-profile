@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Switch between the primary Gemma service and the Huihui security-audit profile.
+set -euo pipefail
+
+primary=llama-gemma-zero-copy.service
+proxy=llama-gemma-lan-test.service
+proxy_socket=llama-gemma-lan-test.socket
+audit=huihui-gemma4-security-audit.service
+legacy_audit=huihui-gemma4-12b-zero-copy.service
+legacy_trial=huihui-gemma4-12b-trial.service
+lock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/gemma-profile.lock"
+primary_url=http://127.0.0.1:18094
+lan_url=http://192.168.1.70:8094
+primary_model=gemma-4-e4b-qat-mtp-zero-copy
+audit_model=huihui-gemma-4-12b-abliterated-zero-copy
+
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+
+usage() {
+    cat <<'EOF'
+Usage: gemma-profile primary|audit|status
+
+  primary  Select Gemma 4 E4B QAT + MTP zero-copy (boot default).
+  audit    Select Huihui Gemma 4 12B for local security audits.
+  status   Verify the active model, LAN endpoint, units, restarts and swap.
+EOF
+}
+
+unit_state() {
+    systemctl --user show "$1" -p ActiveState --value 2>/dev/null || printf 'not-found\n'
+}
+
+health_model() {
+    curl --connect-timeout 2 --max-time 5 -fsS "$1/health" 2>/dev/null | jq -r '.model // empty' 2>/dev/null || true
+}
+
+wait_for_model() {
+    local url=$1 expected=$2 health_file=$3 unit=$4
+    for _ in $(seq 1 360); do
+        if curl --connect-timeout 2 --max-time 5 -fsS "$url/health" > "$health_file" 2>/dev/null &&
+           jq -e --arg expected "$expected" '.status == "ok" and .model == $expected and .vulkan_model_resident == true' "$health_file" >/dev/null; then
+            return 0
+        fi
+        [[ $(unit_state "$unit") == failed ]] && break
+        sleep 1
+    done
+    return 1
+}
+
+verify_unit() {
+    local unit=$1 expected=$2
+    local state lan_seen
+    state=$(systemctl --user show "$unit" -p ActiveState -p SubState -p NRestarts -p MemorySwapCurrent -p MemorySwapPeak)
+    grep -Fx 'ActiveState=active' <<<"$state" >/dev/null
+    grep -Fx 'SubState=running' <<<"$state" >/dev/null
+    grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
+    grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
+    grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
+    lan_seen=$(health_model "$lan_url")
+    [[ $lan_seen == "$expected" ]]
+    printf '%s\n' "$state"
+    printf 'Model=%s\nLAN=%s\n' "$expected" "$lan_url"
+}
+
+activate_primary() {
+    systemctl --user reset-failed "$primary" "$proxy" "$proxy_socket" >/dev/null 2>&1 || true
+    systemctl --user start "$primary"
+    systemctl --user start "$proxy_socket"
+    local health
+    health=$(mktemp)
+    if ! wait_for_model "$primary_url" "$primary_model" "$health" "$primary"; then
+        rm -f "$health"
+        return 1
+    fi
+    rm -f "$health"
+    verify_unit "$primary" "$primary_model"
+}
+
+activate_audit() {
+    systemctl --user reset-failed "$audit" >/dev/null 2>&1 || true
+    systemctl --user start "$audit"
+    local health
+    health=$(mktemp)
+    if ! wait_for_model "$lan_url" "$audit_model" "$health" "$audit"; then
+        rm -f "$health"
+        return 1
+    fi
+    rm -f "$health"
+    verify_unit "$audit" "$audit_model"
+}
+
+start_primary() {
+    local previous_audit=0
+    [[ $(unit_state "$audit") == active || $(unit_state "$legacy_audit") == active || $(unit_state "$legacy_trial") == active ]] && previous_audit=1
+    systemctl --user stop "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    if ! activate_primary; then
+        echo 'Primary failed its health, identity, LAN or swap gate.' >&2
+        systemctl --user stop "$proxy_socket" "$proxy" "$primary" >/dev/null 2>&1 || true
+        if [[ $previous_audit == 1 ]]; then
+            echo 'Restoring the audit profile.' >&2
+            if ! activate_audit; then
+                echo 'FATAL: the audit rollback also failed; run gemma-profile status.' >&2
+                return 2
+            fi
+        fi
+        return 1
+    fi
+}
+
+start_audit() {
+    local previous_primary=0
+    [[ $(unit_state "$primary") == active ]] && previous_primary=1
+    # The proxy requires the primary. Stop it before the primary so a LAN
+    # request cannot reactivate the primary during the transition.
+    systemctl --user stop "$proxy_socket" "$proxy" >/dev/null 2>&1 || true
+    systemctl --user stop "$primary"
+    systemctl --user stop "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    if ! activate_audit; then
+        echo 'Audit failed its health, identity, LAN or swap gate.' >&2
+        systemctl --user stop "$audit" >/dev/null 2>&1 || true
+        if [[ $previous_primary == 1 ]]; then
+            echo 'Restoring the primary profile.' >&2
+            if ! activate_primary; then
+                echo 'FATAL: the primary rollback also failed; run gemma-profile status.' >&2
+                return 2
+            fi
+        fi
+        return 1
+    fi
+}
+
+show_status() {
+    local primary_state audit_state primary_seen audit_seen lan_seen socket_state state
+    primary_state=$(unit_state "$primary")
+    audit_state=$(unit_state "$audit")
+    socket_state=$(unit_state "$proxy_socket")
+    primary_seen=$(health_model "$primary_url")
+    audit_seen=$(health_model "$lan_url")
+    lan_seen=$audit_seen
+    if [[ $audit_state == active && $audit_seen == "$audit_model" && $primary_state != active && $socket_state != active ]]; then
+        state=$(systemctl --user show "$audit" -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p MemorySwapPeak)
+        grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
+        printf 'Profile=audit\nModel=%s\nLAN=%s\n%s\n' "$audit_model" "$lan_url" "$state"
+    elif [[ $primary_state == active && $primary_seen == "$primary_model" && $lan_seen == "$primary_model" && $audit_state != active && $socket_state == active ]]; then
+        state=$(systemctl --user show "$primary" -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p MemorySwapPeak)
+        grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
+        printf 'Profile=primary\nModel=%s\nLAN=%s\n%s\n' "$primary_model" "$lan_url" "$state"
+    else
+        printf 'Profile=inconsistent\nPrimaryState=%s\nPrimaryModel=%s\nAuditState=%s\nAuditOrLANModel=%s\nLANSocketState=%s\n' "$primary_state" "${primary_seen:-unavailable}" "$audit_state" "${lan_seen:-unavailable}" "$socket_state"
+        return 1
+    fi
+}
+
+[[ $# == 1 ]] || { usage >&2; exit 2; }
+exec 9>"$lock"
+flock -n 9 || { echo 'Another gemma-profile switch is in progress.' >&2; exit 1; }
+case "$1" in
+    primary) start_primary ;;
+    audit)   start_audit ;;
+    status)  show_status ;;
+    *)       usage >&2; exit 2 ;;
+esac

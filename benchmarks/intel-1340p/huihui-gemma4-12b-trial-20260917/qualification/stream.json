@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "event_count": 132,
+  "progress_count": 2,
+  "content_count": 128,
+  "first_event_ms": 2.200481999999999,
+  "first_progress_ms": 4.449806999999999,
+  "first_content_ms": 1944.8736,
+  "final_ms": 17766.807107,
+  "progress": [
+    {
+      "ms": 4.449806999999999,
+      "value": {
+        "total": 25,
+        "cache": 0,
+        "processed": 0,
+        "time_ms": 0
+      }
+    },
+    {
+      "ms": 510.27621100000005,
+      "value": {
+        "total": 25,
+        "cache": 0,
+        "processed": 25,
+        "time_ms": 173.64847899999998
+      }
+    }
+  ],
+  "text": "Here are eight concise recommendations for reducing local language model latency:\n\n1.  **Quantize the Weights**\n    Reduce the precision of model weights (e.g., from FP16 to INT8 or 4-bit) to decrease memory bandwidth requirements and speed up computation.\n\n2.  **Select a Smaller Parameter Count**\n    Choose a model with fewer total parameters (e.g., switching from 70B to 7B) to significantly decrease the number of calculations per token.\n\n3.  **Use KV Caching**\n    Implement a Key-Value (KV) cache to store the",
+  "finish_reason": "length",
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 128,
+    "total_tokens": 153,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "zero_copy": {
+    "route": "vulkan_prefill_cpu_mtp",
+    "cold": true,
+    "round": 1,
+    "shared_bytes": 754974720,
+    "copied_bytes": 0,
+    "zero_copy": true,
+    "prompt_tokens": 25,
+    "cached_tokens": 0,
+    "canonical_replay_tokens": 0,
+    "generated_tokens": 128,
+    "verified_tokens": 144,
+    "drafted": 72,
+    "accepted": 55,
+    "prefill_s": 1.083440886,
+    "handoff_ms": 62.522606999999994,
+    "first_token_s": 1.941831029,
+    "wall_s": 17.765185341,
+    "decode_tps": 8.026182834158448
+  }
+}

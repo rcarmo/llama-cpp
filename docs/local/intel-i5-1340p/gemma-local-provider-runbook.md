@@ -1,8 +1,45 @@
-# Gemma 4 E4B zero-copy service on Sigma
+# Gemma local model profiles on Sigma
 
-The enabled Gemma service on `sigma` is `llama-gemma-zero-copy.service`. It listens on `127.0.0.1:18094` and is exposed without authentication on the trusted LAN at `http://192.168.1.70:8094/`. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
+**Gemma 4 E4B QAT + MTP zero-copy** is the primary local deployment on `sigma`. Its service is enabled at boot and its immutable runtime is `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
 
-## Current deployment
+**Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** is an explicit local security-audit profile. Its service is static and cannot become the boot default. Both profiles use `http://192.168.1.70:8094/`, without authentication, and are mutually exclusive because they do not fit safely in memory together. The audit process binds only `192.168.1.70`; the primary binds loopback and reaches that address through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
+
+## Switch profiles
+
+Use the installed local command from any interactive shell:
+
+```bash
+gemma-profile status
+gemma-profile audit
+gemma-profile primary
+```
+
+`audit` stops the primary LAN socket and proxy before stopping the primary model, then starts Huihui on `192.168.1.70:8094`. This ordering prevents socket activation from restarting the primary during a switch. The command waits for the expected model identity, resident Vulkan ownership, reachable LAN endpoint and zero process swap. If audit startup fails, it attempts to restore the primary and exits non-zero. A failed restore is reported as fatal and can leave no active profile.
+
+`primary` stops all known Huihui trial units, starts Gemma 4 E4B QAT + MTP on loopback port 18094, then starts the LAN socket proxy on port 8094. If the primary fails its gate after an audit-to-primary switch, the command attempts to restore the audit profile. `status` checks the expected local and LAN model identities, mutually exclusive unit state, LAN socket state, restart count, memory and swap. It exits non-zero for an inconsistent state. If either rollback reports `FATAL`, inspect `gemma-profile status` and the two unit journals before retrying.
+
+The LAN URL does not change:
+
+```text
+http://192.168.1.70:8094/
+```
+
+The primary unit remains enabled. The audit unit has no `[Install]` section and reports `UnitFileState=static`; do not enable it. Return to the primary after audit work:
+
+```bash
+gemma-profile primary
+```
+
+Tracked switch files:
+
+- `tools/gemma-profile`;
+- `tools/run-huihui-security-audit-service.sh`;
+- `tools/config/huihui-security-audit.env.example`;
+- `tools/systemd/user/huihui-gemma4-security-audit.service`.
+
+The installed command is `~/.local/bin/gemma-profile`, symlinked to the tracked script. The installed audit environment is `~/.config/huihui-gemma4-security-audit/service.env`.
+
+## Primary deployment: Gemma 4 E4B QAT + MTP zero-copy
 
 | Item | Value |
 |---|---|
@@ -36,6 +73,36 @@ Model identities:
 
 The optional multimodal projector is not loaded. This deployment accepts text only.
 
+## Security-audit profile: Huihui Gemma 4 12B
+
+| Item | Value |
+|---|---|
+| Purpose | Local security audits and model-behaviour tests |
+| Boot status | Static unit; explicit selection only |
+| Service | `huihui-gemma4-security-audit.service` |
+| LAN UI and API | `http://192.168.1.70:8094/` |
+| Model | Huihui Gemma 4 12B It QAT Q4_0-unquantized Abliterated, Q4_K |
+| MTP assistant | Matching Gemma 4 12B QAT BF16 assistant |
+| Context / maximum output | 8,192 / 2,048 tokens |
+| Generation | CPU target, 8 threads, MTP depth 1 |
+| Cold prefill | Vulkan on Intel Iris Xe |
+| Memory / swap limit | 28 GiB / 0 |
+| Executable SHA-256 | `2a8ac52d18234a9c4a71022e46bcab857acdb2b41fc1afc2436f1de94ae4252e` |
+| Main model SHA-256 | `8cfe39c96b966b2bc99d908315404914e9128fb35e134ca36f1a199507d6da6b` |
+| MTP model SHA-256 | `c24069c9ea03da35c65cdf1d03d9f1dc3c69f962362bee02d79b51a0f4de2261` |
+
+The immutable audit runtime is `runtime/deployments/huihui-gemma4-security-audit-a4629719f-2a8ac52d`. The model files remain outside that closure because each is addressed by an exact path and checksum.
+
+The 17 September tuning screen compared seven thread/depth profiles on the same deterministic 256-token security-review request. Eight CPU threads with MTP depth 1 led the two-run screen at 8.0692 tok/s mean. Depth 2 reached 7.8338 tok/s and the previous depth-3 setting reached 6.7707 tok/s. All 14 timed runs generated 256 tokens and copied zero K/V bytes. This is a narrow local fixture, not a cross-model comparison.
+
+The qualification passed exact append reuse, factual, arithmetic and coding responses, non-streamed tool calls and tool-result continuation, incremental SSE with prompt progress, streamed tool-call assembly, cancellation/reset recovery and serial admission. Cold turns shared 754,974,720 logical K/V bytes and copied zero bytes. The final live unit reached 21,872,705,536 bytes peak memory with zero process and cgroup swap.
+
+The embedded llama.cpp UI is present. A headless Chromium check over the LAN URL loaded `llama-ui`, found 12 interactive controls and reported no page errors or unexpected failed requests. `/tools` returns the standard `403 feature_disabled` response because this profile does not execute server-side shell or MCP tools. OpenAI-compatible client-supplied tool definitions, tool-call generation and tool-result continuation are enabled. `/slots`, `/metrics`, `/tokenize`, `/detokenize`, embeddings, multimodal input and server-side tools are not implemented by the focused zero-copy server.
+
+The parser fix classifies a repeated empty Gemma 4 thought channel as reasoning metadata. With thinking disabled, visible content no longer includes `<|channel>thought\n<channel|>`. The service still renders the model's canonical no-thinking generation prefix.
+
+Evidence: [Huihui security-audit trial](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md).
+
 ## Request lifecycle
 
 The process loads CPU target, CPU assistant and Vulkan target model owners once at startup. A cold request then:
@@ -51,7 +118,7 @@ The transfer does not write a K/V state file. The response includes a `zero_copy
 
 Only an exact append to the committed message/tool history reuses CPU K/V. An edited message, regenerated branch, changed tool list or different conversation resets the slot and performs another cold Vulkan prefill. The request can keep the same `X-Conversation-Id`; divergent history is a cold start, not an error.
 
-A client disconnect aborts active inference and clears the resident slot. `DELETE /v1/stream` with the owning `X-Conversation-Id` explicitly cancels and clears it. The service streams prompt progress, content/reasoning and tool-call deltas to the embedded UI as they become available, but it does not keep a server-side replay buffer after a dropped stream connection.
+A client disconnect aborts active inference and clears the resident slot. `DELETE /v1/stream` requires the owning identity in `X-Conversation-Id` or the UI-compatible `conv_id` query parameter; a missing or mismatched identity is rejected. The service streams prompt progress, content/reasoning and tool-call deltas to the embedded UI as they become available, but it does not keep a server-side replay buffer after a dropped stream connection.
 
 ## API surface
 
@@ -207,6 +274,21 @@ systemctl --user enable --now llama-gemma-zero-copy.service \
   llama-gemma-lan-test.socket
 ```
 
+Install the audit profile and switch command after creating its qualified immutable runtime:
+
+```bash
+install -d -m 0700 ~/.config/huihui-gemma4-security-audit
+install -m 0600 "$root/tools/config/huihui-security-audit.env.example" \
+  ~/.config/huihui-gemma4-security-audit/service.env
+install -m 0644 "$root/tools/systemd/user/huihui-gemma4-security-audit.service" \
+  ~/.config/systemd/user/
+install -d -m 0755 ~/.local/bin
+ln -sfn "$root/tools/gemma-profile" ~/.local/bin/gemma-profile
+systemctl --user daemon-reload
+```
+
+Keep `huihui-gemma4-security-audit.service` disabled. `gemma-profile audit` starts it directly when required.
+
 The validated host has `Linger=yes`, which allows the user service to start without an interactive login. Check it with:
 
 ```bash
@@ -214,6 +296,8 @@ loginctl show-user "$(id -un)" -p Linger
 ```
 
 ## Operate and verify
+
+For routine selection and status, use `gemma-profile` as described in [Switch profiles](#switch-profiles). The commands below inspect the primary unit directly.
 
 ```bash
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
