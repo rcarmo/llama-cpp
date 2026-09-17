@@ -1,6 +1,8 @@
 # Qwen long-context user service
 
-The selected service runs Qwen3.6-35B-A3B Q2_K_XL with one 128K slot, native MTP depth 3, Q4_0 KV, mmap weights and bounded Fieldfare expert advice.
+> Retained disabled profile. The current primary is [Gemma 4 E4B QAT + MTP zero-copy](../../../docs/local/intel-i5-1340p/gemma-local-provider-runbook.md). Stop the primary model and its LAN socket before starting Qwen, and restore the primary with `gemma-profile primary` afterward.
+
+The selected Qwen profile runs Qwen3.6-35B-A3B Q2_K_XL with one 128K slot, native MTP depth 3, Q4_0 KV, mmap weights and bounded Fieldfare expert advice.
 
 The hardware-specific operational reference is [`docs/intel-1340p-qwen-longctx-runbook.md`](../../../docs/intel-1340p-qwen-longctx-runbook.md). This file retains the shorter deployment summary used by the benchmark campaign.
 
@@ -30,7 +32,7 @@ The hardware-specific operational reference is [`docs/intel-1340p-qwen-longctx-r
 
 The raw fixed-slot expert cache was not implemented. Under controlled 10 GiB page pressure, cold bounded execution was only 0.64% slower than the warm bounded control, below the documented 10% acceptance gate.
 
-## Installation
+## Installation for manual use
 
 The source files are:
 
@@ -44,7 +46,11 @@ Install for the current user:
 install -Dm0644 tools/config/llama-qwen-longctx.env.example ~/.config/llama-qwen-longctx/service.env
 install -Dm0644 tools/systemd/user/llama-qwen-longctx.service ~/.config/systemd/user/llama-qwen-longctx.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-qwen-longctx.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
+systemctl --user start llama-qwen-longctx.service
 ```
 
 The installed unit invokes the canonical workspace launcher and reads machine-local settings from `~/.config/llama-qwen-longctx/service.env`. Rebuilds and configuration changes take effect after restart.
@@ -74,6 +80,7 @@ curl -H 'Accept-Encoding: gzip' http://127.0.0.1:8090/ -o /tmp/llama-ui.html.gz
 
 ```bash
 systemctl --user disable --now llama-qwen-longctx.service
+gemma-profile primary
 ```
 
 Unset `GGML_CPU_EXPERT_IO_ADVISE_MODE` or set it to `off` to disable expert advice. The default mmap compute path remains unchanged.

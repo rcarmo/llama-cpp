@@ -41,7 +41,7 @@ Raw responses and telemetry are under `/var/home/agent/workspace/reports/ornith-
 
 ## Service operations
 
-Install or refresh the tracked service files:
+Install or refresh the tracked service files. Stop the current primary and its LAN socket before starting Ornith, and keep Ornith disabled at boot:
 
 ```bash
 mkdir -p ~/.config/llama-ornith-local-provider ~/.config/systemd/user
@@ -50,7 +50,11 @@ cp tools/config/llama-ornith-1.5-local-provider.env.example \
 cp tools/systemd/user/llama-ornith-local-provider.service \
   ~/.config/systemd/user/llama-ornith-local-provider.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-ornith-local-provider.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
+systemctl --user start llama-ornith-local-provider.service
 ```
 
 Check the service:
@@ -81,7 +85,7 @@ Stop Ornith before enabling an older service:
 
 ```bash
 systemctl --user disable --now llama-ornith-local-provider.service
-systemctl --user enable --now llama-gemma-zero-copy.service llama-gemma-lan-test.socket
+gemma-profile primary
 ```
 
 The pre-Ornith Pi model registration is saved at `~/.pi/agent/models.json.pre-ornith-20260820`. Restore it only when an older service is available:

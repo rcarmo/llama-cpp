@@ -159,14 +159,20 @@ install -Dm0600 tools/config/llama-gemma4-candidate.env.example \
   ~/.config/llama-gemma-local-provider/service.env
 install -Dm0644 tools/systemd/user/llama-gemma-local-provider.service \
   ~/.config/systemd/user/llama-gemma-local-provider.service
-systemctl --user disable --now \
+systemctl --user stop \
   llama-gemma-lan-test.socket \
-  llama-gemma-zero-copy.service
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-candidate.service \
+  llama-qwen-longctx.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-gemma-local-provider.service
+systemctl --user start llama-gemma-local-provider.service
 ```
 
-The tracked historical profile binds to `127.0.0.1:8091` and does not configure an API key. Keep it loopback-only. Current operations and the rollback order are in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
+The tracked historical profile binds to `127.0.0.1:8091` and does not configure an API key. Keep it loopback-only. After the historical Gemma session, stop `llama-gemma-local-provider.service` and run `gemma-profile primary`. Current operations and the rollback order are in [`gemma-local-provider-runbook.md`](gemma-local-provider-runbook.md).
 
 ## Health and API checks
 
@@ -228,7 +234,8 @@ Stop new long requests if sustained package temperature approaches or exceeds th
 ## Operations
 
 ```bash
-systemctl --user restart llama-gemma-local-provider.service
+# This updates the process only when the retained service is already active.
+systemctl --user try-restart llama-gemma-local-provider.service
 systemctl --user stop llama-gemma-local-provider.service
 systemctl --user disable --now llama-gemma-local-provider.service
 journalctl --user -u llama-gemma-local-provider.service --since today
@@ -279,17 +286,26 @@ Inspect the server command and logs for the assistant model. The launcher must i
 
 ## Rollback to Qwen 128K
 
-Stop Gemma and restore the tracked Qwen service profile:
+This section records the historical 128K fallback. On the current host, stop the primary zero-copy service and its LAN socket before starting Qwen:
 
 ```bash
-systemctl --user disable --now llama-gemma-local-provider.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-gemma-local-provider.service \
+  llama-candidate.service \
+  llama-qwen-longctx.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
 cd /var/home/agent/workspace/projects/llama-cpp
 install -Dm0644 tools/config/llama-qwen-longctx.env.example \
   ~/.config/llama-qwen-longctx/service.env
 install -Dm0644 tools/systemd/user/llama-qwen-longctx.service \
   ~/.config/systemd/user/llama-qwen-longctx.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-qwen-longctx.service
+systemctl --user start llama-qwen-longctx.service
 ```
 
 Verify Qwen health on port 8090:
@@ -297,6 +313,8 @@ Verify Qwen health on port 8090:
 ```bash
 curl -fsS http://127.0.0.1:8090/health | jq .
 ```
+
+After the historical Qwen session, restore the current primary with `gemma-profile primary`.
 
 <!-- INTEL_128K_STATUS_BEGIN -->
 Gemma passed near-capacity 128K validation with 124,112 prompt tokens, 22.49 prompt tok/s, 4.49 generation tok/s, 29/42 draft acceptance, 11141 MiB peak PSS and 90 C peak package temperature. The selected profile is context 131072, batch 1024, ubatch 256, F16 KV and Flash Attention off. Qwen remains the rollback baseline.

@@ -1,5 +1,7 @@
 # Intel i5-1340P Qwen3.6 128K service runbook
 
+> Retained disabled profile. The current primary is [Gemma 4 E4B QAT + MTP zero-copy](gemma-local-provider-runbook.md). Stop the primary model and its LAN socket before starting Qwen, and restore the primary with `gemma-profile primary` afterward.
+
 This runbook defines the validated Qwen3.6-35B-A3B service on `sigma`: one 131,072-token slot, native MTP, an embedded Web UI and a LAN endpoint on port 8090.
 
 ## Hardware and software
@@ -115,13 +117,13 @@ GGML_CPU_EXPERT_IO_PROFILE=1
 GGML_CPU_EXPERT_IO_ADVISE_MODE=bounded
 ```
 
-After editing the file on an installed system:
+If Qwen is already the active manual profile, apply an environment change with:
 
 ```bash
-systemctl --user restart llama-qwen-longctx.service
+systemctl --user try-restart llama-qwen-longctx.service
 ```
 
-For first installation, use the ordered steps under [Install and boot startup](#install-and-boot-startup).
+If Qwen is not already active, use the ordered steps under [Install for manual use](#install-for-manual-use). Those steps stop the primary first.
 
 ## Selected inference profile
 
@@ -292,15 +294,24 @@ BUILD_JOBS=2 tools/build-intel-1340p.sh
 
 `tools/build-intel-1340p.sh` uses rootless Podman and the local Fedora 44 build image. It builds with Clang, native x86 ISA, AVX-VNNI, OpenMP, the CPU backend, server/UI targets and tests. It runs `test-x86-quant-dot` before returning success.
 
-The service launches the binary directly from `build-intel-clang`. Rebuilds take effect on the next restart:
+The service launches the binary directly from `build-intel-clang`. Rebuilds take effect on the next restart. Before starting or restarting this retained profile, stop the current primary and all other retained inference services:
 
 ```bash
-systemctl --user restart llama-qwen-longctx.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-candidate.service \
+  llama-gemma-local-provider.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
+systemctl --user start llama-qwen-longctx.service
 ```
 
-## Install and boot startup
+## Install for manual use
 
-Install the local config and user unit from the repository root:
+Install the local config and user unit from the repository root. Keep this retained profile disabled; start it only after stopping the current primary as shown below:
 
 ```bash
 cd /var/home/agent/workspace/projects/llama-cpp
@@ -309,10 +320,19 @@ install -Dm0644 tools/config/llama-qwen-longctx.env.example \
 install -Dm0644 tools/systemd/user/llama-qwen-longctx.service \
   ~/.config/systemd/user/llama-qwen-longctx.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-qwen-longctx.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-candidate.service \
+  llama-gemma-local-provider.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
+systemctl --user start llama-qwen-longctx.service
 ```
 
-Enable user lingering once so the service starts without login:
+User lingering permits manual user services to continue without an interactive login. It does not make this retained Qwen unit the boot default:
 
 ```bash
 loginctl enable-linger "$USER"
@@ -325,13 +345,14 @@ export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
 ```
 
-Loginless recovery was validated by restarting `user@1001.service`; the Qwen service returned active with a new PID, healthy endpoint, UI, metrics and the 131,072-token speculative slot.
+During the original qualification, loginless recovery was validated by restarting `user@1001.service`; the then-enabled Qwen service returned active with a new PID, healthy endpoint, UI, metrics and the 131,072-token speculative slot. That is historical evidence. The unit is now retained disabled.
 
 ## Operations
 
 ```bash
 systemctl --user status llama-qwen-longctx.service
-systemctl --user restart llama-qwen-longctx.service
+# This updates the process only when the retained service is already active.
+systemctl --user try-restart llama-qwen-longctx.service
 systemctl --user stop llama-qwen-longctx.service
 journalctl --user -u llama-qwen-longctx.service -f
 ```
@@ -414,16 +435,33 @@ Disable expert advice while retaining mmap and metrics:
 ```bash
 sed -i 's/^GGML_CPU_EXPERT_IO_ADVISE_MODE=.*/GGML_CPU_EXPERT_IO_ADVISE_MODE=off/' \
   ~/.config/llama-qwen-longctx/service.env
-systemctl --user restart llama-qwen-longctx.service
+# Apply only if this retained profile is already active.
+systemctl --user try-restart llama-qwen-longctx.service
 ```
 
-Restore the tracked profile:
+Restore the tracked Qwen profile for a manual session:
 
 ```bash
 cd /var/home/agent/workspace/projects/llama-cpp
 install -Dm0644 tools/config/llama-qwen-longctx.env.example \
   ~/.config/llama-qwen-longctx/service.env
-systemctl --user restart llama-qwen-longctx.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-candidate.service \
+  llama-gemma-local-provider.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
+systemctl --user start llama-qwen-longctx.service
+```
+
+After the Qwen session:
+
+```bash
+systemctl --user stop llama-qwen-longctx.service
+gemma-profile primary
 ```
 
 Raw measurements and selection evidence are under `benchmarks/intel-1340p/qwen-longctx-fieldfare/`.

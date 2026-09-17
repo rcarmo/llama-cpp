@@ -1,5 +1,7 @@
 # Maple Preview local Pi provider
 
+> Retained disabled profile. The current primary is [Gemma 4 E4B QAT + MTP zero-copy](gemma-local-provider-runbook.md). Stop the primary model and its LAN socket before starting Maple, and restore the primary with `gemma-profile primary` afterward.
+
 The user service `llama-maple-local-provider.service` exposes Maple Preview on `127.0.0.1:8093`. Pi registers the model as `local-maple/maple-preview-tq2-exact-head`. The hosted default stays unchanged.
 
 ## Configuration
@@ -36,9 +38,9 @@ Validated source files:
 - `tools/systemd/user/llama-maple-local-provider.service`
 - `benchmarks/intel-1340p/maple-preview/production-context/`
 
-## Install or update
+## Install for manual use
 
-Stop the transient validation server before installation. Install the profile and unit, then start the user service:
+Stop the transient validation server before installation. Install the profile and unit, then stop the current primary before starting Maple. Keep Maple disabled at boot:
 
 ```bash
 set -euo pipefail
@@ -54,10 +56,14 @@ install -m 0644 \
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
 systemctl --user daemon-reload
-systemctl --user enable --now llama-maple-local-provider.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
+systemctl --user start llama-maple-local-provider.service
 ```
 
-The unit uses `Restart=on-failure`. It starts through the user manager when lingering is enabled.
+The unit uses `Restart=on-failure`. User lingering lets a manually started service continue without an interactive login; it does not make Maple the boot default.
 
 ## Register Pi
 
@@ -150,6 +156,7 @@ Stop and disable only the Maple provider:
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus
 systemctl --user disable --now llama-maple-local-provider.service
+gemma-profile primary
 ```
 
 Remove only the Pi provider entry:

@@ -1,6 +1,6 @@
 # Gemma zero-copy service qualification, 15 September 2026
 
-> Historical architecture record. The [ZC1 generation-parity release](../gemma-generation-parity-20260916/README.md) superseded its generation settings, and the [ZC2 Q4 scheduling release](../gemma-zc-speed-20260916/README.md) is the current deployment.
+> Historical architecture record. The [ZC1 generation-parity release](../gemma-generation-parity-20260916/README.md) superseded its generation settings. The primary deployment is now Gemma 4 E4B QAT + MTP zero-copy with the [Q4 scheduling release](../gemma-zc-speed-20260916/README.md), historically labelled ZC2.
 
 ## Result
 

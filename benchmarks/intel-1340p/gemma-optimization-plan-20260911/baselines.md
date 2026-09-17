@@ -1,14 +1,14 @@
 # Baseline ledger
 
-**Current production: ZC2-q4-n4-schedule. Historical file-mediated reference: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** ZC2 inherits ZC1's zero-copy Vulkan-prefill service and generation semantics, and adds a measured CPU Q4 scheduling change. B1 is not deployed. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
+**Current primary: Gemma 4 E4B QAT + MTP zero-copy in `llama-gemma-zero-copy.service`. Historical file-mediated reference: B0-score3. Scoped experimental reference: B1-query-reuse for its qualified saved64K CPU decode profile.** The current primary inherits ZC1's zero-copy Vulkan-prefill service and generation semantics and adds a measured CPU Q4 scheduling change. The campaign and machine-readable evidence use the historical identifier `ZC2-q4-n4-schedule`. B1 is not deployed. Dual128K, full prompt-cache pressure and broad long quality remain unqualified. Earlier observations and manifests are retained by date.
 
-## ZC2-q4-n4-schedule: deployed zero-copy profile
+## Gemma 4 E4B QAT + MTP zero-copy primary
 
-Full machine-readable settings, deployment identity and results: [baselines/ZC2-q4-n4-schedule.json](baselines/ZC2-q4-n4-schedule.json). The [speed campaign](../gemma-zc-speed-20260916/README.md) confirmed an equivalent four-row Q4 schedule, rejected two biased-nibble alternatives, passed the full serving suite, and deployed an immutable closure.
+Full machine-readable settings, deployment identity and results: [baselines/ZC2-q4-n4-schedule.json](baselines/ZC2-q4-n4-schedule.json), where `ZC2-q4-n4-schedule` is the historical campaign identifier. The [speed campaign](../gemma-zc-speed-20260916/README.md) confirmed an equivalent four-row Q4 schedule, rejected two biased-nibble alternatives, passed the full serving suite, and deployed an immutable closure.
 
 | Field | Value |
 |---|---|
-| State | Deployed and live-verified |
+| State | Primary deployment; live-verified |
 | Source | `2768e715cfb52354a6390a8e24e2e8298b9dbdef` |
 | Server SHA-256 | `1c5ba7000b324ada041e58f0ef76d3e3fce44ea65ee4ac68ef0882d6a92fa702` |
 | Generation | ZC1 semantics unchanged; MTP3, `n_min=1`, model metadata on, backend sampling and attached pools off |
@@ -25,7 +25,7 @@ Full machine-readable settings, deployment identity and results: [baselines/ZC1-
 
 | Field | Value |
 |---|---|
-| State | Superseded by ZC2; retained as immutable rollback |
+| State | Superseded by the primary Q4 scheduling deployment; retained as immutable rollback |
 | Source | `ddb93ad19bfb6536f9f4ab6a8819527097de44ee` |
 | Server SHA-256 | `7871f50260b2d4491f719fefe64f768ded8fceb22248177418d349a3c237f314` |
 | Generation | Model metadata on (`top_k=64` default); request overrides preserved; MTP3, `n_min=1`; backend sampling off |
@@ -43,8 +43,8 @@ Full machine-readable runtime/flags/hashes: [baselines/B0-score3.json](baselines
 
 | Field | Value |
 |---|---|
-| State | Deployed, safe starting reference within listed coverage |
-| Live release | `20260911-score3-stopped` |
+| State | Historical safe starting reference within listed coverage; no longer deployed |
+| Historical release | `20260911-score3-stopped` |
 | CPU | Small-target-batch8; score3x4 / value2x4; decode8 / prefill16; draft8/16; MTP3 |
 | GPU | IrisXe FP32 accumulation, microbatch256, eligible cold text4096..65536 |
 | KV | F16, compact SWA, FA off; validated padded export/v3-to-v2 handoff |
@@ -84,7 +84,7 @@ Use `B1-decode-<name>`, `B2-prefill-<name>` or the next unused ID; numeric order
 7. Refresh the next experiment's reference and restoration paths. Existing comparisons finish against their frozen parent; if changing that parent is necessary, close/amend the experiment and preserve its earlier results.
 8. If later evidence exposes an affected integration or safety regression, append a held/restricted/reference-revoked event. New experiments in that scope return to the last safe parent; unaffected validated improvements remain enabled. Fixes get new candidate identities and rerun only the invalidated gates plus necessary integration checks.
 
-At the original plan closeout no B1/B2 was qualified. The later [B1-query-reuse manifest](baselines/B1-query-reuse.json) records a qualified experimental saved64K decode scope; B0 remains production and B2 does not exist. The original manifests and events are unchanged.
+At the original plan closeout no B1/B2 was qualified and B0 was then the production profile. The later [B1-query-reuse manifest](baselines/B1-query-reuse.json) records a qualified experimental saved64K decode scope; B2 does not exist. The original manifests and events are unchanged, while the current primary is the Gemma 4 E4B QAT + MTP zero-copy profile above.
 
 ## Retained opportunities and negative controls
 

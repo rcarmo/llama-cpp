@@ -20,9 +20,13 @@ This campaign installs Qwen 3.8 27B as a manual, loopback-only provider and comp
 
 The installed profile uses one 8,192-token slot, Q4_0 KV, MTP depth 3, eight model threads on CPUs 0-7, and process affinity 0-15. The target and MTP processes consume almost all 31 GiB of RAM. The unit is disabled and conflicts with the installed Gemma, Maple and Qwen 3.6 units.
 
-Start the MTP profile only for a manual session:
+Start the MTP profile only for a manual session. The retained unit predates the current zero-copy primary and its systemd `Conflicts=` list does not include that service, so stop the primary and its LAN socket explicitly first:
 
 ```bash
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
 systemctl --user start llama-qwen38-local-provider.service
 curl -fsS http://127.0.0.1:8094/health
 pi -p --provider local-qwen38 --model qwen3.8-27b-q4km-mtp --thinking low \
@@ -35,23 +39,16 @@ For lower swap risk, stop the resident providers and run the target without MTP:
 LLAMA_USE_MTP=0 tools/run-intel-qwen38.sh
 ```
 
-Restore the resident providers after the session:
+The commands above describe the August campaign layout. They are not current restoration instructions. Restore the primary model after a manual session with:
 
 ```bash
 systemctl --user stop llama-qwen38-local-provider.service
-systemctl --user start \
-  llama-gemma-local-provider.service \
-  llama-maple-local-provider.service \
-  llama-qwen-longctx.service
+gemma-profile primary
+gemma-profile status
+curl -fsS http://192.168.1.70:8094/health
 ```
 
-Check all endpoints:
-
-```bash
-curl -fsS http://127.0.0.1:8091/health
-curl -fsS http://127.0.0.1:8093/health
-curl -fsS http://127.0.0.1:8090/health
-```
+Gemma 4 E4B QAT + MTP zero-copy is the current primary deployment. Maple and Qwen 3.6 are retained disabled profiles; do not start them as part of normal Qwen 3.8 cleanup.
 
 ## Vision
 
@@ -59,9 +56,9 @@ The normal service omits the 600 MiB projector to reduce memory pressure. Run th
 
 ```bash
 systemctl --user stop \
-  llama-gemma-local-provider.service \
-  llama-maple-local-provider.service \
-  llama-qwen-longctx.service
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
 LLAMA_CTX=4096 \
 LLAMA_MM_PROJ=/var/home/agent/workspace/projects/models/qwen3.8-27b/mmproj-Qwen3.8-27B-Q8_0.gguf \
   tools/run-intel-qwen38.sh

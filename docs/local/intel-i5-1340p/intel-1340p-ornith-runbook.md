@@ -140,11 +140,20 @@ The command must contain:
 
 The Ornith and Gemma profiles share `llama-candidate.service` and the active file `~/.config/llama-candidate/service.env`. Installing this profile replaces the active candidate configuration.
 
-Stop conflicting services first:
+Stop conflicting services first. Keep retained profiles disabled at boot:
 
 ```bash
-systemctl --user disable --now llama-qwen-longctx.service 2>/dev/null || true
-systemctl --user disable --now llama-candidate.service 2>/dev/null || true
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service
+systemctl --user stop \
+  llama-qwen-longctx.service \
+  llama-candidate.service \
+  llama-gemma-local-provider.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service 2>/dev/null || true
 ```
 
 Install the Ornith profile and unit:
@@ -156,8 +165,10 @@ install -Dm0644 tools/config/llama-ornith-candidate.env.example \
 install -Dm0644 tools/systemd/user/llama-candidate.service \
   ~/.config/systemd/user/llama-candidate.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-candidate.service
+systemctl --user start llama-candidate.service
 ```
+
+After the manual Ornith session, stop the candidate and restore the current primary with `gemma-profile primary`.
 
 The tracked profile binds to `127.0.0.1:8091` and does not configure an API key. Keep it loopback-only unless an authenticated reverse proxy or trusted-network policy is in place.
 
@@ -226,7 +237,8 @@ Stop new long requests if sustained package temperature approaches or exceeds th
 ## Operations
 
 ```bash
-systemctl --user restart llama-candidate.service
+# This updates the process only when the retained service is already active.
+systemctl --user try-restart llama-candidate.service
 systemctl --user stop llama-candidate.service
 systemctl --user disable --now llama-candidate.service
 journalctl --user -u llama-candidate.service --since today
@@ -273,17 +285,25 @@ The 32K pressure test recorded 7,105 process major faults but completed without 
 
 ## Rollback to Qwen 128K
 
-Stop the candidate and restore the tracked Qwen service profile:
+This section records the historical 128K fallback. On the current host, stop the candidate, primary zero-copy service and LAN socket before starting Qwen:
 
 ```bash
 systemctl --user disable --now llama-candidate.service
+systemctl --user stop \
+  llama-gemma-lan-test.socket \
+  llama-gemma-lan-test.service \
+  llama-gemma-zero-copy.service \
+  llama-gemma-local-provider.service \
+  llama-maple-local-provider.service \
+  llama-ornith-local-provider.service \
+  llama-qwen38-local-provider.service
 cd /var/home/agent/workspace/projects/llama-cpp
 install -Dm0644 tools/config/llama-qwen-longctx.env.example \
   ~/.config/llama-qwen-longctx/service.env
 install -Dm0644 tools/systemd/user/llama-qwen-longctx.service \
   ~/.config/systemd/user/llama-qwen-longctx.service
 systemctl --user daemon-reload
-systemctl --user enable --now llama-qwen-longctx.service
+systemctl --user start llama-qwen-longctx.service
 ```
 
 Verify Qwen health on port 8090:
@@ -291,6 +311,8 @@ Verify Qwen health on port 8090:
 ```bash
 curl -fsS http://127.0.0.1:8090/health | jq .
 ```
+
+After the historical Qwen session, restore the current primary with `gemma-profile primary`.
 
 <!-- INTEL_128K_STATUS_BEGIN -->
 Ornith passed near-capacity 128K validation with 124,341 prompt tokens, 13.14 prompt tok/s, 2.63 generation tok/s, 37/44 draft acceptance, 23857 MiB peak PSS and 91 C peak package temperature. The selected profile is context 131072, batch 1024, ubatch 256, F16 KV and Flash Attention off. Qwen remains the rollback baseline.

@@ -76,4 +76,4 @@ The source wrapper expects Podman, Bun, `/dev/dri/renderD128`, the model above a
 
 A later 32K LAN trial used the same production source with full Iris Xe offload and active embedded MTP. The initial smoke in `service-live-20260915.txt` passed health, UI, one trivial completion and resource checks. Interactive use then measured 0.81 tok/s decode and produced incoherent output. The test service was stopped, disabled and removed.
 
-A CPU-only target-only diagnosis reached 2.30 tok/s and produced coherent tokens, but it remained unsuitable for interactive use on Sigma. The accepted Gemma 4 E4B provider replaced the LAN endpoint after passing factual, arithmetic and JSON checks with two 131K slots.
+A CPU-only target-only diagnosis reached 2.30 tok/s and produced coherent tokens, but it remained unsuitable for interactive use on Sigma. The Gemma 4 E4B provider that first replaced the LAN endpoint used two 131K slots. The current primary is the later one-slot 32K Gemma 4 E4B QAT + MTP zero-copy service.

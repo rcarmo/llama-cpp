@@ -1,6 +1,6 @@
-# Gemma ZC2 Q4 scheduling release (16 September 2026)
+# Gemma 4 E4B QAT + MTP Q4 scheduling release (16 September 2026)
 
-This profile-first campaign used `ZC1-generation-parity` as its comparison parent. The qualified candidate is now deployed as ZC2; `runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502` is its verified rollback root.
+This profile-first campaign used `ZC1-generation-parity` as its comparison parent. The qualified candidate is the primary Gemma 4 E4B QAT + MTP zero-copy deployment in `llama-gemma-zero-copy.service`; its historical campaign/evidence identifier is `ZC2-q4-n4-schedule`. `runtime/deployments/gemma-generation-parity-ddb93ad19-7871f502` is its verified rollback root.
 
 ## Current attribution
 

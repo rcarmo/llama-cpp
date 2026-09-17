@@ -1,6 +1,6 @@
 # Gemma zero-copy generation parity, 16 September 2026
 
-> Superseded deployment record. ZC2 retains these generation semantics and uses this deployment root as its verified rollback. See the [Q4 scheduling release](../gemma-zc-speed-20260916/README.md) for current live identity and performance.
+> Superseded deployment record. The primary Gemma 4 E4B QAT + MTP zero-copy deployment retains these generation semantics and uses this deployment root as its verified rollback. Its historical Q4 scheduling campaign/evidence label is ZC2; see the [Q4 scheduling release](../gemma-zc-speed-20260916/README.md) for current identity and performance.
 
 This ZC1 release restored model-derived sampling defaults and speculative `n_min=1`. Attached CPU threadpools and the historical small-target-batch dispatch were disabled. The accepted semantic changes were throughput-neutral on the sustained fixture and passed the full serving qualification.
 

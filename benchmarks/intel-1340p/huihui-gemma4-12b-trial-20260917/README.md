@@ -1,6 +1,6 @@
 # Huihui Gemma 4 12B local security-audit profile (17 September 2026)
 
-This directory records the temporary Huihui Gemma 4 12B profile on `sigma`. **Gemma 4 E4B QAT + MTP zero-copy remains the primary local deployment.** Historical records call the primary optimisation generation `ZC2`.
+This directory records the temporary Huihui Gemma 4 12B profile on `sigma`. **Gemma 4 E4B QAT + MTP zero-copy remains the primary local deployment and was restored after the trial.** Historical records call the primary optimisation generation `ZC2`.
 
 ## Selected audit profile
 
@@ -20,7 +20,7 @@ This directory records the temporary Huihui Gemma 4 12B profile on `sigma`. **Ge
 | Target SHA-256 | `8cfe39c96b966b2bc99d908315404914e9128fb35e134ca36f1a199507d6da6b` |
 | Assistant SHA-256 | `c24069c9ea03da35c65cdf1d03d9f1dc3c69f962362bee02d79b51a0f4de2261` |
 
-The immutable runtime is `runtime/deployments/huihui-gemma4-security-audit-a4629719f-2a8ac52d`. The audit unit is static and cannot start at boot through `systemctl enable`.
+The immutable runtime is `runtime/deployments/huihui-gemma4-security-audit-a4629719f-2a8ac52d`. The audit unit is static and cannot start at boot through `systemctl enable`. The final recorded host state is the restored primary profile; the audit profile is installed and inactive.
 
 ## Local switching
 
@@ -70,9 +70,9 @@ The selected profile passed:
 - browser rendering over the LAN URL with title `llama-ui`, 12 interactive controls, no page exceptions and no unexpected failed requests;
 - `shared_bytes=754974720`, `copied_bytes=0`, resident Vulkan ownership, zero restarts and zero service swap.
 
-The final installed profile peaked at 21,872,705,536 bytes during its post-install cold smoke. Global zram still contains pages from earlier workloads; the audit cgroup recorded `MemorySwapCurrent=0` and `MemorySwapPeak=0`.
+The retained audit deployment snapshot recorded a 21,475,110,912-byte memory peak. Global zram still contained pages from earlier workloads; the audit cgroup recorded `MemorySwapCurrent=0` and `MemorySwapPeak=0`.
 
-Raw evidence is under `qualification/`, `tuning/`, `zero-copy-cutover/` and `deployment/`. `run-zero-copy-cutover.sh` and `run-speed-screen.sh` are campaign scripts. `install-audit-profile.sh` verifies the existing immutable closure and installs the tracked unit, environment and switch command. Routine operation uses `tools/gemma-profile`.
+Raw evidence is under `qualification/`, `tuning/`, `zero-copy-cutover/` and `deployment/`. Files inside those directories are dated observations; `deployment/final-primary-*` records the post-trial primary state. Its health snapshot precedes the first post-restart request, so `zero_copy_ready=false` and zero handoffs are expected there; the retained primary qualification records the completed handoff gates. `run-zero-copy-cutover.sh` and `run-speed-screen.sh` are campaign scripts. `install-audit-profile.sh` verifies the existing immutable closure and installs the tracked unit, environment and switch command. Routine operation uses `tools/gemma-profile`.
 
 ## Scope
 

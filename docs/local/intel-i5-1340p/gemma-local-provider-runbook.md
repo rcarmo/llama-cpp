@@ -95,7 +95,7 @@ The immutable audit runtime is `runtime/deployments/huihui-gemma4-security-audit
 
 The 17 September tuning screen compared seven thread/depth profiles on the same deterministic 256-token security-review request. Eight CPU threads with MTP depth 1 led the two-run screen at 8.0692 tok/s mean. Depth 2 reached 7.8338 tok/s and the previous depth-3 setting reached 6.7707 tok/s. All 14 timed runs generated 256 tokens and copied zero K/V bytes. This is a narrow local fixture, not a cross-model comparison.
 
-The qualification passed exact append reuse, factual, arithmetic and coding responses, non-streamed tool calls and tool-result continuation, incremental SSE with prompt progress, streamed tool-call assembly, cancellation/reset recovery and serial admission. Cold turns shared 754,974,720 logical K/V bytes and copied zero bytes. The final live unit reached 21,872,705,536 bytes peak memory with zero process and cgroup swap.
+The qualification passed exact append reuse, factual, arithmetic and coding responses, non-streamed tool calls and tool-result continuation, incremental SSE with prompt progress, streamed tool-call assembly, cancellation/reset recovery and serial admission. Cold turns shared 754,974,720 logical K/V bytes and copied zero bytes. The retained audit deployment snapshot recorded a 21,475,110,912-byte memory peak with zero process and cgroup swap.
 
 The embedded llama.cpp UI is present. A headless Chromium check over the LAN URL loaded `llama-ui`, found 12 interactive controls and reported no page errors or unexpected failed requests. `/tools` returns the standard `403 feature_disabled` response because this profile does not execute server-side shell or MCP tools. OpenAI-compatible client-supplied tool definitions, tool-call generation and tool-result continuation are enabled. `/slots`, `/metrics`, `/tokenize`, `/detokenize`, embeddings, multimodal input and server-side tools are not implemented by the focused zero-copy server.
 
@@ -287,7 +287,7 @@ ln -sfn "$root/tools/gemma-profile" ~/.local/bin/gemma-profile
 systemctl --user daemon-reload
 ```
 
-Keep `huihui-gemma4-security-audit.service` disabled. `gemma-profile audit` starts it directly when required.
+Keep `huihui-gemma4-security-audit.service` static and inactive. `gemma-profile audit` starts it directly when required.
 
 The validated host has `Linger=yes`, which allows the user service to start without an interactive login. Check it with:
 
@@ -409,11 +409,11 @@ Restore the CPU provider only after stopping the zero-copy service and LAN proxy
 systemctl --user disable --now \
   llama-gemma-lan-test.socket \
   llama-gemma-zero-copy.service
-systemctl --user enable --now llama-gemma-local-provider.service
+systemctl --user start llama-gemma-local-provider.service
 curl -fsS http://127.0.0.1:8091/health
 ```
 
-This restores the loopback rollback endpoint. The tracked LAN proxy now targets 18094; do not start it against the CPU rollback without changing and reviewing that target.
+This restores the loopback rollback endpoint for a manual session without changing the boot default. The tracked LAN proxy targets 18094; do not start it against the CPU rollback without changing and reviewing that target. Stop the CPU rollback and run `gemma-profile primary` when finished.
 
 ## Remove the zero-copy service
 
