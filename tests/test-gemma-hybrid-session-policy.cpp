@@ -107,5 +107,22 @@ int main() {
     std::map<std::string, std::string> headers = {{"x-conversation-id", "conversation-a"}};
     CHECK(gemma_hybrid::header_value(headers, "X-Conversation-Id") == "conversation-a");
     CHECK(gemma_hybrid::header_value(headers, "missing").empty());
+
+    gemma_hybrid::require_reset_owner("conversation-a", "conversation-a");
+    gemma_hybrid::require_reset_owner("", "conversation-a");
+    bool rejected_reset = false;
+    try {
+        gemma_hybrid::require_reset_owner("conversation-a", "");
+    } catch (const std::invalid_argument &) {
+        rejected_reset = true;
+    }
+    CHECK(rejected_reset);
+    rejected_reset = false;
+    try {
+        gemma_hybrid::require_reset_owner("conversation-a", "conversation-b");
+    } catch (const std::invalid_argument &) {
+        rejected_reset = true;
+    }
+    CHECK(rejected_reset);
     return 0;
 }

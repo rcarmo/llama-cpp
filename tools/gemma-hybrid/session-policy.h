@@ -114,6 +114,15 @@ inline request_action classify_request(
     }
 }
 
+inline void require_reset_owner(const std::string & active_conversation, const std::string & request_conversation) {
+    if (request_conversation.empty()) {
+        throw std::invalid_argument("conversation identity is required");
+    }
+    if (!active_conversation.empty() && request_conversation != active_conversation) {
+        throw std::invalid_argument("conversation does not own the resident slot");
+    }
+}
+
 inline std::string header_value(const std::map<std::string, std::string> & headers, const std::string & name) {
     for (const auto & item : headers) {
         if (item.first.size() != name.size()) {

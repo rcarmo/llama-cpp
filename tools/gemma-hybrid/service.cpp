@@ -244,11 +244,10 @@ public:
     }
 
     void reset(const std::string & conversation) {
+        gemma_hybrid::require_reset_owner(active_conversation, conversation);
         cancel_epoch.fetch_add(1);
         std::lock_guard<std::timed_mutex> lock(mutex);
-        if (!conversation.empty() && !active_conversation.empty() && conversation != active_conversation) {
-            throw std::invalid_argument("conversation does not own the resident slot");
-        }
+        gemma_hybrid::require_reset_owner(active_conversation, conversation);
         reset_runtime();
         active_conversation.clear();
     }
@@ -463,7 +462,11 @@ private:
         inputs.enable_thinking = false;
         inputs.parallel_tool_calls = request.value("parallel_tool_calls", false);
         inputs.tool_choice = common_chat_tool_choice_parse_oaicompat(request.value("tool_choice", std::string("auto")));
-        inputs.reasoning_format = COMMON_REASONING_FORMAT_NONE;
+        // Build the Gemma 4 parser with reasoning channels enabled even though
+        // thinking is disabled in the rendered prompt. Huihui can repeat the
+        // template's empty thought channel before visible content; the parser
+        // must classify and remove that marker rather than expose it as text.
+        inputs.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
         return common_chat_templates_apply(templates.get(), inputs);
     }
 
@@ -594,7 +597,7 @@ private:
         double last_token_s = -1;
         bool eog = false;
         common_chat_parser_params parser(chat);
-        parser.reasoning_format = COMMON_REASONING_FORMAT_NONE;
+        parser.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
         parser.parse_tool_calls = true;
         parser.parser.load(chat.parser);
         common_chat_msg partial_message;
@@ -912,8 +915,20 @@ int main(int argc, char ** argv) {
         http.get("/props", props);
         http.get("/models", models);
         http.get("/v1/models", models);
+        auto tools_disabled = safe_handler([&](const server_http_req &) {
+            return response_json({{"error", {{"message", "this feature is disabled"}, {"type", "feature_disabled"}}}}, 403);
+        });
+        // The embedded UI probes this route at startup. Return the same explicit
+        // disabled response as llama-server when no server-side tools are set.
+        // Client-supplied OpenAI tool definitions remain supported by completions.
+        http.get("/tools", tools_disabled);
+        http.post("/tools", tools_disabled);
         auto reset = safe_handler([&](const server_http_req & request) {
-            session.reset(gemma_hybrid::header_value(request.headers, "X-Conversation-Id"));
+            std::string conversation = gemma_hybrid::header_value(request.headers, "X-Conversation-Id");
+            if (conversation.empty()) {
+                conversation = request.get_param("conv_id");
+            }
+            session.reset(conversation);
             return response_json({{"status", "reset"}});
         });
         http.post("/chat/completions", completion);
