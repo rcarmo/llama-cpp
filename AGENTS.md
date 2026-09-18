@@ -13,6 +13,28 @@ This is Rui Carmo's development fork. The owner permits AI-assisted implementati
 - Deployment, service interruption and public communication require their own authorisation; permission to commit does not imply permission to deploy.
 - Keep changes small enough to inspect and explain. Seek design confirmation for invasive work, but do not require the owner to satisfy upstream contributor procedures for local experiments.
 
+## Mandatory prior-feature reuse review
+
+- Before planning or implementing any feature, optimisation, model integration or backend campaign, you MUST inspect earlier fork work for beneficial features that can be reused. Search the relevant source, Git history, local documentation, benchmark reports and indexed project notes. Do not treat the requested patch or the most obvious runtime flags as the complete design space.
+- You MUST attempt to reuse each applicable proven feature before designing a replacement. Examples include shared-memory and zero-copy paths, GPU-prefill/CPU-generation handoff, scheduler and ownership mechanisms, MTP support, backend fallbacks, API/UI integration, profile switching, resource guards, rollback logic and existing test/evidence harnesses.
+- Preserve the invariants and regression coverage of reused features. If direct reuse is not possible, record the exact incompatibility or failed acceptance gate. Do not omit a previous feature merely because it needs adaptation to a new model, quantisation or backend.
+- Maintain a prior-feature reuse checklist for every implementation. Create it before code changes in the implementation plan, work item or campaign report, and keep it current as work proceeds. A completed implementation without this checklist is incomplete.
+- Each checklist item MUST name the previous feature and source path or commit, its applicability, its status (`applied`, `adapted`, `not applicable`, `deferred` or `rejected`), the implementation location, and the test or measurement that supports the status. `Deferred` and `rejected` entries MUST include a reason and must not be presented as completed optimisation coverage.
+- Before reporting performance or completion, review the checklist again and verify that every `applied` or `adapted` feature was exercised by the final test matrix. State any remaining omitted feature next to the performance conclusion.
+
+Use this minimum format:
+
+```markdown
+## Prior-feature reuse checklist
+
+- [ ] Feature: `<name>`
+  - Source: `<path, report or commit>`
+  - Applicability: `<why it applies or does not apply>`
+  - Status: `<applied|adapted|not applicable|deferred|rejected>`
+  - Implementation: `<current path or commit, or none>`
+  - Evidence: `<test, benchmark or reason>`
+```
+
 ## Local documentation and benchmark defaults
 
 - Use `docs/local/README.md` as the entry point for fork-local work. Keep upstream documentation separate.
