@@ -4979,8 +4979,9 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         }
 #endif
         for (const auto type : non_lut_quant_types) {
-            // regression in unified shader on Ampere
-            if (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q5_K) {
+            // PTQ1_0 has no coopmat2 decoder; leave its slots empty for fallback.
+            // Q4_K and Q5_K use dedicated shaders due to a unified-shader regression on Ampere.
+            if (type == GGML_TYPE_PTQ1_0 || type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q5_K) {
                 continue;
             }
             auto& tc = ((type >= GGML_TYPE_Q2_K && type <= GGML_TYPE_Q6_K) || type == GGML_TYPE_TQ1_0 || type == GGML_TYPE_TQ2_0) ? tc_mmq_k : tc_mmq;
@@ -5026,7 +5027,7 @@ static void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         }
 #endif
         for (const auto type : non_lut_quant_types) {
-            if (type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q5_K) {
+            if (type == GGML_TYPE_PTQ1_0 || type == GGML_TYPE_Q4_K || type == GGML_TYPE_Q5_K) {
                 continue;
             }
             spec_fn_t qs_id = [&, type](const std::vector<uint32_t>& wt, bool a) { return ggml_vk_mul_mm_cm2_spec(wt, a, (uint32_t)type); };
