@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 import os
 import sys
+import tempfile
 
 # Necessary to load the local gguf package
 if "NO_LOCAL_GGUF" not in os.environ and (Path(__file__).parent.parent.parent / 'gguf-py').exists():
@@ -13,6 +14,23 @@ import gguf
 
 
 class TestMetadataMethod(unittest.TestCase):
+
+    def test_ptq1_file_type_round_trip(self):
+        self.assertEqual(gguf.LlamaFileType.MOSTLY_PTQ1_0, 143)
+        self.assertEqual(gguf.LlamaFileType(143), gguf.LlamaFileType.MOSTLY_PTQ1_0)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "ptq1-file-type.gguf"
+            writer = gguf.GGUFWriter(path, "test")
+            writer.add_file_type(gguf.LlamaFileType.MOSTLY_PTQ1_0)
+            writer.write_header_to_file()
+            writer.write_kv_data_to_file()
+            writer.close()
+
+            reader = gguf.GGUFReader(path)
+            file_type = reader.get_field(gguf.Keys.General.FILE_TYPE)
+            self.assertIsNotNone(file_type)
+            self.assertEqual(file_type.contents(), 143)
 
     def test_id_to_title(self):
         self.assertEqual(gguf.Metadata.id_to_title("Mixtral-8x7B-Instruct-v0.1"), "Mixtral 8x7B Instruct v0.1")
