@@ -116,7 +116,7 @@ Operations and evidence:
 
 ### Local model profiles
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP and Bonsai 2 27B PQ2_0 use static, inactive units for explicit tests. Use `gemma-profile primary|audit|bonsai|status`; all profiles use `192.168.1.70:11434`, the standard Ollama port, and run one at a time. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes.
+Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP and the verified Bonsai 2 27B PQ2_0 CPU baseline use static, inactive units for explicit tests. Use `gemma-profile primary|audit|bonsai|status`; all profiles use `192.168.1.70:11434`, the standard Ollama port, and run one at a time. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes. The HN accelerated Bonsai instructions use PTQ1_0. The installed profile uses PQ2_0; PTQ1_0 integration is pending.
 
 The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 11434.
 
@@ -134,6 +134,8 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md`](benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md)
 - [`benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md`](benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md)
 - [`benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md`](benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md)
+- [`benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md`](benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md)
+- [`benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md`](benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md)
 - [`tools/gemma-hybrid/README.md`](tools/gemma-hybrid/README.md)
 
 ### Ornith and Gemma 128K validation

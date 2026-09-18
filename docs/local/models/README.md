@@ -19,6 +19,13 @@ The same work can be read by model family instead of by host. That matters whene
   * Sigma campaigns: [in-memory K/V handoff](../intel-i5-1340p/in-memory-kv-handoff.md), [Ornith/Gemma optimisation](../intel-i5-1340p/intel-1340p-ornith-gemma-campaign.md), [Gemma/Ornith agentic comparison](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md), [Gemma integration closeout](../../../benchmarks/intel-1340p/gemma-integration-b0-20260911/report.md), [Gemma research above 32K](../../../benchmarks/intel-1340p/gemma-hybrid-perf-20260910/report.md)
   * K3 history: [dense fallback experiments](../spacemit-k3/spacemit-dense-fallback-experiments.md)
 
+## Bonsai
+
+* Bonsai 2 27B
+  * Sigma operations: [static PQ2 CPU baseline](../intel-i5-1340p/gemma-local-provider-runbook.md#cpu-baseline-profile-bonsai-2-27b-pq2_0)
+  * Sigma campaign: [PQ2 correctness and CPU/Vulkan baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md)
+  * Pending accelerated path: [HN and Prism PTQ1_0 correction](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md)
+
 ## Maple and Ornith
 
 * Maple Preview: [design](../intel-i5-1340p/maple-preview-design.md), [runbook](../intel-i5-1340p/maple-local-provider-runbook.md), [implementation evidence](../../../benchmarks/intel-1340p/maple-preview/README.md), [agentic comparison](../../../benchmarks/intel-1340p/maple-preview/agentic/report.md)

@@ -4,7 +4,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Start with the current roles
 
-* [Local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment plus static Huihui security-audit and Bonsai 2 27B CPU test profiles, with health-checked switching and one LAN UI/API on port 11434.
+* [Local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment plus static Huihui security-audit and verified Bonsai 2 27B PQ2 CPU-baseline profiles, with health-checked switching and one LAN UI/API on port 11434.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
 * [Maple Preview local provider](maple-local-provider-runbook.md) -- explicit alternative provider, not the default.
 * [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.
@@ -25,7 +25,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [Gemma generation parity](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) -- ZC1 baseline: model-derived defaults and `n_min=1`, rejected pool/small-batch paths, sustained and historical fixtures, full serving qualification and immutable rollback.
 * [Gemma 4 E4B QAT + MTP Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) -- primary deployment, historically labelled ZC2: equivalent four-row Q4 arithmetic with shorter temporary lifetimes, confirmed sustained and historical speedups, full zero-copy/UI qualification and verified ZC1 rollback.
 * [Huihui Gemma 4 12B security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md) -- explicit boot-disabled alternative with matched MTP, zero-copy handoff, parser correction, full embedded UI and repeatable local switching.
-* [Bonsai 2 27B PQ2_0 integration](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) -- PQ2/Hadamard integration, CPU/Vulkan comparison, API/UI qualification and a static CPU-only test profile.
+* [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) -- PQ2/Hadamard correctness, CPU/Vulkan comparison, API/UI qualification and a static CPU-only profile; its [HN/PTQ1 correction](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md) identifies the pending accelerated path.
 * [Qwen3.8 embedded-MTP microbatch cap](qwen38-vulkan-mtp-memory.md) -- 15 September 2026 Intel Iris Xe memory and prefill qualification; committed but not deployed.
 * [Paired Q6 note](cpu-q6-pair.md)
 
@@ -46,4 +46,4 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 
 * CPU masks in these documents are host-specific. Several reports note that requested binding and observed OpenMP worker placement were not identical.
 * Thermal annotations exist where they were measured, but not every campaign has full thermal telemetry. Keep that distinction.
-* The 16 September Gemma Q4 scheduling campaign defines the primary Gemma 4 E4B QAT + MTP deployment. Generation parity defines its ZC1 baseline, and the 15 September service report defines the original zero-copy architecture. The 17 September Huihui profile and 18 September Bonsai CPU profile are explicit local alternatives. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
+* The 16 September Gemma Q4 scheduling campaign defines the primary Gemma 4 E4B QAT + MTP deployment. Generation parity defines its ZC1 baseline, and the 15 September service report defines the original zero-copy architecture. The 17 September Huihui profile and 18 September Bonsai PQ2 CPU baseline are explicit local alternatives. PTQ1 qualification is pending. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
