@@ -1,0 +1,1 @@
+/var/home/agent/workspace/projects/llama-cpp-bonsai-ptq1/build-ptq1-vulkan/bin/llama-server -m /var/home/agent/workspace/projects/models/ternary-bonsai-2-27b/Ternary-Bonsai-2-27B-PTQ1_0.gguf --host 127.0.0.1 --port 18138 -ngl 0 -fa off -c 2048 -t 12 -tb 16 --parallel 1 --reasoning off --reasoning-budget 0 --device none

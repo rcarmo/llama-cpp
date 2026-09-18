@@ -1,0 +1,1 @@
+/var/home/agent/workspace/projects/llama-cpp-bonsai-ptq1/build-ptq1-vulkan/bin/llama-bench -m /var/home/agent/workspace/projects/models/ternary-bonsai-2-27b/Ternary-Bonsai-2-27B-PTQ1_0.gguf -p 512 -n 128 -r 1 -t 12 -ngl 0 -fa off -o json -oe none --device none

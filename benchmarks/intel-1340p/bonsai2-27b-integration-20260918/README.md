@@ -1,8 +1,8 @@
-# Bonsai 2 27B PQ2_0 baseline on Intel Core i5-1340P
+# Bonsai 2 27B PQ2_0 integration on Intel Core i5-1340P
 
-Bonsai 2 27B PQ2_0 runs correctly on `sigma` with a CPU-only llama.cpp profile. CPU generation reached about 1.48 tok/s. Full Vulkan offload of this PQ2 model was correct but slower at 0.59 tok/s, so the retained PQ2 test profile disables Vulkan.
+Bonsai 2 27B PQ2_0 runs correctly on `sigma` with a CPU-only llama.cpp profile. CPU generation reached about 1.48 tok/s. Full PQ2 Vulkan offload was correct but slower at 0.59 tok/s, so the retained test profile disables Vulkan.
 
-The Hacker News instructions and accelerated reports use the smaller `Ternary-Bonsai-2-27B-PTQ1_0.gguf`. The installed profile and results below use PQ2_0. They establish a PQ2 correctness and CPU baseline; PTQ1's native Vulkan path is pending qualification. See [HN and Prism PTQ1_0 correction](hn-ptq1-review.md).
+The separate [PTQ1_0 qualification](ptq1-qualification/README.md) reached 25.5768 prompt tok/s with native full Vulkan offload. Its generation rate was 0.4763 tok/s, so PTQ1 source support is accepted without replacing the retained PQ2 CPU profile.
 
 ## Frozen inputs
 
@@ -22,7 +22,7 @@ The Hacker News instructions and accelerated reports use the smaller `Ternary-Bo
 
 The model reports 26,895,998,464 parameters and `PQ2_0 - 2.13 bpw (group 128)`. Source research and repository metadata were frozen under `/tmp/hn-49746618` during the campaign; the report retains immutable revisions and hashes rather than temporary fetched pages.
 
-## Integrated PQ2 source
+## Integrated source
 
 The branch adds the minimum runtime chain needed by this GGUF on the current fork:
 
@@ -43,7 +43,7 @@ Focused build checks passed:
 - CPU-only server rebuild after the Metal prune: byte-identical before UI embedding;
 - CPU-only server rebuild with the frozen UI: quantisation and 28/28 CPU Hadamard tests passed.
 
-## PQ2 CPU and Vulkan results
+## CPU and Vulkan results
 
 Both timed requests used the same 23-token chat prompt, six generated tokens, temperature 0, a 2,048-token context, eight decode threads, 16 batch threads and no warm-up. Each returned exactly `BONSAI_OK`.
 
@@ -52,9 +52,7 @@ Both timed requests used the same 23-token chat prompt, six generated tokens, te
 | CPU, `-ngl 0` | 4 s | 2.0901 tok/s | 1.4846 tok/s | 14 s | 626.7 MB sampled; model pages mmap-backed | 0 / 0 | Accepted |
 | Vulkan, `-ngl 99` | 8 s | 1.2763 tok/s | 0.5860 tok/s | 26 s | 8,173,744,128 bytes | 0 / 0 | Rejected for speed |
 
-Full Vulkan offload reduced prompt throughput by 38.94% and generation throughput by 60.53% relative to CPU for this request. The published local Vulkan source has FWHT support but no `GGML_TYPE_PQ2_0` matmul/dequant path; PQ2 matrix work falls back to CPU. Further PQ2 hybrid layer splits were not screened because they add backend crossings without a Vulkan PQ2 kernel.
-
-This result does not apply to PTQ1_0. Prism commit `01fd9521c` defines PTQ1 as a separate type with native Vulkan dequantisation and matrix shaders. That format and its direct Hadamard-sharing dependency are pending isolated integration and qualification.
+Full Vulkan offload reduced prompt throughput by 38.94% and generation throughput by 60.53% relative to CPU for this request. The Vulkan source has FWHT support but no `GGML_TYPE_PQ2_0` matmul/dequant path; PQ2 matrix work falls back to CPU. Further hybrid layer splits were not screened because they add backend crossings without a Vulkan PQ2 kernel.
 
 The first CLI smoke loaded the model but entered repeated conversation turns after the requested output limit. It is retained only as an invalid-run diagnostic and is excluded from timings.
 
@@ -75,9 +73,9 @@ The accepted CPU profile passed:
 
 The tool request was correct but slow: 287 prompt tokens at 2.1978 tok/s and 28 generated tokens at 1.4754 tok/s took 149 seconds wall-clock. The profile is suitable for explicit local tests, not interactive replacement of the primary Gemma service.
 
-## Retained PQ2 profile
+## Retained profile
 
-The qualified PQ2 runtime is ignored by Git and installed locally at:
+The qualified runtime is ignored by Git and installed locally at:
 
 ```text
 runtime/deployments/bonsai2-27b-pq2-cpu-bb2ea4754-ccb8e4aa
@@ -116,7 +114,6 @@ The complete successful transition matrix also passed: primary to audit in 12 se
 | `profile-matrix/` | successful primary/audit/Bonsai transition matrix |
 | `rollback-failure/` | deliberate Bonsai startup failure and automatic primary restore |
 | `cpu-smoke/` | invalid repeated-conversation CLI diagnostic |
-| `hn-ptq1-review.md` | HN correction, PTQ1 artefact/release identity and minimum patch-chain review |
-| `hn-ptq1-sources.json` | frozen cited comments and exact model, release, commit and Metal-PR identities |
+| `ptq1-qualification/` | PTQ1 CPU/Vulkan tests, benchmarks, API/SSE/tools/UI gates and resource captures |
 
-`artifact-inventory.tsv` lists the retained files. `evidence.sha256` verifies all evidence except itself.
+`artifact-inventory.tsv` lists the retained PQ2 files. `evidence.sha256` verifies all PQ2 evidence except itself. The PTQ1 directory has its own inventory and hash manifest.
