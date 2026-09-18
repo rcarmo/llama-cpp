@@ -1,0 +1,26 @@
+[Unit]
+Description=Bonsai 2 27B PQ2_0 CPU-only test service
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/local/intel-i5-1340p/gemma-local-provider-runbook.md
+After=network-online.target
+Wants=network-online.target
+Conflicts=llama-gemma-zero-copy.service llama-gemma-lan-test.socket llama-gemma-lan-test.service huihui-gemma4-security-audit.service
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/bonsai2-27b-cpu/service.env
+ExecStart=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-bonsai2-cpu-service.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillSignal=SIGTERM
+MemoryMax=28G
+MemorySwapMax=0
+OOMScoreAdjust=200
+TasksMax=256
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+# Deliberately no [Install] section: use `gemma-profile bonsai`; never enable this
+# temporary CPU-only test profile as a boot default.

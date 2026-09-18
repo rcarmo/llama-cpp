@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Switch between the primary Gemma service and the Huihui security-audit profile.
+# Switch between the primary Gemma service and boot-disabled test profiles.
 set -euo pipefail
 
 primary=llama-gemma-zero-copy.service
 proxy=llama-gemma-lan-test.service
 proxy_socket=llama-gemma-lan-test.socket
 audit=huihui-gemma4-security-audit.service
+bonsai=bonsai2-27b-cpu.service
 legacy_audit=huihui-gemma4-12b-zero-copy.service
 legacy_trial=huihui-gemma4-12b-trial.service
 lock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/gemma-profile.lock"
@@ -13,16 +14,18 @@ primary_url=http://127.0.0.1:18094
 lan_url=http://192.168.1.70:11434
 primary_model=gemma-4-e4b-qat-mtp-zero-copy
 audit_model=huihui-gemma-4-12b-abliterated-zero-copy
+bonsai_model=bonsai-2-27b-pq2-cpu
 
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
 
 usage() {
     cat <<'EOF'
-Usage: gemma-profile primary|audit|status
+Usage: gemma-profile primary|audit|bonsai|status
 
   primary  Select Gemma 4 E4B QAT + MTP zero-copy (boot default).
   audit    Select Huihui Gemma 4 12B for local security audits.
+  bonsai   Select Bonsai 2 27B PQ2_0 CPU-only for local tests.
   status   Verify the active model, LAN endpoint, units, restarts and swap.
 EOF
 }
@@ -33,6 +36,12 @@ unit_state() {
 
 health_model() {
     curl --connect-timeout 2 --max-time 5 -fsS "$1/health" 2>/dev/null | jq -r '.model // empty' 2>/dev/null || true
+}
+
+models_has_alias() {
+    local url=$1 expected=$2
+    curl --connect-timeout 2 --max-time 5 -fsS "$url/v1/models" 2>/dev/null |
+        jq -e --arg expected "$expected" 'any(.data[]?; .id == $expected or ((.aliases // []) | index($expected) != null))' >/dev/null 2>&1
 }
 
 wait_for_model() {
@@ -57,8 +66,12 @@ verify_unit() {
     grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
     grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
     grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
-    lan_seen=$(health_model "$lan_url")
-    [[ $lan_seen == "$expected" ]]
+    if [[ $expected == "$bonsai_model" ]]; then
+        models_has_alias "$lan_url" "$expected"
+    else
+        lan_seen=$(health_model "$lan_url")
+        [[ $lan_seen == "$expected" ]]
+    fi
     printf '%s\n' "$state"
     printf 'Model=%s\nLAN=%s\n' "$expected" "$lan_url"
 }
@@ -90,70 +103,136 @@ activate_audit() {
     verify_unit "$audit" "$audit_model"
 }
 
+activate_bonsai() {
+    systemctl --user reset-failed "$bonsai" >/dev/null 2>&1 || true
+    systemctl --user start "$bonsai"
+    for _ in $(seq 1 360); do
+        if curl --connect-timeout 2 --max-time 5 -fsS "$lan_url/health" 2>/dev/null | jq -e '.status == "ok"' >/dev/null 2>&1 &&
+           models_has_alias "$lan_url" "$bonsai_model"; then
+            verify_unit "$bonsai" "$bonsai_model"
+            return 0
+        fi
+        [[ $(unit_state "$bonsai") == failed ]] && break
+        sleep 1
+    done
+    return 1
+}
+
+active_profile() {
+    local name
+    for name in primary audit bonsai legacy_audit legacy_trial; do
+        [[ $(unit_state "${!name}") == active ]] && { printf '%s\n' "$name"; return; }
+    done
+    printf 'none\n'
+}
+
+activate_legacy() {
+    local unit=$1 state
+    systemctl --user reset-failed "$unit" >/dev/null 2>&1 || true
+    systemctl --user start "$unit"
+    state=$(systemctl --user show "$unit" -p ActiveState -p SubState -p NRestarts -p MemorySwapCurrent -p MemorySwapPeak)
+    grep -Fx 'ActiveState=active' <<<"$state" >/dev/null
+    grep -Fx 'SubState=running' <<<"$state" >/dev/null
+    grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
+    grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
+    grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
+}
+
+restore_profile() {
+    local previous=$1
+    case "$previous" in
+        primary)      echo 'Restoring the primary profile.' >&2; activate_primary ;;
+        audit)        echo 'Restoring the audit profile.' >&2; activate_audit ;;
+        bonsai)       echo 'Restoring the Bonsai profile.' >&2; activate_bonsai ;;
+        legacy_audit) echo "Restoring $legacy_audit." >&2; activate_legacy "$legacy_audit" ;;
+        legacy_trial) echo "Restoring $legacy_trial." >&2; activate_legacy "$legacy_trial" ;;
+        none)         return 0 ;;
+    esac
+}
+
 start_primary() {
-    local previous_audit=0
-    [[ $(unit_state "$audit") == active || $(unit_state "$legacy_audit") == active || $(unit_state "$legacy_trial") == active ]] && previous_audit=1
-    systemctl --user stop "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
-    systemctl --user reset-failed "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    local previous
+    previous=$(active_profile)
+    systemctl --user stop "$audit" "$bonsai" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$audit" "$bonsai" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
     if ! activate_primary; then
         echo 'Primary failed its health, identity, LAN or swap gate.' >&2
         systemctl --user stop "$proxy_socket" "$proxy" "$primary" >/dev/null 2>&1 || true
-        if [[ $previous_audit == 1 ]]; then
-            echo 'Restoring the audit profile.' >&2
-            if ! activate_audit; then
-                echo 'FATAL: the audit rollback also failed; run gemma-profile status.' >&2
-                return 2
-            fi
+        if ! restore_profile "$previous"; then
+            echo "FATAL: the $previous rollback also failed; run gemma-profile status." >&2
+            return 2
         fi
         return 1
     fi
 }
 
 start_audit() {
-    local previous_primary=0
-    [[ $(unit_state "$primary") == active ]] && previous_primary=1
+    local previous
+    previous=$(active_profile)
     # The proxy requires the primary. Stop it before the primary so a LAN
     # request cannot reactivate the primary during the transition.
     systemctl --user stop "$proxy_socket" "$proxy" >/dev/null 2>&1 || true
-    systemctl --user stop "$primary"
-    systemctl --user stop "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
-    systemctl --user reset-failed "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user stop "$primary" "$bonsai" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$bonsai" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
     if ! activate_audit; then
         echo 'Audit failed its health, identity, LAN or swap gate.' >&2
         systemctl --user stop "$audit" >/dev/null 2>&1 || true
-        if [[ $previous_primary == 1 ]]; then
-            echo 'Restoring the primary profile.' >&2
-            if ! activate_primary; then
-                echo 'FATAL: the primary rollback also failed; run gemma-profile status.' >&2
-                return 2
-            fi
+        if ! restore_profile "$previous"; then
+            echo "FATAL: the $previous rollback also failed; run gemma-profile status." >&2
+            return 2
+        fi
+        return 1
+    fi
+}
+
+start_bonsai() {
+    local previous
+    previous=$(active_profile)
+    systemctl --user stop "$proxy_socket" "$proxy" >/dev/null 2>&1 || true
+    systemctl --user stop "$primary" "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    systemctl --user reset-failed "$primary" "$audit" "$legacy_audit" "$legacy_trial" >/dev/null 2>&1 || true
+    if ! activate_bonsai; then
+        echo 'Bonsai failed its health, identity, LAN or swap gate.' >&2
+        systemctl --user stop "$bonsai" >/dev/null 2>&1 || true
+        if ! restore_profile "$previous"; then
+            echo "FATAL: the $previous rollback also failed; run gemma-profile status." >&2
+            return 2
         fi
         return 1
     fi
 }
 
 show_status() {
-    local primary_state audit_state primary_seen audit_seen lan_seen socket_state state
+    local primary_state audit_state bonsai_state legacy_audit_state legacy_trial_state primary_seen audit_seen lan_seen socket_state state
     primary_state=$(unit_state "$primary")
     audit_state=$(unit_state "$audit")
+    bonsai_state=$(unit_state "$bonsai")
+    legacy_audit_state=$(unit_state "$legacy_audit")
+    legacy_trial_state=$(unit_state "$legacy_trial")
     socket_state=$(unit_state "$proxy_socket")
     primary_seen=$(health_model "$primary_url")
     audit_seen=$(health_model "$lan_url")
     lan_seen=$audit_seen
-    if [[ $audit_state == active && $audit_seen == "$audit_model" && $primary_state != active && $socket_state != active ]]; then
+    if [[ $audit_state == active && $audit_seen == "$audit_model" && $primary_state != active && $bonsai_state != active && $legacy_audit_state != active && $legacy_trial_state != active && $socket_state != active ]]; then
         state=$(systemctl --user show "$audit" -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p MemorySwapPeak)
         grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
         grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
         grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
         printf 'Profile=audit\nModel=%s\nLAN=%s\n%s\n' "$audit_model" "$lan_url" "$state"
-    elif [[ $primary_state == active && $primary_seen == "$primary_model" && $lan_seen == "$primary_model" && $audit_state != active && $socket_state == active ]]; then
+    elif [[ $bonsai_state == active && $primary_state != active && $audit_state != active && $legacy_audit_state != active && $legacy_trial_state != active && $socket_state != active ]] && models_has_alias "$lan_url" "$bonsai_model"; then
+        state=$(systemctl --user show "$bonsai" -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p MemorySwapPeak)
+        grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
+        grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
+        printf 'Profile=bonsai\nModel=%s\nLAN=%s\n%s\n' "$bonsai_model" "$lan_url" "$state"
+    elif [[ $primary_state == active && $primary_seen == "$primary_model" && $lan_seen == "$primary_model" && $audit_state != active && $bonsai_state != active && $legacy_audit_state != active && $legacy_trial_state != active && $socket_state == active ]]; then
         state=$(systemctl --user show "$primary" -p MainPID -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p MemorySwapPeak)
         grep -Fx 'NRestarts=0' <<<"$state" >/dev/null
         grep -Fx 'MemorySwapCurrent=0' <<<"$state" >/dev/null
         grep -Fx 'MemorySwapPeak=0' <<<"$state" >/dev/null
         printf 'Profile=primary\nModel=%s\nLAN=%s\n%s\n' "$primary_model" "$lan_url" "$state"
     else
-        printf 'Profile=inconsistent\nPrimaryState=%s\nPrimaryModel=%s\nAuditState=%s\nAuditOrLANModel=%s\nLANSocketState=%s\n' "$primary_state" "${primary_seen:-unavailable}" "$audit_state" "${lan_seen:-unavailable}" "$socket_state"
+        printf 'Profile=inconsistent\nPrimaryState=%s\nPrimaryModel=%s\nAuditState=%s\nBonsaiState=%s\nLegacyAuditState=%s\nLegacyTrialState=%s\nAuditOrLANModel=%s\nLANSocketState=%s\n' "$primary_state" "${primary_seen:-unavailable}" "$audit_state" "$bonsai_state" "$legacy_audit_state" "$legacy_trial_state" "${lan_seen:-unavailable}" "$socket_state"
         return 1
     fi
 }
@@ -164,6 +243,7 @@ flock -n 9 || { echo 'Another gemma-profile switch is in progress.' >&2; exit 1;
 case "$1" in
     primary) start_primary ;;
     audit)   start_audit ;;
+    bonsai)  start_bonsai ;;
     status)  show_status ;;
     *)       usage >&2; exit 2 ;;
 esac
