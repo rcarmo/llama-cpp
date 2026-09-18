@@ -1,0 +1,87 @@
+{
+  "frozen_at": "2026-09-18T16:42:28.349Z",
+  "hn": {
+    "id": 49746618,
+    "title": "Bonsai 2 27B: Near-Lossless Compression in a 9x Smaller Footprint",
+    "url": "https://news.ycombinator.com/item?id=49746618",
+    "points": 528,
+    "created_at": "2026-09-17T21:13:31.000Z",
+    "direct_children": 37,
+    "comment_count": 172,
+    "comments": [
+      {
+        "id": 49747390,
+        "parent_id": 49746618,
+        "author": "simonw",
+        "created_at": "2026-09-17T22:13:05.000Z",
+        "text_html": "If you want to try out out the GGUFs from <a href=\"https:&#x2F;&#x2F;huggingface.co&#x2F;prism-ml&#x2F;Ternary-Bonsai-2-27B-gguf#these-files-need-our-llamacpp-build\" rel=\"nofollow\">https:&#x2F;&#x2F;huggingface.co&#x2F;prism-ml&#x2F;Ternary-Bonsai-2-27B-gguf#th...</a> be aware that you need Prism&#x27;s llama.cpp fork to get them to work, from <a href=\"https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;llama.cpp&#x2F;releases&#x2F;tag&#x2F;prism-b10685-7dffb15\" rel=\"nofollow\">https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;llama.cpp&#x2F;releases&#x2F;tag&#x2F;prism-...</a><p>This should work:<p><pre><code>  cd &#x2F;tmp\n\n  # Get the Prism macOS runtime\n  curl -fL https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;llama.cpp&#x2F;releases&#x2F;download&#x2F;prism-b10685-7dffb15&#x2F;llama-prism-b10685-7dffb15-bin-macos-arm64.tar.gz -o bonsai-runtime.tar.gz\n  tar -xzf bonsai-runtime.tar.gz\n\n  # Get the ~5.95 GB GGUF model:\n  curl -fL https:&#x2F;&#x2F;huggingface.co&#x2F;prism-ml&#x2F;Ternary-Bonsai-2-27B-gguf&#x2F;resolve&#x2F;main&#x2F;Ternary-Bonsai-2-27B-PTQ1_0.gguf -o Ternary-Bonsai-2-27B-PTQ1_0.gguf\n\n  # Run the server, I used port 8331\n  .&#x2F;llama-prism-b10685-7dffb15&#x2F;llama-server \\\n    -m Ternary-Bonsai-2-27B-PTQ1_0.gguf \\\n    --port 8331 -ngl 99 -fa on -c 32768\n</code></pre>\nThen open http:&#x2F;&#x2F;localhost:8331 for the (very good) baked in llama-server web UI... or run a prompt via the API like this:<p><pre><code>  uvx llm openai endpoint http:&#x2F;&#x2F;127.0.0.1:8331&#x2F;v1 \\\n    --model bonsai-2-27b --responses hi\n</code></pre>\nThat&#x27;s running at ~20 token&#x2F;second for me on an M5 Pro (after a server restart I got 44 token&#x2F;second, not sure why), but I&#x27;m pretty sure something isn&#x27;t working right, on startup the server said &quot;ggml_metal_device_init: - the tensor API is not supported in this environment - disabling&quot;.",
+        "url": "https://news.ycombinator.com/item?id=49747390"
+      },
+      {
+        "id": 49749255,
+        "parent_id": 49747390,
+        "author": "francisjp",
+        "created_at": "2026-09-18T01:42:23.000Z",
+        "text_html": "Thanks for all of your exploration in public Simon.<p>Commenting because the fix I proposed was merged in roughly 49 commits after the PrismML Fork. The “tensor API is not supported” warning occurred because llama.cpp’s startup probe fails to compile a matmul2d kernel: Metal’s tensor headers require language version 4.0, but ggml-metal-device.m previously omitted MTLCompileOptions.languageVersion, disabling the API universally.<p>Here’s a link to the diff if you want to try and update that fork to take advantage of the prefill gains afforded by the hardware: <a href=\"https:&#x2F;&#x2F;github.com&#x2F;ggml-org&#x2F;llama.cpp&#x2F;pull&#x2F;27461&#x2F;changes\" rel=\"nofollow\">https:&#x2F;&#x2F;github.com&#x2F;ggml-org&#x2F;llama.cpp&#x2F;pull&#x2F;27461&#x2F;changes</a>",
+        "url": "https://news.ycombinator.com/item?id=49749255"
+      },
+      {
+        "id": 49752113,
+        "parent_id": 49747390,
+        "author": "wombat23",
+        "created_at": "2026-09-18T09:53:31.000Z",
+        "text_html": "I managed to run it with RTX 3070 (8GB VRAM) following the &quot;Quickstart&quot; on HF model card with minor modifications (modify the architecture 86 for your own hardware):<p><pre><code>  git clone https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;llama.cpp &amp;&amp; cd llama.cpp\n  cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86 &amp;&amp; cmake --build build -j\n</code></pre>\nThen downloaded &amp; verified `Ternary-Bonsai-2-27B-PTQ1_0.gguf` from HF and ran<p><pre><code>  .&#x2F;llama.cpp&#x2F;build&#x2F;bin&#x2F;llama-cli -m Ternary-Bonsai-2-27B-PTQ1_0.gguf -ngl 99 -fa on -c 32768 -b 256 -ub 64 --temp 1.0 --top-p 0.95 --top-k 20 -ctk q8_0 -ctv q8_0 -p &quot;hello world in x86 assembler&quot; -n 256\n</code></pre>\nthe parameters were suggested by gpt-5.6-luna to reduce memory footprint, as the  defaults ran OOM on my gpu. result looks good:<p><pre><code>  [ Prompt: 165.6 t&#x2F;s | Generation: 40.6 t&#x2F;s ]\n</code></pre>\nwould be nice if they upstreamed their changes so that it runs with the original llama.cpp",
+        "url": "https://news.ycombinator.com/item?id=49752113"
+      },
+      {
+        "id": 49755122,
+        "parent_id": 49752780,
+        "author": "wombat23",
+        "created_at": "2026-09-18T14:42:52.000Z",
+        "text_html": "I don&#x27;t see any significant speed up. also with defaults according to --help<p><pre><code>  -b,    --batch-size N                   logical maximum batch size (default: 2048)\n  -ub,   --ubatch-size N                  physical maximum batch size (default: 512)\n</code></pre>\nI also tried double the default. that also means that they can be left to default settings, apparently.",
+        "url": "https://news.ycombinator.com/item?id=49755122"
+      },
+      {
+        "id": 49755246,
+        "parent_id": 49752113,
+        "author": "zepearl",
+        "created_at": "2026-09-18T14:51:22.000Z",
+        "text_html": "Exact same test executed on my RTX 3060 (12 GiB VRAM, PCIe 3.0 4x slot):<p><pre><code>  [ Prompt: 95.0 t&#x2F;s | Generation: 26.5 t&#x2F;s ]\n</code></pre>\n(the test&#x27;s prompt is very short but with longer ones the I get ~200 prompt processing rate, but I was hoping for a better token generation rate...)<p>Am I understanding correctly that no draft model exists (will never exist or just currently does not exist yet)?<p>There is no draft file in Huggingface&#x27;s repository ( <a href=\"https:&#x2F;&#x2F;huggingface.co&#x2F;prism-ml&#x2F;Ternary-Bonsai-2-27B-gguf&#x2F;tree&#x2F;main\" rel=\"nofollow\">https:&#x2F;&#x2F;huggingface.co&#x2F;prism-ml&#x2F;Ternary-Bonsai-2-27B-gguf&#x2F;tr...</a> ) and in the file &quot;scripts&#x2F;download_models.sh&quot; of the demo repository ( <a href=\"https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;Bonsai-demo&#x2F;blob&#x2F;main&#x2F;scripts&#x2F;download_models.sh\" rel=\"nofollow\">https:&#x2F;&#x2F;github.com&#x2F;PrismML-Eng&#x2F;Bonsai-demo&#x2F;blob&#x2F;main&#x2F;scripts...</a> ) I see this remark:<p><pre><code>  if [ &quot;$_family&quot; = &quot;bonsai2&quot; ]; then\n    the projector ships in the same repo; Bonsai 2 has no dspark drafter</code></pre>",
+        "url": "https://news.ycombinator.com/item?id=49755246"
+      }
+    ]
+  },
+  "model": {
+    "repository": "prism-ml/Ternary-Bonsai-2-27B-gguf",
+    "revision": "6ed5e12bf84b7a63069882c91dd9e9218647d17b",
+    "rfilename": "Ternary-Bonsai-2-27B-PTQ1_0.gguf",
+    "size": 5946648928,
+    "sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3"
+  },
+  "prism_release": {
+    "tag_name": "prism-b10685-7dffb15",
+    "target_commitish": "7dffb158de30ebb8ef9d64f33c6b0b2d7c1e6313",
+    "published_at": "2026-09-15T09:34:13Z",
+    "url": "https://github.com/PrismML-Eng/llama.cpp/releases/tag/prism-b10685-7dffb15"
+  },
+  "required_sigma_commits": [
+    {
+      "sha": "633168fb66919408e7b649bcf7a651d065ebed3e",
+      "subject": "hadamard: share the activation transform between folded weights that share an input (#137)",
+      "url": "https://github.com/PrismML-Eng/llama.cpp/commit/633168fb66919408e7b649bcf7a651d065ebed3e"
+    },
+    {
+      "sha": "01fd9521c92e7882a3fa1083bb933e3bd9305bef",
+      "subject": "ggml: add PTQ1_0, ternary at group 128 (1.75 bpw, lossless vs PQ2_0) (#148)",
+      "url": "https://github.com/PrismML-Eng/llama.cpp/commit/01fd9521c92e7882a3fa1083bb933e3bd9305bef"
+    }
+  ],
+  "metal_only_pr": {
+    "number": 27461,
+    "title": "metal: enable Metal 4.0 tensor API on M5+/A19+",
+    "state": "closed",
+    "merged_at": "2026-09-01T09:02:43Z",
+    "merge_commit_sha": "d5d993a0938ddc0d2a4328632b8dcfbfa64b63e6",
+    "url": "https://github.com/ggml-org/llama.cpp/pull/27461"
+  }
+}

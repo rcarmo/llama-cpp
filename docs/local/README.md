@@ -11,7 +11,7 @@ This fork has accumulated a lot of host-specific work -- enough that the old fla
 
 ## Reading order
 
-* For the current Sigma serving setup, start with the [Gemma zero-copy runbook](intel-i5-1340p/gemma-local-provider-runbook.md). Dated benchmark reports preserve the service state observed during their campaign; they are not current rollback instructions.
+* For the current Sigma serving setup, start with the [local model profiles runbook](intel-i5-1340p/gemma-local-provider-runbook.md). It covers the primary Gemma service and static Huihui/PQ2 Bonsai profiles. Dated benchmark reports preserve the service state observed during their campaign; they are not current rollback instructions.
 * If you are trying to understand how a result evolved, use the chronology page first and treat undated runbooks as current operational state, not as dated benchmark claims.
 * If you need raw logs, JSON, thermal CSVs or reproduction scripts, prefer the benchmark tree over the prose reports. The reports summarise measured outcomes; the benchmark directories keep the evidence.
 

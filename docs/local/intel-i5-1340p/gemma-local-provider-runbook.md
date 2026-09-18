@@ -106,11 +106,11 @@ The parser fix classifies a repeated empty Gemma 4 thought channel as reasoning 
 
 Evidence: [Huihui security-audit trial](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md).
 
-## CPU test profile: Bonsai 2 27B PQ2_0
+## CPU baseline profile: Bonsai 2 27B PQ2_0
 
 | Item | Value |
 |---|---|
-| Purpose | Explicit local ternary-model and API tests |
+| Purpose | Verified PQ2 correctness/API baseline for explicit local tests |
 | Boot status | Static unit; explicit selection only |
 | Service | `bonsai2-27b-cpu.service` |
 | Model alias | `bonsai-2-27b-pq2-cpu` |
@@ -123,11 +123,13 @@ Evidence: [Huihui security-audit trial](../../../benchmarks/intel-1340p/huihui-g
 | Server SHA-256 | `ccb8e4aa5541d54d97bd3a359d30f31c01dec7d2e3645023bff36d40dfd76fca` |
 | Model SHA-256 | `3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1` |
 
-The immutable runtime is `runtime/deployments/bonsai2-27b-pq2-cpu-bb2ea4754-ccb8e4aa`. It was built with `GGML_VULKAN=OFF` and embeds the primary profile's frozen 70-asset UI. CPU smoke generation measured about 1.48 tok/s. Full Vulkan offload produced correct output but measured 0.59 tok/s because Vulkan has no PQ2_0 matrix kernel; it is excluded from the profile.
+The immutable runtime is `runtime/deployments/bonsai2-27b-pq2-cpu-bb2ea4754-ccb8e4aa`. It was built with `GGML_VULKAN=OFF` and embeds the primary profile's frozen 70-asset UI. CPU smoke generation measured about 1.48 tok/s. Full Vulkan offload of the PQ2 model produced correct output but measured 0.59 tok/s because published local master has no PQ2_0 Vulkan matrix kernel; it is excluded from this profile.
 
-The profile passed exact non-streaming output, incremental SSE, forced OpenAI-style tool selection, 70/70 UI asset equality, model alias checks, zero swap/OOM and primary rollback. A 315-token forced tool request took 149 seconds, so this profile is for deliberate tests rather than routine interactive use.
+The Hacker News instructions and accelerated reports use `Ternary-Bonsai-2-27B-PTQ1_0.gguf`, a distinct 5,946,648,928-byte format with native Vulkan support in Prism commit `01fd9521c`. Published local master contains no PTQ1_0 implementation or direct Hadamard-sharing dependency `633168fb`. The installed PQ2 service is the verified baseline. PTQ1 integration, qualification and fastest-profile selection on Sigma are pending.
 
-Evidence: [Bonsai 2 27B PQ2_0 integration](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md).
+The PQ2 profile passed exact non-streaming output, incremental SSE, forced OpenAI-style tool selection, 70/70 UI asset equality, model alias checks, zero swap/OOM and primary rollback. A 315-token forced tool request took 149 seconds, so this profile is for deliberate tests rather than routine interactive use.
+
+Evidence: [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) and [HN/PTQ1 source correction](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md).
 
 ## Gemma zero-copy request lifecycle
 
