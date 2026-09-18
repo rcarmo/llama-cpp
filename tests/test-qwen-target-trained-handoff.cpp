@@ -156,7 +156,9 @@ int main(int argc, char ** argv) {
 
     const char * threads_env = std::getenv("QWEN_THREADS");
     const int32_t n_threads = threads_env ? parse_count(threads_env, "QWEN_THREADS", 64) : 12;
-    if (n_threads < 0) return 2;
+    const char * layers_env = std::getenv("QWEN_GPU_LAYERS");
+    const int32_t n_gpu_layers = use_vulkan && layers_env ? parse_count(layers_env, "QWEN_GPU_LAYERS", 999) : 999;
+    if (n_threads < 0 || n_gpu_layers < 0) return 2;
     const bool flash_attn = std::getenv("QWEN_FLASH_ATTN") && std::strcmp(std::getenv("QWEN_FLASH_ATTN"), "1") == 0;
     const uint32_t n_ctx = (uint32_t) std::max<int32_t>(32, n_prefill + n_output);
     const uint32_t n_batch = (uint32_t) std::max<int32_t>(32, n_chunk);
@@ -183,7 +185,7 @@ int main(int argc, char ** argv) {
     if (use_vulkan) {
         const int64_t start = llama_time_us();
         auto params = llama_model_default_params();
-        params.n_gpu_layers = 999;
+        params.n_gpu_layers = n_gpu_layers;
         gpu_model.reset(llama_model_load_from_file(model_path, params));
         if (!gpu_model) return fail("load_gpu_model");
         load_gpu_us = llama_time_us() - start;
@@ -221,6 +223,7 @@ int main(int argc, char ** argv) {
     int64_t destination_init_us = 0;
     int64_t handoff_us = 0;
     int64_t source_release_us = 0;
+    int64_t reeval_us = 0;
     llama_context * active = source.get();
     if (handoff) {
         const int64_t init_start = llama_time_us();
@@ -242,6 +245,14 @@ int main(int argc, char ** argv) {
         source_release_us = llama_time_us() - release_start;
         active = destination.get();
         if (!memory_checkpoint("source_released")) return fail("checkpoint_source_released");
+
+        if (!llama_memory_seq_rm(llama_get_memory(active), 0, n_prefill - 1, -1)) return fail("remove_last_prompt_token");
+        auto last_prompt = make_batch({prompt_tokens.back()}, n_prefill - 1);
+        const int64_t reeval_start = llama_time_us();
+        if (llama_decode(active, last_prompt.batch) != 0) return fail("reeval_last_prompt_token");
+        const logits_result reeval_logits = inspect_logits(active);
+        if (!reeval_logits.finite) return fail("reeval_logits");
+        reeval_us = llama_time_us() - reeval_start;
     }
 
     const int64_t continuation_start = llama_time_us();
@@ -258,15 +269,15 @@ int main(int argc, char ** argv) {
 
     std::printf(
         "QUALIFY_RESULT profile=%s tokens_prefill=%d tokens_continue=%d chunk_tokens=%d ubatch_tokens=%u chunks=%d "
-        "threads=%d flash_attn=%d n_rs_seq=%u load_cpu_us=%lld load_gpu_us=%lld prefill_us=%lld "
-        "destination_init_us=%lld handoff_us=%lld source_release_us=%lld continuation_us=%lld active_wall_us=%lld "
+        "threads=%d gpu_layers=%d flash_attn=%d n_rs_seq=%u load_cpu_us=%lld load_gpu_us=%lld prefill_us=%lld "
+        "destination_init_us=%lld handoff_us=%lld source_release_us=%lld reeval_us=%lld continuation_us=%lld active_wall_us=%lld "
         "shared_bytes=%zu copied_bytes=%zu final_pos=%d prefill_finite=1 prefill_top_id=%d prefill_hash=%016llx "
         "logits_finite=1 logits_top_id=%d logits_hash=%016llx total_us=%lld\n",
         argv[1], n_prefill, n_output, n_chunk, n_ubatch, (n_prefill + n_chunk - 1) / n_chunk,
-        n_threads, flash_attn ? 1 : 0, llama_n_rs_seq(active),
+        n_threads, use_vulkan ? n_gpu_layers : 0, flash_attn ? 1 : 0, llama_n_rs_seq(active),
         (long long) load_cpu_us, (long long) load_gpu_us, (long long) prefill_us,
         (long long) destination_init_us, (long long) handoff_us, (long long) source_release_us,
-        (long long) continuation_us, (long long) (llama_time_us() - active_start),
+        (long long) reeval_us, (long long) continuation_us, (long long) (llama_time_us() - active_start),
         transfer.shared_bytes, transfer.copied_bytes, (int) final_pos,
         prefill_logits.top_id, (unsigned long long) prefill_logits.hash,
         final_logits.top_id, (unsigned long long) final_logits.hash,
