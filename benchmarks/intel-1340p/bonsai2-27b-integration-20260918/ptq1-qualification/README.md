@@ -22,7 +22,7 @@ PTQ1_0 full Vulkan offload reached 25.5768 prompt tok/s and 0.4763 generation to
 | GGUF `general.file_type` | `143` |
 | Tensor format | `PTQ1_0`, 1.75 bits per weight, group 128 |
 
-Python's public `LlamaFileType.MOSTLY_PTQ1_0` now matches C++ and the model's `general.file_type` value `143`. The internal quantisation-output enum remains `GGML_FTYPE_MOSTLY_PTQ1_0 = 129`. A zero-tensor GGUF writer/reader round-trip and all five metadata tests pass in a disposable Fedora 44 environment with NumPy.
+Python's public `LlamaFileType.MOSTLY_PTQ1_0` now matches C++ and the model's `general.file_type` value `143`. The internal quantisation-output enum remains `GGML_FTYPE_MOSTLY_PTQ1_0 = 129`. A zero-tensor GGUF writer/reader round-trip and all six metadata tests pass in a disposable Fedora 44 environment with NumPy and PyYAML. `python-metadata-tests.log` retains the complete successful run.
 
 The Vulkan build uses GCC 16.1.1, `GGML_NATIVE=ON`, `GGML_OPENMP=ON` and `GGML_VULKAN=ON`. The tested server launcher has SHA-256 `a743126659be6866db407552dc24bf330aa01ba31eec4fa15e2d5f8749025879`. The post-boundary `libggml-vulkan.so` has SHA-256 `9b6dea6bc47e457c3a63ad568a9d12ffd49de15122934b5c3083ef661b2c47f3`; shared libraries contain most server implementation code.
 
