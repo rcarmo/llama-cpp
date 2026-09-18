@@ -1,6 +1,6 @@
 # HN and Prism PTQ1_0 correction
 
-The Hacker News instructions and reported accelerated runs use `Ternary-Bonsai-2-27B-PTQ1_0.gguf`. The first Sigma campaign qualified the installed PQ2_0 profile as a correct CPU baseline. PTQ1 acceleration testing on Sigma is pending.
+The Hacker News instructions and reported accelerated runs use `Ternary-Bonsai-2-27B-PTQ1_0.gguf`. Sigma PTQ1 qualification reached 25.5768 prompt tok/s with full Vulkan offload, while generation reached 0.4763 tok/s. The installed PQ2_0 CPU profile remains faster for generation at 1.4846 tok/s.
 
 ## Sources checked
 
@@ -26,7 +26,7 @@ These reports use Apple or NVIDIA hardware and are not expected Sigma rates. The
 | Release commit | `7dffb158de30ebb8ef9d64f33c6b0b2d7c1e6313` |
 | Release date | 15 September 2026 |
 
-Prism describes PTQ1_0 as a group-128 ternary packing with tensor type `143`, ftype `129` and 1.75 bits per weight. The format stores 128 ternary values in 24 base-3 payload bytes, two high-trit bytes and one FP16 scale. It is 1,259,520,000 bytes smaller than the 7,206,168,928-byte PQ2_0 model.
+Prism describes PTQ1_0 as a group-128 ternary packing with tensor type `143` and 1.75 bits per weight. The downloaded GGUF sets `general.file_type` to `143`. GGML's quantisation-output enum separately uses `GGML_FTYPE_MOSTLY_PTQ1_0 = 129`; it is not the value stored in this file's `general.file_type`. The format stores 128 ternary values in 24 base-3 payload bytes, two high-trit bytes and one FP16 scale. It is 1,259,520,000 bytes smaller than the 7,206,168,928-byte PQ2_0 model.
 
 ## Sigma-relevant patch chain
 
@@ -45,8 +45,20 @@ The release contains backend-specific follow-ups that are not required for Sigma
 
 Prism `#165` adds six hybrid-attention graph fusions and reports about 2.6% decode improvement for a 27B Metal case. It is optional performance work after PTQ1 correctness, not part of the minimum format/backend chain.
 
-## Current implementation status
+## Sigma implementation and result
 
-Implementation baseline `249d21cff2342c47391147911443955b2dee7f5c` contains PQ2_0 support and the static CPU baseline profile. Its source has no `GGML_TYPE_PTQ1_0`, no PTQ1 Vulkan shaders and no `hadamard_memo` graph cache. This documentation correction does not change that source boundary. The report's PQ2 CPU and Vulkan measurements remain valid for that format only.
+The isolated `feat/bonsai2-ptq1-integration` branch applies the Hadamard dependency as `685c6cdf0` and adapts PTQ1 core, CPU, loader and Vulkan support as `62f4bbb72`. The final metadata fix changes Python's public `LlamaFileType.MOSTLY_PTQ1_0` from the internal ftype value `129` to the on-disk/C++ value `143` and adds a writer/reader regression test. Commit `4a3950bb8` registers the backend-independent element-map test. Commit `e96d552c0` adds PTQ to the current unified Vulkan quantised matrix shader. Commit `a21384cf8` rejects quantised copy and set-row operations that have no released PTQ pipeline. Commit `a9ca156ea` excludes PTQ from coopmat2 pipeline creation because the released PTQ implementation has no coopmat2 decoder.
 
-An isolated `feat/bonsai2-ptq1-integration` worktree was opened from this baseline. `#137` applies cleanly. `#148` needs adaptation to the newer local type tables, CPU APIs and Vulkan pipeline generator. No unresolved PTQ work is included in the documentation commit.
+The unified shader fix was necessary. Before it, PTQ matvec cases passed, but 11 larger matrix cases produced infinite error because the unified runtime shader accepted type `143` without a PTQ buffer alias or decode branch. After the fix, focused CPU and Vulkan PTQ matmul, get-rows and Hadamard tests passed.
+
+Standard one-repetition `llama-bench` results were:
+
+| Profile | Prompt tok/s | Generation tok/s |
+|---|---:|---:|
+| PTQ1 CPU, 12 threads | 0.9854 | 0.7958 |
+| PTQ1 hybrid, 16 GPU layers | 7.3774 | 0.5843 |
+| PTQ1 full Vulkan, 99 GPU layers | 25.5768 | 0.4763 |
+
+Full Vulkan prompt ingestion is 12.24 times the published PQ2_0 CPU prompt rate. PQ2_0 CPU generation remains 3.12 times the PTQ1 full-Vulkan generation rate. PTQ1 source support is accepted, but no PTQ service is installed or enabled. The existing static PQ2_0 CPU profile remains the faster Bonsai profile for generated output.
+
+The [qualification report](ptq1-qualification/README.md) records commands, tests, resource limits, server/API/UI gates and evidence hashes.

@@ -425,6 +425,52 @@ void load_a_to_shmem(const uint pos_a, const uint row, const uint col, const uin
 
         store_a(col, k_pair, FLOAT_TYPEV2(v.xy));
         store_a(col, k_pair + 1, FLOAT_TYPEV2(v.zw));
+    } else if (MmTypeA == GGML_TYPE_PTQ1_0) {
+        const uint idx = pos_a + col * p.stride_a / mm_load_vec_a() + row;
+
+        const uint ib  = idx / 16;
+        const uint grp = idx & 0xfu;
+        const uint e0  = grp * 8u;
+        const float d = float(a_ptq1_0.data[ib].d);
+
+        const uint k_pair = row * mm_load_vec_a() / 2;
+        [[unroll]] for (uint l = 0; l < 4; ++l) {
+            const uint e = e0 + 2u*l;
+            uint b0;
+            uint n0;
+            uint b1;
+            uint n1;
+            if (e < 80u) {
+                b0 = uint(a_ptq1_0.data[ib].qs[e & 15u]);
+                n0 = e >> 4u;
+            } else if (e < 120u) {
+                const uint t = e - 80u;
+                b0 = uint(a_ptq1_0.data[ib].qs[16u + (t & 7u)]);
+                n0 = t >> 3u;
+            } else {
+                const uint t = e - 120u;
+                b0 = uint(a_ptq1_0.data[ib].qh[t & 1u]);
+                n0 = t >> 1u;
+            }
+            const uint e_next = e + 1u;
+            if (e_next < 80u) {
+                b1 = uint(a_ptq1_0.data[ib].qs[e_next & 15u]);
+                n1 = e_next >> 4u;
+            } else if (e_next < 120u) {
+                const uint t = e_next - 80u;
+                b1 = uint(a_ptq1_0.data[ib].qs[16u + (t & 7u)]);
+                n1 = t >> 3u;
+            } else {
+                const uint t = e_next - 120u;
+                b1 = uint(a_ptq1_0.data[ib].qh[t & 1u]);
+                n1 = t >> 1u;
+            }
+            for (uint i = 0u; i < n0; ++i) b0 = (b0 * 3u) & 0xFFu;
+            for (uint i = 0u; i < n1; ++i) b1 = (b1 * 3u) & 0xFFu;
+            store_a(col, k_pair + l, FLOAT_TYPEV2(
+                float(int((b0 * 3u) >> 8u) - 1) * d,
+                float(int((b1 * 3u) >> 8u) - 1) * d));
+        }
     } else if (MmTypeA == GGML_TYPE_Q1_0) {
         const uint idx = pos_a + col * p.stride_a / mm_load_vec_a() + row;
         const uint k_pair = row * mm_load_vec_a() / 2;
