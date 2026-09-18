@@ -1,5 +1,5 @@
 #!/bin/bash
-# SCRIPT_JDOC: {"summary":"Run durable API, SSE, tools, UI, warm reuse and cancellation gates for the Bonsai zero-copy service","kind":"mixed","weight":"heavy","role":"entrypoint"}
+# SCRIPT_JDOC: {"summary":"Resume only the Bonsai zero-copy tools, cancellation, recovery and resource gates","kind":"mixed","weight":"heavy","role":"entrypoint"}
 set -euo pipefail
 
 if [[ $# != 1 ]]; then
@@ -59,41 +59,14 @@ for _ in $(seq 1 600); do
     sleep 1
 done
 [[ $ready == 1 ]]
-jq -e '.status == "ok" and .mode == "qwen35-target" and .zero_copy_ready == false' "$out/health-start.json" > /dev/null
-
-curl --compressed -fsS -D "$out/ui.headers" --max-time 30 "http://127.0.0.1:$port/" -o "$out/ui.html"
-grep -qi '^content-type: text/html' "$out/ui.headers"
-grep -qi '<!doctype html' "$out/ui.html"
-
-cat > "$out/cold-request.json" <<'JSON'
-{"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Reply with exactly BONSAI_ZC_OK and nothing else."}],"temperature":0,"max_tokens":32,"stream":false}
-JSON
-curl -fsS --max-time 600 -H 'Content-Type: application/json' -H 'X-Conversation-Id: exact' \
-    --data-binary @"$out/cold-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/cold-response.json"
-jq -e '.choices[0].message.content == "BONSAI_ZC_OK" and .zero_copy.route == "vulkan_prefill_cpu_target" and .zero_copy.zero_copy == true and .zero_copy.shared_bytes > 0 and .zero_copy.copied_bytes == 0' "$out/cold-response.json" > /dev/null
-
-jq '{model:"bonsai-2-27b-ptq1-zero-copy",messages:[.messages[0],$assistant,{role:"user",content:"Reply with exactly BONSAI_ZC_WARM_OK and nothing else."}],temperature:0,max_tokens:32,stream:false}' \
-    --argjson assistant "$(jq -c '.choices[0].message' "$out/cold-response.json")" "$out/cold-request.json" > "$out/warm-request.json"
-curl -fsS --max-time 600 -H 'Content-Type: application/json' -H 'X-Conversation-Id: exact' \
-    --data-binary @"$out/warm-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/warm-response.json"
-jq -e '.choices[0].message.content == "BONSAI_ZC_WARM_OK" and .zero_copy.route == "cpu_target_reuse" and .zero_copy.cold == false and .zero_copy.cached_tokens > 0' "$out/warm-response.json" > /dev/null
-
-cat > "$out/stream-request.json" <<'JSON'
-{"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Reply with exactly BONSAI_ZC_STREAM_OK and nothing else."}],"temperature":0,"max_tokens":40,"stream":true}
-JSON
-curl -sS -N --max-time 600 -D "$out/stream.headers" -H 'Content-Type: application/json' -H 'X-Conversation-Id: stream' \
-    --data-binary @"$out/stream-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/stream.sse"
-grep -qi '^content-type: text/event-stream' "$out/stream.headers"
-grep -q '^data: \[DONE\]' "$out/stream.sse"
-awk '/^data: /{sub(/^data: /,"");if($0!="[DONE]")print}' "$out/stream.sse" | jq -sr '[.[].choices[0].delta.content // ""]|join("")' > "$out/stream-content.json"
-[[ $(cat "$out/stream-content.json") == BONSAI_ZC_STREAM_OK ]]
+jq -e '.status == "ok" and .mode == "qwen35-target"' "$out/health-start.json" > /dev/null
 
 cat > "$out/tool-request.json" <<'JSON'
 {"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Call get_weather for Lisbon. Do not answer in prose."}],"tools":[{"type":"function","function":{"name":"get_weather","description":"Get current weather for a city","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"],"additionalProperties":false}}}],"tool_choice":{"type":"function","function":{"name":"get_weather"}},"temperature":0,"max_tokens":96,"stream":false}
 JSON
 curl -fsS --max-time 900 -H 'Content-Type: application/json' -H 'X-Conversation-Id: tool' \
     --data-binary @"$out/tool-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/tool-response.json"
-jq -e '.choices[0].finish_reason == "tool_calls" and .choices[0].message.tool_calls[0].function.name == "get_weather" and ((.choices[0].message.tool_calls[0].function.arguments|fromjson).city == "Lisbon")' "$out/tool-response.json" > /dev/null
+jq -e '.choices[0].finish_reason == "tool_calls" and .choices[0].message.tool_calls[0].function.name == "get_weather" and ((.choices[0].message.tool_calls[0].function.arguments|fromjson).city == "Lisbon") and .zero_copy.zero_copy == true' "$out/tool-response.json" > /dev/null
 
 cat > "$out/cancel-request.json" <<'JSON'
 {"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Count upward forever, one integer per line."}],"temperature":0,"max_tokens":128,"stream":true}
@@ -103,6 +76,7 @@ timeout --signal=TERM --kill-after=2 3 curl -sS -N -H 'Content-Type: application
     --data-binary @"$out/cancel-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/cancel.sse" 2> "$out/cancel.stderr"
 printf '%s\n' "$?" > "$out/cancel.exit"
 set -e
+[[ $(cat "$out/cancel.exit") != 0 ]]
 for _ in $(seq 1 180); do
     curl -fsS --max-time 2 "http://127.0.0.1:$port/health" > "$out/health-after-cancel.json" || true
     [[ $(jq -r '.processing // true' "$out/health-after-cancel.json" 2>/dev/null || echo true) == false ]] && break
@@ -110,11 +84,14 @@ for _ in $(seq 1 180); do
 done
 jq -e '.status == "ok" and .processing == false' "$out/health-after-cancel.json" > /dev/null
 
+cat > "$out/recovery-request.json" <<'JSON'
+{"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Reply with exactly BONSAI_ZC_RECOVERY_OK and nothing else."}],"temperature":0,"max_tokens":40,"stream":false}
+JSON
 curl -fsS --max-time 600 -H 'Content-Type: application/json' -H 'X-Conversation-Id: recovery' \
-    --data-binary @"$out/cold-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/recovery-response.json"
-jq -e '.choices[0].message.content == "BONSAI_ZC_OK" and .zero_copy.zero_copy == true' "$out/recovery-response.json" > /dev/null
+    --data-binary @"$out/recovery-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/recovery-response.json"
+jq -e '.choices[0].message.content == "BONSAI_ZC_RECOVERY_OK" and .zero_copy.zero_copy == true and .zero_copy.shared_bytes > 0 and .zero_copy.copied_bytes == 0' "$out/recovery-response.json" > /dev/null
 curl -fsS --max-time 10 "http://127.0.0.1:$port/health" > "$out/health-final.json"
-jq -e '.status == "ok" and .zero_copy_ready == true and .handoffs >= 4 and .shared_bytes > 0 and .copied_bytes == 0' "$out/health-final.json" > /dev/null
+jq -e '.status == "ok" and .zero_copy_ready == true and .handoffs >= 2 and .shared_bytes > 0 and .copied_bytes == 0' "$out/health-final.json" > /dev/null
 
 cgroup=$(awk -F: '$1=="0"{print $3}' /proc/self/cgroup)
 {
