@@ -35,6 +35,42 @@ inline void normalize_request(json & request) {
     }
 }
 
+inline std::string normalize_tool_choice(json & request) {
+    if (!request.contains("tool_choice") || request.at("tool_choice").is_null()) {
+        return "auto";
+    }
+    const json & choice = request.at("tool_choice");
+    if (choice.is_string()) {
+        const std::string value = choice.get<std::string>();
+        if (value != "auto" && value != "none" && value != "required") {
+            throw std::invalid_argument("tool_choice must be auto, none, required or a named function");
+        }
+        return value;
+    }
+    if (!choice.is_object() || choice.value("type", std::string()) != "function" ||
+            !choice.contains("function") || !choice.at("function").is_object()) {
+        throw std::invalid_argument("invalid tool_choice object");
+    }
+    const std::string name = choice.at("function").value("name", std::string());
+    if (name.empty()) {
+        throw std::invalid_argument("tool_choice function name is required");
+    }
+    json selected = json::array();
+    for (const auto & tool : request.at("tools")) {
+        if (tool.is_object() && tool.value("type", std::string()) == "function" &&
+                tool.contains("function") && tool.at("function").is_object() &&
+                tool.at("function").value("name", std::string()) == name) {
+            selected.push_back(tool);
+        }
+    }
+    if (selected.empty()) {
+        throw std::invalid_argument("tool_choice function is not present in tools");
+    }
+    request["tools"] = std::move(selected);
+    request["tool_choice"] = "required";
+    return "required";
+}
+
 inline uint64_t sampling_override_mask(const json & request) {
     uint64_t result = 0;
     if (request.contains("samplers")) result |= COMMON_PARAMS_SAMPLING_CONFIG_SAMPLERS;

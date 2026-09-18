@@ -208,6 +208,7 @@ public:
         }
         if (cancelled()) throw std::runtime_error("request cancelled");
         gemma_hybrid::normalize_request(request);
+        gemma_hybrid::normalize_tool_choice(request);
         const auto action = gemma_hybrid::classify_request(active_conversation, conversation, committed, prior_tools, request);
         if (action == gemma_hybrid::request_action::start) {
             reset_runtime();

@@ -66,6 +66,47 @@ int main() {
     CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_ETA) != 0);
     CHECK(gemma_hybrid::sampling_override_mask(json::object()) == 0);
 
+    json tool_request = {
+        {"messages", json::array({message("user", "tool")})},
+        {"tools", json::array({
+            {{"type", "function"}, {"function", {{"name", "one"}}}},
+            {{"type", "function"}, {"function", {{"name", "two"}}}}
+        })},
+        {"tool_choice", {{"type", "function"}, {"function", {{"name", "two"}}}}}
+    };
+    gemma_hybrid::normalize_request(tool_request);
+    CHECK(gemma_hybrid::normalize_tool_choice(tool_request) == "required");
+    CHECK(tool_request.at("tool_choice") == "required");
+    CHECK(tool_request.at("tools").size() == 1);
+    CHECK(tool_request.at("tools")[0].at("function").at("name") == "two");
+    for (const char * value : {"auto", "none", "required"}) {
+        json string_choice = {{"messages", json::array({message("user", "tool")})}, {"tools", json::array()}, {"tool_choice", value}};
+        gemma_hybrid::normalize_request(string_choice);
+        CHECK(gemma_hybrid::normalize_tool_choice(string_choice) == value);
+    }
+    bool invalid_choice = false;
+    try {
+        json missing = {
+            {"messages", json::array({message("user", "tool")})},
+            {"tools", json::array({{{"type", "function"}, {"function", {{"name", "one"}}}}})},
+            {"tool_choice", {{"type", "function"}, {"function", {{"name", "missing"}}}}}
+        };
+        gemma_hybrid::normalize_request(missing);
+        gemma_hybrid::normalize_tool_choice(missing);
+    } catch (const std::invalid_argument &) {
+        invalid_choice = true;
+    }
+    CHECK(invalid_choice);
+    invalid_choice = false;
+    try {
+        json malformed = {{"messages", json::array({message("user", "tool")})}, {"tools", json::array()}, {"tool_choice", json::object()}};
+        gemma_hybrid::normalize_request(malformed);
+        gemma_hybrid::normalize_tool_choice(malformed);
+    } catch (const std::invalid_argument &) {
+        invalid_choice = true;
+    }
+    CHECK(invalid_choice);
+
     json committed = first.at("messages");
     committed.push_back(message("assistant", "answer"));
     json append = {{"messages", committed}, {"tools", json::array()}};
