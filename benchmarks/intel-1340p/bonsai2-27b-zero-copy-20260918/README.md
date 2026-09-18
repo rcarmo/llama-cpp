@@ -14,7 +14,7 @@ This campaign tests the existing strict Qwen35 Intel UMA handoff with the Bonsai
 - Persistence: none. State remains in one process and no K/V state file is written.
 - Performance gate: compare matched CPU, full Vulkan and Vulkan-prefill-to-CPU-handoff profiles at short and meaningful prompt sizes. Report stage and whole-workload time, not only handoff time.
 - Host limits: serial bounded units or containers, `MemorySwapMax=0`, no OOM, at least 6 GiB available memory, automatic Gemma restoration, and coordination for `renderD128`.
-- Correctness gate: expected final position, finite logits, deterministic same-profile results, `shared_bytes > 0`, `copied_bytes == 0`, successful continuation after GPU source/model destruction, and unchanged source/runtime defaults.
+- Correctness gate: expected final position, finite logits, fixed token work, `shared_bytes > 0`, `copied_bytes == 0`, successful continuation after GPU source/model destruction, and unchanged source/runtime defaults. Record every logits top ID and hash. Exact synthetic continuation must match its copied reference. Trained Vulkan hashes are diagnostic because the inherited Qwen35 Vulkan path has documented long-context variation.
 - Closure: publish only if the topology is correct and materially useful for at least one measured workload. Otherwise retain the evidence as a rejected experiment and correct the earlier performance conclusion.
 
 ## Prior-feature reuse checklist
