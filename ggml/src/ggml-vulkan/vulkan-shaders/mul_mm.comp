@@ -55,6 +55,7 @@ layout (constant_id = 11) const uint ALIGNED = 0;
 uint mm_load_vec_a() {
     switch (MmTypeA) {
     case GGML_TYPE_Q1_0:
+    case GGML_TYPE_PTQ1_0:
     case GGML_TYPE_Q4_0:
     case GGML_TYPE_Q4_1:
     case GGML_TYPE_Q5_1:
@@ -96,6 +97,7 @@ layout (binding = 0) readonly buffer A_PACKED32 {A_TYPE_PACKED32 data_a_packed32
 #else
 // Unpacked struct aliases
 layout (binding = 0) readonly buffer BUF_Q1_0     { block_q1_0 data[];     } a_q1_0;
+layout (binding = 0) readonly buffer BUF_PTQ1_0   { block_ptq1_0 data[];   } a_ptq1_0;
 layout (binding = 0) readonly buffer BUF_Q2_0     { block_q2_0 data[];     } a_q2_0;
 layout (binding = 0) readonly buffer BUF_Q2_K     { block_q2_K data[];     } a_q2_k;
 layout (binding = 0) readonly buffer BUF_Q3_K     { block_q3_K data[];     } a_q3_k;
