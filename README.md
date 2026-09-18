@@ -68,7 +68,7 @@ Key entrypoints:
 - `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
 - `tools/run-intel-candidate.sh` - historical CPU Ornith and Gemma profiles;
 - `tools/run-gemma-zero-copy-service.sh` - primary 32K Gemma Vulkan-prefill/CPU-MTP service;
-- `tools/gemma-profile` - switch between the primary model and the Huihui security-audit profile;
+- `tools/gemma-profile` - switch among the primary model and static Huihui/Bonsai test profiles;
 - `tools/validate-intel-candidate.sh` - no-install historical candidate validation;
 - `tools/systemd/user/` - tracked user services.
 
@@ -114,9 +114,9 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md`](benchmarks/intel-1340p/qwen-longctx-fieldfare/report.md)
 - [`docs/expert-io-adoption-baseline.md`](docs/expert-io-adoption-baseline.md)
 
-### Gemma local profiles
+### Local model profiles
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP uses a static, inactive unit for local security audits. Use `gemma-profile primary|audit|status` to switch them; both use `192.168.1.70:11434`, the standard Ollama port, and cannot run together safely. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes.
+Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP and Bonsai 2 27B PQ2_0 use static, inactive units for explicit tests. Use `gemma-profile primary|audit|bonsai|status`; all profiles use `192.168.1.70:11434`, the standard Ollama port, and run one at a time. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes.
 
 The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 11434.
 
@@ -188,7 +188,7 @@ curl -fsS http://127.0.0.1:8095/health
 pi --provider local-ornith --model ornith-1.5-35b-a3b-q4-k-m
 ```
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary and sole boot-enabled local model service. The Huihui security-audit unit is static and inactive. The retained Ornith, Maple, Qwen3.6, Qwen3.8 and historical two-slot Gemma CPU services are disabled. Their weight files remain available for explicit tests or rollback.
+Gemma 4 E4B QAT + MTP zero-copy is the primary and sole boot-enabled local model service. The Huihui security-audit and Bonsai CPU test units are static and inactive. The retained Ornith, Maple, Qwen3.6, Qwen3.8 and historical two-slot Gemma CPU services are disabled. Their weight files remain available for explicit tests or rollback.
 
 Installation, Pi registration, diagnostics, measurements and rollback:
 

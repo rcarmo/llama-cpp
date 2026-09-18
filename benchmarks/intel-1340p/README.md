@@ -72,12 +72,13 @@ These directories freeze the file-mediated CPU/GPU service and decoder deploymen
 * [xe-master-agentic-20260914/](xe-master-agentic-20260914/)
 * [xe-zero-copy-throughput-20260914/](xe-zero-copy-throughput-20260914/)
 
-## 2026-09-15 and 2026-09-16 Gemma service and Qwen3.8 memory
+## 2026-09-15 to 2026-09-18 service and model integration
 
 * [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- original in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
 * [gemma-generation-parity-20260916/](gemma-generation-parity-20260916/) -- ZC1 baseline record: model sampling metadata and `n_min=1` restored; attached pools and small-target-batch rejected; sustained A/B, quality and full serving qualification.
 * [gemma-zc-speed-20260916/](gemma-zc-speed-20260916/) -- primary Gemma 4 E4B QAT + MTP deployment (historical label ZC2): shorter-lived Q4 four-row temporaries improved sustained decode by 11.56% over eight confirmation runs and the historical 512/64 fixture by 5.58%; full zero-copy/UI qualification and verified ZC1 rollback passed.
 * [huihui-gemma4-12b-trial-20260917/](huihui-gemma4-12b-trial-20260917/) -- explicit local security-audit profile: matched Huihui QAT target/MTP pair, response-channel parser fix, seven-profile speed screen, zero-copy/service/UI qualification and a health-checked switch back to the primary model.
+* [bonsai2-27b-integration-20260918/](bonsai2-27b-integration-20260918/) -- Bonsai 2 27B PQ2_0 integration: CPU and Hadamard support, CPU/Vulkan comparison, API/tool/SSE/UI checks and a static CPU-only profile with primary rollback.
 * [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.
 
 These directories mix curated `README.md` or `report.md` pages with raw JSON, stdout captures and scripts. Read the per-directory README first when one exists.

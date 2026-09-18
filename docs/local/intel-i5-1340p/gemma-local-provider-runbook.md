@@ -1,8 +1,8 @@
-# Gemma local model profiles on Sigma
+# Local model profiles on Sigma
 
 **Gemma 4 E4B QAT + MTP zero-copy** is the primary local deployment on `sigma`. Its service is enabled at boot and its immutable runtime is `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
 
-**Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** is an explicit local security-audit profile. Its service is static and cannot become the boot default. Both profiles use `http://192.168.1.70:11434/`, without authentication, and are mutually exclusive because they do not fit safely in memory together. The audit process binds only `192.168.1.70`; the primary binds loopback and reaches that address through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
+Two static profiles are available for explicit tests: **Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** for security audits and **Bonsai 2 27B PQ2_0** for CPU-only ternary-model tests. All three profiles use `http://192.168.1.70:11434/` without authentication and are mutually exclusive. Huihui and Bonsai bind the LAN address directly; the primary binds loopback and reaches the LAN through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
 
 ## Switch profiles
 
@@ -11,14 +11,15 @@ Use the installed local command from any interactive shell:
 ```bash
 gemma-profile status
 gemma-profile audit
+gemma-profile bonsai
 gemma-profile primary
 ```
 
-`audit` stops the primary LAN socket and proxy before stopping the primary model, then starts Huihui on `192.168.1.70:11434`. This ordering prevents socket activation from restarting the primary during a switch. The command waits for the expected model identity, resident Vulkan ownership, reachable LAN endpoint and zero process swap. If audit startup fails, it attempts to restore the primary and exits non-zero. A failed restore is reported as fatal and can leave no active profile.
+`audit` and `bonsai` stop the primary LAN socket and proxy before stopping the primary model. This ordering prevents socket activation from restarting the primary during a switch. The audit gate requires the expected model identity, resident Vulkan ownership, reachable LAN endpoint and zero process swap. The Bonsai gate checks `/health`, the exact alias in `/v1/models`, the LAN endpoint and zero service swap.
 
-`primary` stops all known Huihui trial units, starts Gemma 4 E4B QAT + MTP on loopback port 18094, then starts the LAN socket proxy on port 11434. If the primary fails its gate after an audit-to-primary switch, the command attempts to restore the audit profile. `status` checks the expected local and LAN model identities, mutually exclusive unit state, LAN socket state, restart count, memory and swap. It exits non-zero for an inconsistent state. If either rollback reports `FATAL`, inspect `gemma-profile status` and the two unit journals before retrying.
+`primary` stops all known test profiles, starts Gemma 4 E4B QAT + MTP on loopback port 18094, then starts the LAN socket proxy on port 11434. Every failed switch attempts to restore the previously active qualified profile and exits non-zero. `status` checks model identity, mutually exclusive unit state, LAN socket state, restart count, memory and swap. It exits non-zero for an inconsistent state. If a rollback reports `FATAL`, inspect `gemma-profile status` and the affected unit journals before retrying.
 
-Both profiles use the standard Ollama TCP port:
+All profiles use the standard Ollama TCP port:
 
 ```text
 http://192.168.1.70:11434/
@@ -26,7 +27,7 @@ http://192.168.1.70:11434/
 
 The service remains the focused llama.cpp OpenAI-compatible API. Port selection does not add Ollama-native routes such as `/api/generate` or `/api/chat`; clients should use `/v1/chat/completions`.
 
-The primary unit remains enabled. The audit unit has no `[Install]` section and reports `UnitFileState=static`; do not enable it. Return to the primary after audit work:
+The primary unit remains enabled. The audit and Bonsai units have no `[Install]` sections and report `UnitFileState=static`; do not enable them. Return to the primary after test work:
 
 ```bash
 gemma-profile primary
@@ -35,11 +36,11 @@ gemma-profile primary
 Tracked switch files:
 
 - `tools/gemma-profile`;
-- `tools/run-huihui-security-audit-service.sh`;
-- `tools/config/huihui-security-audit.env.example`;
-- `tools/systemd/user/huihui-gemma4-security-audit.service`.
+- `tools/run-huihui-security-audit-service.sh` and `tools/run-bonsai2-cpu-service.sh`;
+- `tools/config/huihui-security-audit.env.example` and `tools/config/bonsai2-27b-cpu.env.example`;
+- `tools/systemd/user/huihui-gemma4-security-audit.service` and `tools/systemd/user/bonsai2-27b-cpu.service`.
 
-The installed command is `~/.local/bin/gemma-profile`, symlinked to the tracked script. The installed audit environment is `~/.config/huihui-gemma4-security-audit/service.env`.
+The installed command is `~/.local/bin/gemma-profile`, symlinked to the tracked script. Profile environments are under `~/.config/huihui-gemma4-security-audit/` and `~/.config/bonsai2-27b-cpu/`.
 
 ## Primary deployment: Gemma 4 E4B QAT + MTP zero-copy
 
@@ -105,9 +106,32 @@ The parser fix classifies a repeated empty Gemma 4 thought channel as reasoning 
 
 Evidence: [Huihui security-audit trial](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md).
 
-## Request lifecycle
+## CPU test profile: Bonsai 2 27B PQ2_0
 
-The process loads CPU target, CPU assistant and Vulkan target model owners once at startup. A cold request then:
+| Item | Value |
+|---|---|
+| Purpose | Explicit local ternary-model and API tests |
+| Boot status | Static unit; explicit selection only |
+| Service | `bonsai2-27b-cpu.service` |
+| Model alias | `bonsai-2-27b-pq2-cpu` |
+| LAN UI and API | `http://192.168.1.70:11434/` |
+| Model | Ternary Bonsai 2 27B, PQ2_0 group 128 |
+| Context / slots | 2,048 tokens / one slot |
+| Generation | CPU only, eight threads; no MTP |
+| Batch threads | 16 |
+| Memory / swap limit | 28 GiB / 0 |
+| Server SHA-256 | `ccb8e4aa5541d54d97bd3a359d30f31c01dec7d2e3645023bff36d40dfd76fca` |
+| Model SHA-256 | `3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1` |
+
+The immutable runtime is `runtime/deployments/bonsai2-27b-pq2-cpu-bb2ea4754-ccb8e4aa`. It was built with `GGML_VULKAN=OFF` and embeds the primary profile's frozen 70-asset UI. CPU smoke generation measured about 1.48 tok/s. Full Vulkan offload produced correct output but measured 0.59 tok/s because Vulkan has no PQ2_0 matrix kernel; it is excluded from the profile.
+
+The profile passed exact non-streaming output, incremental SSE, forced OpenAI-style tool selection, 70/70 UI asset equality, model alias checks, zero swap/OOM and primary rollback. A 315-token forced tool request took 149 seconds, so this profile is for deliberate tests rather than routine interactive use.
+
+Evidence: [Bonsai 2 27B PQ2_0 integration](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md).
+
+## Gemma zero-copy request lifecycle
+
+The primary and audit processes load CPU target, CPU assistant and Vulkan target model owners once at startup. A cold request then:
 
 1. creates a fresh Vulkan context from the resident Vulkan target model;
 2. renders and evaluates the chat prompt in that context;
@@ -276,7 +300,7 @@ systemctl --user enable --now llama-gemma-zero-copy.service \
   llama-gemma-lan-test.socket
 ```
 
-Install the audit profile and switch command after creating its qualified immutable runtime:
+Install the static profiles and switch command after creating their qualified immutable runtimes:
 
 ```bash
 install -d -m 0700 ~/.config/huihui-gemma4-security-audit
@@ -284,12 +308,13 @@ install -m 0600 "$root/tools/config/huihui-security-audit.env.example" \
   ~/.config/huihui-gemma4-security-audit/service.env
 install -m 0644 "$root/tools/systemd/user/huihui-gemma4-security-audit.service" \
   ~/.config/systemd/user/
+benchmarks/intel-1340p/bonsai2-27b-integration-20260918/install-bonsai-profile.sh
 install -d -m 0755 ~/.local/bin
 ln -sfn "$root/tools/gemma-profile" ~/.local/bin/gemma-profile
 systemctl --user daemon-reload
 ```
 
-Keep `huihui-gemma4-security-audit.service` static and inactive. `gemma-profile audit` starts it directly when required.
+Keep `huihui-gemma4-security-audit.service` and `bonsai2-27b-cpu.service` static and inactive. `gemma-profile audit` or `gemma-profile bonsai` starts the requested profile directly.
 
 The validated host has `Linger=yes`, which allows the user service to start without an interactive login. Check it with:
 
