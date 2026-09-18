@@ -362,6 +362,7 @@ if (NOT GGML_BACKEND_DL)
     # these tests use the backends directly and cannot be built with dynamic loading
     llama_build_and_test(test-barrier.cpp)
     llama_build_and_test(test-quantize-fns.cpp)
+    llama_build_and_test(test-ptq1_0-element-map.cpp)
     llama_build_and_test(test-expert-io-plan.cpp)
     target_include_directories(test-expert-io-plan PRIVATE ${PROJECT_SOURCE_DIR}/ggml/src/ggml-cpu)
     target_link_libraries(test-expert-io-plan PRIVATE ggml-cpu)
