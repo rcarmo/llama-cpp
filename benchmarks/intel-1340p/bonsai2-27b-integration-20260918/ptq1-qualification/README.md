@@ -14,12 +14,15 @@ PTQ1_0 full Vulkan offload reached 25.5768 prompt tok/s and 0.4763 generation to
 | Current Vulkan matrix fix | `e96d552c0` |
 | Unsupported-operation boundary | `a21384cf8` |
 | Coopmat2 exclusion | `a9ca156ea` |
+| Python public file-type fix | `c4ea0f7de` |
 | Model | `Ternary-Bonsai-2-27B-PTQ1_0.gguf` |
 | Model repository revision | `6ed5e12bf84b7a63069882c91dd9e9218647d17b` |
 | File size | 5,946,648,928 bytes |
 | SHA-256 | `53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3` |
 | GGUF `general.file_type` | `143` |
 | Tensor format | `PTQ1_0`, 1.75 bits per weight, group 128 |
+
+Python's public `LlamaFileType.MOSTLY_PTQ1_0` now matches C++ and the model's `general.file_type` value `143`. The internal quantisation-output enum remains `GGML_FTYPE_MOSTLY_PTQ1_0 = 129`. A zero-tensor GGUF writer/reader round-trip and all five metadata tests pass in a disposable Fedora 44 environment with NumPy.
 
 The Vulkan build uses GCC 16.1.1, `GGML_NATIVE=ON`, `GGML_OPENMP=ON` and `GGML_VULKAN=ON`. The tested server launcher has SHA-256 `a743126659be6866db407552dc24bf330aa01ba31eec4fa15e2d5f8749025879`. The post-boundary `libggml-vulkan.so` has SHA-256 `9b6dea6bc47e457c3a63ad568a9d12ffd49de15122934b5c3083ef661b2c47f3`; shared libraries contain most server implementation code.
 

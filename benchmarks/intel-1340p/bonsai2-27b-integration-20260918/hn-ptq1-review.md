@@ -47,7 +47,7 @@ Prism `#165` adds six hybrid-attention graph fusions and reports about 2.6% deco
 
 ## Sigma implementation and result
 
-The isolated `feat/bonsai2-ptq1-integration` branch applies the Hadamard dependency as `685c6cdf0` and adapts PTQ1 core, CPU, loader and Vulkan support as `62f4bbb72`. Commit `4a3950bb8` registers the backend-independent element-map test. Commit `e96d552c0` adds PTQ to the current unified Vulkan quantised matrix shader. Commit `a21384cf8` rejects quantised copy and set-row operations that have no released PTQ pipeline. Commit `a9ca156ea` excludes PTQ from coopmat2 pipeline creation because the released PTQ implementation has no coopmat2 decoder.
+The isolated `feat/bonsai2-ptq1-integration` branch applies the Hadamard dependency as `685c6cdf0` and adapts PTQ1 core, CPU, loader and Vulkan support as `62f4bbb72`. The final metadata fix changes Python's public `LlamaFileType.MOSTLY_PTQ1_0` from the internal ftype value `129` to the on-disk/C++ value `143` and adds a writer/reader regression test. Commit `4a3950bb8` registers the backend-independent element-map test. Commit `e96d552c0` adds PTQ to the current unified Vulkan quantised matrix shader. Commit `a21384cf8` rejects quantised copy and set-row operations that have no released PTQ pipeline. Commit `a9ca156ea` excludes PTQ from coopmat2 pipeline creation because the released PTQ implementation has no coopmat2 decoder.
 
 The unified shader fix was necessary. Before it, PTQ matvec cases passed, but 11 larger matrix cases produced infinite error because the unified runtime shader accepted type `143` without a PTQ buffer alias or decode branch. After the fix, focused CPU and Vulkan PTQ matmul, get-rows and Hadamard tests passed.
 
