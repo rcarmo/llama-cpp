@@ -558,6 +558,33 @@ static inline __m128i get_scale_shuffle(int i) {
 #  define GGML_DPBUSD_256 _mm256_dpbusd_avx_epi32
 #endif
 
+#if (defined(__AVX512VNNI__) && defined(__AVX512VL__)) || defined(__AVXVNNI__)
+static inline __m128i decode_ptq1_0_16(const uint8_t * qs, uint16_t pow3) {
+    const __m128i src = _mm_loadu_si128((const __m128i *) qs);
+    const __m256i values = _mm256_cvtepu8_epi16(src);
+    const __m256i wrapped = _mm256_and_si256(_mm256_mullo_epi16(values, _mm256_set1_epi16(pow3)), _mm256_set1_epi16(0xff));
+    const __m256i digits = _mm256_srli_epi16(_mm256_mullo_epi16(wrapped, _mm256_set1_epi16(3)), 8);
+    return _mm_packus_epi16(_mm256_castsi256_si128(digits), _mm256_extracti128_si256(digits, 1));
+}
+
+static inline __m128i decode_ptq1_0_8(const uint8_t * qs, uint16_t pow3) {
+    const __m128i src = _mm_loadl_epi64((const __m128i *) qs);
+    const __m128i values = _mm_cvtepu8_epi16(src);
+    const __m128i wrapped = _mm_and_si128(_mm_mullo_epi16(values, _mm_set1_epi16(pow3)), _mm_set1_epi16(0xff));
+    const __m128i digits = _mm_srli_epi16(_mm_mullo_epi16(wrapped, _mm_set1_epi16(3)), 8);
+    return _mm_packus_epi16(digits, _mm_setzero_si128());
+}
+
+static inline uint16_t decode_ptq1_0_2(const uint8_t * qs, uint16_t pow3) {
+    uint16_t packed;
+    memcpy(&packed, qs, sizeof(packed));
+    const __m128i values = _mm_cvtepu8_epi16(_mm_cvtsi32_si128(packed));
+    const __m128i wrapped = _mm_and_si128(_mm_mullo_epi16(values, _mm_set1_epi16(pow3)), _mm_set1_epi16(0xff));
+    const __m128i digits = _mm_srli_epi16(_mm_mullo_epi16(wrapped, _mm_set1_epi16(3)), 8);
+    return (uint16_t) _mm_cvtsi128_si32(_mm_packus_epi16(digits, _mm_setzero_si128()));
+}
+#endif
+
 void ggml_vec_dot_q2_0_g128_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
     const int qk = QK2_0_G128;
     const int nb = n / qk;
@@ -626,6 +653,55 @@ void ggml_vec_dot_q2_0_g128_q8_0(int n, float * GGML_RESTRICT s, size_t bs, cons
 #endif
 
     *s = sumf;
+}
+
+void ggml_vec_dot_ptq1_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
+    const int qk = QK_PTQ1_0;
+    const int nb = n / qk;
+
+    assert(n % qk == 0);
+    assert(nrc == 1);
+    UNUSED(nrc);
+    UNUSED(bx);
+    UNUSED(by);
+    UNUSED(bs);
+
+    const block_ptq1_0 * GGML_RESTRICT x = vx;
+    const block_q8_0   * GGML_RESTRICT y = vy;
+
+#if (defined(__AVX512VNNI__) && defined(__AVX512VL__)) || defined(__AVXVNNI__)
+    static const uint16_t pow3[5] = {1, 3, 9, 27, 81};
+    const __m256i ones = _mm256_set1_epi8(1);
+    float sumf = 0.0f;
+
+    for (int i = 0; i < nb; ++i) {
+        uint8_t codes[QK_PTQ1_0];
+        for (int digit = 0; digit < 5; ++digit) {
+            _mm_storeu_si128((__m128i *) &codes[digit * 16], decode_ptq1_0_16(x[i].qs, pow3[digit]));
+            _mm_storel_epi64((__m128i *) &codes[80 + digit * 8], decode_ptq1_0_8(x[i].qs + 16, pow3[digit]));
+        }
+        for (int digit = 0; digit < 4; ++digit) {
+            const uint16_t pair = decode_ptq1_0_2(x[i].qh, pow3[digit]);
+            memcpy(&codes[120 + digit * 2], &pair, sizeof(pair));
+        }
+
+        const float d0 = GGML_CPU_FP16_TO_FP32(x[i].d);
+        float sumi = 0.0f;
+        for (int k = 0; k < 4; ++k) {
+            const block_q8_0 * GGML_RESTRICT yb = &y[i * 4 + k];
+            const __m256i code = _mm256_loadu_si256((const __m256i *) &codes[k * 32]);
+            const __m256i qy = _mm256_loadu_si256((const __m256i *) yb->qs);
+            const int dp = hsum_i32_8(GGML_DPBUSD_256(_mm256_setzero_si256(), code, qy));
+            const int sy = hsum_i32_8(GGML_DPBUSD_256(_mm256_setzero_si256(), ones, qy));
+            sumi += GGML_CPU_FP16_TO_FP32(yb->d) * (float) (dp - sy);
+        }
+        sumf += d0 * sumi;
+    }
+
+    *s = sumf;
+#else
+    ggml_vec_dot_ptq1_0_q8_0_generic(n, s, bs, vx, bx, vy, by, nrc);
+#endif
 }
 
 void ggml_vec_dot_q1_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
