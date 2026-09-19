@@ -209,10 +209,10 @@ public:
         if (cancelled()) throw std::runtime_error("request cancelled");
         gemma_hybrid::normalize_request(request);
         gemma_hybrid::normalize_tool_choice(request);
-        const auto action = gemma_hybrid::classify_request(active_conversation, conversation, committed, prior_tools, request);
-        if (action == gemma_hybrid::request_action::start) {
+        if (cancelled()) throw std::runtime_error("request cancelled");
+        const auto admission = owner_state.classify_and_update(conversation, committed, prior_tools, request, epoch, cancel_epoch);
+        if (admission.action == gemma_hybrid::request_action::start) {
             reset_runtime();
-            active_conversation = conversation;
         } else {
             gemma_hybrid::check_append(committed, prior_tools, request);
         }
@@ -220,38 +220,28 @@ public:
             return run_turn(request, cancelled, callbacks, completion_id);
         } catch (...) {
             reset_runtime();
-            active_conversation.clear();
+            owner_state.clear();
             throw;
         }
     }
 
     json status() const {
         std::unique_lock<std::timed_mutex> lock(mutex, std::defer_lock);
-        if (!lock.try_lock_for(std::chrono::milliseconds(100))) {
-            return {{"status", "ok"}, {"model", cfg.alias}, {"context_size", cfg.context}, {"processing", true}};
+        const bool processing = !lock.try_lock_for(std::chrono::milliseconds(100));
+        const auto current = route_state.snapshot();
+        if (processing) {
+            return gemma_hybrid::make_health_status(cfg.alias, cfg.context, true, target_only(), gpu_target != nullptr, current);
         }
-        return {
-            {"status", "ok"},
-            {"model", cfg.alias},
-            {"context_size", cfg.context},
-            {"processing", false},
-            {"round", round},
-            {"zero_copy_ready", current_zero_copy_ready},
-            {"mode", target_only() ? "qwen35-target" : "gemma4-mtp"},
-            {"handoffs", handoffs},
-            {"shared_bytes", total_shared_bytes},
-            {"copied_bytes", total_copied_bytes},
-            {"vulkan_model_resident", gpu_target != nullptr},
-        };
+        const gemma_hybrid::inference_lifetime_snapshot lifetime = {round, handoffs, total_shared_bytes, total_copied_bytes};
+        return gemma_hybrid::make_health_status(cfg.alias, cfg.context, false, target_only(), gpu_target != nullptr, current, &lifetime);
     }
 
     void reset(const std::string & conversation) {
-        gemma_hybrid::require_reset_owner(active_conversation, conversation);
-        cancel_epoch.fetch_add(1);
+        const auto token = owner_state.request_cancel(conversation, cancel_epoch);
         std::lock_guard<std::timed_mutex> lock(mutex);
-        gemma_hybrid::require_reset_owner(active_conversation, conversation);
+        owner_state.require(token);
         reset_runtime();
-        active_conversation.clear();
+        owner_state.clear();
     }
 
     const std::string & alias() const {
@@ -291,6 +281,7 @@ private:
     config cfg;
     mutable std::timed_mutex mutex;
     std::atomic<uint64_t> cancel_epoch{0};
+    gemma_hybrid::conversation_owner_state owner_state;
     model_ptr cpu_target{nullptr, llama_model_free};
     model_ptr draft_model{nullptr, llama_model_free};
     model_ptr gpu_target{nullptr, llama_model_free};
@@ -305,13 +296,12 @@ private:
     std::vector<llama_token> history;
     json committed = json::array();
     json prior_tools = json::array();
-    std::string active_conversation;
     size_t stable_prefix = 0;
     int32_t round = 0;
     size_t handoffs = 0;
     size_t total_shared_bytes = 0;
     size_t total_copied_bytes = 0;
-    bool current_zero_copy_ready = false;
+    gemma_hybrid::inference_route_state route_state;
 
     bool target_only() const {
         return cfg.draft_path.empty();
@@ -419,7 +409,7 @@ private:
         prior_tools = json::array();
         stable_prefix = 0;
         round = 0;
-        current_zero_copy_ready = false;
+        route_state.reset();
     }
 
     static bool abort_callback(void * data) {
@@ -530,6 +520,8 @@ private:
         const auto started = clock_type::now();
         const bool cold = !target_ctx;
         const bool cpu_tool_route = target_only() && !request.at("tools").empty();
+        const auto route = gemma_hybrid::select_inference_route(target_only(), cpu_tool_route, cold);
+        route_state.begin(route, cold);
         const common_chat_params chat = render_chat(request);
         const auto * vocab = llama_model_get_vocab(cpu_target.get());
         std::vector<llama_token> prompt = tokenize(vocab, chat.prompt);
@@ -581,7 +573,7 @@ private:
                 ++handoffs;
                 total_shared_bytes += transfer.shared_bytes;
                 total_copied_bytes += transfer.copied_bytes;
-                current_zero_copy_ready = true;
+                route_state.record_handoff(transfer.shared_bytes, transfer.copied_bytes);
                 init_cpu_mtp();
             }
             history = prompt;
@@ -755,7 +747,7 @@ private:
         const double wall_s = elapsed_s(started);
         const double decode_tps = generated.size() > 1 && last_token_s > first_token_s ? (generated.size() - 1) / (last_token_s - first_token_s) : 0;
         json telemetry = {
-            {"route", cpu_tool_route ? (cold ? "cpu_target_tool_fallback" : "cpu_target_tool_fallback_reuse") : target_only() ? (cold ? "vulkan_prefill_cpu_target" : "cpu_target_reuse") : (cold ? "vulkan_prefill_cpu_mtp" : "cpu_mtp_reuse")}, {"cold", cold}, {"round", round},
+            {"route", gemma_hybrid::inference_route_name(route)}, {"cold", cold}, {"round", round},
             {"shared_bytes", transfer.shared_bytes}, {"copied_bytes", transfer.copied_bytes}, {"zero_copy", cold && transfer.shared_bytes > 0 && transfer.copied_bytes == 0},
             {"prompt_tokens", prompt.size()}, {"cached_tokens", reused}, {"canonical_replay_tokens", replayed},
             {"generated_tokens", generated.size()}, {"verified_tokens", verified}, {"drafted", drafted}, {"accepted", accepted},

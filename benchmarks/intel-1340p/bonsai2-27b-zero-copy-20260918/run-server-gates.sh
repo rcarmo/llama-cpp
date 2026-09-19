@@ -59,7 +59,7 @@ for _ in $(seq 1 600); do
     sleep 1
 done
 [[ $ready == 1 ]]
-jq -e '.status == "ok" and .mode == "qwen35-target" and .zero_copy_ready == false' "$out/health-start.json" > /dev/null
+jq -e '.status == "ok" and .mode == "qwen35-target" and .route == "idle" and .zero_copy_ready == false and .current_shared_bytes == 0 and .current_copied_bytes == 0' "$out/health-start.json" > /dev/null
 
 curl --compressed -fsS -D "$out/ui.headers" --max-time 30 "http://127.0.0.1:$port/" -o "$out/ui.html"
 grep -qi '^content-type: text/html' "$out/ui.headers"
@@ -114,7 +114,7 @@ curl -fsS --max-time 600 -H 'Content-Type: application/json' -H 'X-Conversation-
     --data-binary @"$out/cold-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/recovery-response.json"
 jq -e '.choices[0].message.content == "BONSAI_ZC_OK" and .zero_copy.zero_copy == true' "$out/recovery-response.json" > /dev/null
 curl -fsS --max-time 10 "http://127.0.0.1:$port/health" > "$out/health-final.json"
-jq -e '.status == "ok" and .zero_copy_ready == true and .handoffs >= 4 and .shared_bytes > 0 and .copied_bytes == 0' "$out/health-final.json" > /dev/null
+jq -e '.status == "ok" and .route == "vulkan_prefill_cpu_target" and .zero_copy_ready == true and .current_shared_bytes > 0 and .current_copied_bytes == 0 and .handoffs_total >= 4 and .shared_bytes_total > 0 and .copied_bytes_total == 0' "$out/health-final.json" > /dev/null
 
 cgroup=$(awk -F: '$1=="0"{print $3}' /proc/self/cgroup)
 {

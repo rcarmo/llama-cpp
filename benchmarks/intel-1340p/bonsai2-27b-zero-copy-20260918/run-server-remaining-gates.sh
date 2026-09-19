@@ -59,7 +59,7 @@ for _ in $(seq 1 600); do
     sleep 1
 done
 [[ $ready == 1 ]]
-jq -e '.status == "ok" and .mode == "qwen35-target"' "$out/health-start.json" > /dev/null
+jq -e '.status == "ok" and .mode == "qwen35-target" and .route == "idle" and .zero_copy_ready == false and .current_shared_bytes == 0 and .current_copied_bytes == 0' "$out/health-start.json" > /dev/null
 
 cat > "$out/tool-request.json" <<'JSON'
 {"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Call get_weather for Lisbon. Do not answer in prose."}],"tools":[{"type":"function","function":{"name":"get_weather","description":"Get current weather for a city","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"],"additionalProperties":false}}}],"tool_choice":{"type":"function","function":{"name":"get_weather"}},"temperature":0,"max_tokens":96,"stream":false}
@@ -82,7 +82,7 @@ for _ in $(seq 1 180); do
     [[ $(jq -r '.processing // true' "$out/health-after-cancel.json" 2>/dev/null || echo true) == false ]] && break
     sleep 1
 done
-jq -e '.status == "ok" and .processing == false' "$out/health-after-cancel.json" > /dev/null
+jq -e '.status == "ok" and .processing == false and .route == "idle" and .zero_copy_ready == false and .current_shared_bytes == 0 and .current_copied_bytes == 0' "$out/health-after-cancel.json" > /dev/null
 
 cat > "$out/recovery-request.json" <<'JSON'
 {"model":"bonsai-2-27b-ptq1-zero-copy","messages":[{"role":"user","content":"Reply with exactly BONSAI_ZC_RECOVERY_OK and nothing else."}],"temperature":0,"max_tokens":40,"stream":false}
@@ -91,7 +91,7 @@ curl -fsS --max-time 600 -H 'Content-Type: application/json' -H 'X-Conversation-
     --data-binary @"$out/recovery-request.json" "http://127.0.0.1:$port/v1/chat/completions" > "$out/recovery-response.json"
 jq -e '.choices[0].message.content == "BONSAI_ZC_RECOVERY_OK" and .zero_copy.zero_copy == true and .zero_copy.shared_bytes > 0 and .zero_copy.copied_bytes == 0' "$out/recovery-response.json" > /dev/null
 curl -fsS --max-time 10 "http://127.0.0.1:$port/health" > "$out/health-final.json"
-jq -e '.status == "ok" and .zero_copy_ready == true and .handoffs >= 1 and .shared_bytes > 0 and .copied_bytes == 0' "$out/health-final.json" > /dev/null
+jq -e '.status == "ok" and .route == "vulkan_prefill_cpu_target" and .zero_copy_ready == true and .current_shared_bytes > 0 and .current_copied_bytes == 0 and .handoffs_total >= 1 and .shared_bytes_total > 0 and .copied_bytes_total == 0' "$out/health-final.json" > /dev/null
 
 cgroup=$(awk -F: '$1=="0"{print $3}' /proc/self/cgroup)
 {

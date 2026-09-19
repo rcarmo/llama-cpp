@@ -286,3 +286,13 @@ $base/run-guarded-server-gate.sh bonsai-zc-recovery-parser \
 - `independent-review.md`: first review findings, fixes and final PASS.
 
 The failed diagnostic directories are retained because they explain the CPU tool fallback and parser correction. They are excluded from performance medians and passing-gate counts.
+
+## Post-qualification implementation improvement
+
+A 19 September follow-up separates current resident-slot telemetry from process-lifetime counters. `/health` now reports a mutex-backed `route`, `zero_copy_ready`, `current_shared_bytes` and `current_copied_bytes` snapshot while idle or processing. `handoffs_total`, `shared_bytes_total` and `copied_bytes_total` retain lifetime accounting; the previous field names remain compatibility aliases on idle responses.
+
+The route table is a pure policy function with tests for cold and warm Gemma, target-only, CPU tool fallback and CPU tool-fallback reuse paths. Exact object tests cover busy and idle health responses. Concurrent reader/writer tests check complete route states and conversation ownership. Reset uses an owner generation token so an old reset cannot clear a newer request with the same conversation ID. The guarded runners assert current and lifetime fields separately and use `CONTINUE_TOKENS` consistently.
+
+This follow-up does not change context construction, handoff mechanics, fixed-work results, the CPU tool fallback decision or deployment state. The retained `health-*.json` and tool-response files are pre-follow-up observations and do not contain the new health fields. Exact offline tests cover busy and idle health JSON, legacy alias presence, lifetime totals, parser cleanup, route transitions and concurrent route/owner reads. The modified runners define future live acceptance for the new fields.
+
+A fresh offline build passed the policy test 200 consecutive times and passed `test-context-handoff`; the two server target names remained byte-identical. Independent concurrency review passed after the route mutex, owner-generation and cancellation-admission fixes. No GPU rerun was needed.
