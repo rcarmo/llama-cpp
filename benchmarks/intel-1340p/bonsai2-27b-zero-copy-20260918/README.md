@@ -267,6 +267,8 @@ $base/run-guarded-server-gate.sh bonsai-zc-server-remaining \
   "$PWD/$base/run-server-remaining-gates.sh" "$PWD/$base/server-remaining-gates-new"
 $base/run-guarded-server-gate.sh bonsai-zc-recovery-parser \
   "$PWD/$base/run-server-recovery-parser-gate.sh" "$PWD/$base/server-recovery-parser-gate-new"
+$base/run-guarded-server-gate.sh bonsai-zc-health-live \
+  "$PWD/$base/run-server-health-live-gate.sh" "$PWD/$base/server-health-live-gate-new"
 ```
 
 `run-server-parser-gates.sh` retains the failed exact-content diagnostic that identified the empty-think prefix. It is not an accepted final gate.
@@ -283,7 +285,10 @@ $base/run-guarded-server-gate.sh bonsai-zc-recovery-parser \
 - `server-remaining-gates-r3/`: accepted tool fallback, cancellation and recovery responses; the wrapper exited after a response-content assertion;
 - `server-parser-gates/`: failed empty-think exact-content assertion;
 - `server-recovery-parser-gate/`: final passing exact parser, zero-copy and resource gate;
-- `independent-review.md`: first review findings, fixes and final PASS.
+- `server-health-live-gate/`: post-merge cold/warm/reset current-versus-lifetime health verification;
+- `independent-review.md`: first review findings, fixes and final PASS;
+- `independent-review-health-followup.md`: concurrency and health-contract follow-up review;
+- `independent-review-health-live.md`: live gate, artifact and manifest review.
 
 The failed diagnostic directories are retained because they explain the CPU tool fallback and parser correction. They are excluded from performance medians and passing-gate counts.
 
@@ -295,4 +300,15 @@ The route table is a pure policy function with tests for cold and warm Gemma, ta
 
 This follow-up does not change context construction, handoff mechanics, fixed-work results, the CPU tool fallback decision or deployment state. The retained `health-*.json` and tool-response files are pre-follow-up observations and do not contain the new health fields. Exact offline tests cover busy and idle health JSON, legacy alias presence, lifetime totals, parser cleanup, route transitions and concurrent route/owner reads. The modified runners define future live acceptance for the new fields.
 
-A fresh offline build passed the policy test 200 consecutive times and passed `test-context-handoff`; the two server target names remained byte-identical. Independent concurrency review passed after the route mutex, owner-generation and cancellation-admission fixes. No GPU rerun was needed.
+A fresh offline build passed the policy test 200 consecutive times and passed `test-context-handoff`; the two server target names remained byte-identical. Independent concurrency review passed after the route mutex, owner-generation and cancellation-admission fixes.
+
+A short post-merge live gate then verified the external health contract without repeating performance or tool qualification. `server-health-live-gate/` records:
+
+- cold busy route `vulkan_prefill_cpu_target`, `zero_copy_ready=false`, zero current bytes and no lifetime fields;
+- cold completion with 803,753,984 current/lifetime shared bytes, zero copied bytes and one handoff;
+- warm busy route `cpu_target_reuse`, `zero_copy_ready=true`, retained current shared bytes and no lifetime fields;
+- reset route `idle`, cleared current bytes and preserved lifetime handoff/shared totals;
+- exact cold/warm response markers, 34 cached warm prompt tokens, zero cgroup swap/OOM and successful unit exit;
+- automatic primary Gemma restoration with zero restarts and service swap.
+
+The live verification used one 72.530-second bounded unit and released the experimental reservation immediately afterward. Primary Gemma then resumed its normal `renderD128` ownership. The phase did not rerun performance measurements, forced tools or Memento work.
