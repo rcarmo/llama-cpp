@@ -4,10 +4,12 @@
 
 #include <nlohmann/json.hpp>
 
+#include <atomic>
 #include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <map>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -20,6 +22,119 @@ enum class request_action {
     start,
     append,
 };
+
+enum class inference_route {
+    idle,
+    vulkan_prefill_cpu_mtp,
+    cpu_mtp_reuse,
+    vulkan_prefill_cpu_target,
+    cpu_target_reuse,
+    cpu_target_tool_fallback,
+    cpu_target_tool_fallback_reuse,
+};
+
+inline inference_route select_inference_route(bool target_only, bool has_tools, bool cold) {
+    if (!target_only) {
+        return cold ? inference_route::vulkan_prefill_cpu_mtp : inference_route::cpu_mtp_reuse;
+    }
+    if (has_tools) {
+        return cold ? inference_route::cpu_target_tool_fallback : inference_route::cpu_target_tool_fallback_reuse;
+    }
+    return cold ? inference_route::vulkan_prefill_cpu_target : inference_route::cpu_target_reuse;
+}
+
+inline const char * inference_route_name(inference_route route) {
+    switch (route) {
+        case inference_route::idle: return "idle";
+        case inference_route::vulkan_prefill_cpu_mtp: return "vulkan_prefill_cpu_mtp";
+        case inference_route::cpu_mtp_reuse: return "cpu_mtp_reuse";
+        case inference_route::vulkan_prefill_cpu_target: return "vulkan_prefill_cpu_target";
+        case inference_route::cpu_target_reuse: return "cpu_target_reuse";
+        case inference_route::cpu_target_tool_fallback: return "cpu_target_tool_fallback";
+        case inference_route::cpu_target_tool_fallback_reuse: return "cpu_target_tool_fallback_reuse";
+    }
+    throw std::invalid_argument("invalid inference route");
+}
+
+struct inference_route_snapshot {
+    inference_route route = inference_route::idle;
+    bool zero_copy_ready = false;
+    size_t shared_bytes = 0;
+    size_t copied_bytes = 0;
+};
+
+class inference_route_state {
+public:
+    inference_route_snapshot snapshot() const {
+        std::lock_guard<std::mutex> lock(mutex);
+        return current;
+    }
+
+    void begin(inference_route next, bool cold) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (cold) {
+            current.zero_copy_ready = false;
+            current.shared_bytes = 0;
+            current.copied_bytes = 0;
+        }
+        current.route = next;
+    }
+
+    void record_handoff(size_t shared, size_t copied) {
+        std::lock_guard<std::mutex> lock(mutex);
+        current.shared_bytes = shared;
+        current.copied_bytes = copied;
+        current.zero_copy_ready = shared > 0 && copied == 0;
+    }
+
+    void reset() {
+        std::lock_guard<std::mutex> lock(mutex);
+        current = {};
+    }
+
+private:
+    mutable std::mutex mutex;
+    inference_route_snapshot current;
+};
+
+struct inference_lifetime_snapshot {
+    int32_t round = 0;
+    size_t handoffs = 0;
+    size_t shared_bytes = 0;
+    size_t copied_bytes = 0;
+};
+
+inline json make_health_status(
+        const std::string & model,
+        int32_t context_size,
+        bool processing,
+        bool target_only,
+        bool vulkan_model_resident,
+        const inference_route_snapshot & current,
+        const inference_lifetime_snapshot * lifetime = nullptr) {
+    json result = {
+        {"status", "ok"},
+        {"model", model},
+        {"context_size", context_size},
+        {"processing", processing},
+        {"route", inference_route_name(current.route)},
+        {"zero_copy_ready", current.zero_copy_ready},
+        {"current_shared_bytes", current.shared_bytes},
+        {"current_copied_bytes", current.copied_bytes},
+        {"mode", target_only ? "qwen35-target" : "gemma4-mtp"},
+        {"vulkan_model_resident", vulkan_model_resident},
+    };
+    if (lifetime) {
+        result["round"] = lifetime->round;
+        result["handoffs"] = lifetime->handoffs;
+        result["shared_bytes"] = lifetime->shared_bytes;
+        result["copied_bytes"] = lifetime->copied_bytes;
+        result["handoffs_total"] = lifetime->handoffs;
+        result["shared_bytes_total"] = lifetime->shared_bytes;
+        result["copied_bytes_total"] = lifetime->copied_bytes;
+    }
+    return result;
+}
 
 inline void normalize_request(json & request) {
     if (!request.is_object()) {
@@ -195,6 +310,67 @@ inline void require_reset_owner(const std::string & active_conversation, const s
         throw std::invalid_argument("conversation does not own the resident slot");
     }
 }
+
+struct conversation_admission {
+    request_action action = request_action::start;
+    uint64_t generation = 0;
+};
+
+struct conversation_reset_token {
+    std::string conversation;
+    uint64_t generation = 0;
+};
+
+class conversation_owner_state {
+public:
+    conversation_admission classify_and_update(
+            const std::string & request_conversation,
+            const json & committed,
+            const json & prior_tools,
+            const json & request,
+            uint64_t request_epoch,
+            const std::atomic<uint64_t> & cancel_epoch) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (request_epoch != cancel_epoch.load()) {
+            throw std::runtime_error("request cancelled");
+        }
+        const auto action = classify_request(active, request_conversation, committed, prior_tools, request);
+        if (action == request_action::start) {
+            active = request_conversation;
+        }
+        return {action, ++generation};
+    }
+
+    conversation_reset_token request_cancel(const std::string & request_conversation, std::atomic<uint64_t> & cancel_epoch) const {
+        std::lock_guard<std::mutex> lock(mutex);
+        require_reset_owner(active, request_conversation);
+        cancel_epoch.fetch_add(1);
+        return {request_conversation, generation};
+    }
+
+    void require(const conversation_reset_token & token) const {
+        std::lock_guard<std::mutex> lock(mutex);
+        require_reset_owner(active, token.conversation);
+        if (token.generation != generation) {
+            throw std::invalid_argument("conversation ownership changed during reset");
+        }
+    }
+
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex);
+        active.clear();
+    }
+
+    std::string value() const {
+        std::lock_guard<std::mutex> lock(mutex);
+        return active;
+    }
+
+private:
+    mutable std::mutex mutex;
+    std::string active;
+    uint64_t generation = 0;
+};
 
 inline std::string header_value(const std::map<std::string, std::string> & headers, const std::string & name) {
     for (const auto & item : headers) {

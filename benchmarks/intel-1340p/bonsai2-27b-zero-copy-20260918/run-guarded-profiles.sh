@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if [[ $# -lt 4 ]]; then
-    echo "usage: $0 OUTPUT_DIR PREFILL_TOKENS OUTPUT_TOKENS PROFILE..." >&2
+    echo "usage: $0 OUTPUT_DIR PREFILL_TOKENS CONTINUE_TOKENS PROFILE..." >&2
     exit 2
 fi
 
@@ -13,7 +13,7 @@ model="$root/projects/models/ternary-bonsai-2-27b/Ternary-Bonsai-2-27B-PTQ1_0.gg
 image=localhost/llama-intel-build:fedora44
 output_dir=$1
 prefill_tokens=$2
-output_tokens=$3
+continue_tokens=$3
 shift 3
 profiles=("$@")
 chunk_tokens=256
@@ -62,13 +62,13 @@ for profile in "${profiles[@]}"; do
         -v "$worktree:$worktree" -v "$model:$model:ro" -w "$worktree" \
         -e QWEN_THREADS=12 -e QWEN_FLASH_ATTN=1 -e QWEN_GPU_LAYERS=999 \
         -e RUN_PROFILE="$profile" -e RUN_MODEL="$model" \
-        -e RUN_PREFILL="$prefill_tokens" -e RUN_OUTPUT="$output_tokens" \
+        -e RUN_PREFILL="$prefill_tokens" -e RUN_CONTINUE="$continue_tokens" \
         -e RUN_CHUNK="$chunk_tokens" -e RUN_UBATCH="$ubatch_tokens" \
         -e RUN_DIR="$run_dir" "$image" bash -lc '
             set -euo pipefail
             export LD_LIBRARY_PATH="$PWD/build-bonsai-zc/bin"
             build-bonsai-zc/bin/test-qwen-target-trained-handoff \
-                "$RUN_PROFILE" "$RUN_MODEL" "$RUN_PREFILL" "$RUN_OUTPUT" "$RUN_CHUNK" "$RUN_UBATCH" \
+                "$RUN_PROFILE" "$RUN_MODEL" "$RUN_PREFILL" "$RUN_CONTINUE" "$RUN_CHUNK" "$RUN_UBATCH" \
                 > "$RUN_DIR/run.log" 2> "$RUN_DIR/run.stderr"
             rc=$?
             printf "%s\n" "$rc" > "$RUN_DIR/run.exit"
@@ -82,7 +82,7 @@ for profile in "${profiles[@]}"; do
         '
     grep -q '^QUALIFY_RESULT ' "$run_dir/run.log"
     grep -q 'logits_finite=1' "$run_dir/run.log"
-    expected_pos=$((prefill_tokens + output_tokens - 1))
+    expected_pos=$((prefill_tokens + continue_tokens - 1))
     grep -q "final_pos=$expected_pos" "$run_dir/run.log"
     [[ $(awk '/^memory.swap.peak$/{getline;print}' "$run_dir/final.cgroup") == 0 ]]
     [[ $(awk '/^oom_kill /{print $2}' "$run_dir/final.cgroup") == 0 ]]
