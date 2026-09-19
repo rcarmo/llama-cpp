@@ -15,6 +15,6 @@ The review identified and drove these fixes:
 4. Admission compares its captured cancellation epoch with the current epoch while holding the owner mutex, before it increments owner generation. This prevents a cancelled in-flight request from making its own reset token stale.
 5. Busy and idle health responses are tested as complete JSON objects, including absence of idle-only aliases in busy responses.
 6. The report labels retained JSON files as pre-follow-up observations. Updated runners define future live acceptance for current-slot and lifetime fields.
-7. The changed report and five runners are covered by the regenerated 208-file `SHA256SUMS` manifest.
+7. The changed report and runners are covered by the regenerated `SHA256SUMS` manifest.
 
 The final review returned PASS with no required findings.
