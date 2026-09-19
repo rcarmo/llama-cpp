@@ -136,7 +136,7 @@ struct config {
 };
 
 static void usage(const char * name) {
-    std::fprintf(stderr, "usage: %s --model MODEL.gguf --draft ASSISTANT.gguf [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--draft-min N] [--threadpools 0|1] [--model-sampling 0|1] [--max-output N]\n", name);
+    std::fprintf(stderr, "usage: %s --model MODEL.gguf [--draft ASSISTANT.gguf] [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--draft-min N] [--threadpools 0|1] [--model-sampling 0|1] [--max-output N]\n", name);
 }
 
 static config parse_args(int argc, char ** argv) {
@@ -174,8 +174,8 @@ static config parse_args(int argc, char ** argv) {
         } else if (key == "--max-output") result.max_output = std::stoi(value);
         else throw std::invalid_argument("unknown option " + key);
     }
-    if (result.model_path.empty() || result.draft_path.empty()) {
-        throw std::invalid_argument("--model and --draft are required");
+    if (result.model_path.empty()) {
+        throw std::invalid_argument("--model is required");
     }
     if (result.port < 1 || result.port > 65535 || result.context < 1024 || result.batch < 32 || result.ubatch < 32 || result.ubatch > result.batch || result.threads < 1 || result.threads_batch < 1 || result.draft_max < 1 || result.draft_max > 16 || result.draft_min < 0 || result.draft_min > result.draft_max || result.max_output < 1) {
         throw std::invalid_argument("invalid numeric option");
@@ -208,6 +208,7 @@ public:
         }
         if (cancelled()) throw std::runtime_error("request cancelled");
         gemma_hybrid::normalize_request(request);
+        gemma_hybrid::normalize_tool_choice(request);
         const auto action = gemma_hybrid::classify_request(active_conversation, conversation, committed, prior_tools, request);
         if (action == gemma_hybrid::request_action::start) {
             reset_runtime();
@@ -235,7 +236,8 @@ public:
             {"context_size", cfg.context},
             {"processing", false},
             {"round", round},
-            {"zero_copy_ready", round > 0 && total_shared_bytes > 0 && total_copied_bytes == 0},
+            {"zero_copy_ready", current_zero_copy_ready},
+            {"mode", target_only() ? "qwen35-target" : "gemma4-mtp"},
             {"handoffs", handoffs},
             {"shared_bytes", total_shared_bytes},
             {"copied_bytes", total_copied_bytes},
@@ -264,14 +266,14 @@ public:
         }
         return {
             {"default_generation_settings", {
-                {"id", 0}, {"id_task", 0}, {"n_ctx", cfg.context}, {"speculative", true}, {"is_processing", false},
+                {"id", 0}, {"id_task", 0}, {"n_ctx", cfg.context}, {"speculative", !target_only()}, {"is_processing", false},
                 {"params", {
                     {"n_predict", cfg.max_output}, {"max_tokens", cfg.max_output}, {"seed", sampling_defaults.seed},
                     {"temperature", sampling_defaults.temp}, {"top_k", sampling_defaults.top_k}, {"top_p", sampling_defaults.top_p}, {"min_p", sampling_defaults.min_p},
                     {"repeat_last_n", sampling_defaults.penalty_last_n}, {"repeat_penalty", sampling_defaults.penalty_repeat},
                     {"presence_penalty", sampling_defaults.penalty_present}, {"frequency_penalty", sampling_defaults.penalty_freq},
                     {"ignore_eos", sampling_defaults.ignore_eos}, {"stream", false}, {"samplers", samplers},
-                    {"backend_sampling", false}, {"speculative.n_max", cfg.draft_max}, {"speculative.n_min", cfg.draft_min},
+                    {"backend_sampling", false}, {"speculative.n_max", target_only() ? 0 : cfg.draft_max}, {"speculative.n_min", target_only() ? 0 : cfg.draft_min},
                     {"threadpools", cfg.threadpools}, {"model_sampling", cfg.model_sampling}, {"timings_per_token", false}
                 }},
                 {"prompt", ""}, {"next_token", {{"has_next_token", false}, {"has_new_line", false}, {"n_remain", 0}, {"n_decoded", 0}, {"stopping_word", ""}}}
@@ -309,6 +311,11 @@ private:
     size_t handoffs = 0;
     size_t total_shared_bytes = 0;
     size_t total_copied_bytes = 0;
+    bool current_zero_copy_ready = false;
+
+    bool target_only() const {
+        return cfg.draft_path.empty();
+    }
 
     static model_ptr load_model(const std::string & path, bool gpu) {
         llama_model_params params = llama_model_default_params();
@@ -320,7 +327,7 @@ private:
         return model;
     }
 
-    llama_context_params context_params(bool gpu) const {
+    llama_context_params context_params(bool gpu, bool destination = false) const {
         llama_context_params params = llama_context_default_params();
         params.n_ctx = cfg.context;
         params.n_batch = cfg.batch;
@@ -330,11 +337,14 @@ private:
         params.n_threads_batch = cfg.threads_batch;
         params.type_k = GGML_TYPE_F16;
         params.type_v = GGML_TYPE_F16;
-        params.flash_attn_type = LLAMA_FLASH_ATTN_TYPE_DISABLED;
+        params.flash_attn_type = target_only() ? LLAMA_FLASH_ATTN_TYPE_ENABLED : LLAMA_FLASH_ATTN_TYPE_DISABLED;
         params.swa_full = false;
         params.offload_kqv = gpu;
         params.op_offload = gpu;
-        params.kv_cpu_shared = gpu;
+        params.kv_cpu_shared = gpu && !target_only();
+        params.kv_handoff_strict = target_only() && (gpu || destination);
+        params.kv_handoff_destination = target_only() && destination;
+        params.n_rs_seq = target_only() ? 3 : 0;
         params.n_outputs_max = cfg.batch;
         params.n_outputs_max_per_seq = cfg.batch;
         return params;
@@ -375,14 +385,22 @@ private:
 
     void load_models() {
         cpu_target = load_model(cfg.model_path, false);
-        draft_model = load_model(cfg.draft_path, false);
+        if (!target_only()) {
+            draft_model = load_model(cfg.draft_path, false);
+        }
         gpu_target = load_model(cfg.model_path, true);
         char target_arch[64] = {};
-        char draft_arch[64] = {};
         llama_model_meta_val_str(cpu_target.get(), "general.architecture", target_arch, sizeof(target_arch));
-        llama_model_meta_val_str(draft_model.get(), "general.architecture", draft_arch, sizeof(draft_arch));
-        if (std::string(target_arch) != "gemma4" || std::string(draft_arch) != "gemma4-assistant") {
-            throw std::runtime_error("service requires Gemma4 target and assistant models");
+        if (target_only()) {
+            if (std::string(target_arch) != "qwen35" || llama_model_n_layer_nextn(cpu_target.get()) != 0) {
+                throw std::runtime_error("target-only service requires Qwen35 without embedded MTP");
+            }
+        } else {
+            char draft_arch[64] = {};
+            llama_model_meta_val_str(draft_model.get(), "general.architecture", draft_arch, sizeof(draft_arch));
+            if (std::string(target_arch) != "gemma4" || std::string(draft_arch) != "gemma4-assistant") {
+                throw std::runtime_error("draft service requires Gemma4 target and assistant models");
+            }
         }
         templates = common_chat_templates_init(cpu_target.get(), "", "");
         if (cfg.model_sampling) {
@@ -401,6 +419,7 @@ private:
         prior_tools = json::array();
         stable_prefix = 0;
         round = 0;
+        current_zero_copy_ready = false;
     }
 
     static bool abort_callback(void * data) {
@@ -437,6 +456,7 @@ private:
     }
 
     void init_cpu_mtp() {
+        if (target_only()) return;
         llama_context_params params = context_params(false);
         params.ctx_type = LLAMA_CONTEXT_TYPE_MTP;
         params.ctx_other = target_ctx.get();
@@ -462,11 +482,10 @@ private:
         inputs.enable_thinking = false;
         inputs.parallel_tool_calls = request.value("parallel_tool_calls", false);
         inputs.tool_choice = common_chat_tool_choice_parse_oaicompat(request.value("tool_choice", std::string("auto")));
-        // Build the Gemma 4 parser with reasoning channels enabled even though
-        // thinking is disabled in the rendered prompt. Huihui can repeat the
-        // template's empty thought channel before visible content; the parser
-        // must classify and remove that marker rather than expose it as text.
-        inputs.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
+        // Target-only Qwen renders with thinking disabled. Gemma retains its
+        // reasoning channel in the template; response parsing below strips an
+        // empty thought marker from either model before exposing content.
+        inputs.reasoning_format = target_only() ? COMMON_REASONING_FORMAT_NONE : COMMON_REASONING_FORMAT_DEEPSEEK;
         return common_chat_templates_apply(templates.get(), inputs);
     }
 
@@ -510,11 +529,13 @@ private:
             const std::string & completion_id) {
         const auto started = clock_type::now();
         const bool cold = !target_ctx;
+        const bool cpu_tool_route = target_only() && !request.at("tools").empty();
         const common_chat_params chat = render_chat(request);
         const auto * vocab = llama_model_get_vocab(cpu_target.get());
         std::vector<llama_token> prompt = tokenize(vocab, chat.prompt);
         const int32_t budget = gemma_hybrid::output_budget(request, cfg.max_output);
-        if (prompt.size() + budget + cfg.draft_max + 1 > static_cast<size_t>(cfg.context)) {
+        const int32_t draft_headroom = target_only() ? 0 : cfg.draft_max;
+        if (prompt.size() + budget + draft_headroom + 1 > static_cast<size_t>(cfg.context)) {
             throw std::invalid_argument("context or output budget exceeded");
         }
 
@@ -533,7 +554,7 @@ private:
         }
 
         if (cold) {
-            target_ctx = make_context(gpu_target.get(), context_params(true), target_threadpools);
+            target_ctx = make_context(cpu_tool_route ? cpu_target.get() : gpu_target.get(), context_params(!cpu_tool_route), target_threadpools);
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
                 const size_t count = std::min<size_t>(cfg.batch, prompt.size() - i);
@@ -545,28 +566,34 @@ private:
             llama_synchronize(target_ctx.get());
             prefill_s = elapsed_s(prefill_started);
 
-            std::unique_ptr<common_threadpools> destination_threadpools;
-            context_ptr destination = make_context(cpu_target.get(), context_params(false), destination_threadpools);
-            const auto handoff_started = clock_type::now();
-            const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
-            if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
-                throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
+            if (!cpu_tool_route) {
+                std::unique_ptr<common_threadpools> destination_threadpools;
+                context_ptr destination = make_context(cpu_target.get(), context_params(false, true), destination_threadpools);
+                const auto handoff_started = clock_type::now();
+                const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
+                if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
+                    throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
+                }
+                handoff_ms = elapsed_s(handoff_started) * 1000.0;
+                reset_context(target_ctx, target_threadpools);
+                target_ctx = std::move(destination);
+                target_threadpools = std::move(destination_threadpools);
+                ++handoffs;
+                total_shared_bytes += transfer.shared_bytes;
+                total_copied_bytes += transfer.copied_bytes;
+                current_zero_copy_ready = true;
+                init_cpu_mtp();
             }
-            handoff_ms = elapsed_s(handoff_started) * 1000.0;
-            reset_context(target_ctx, target_threadpools);
-            target_ctx = std::move(destination);
-            target_threadpools = std::move(destination_threadpools);
-            ++handoffs;
-            total_shared_bytes += transfer.shared_bytes;
-            total_copied_bytes += transfer.copied_bytes;
-            init_cpu_mtp();
             history = prompt;
-            if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, prompt.size() - 1, -1)) {
-                throw std::runtime_error("prime rollback failed");
+            if (!cpu_tool_route) {
+                if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, prompt.size() - 1, -1)) {
+                    throw std::runtime_error("prime rollback failed");
+                }
+                evaluate(target_ctx.get(), prompt, prompt.size() - 1, 1, speculative.get(), should_stop);
             }
-            evaluate(target_ctx.get(), prompt, prompt.size() - 1, 1, speculative.get(), should_stop);
         } else {
-            if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, reused, -1) || !llama_memory_seq_rm(llama_get_memory(draft_ctx.get()), 0, reused, -1)) {
+            if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, reused, -1) ||
+                    (!target_only() && !llama_memory_seq_rm(llama_get_memory(draft_ctx.get()), 0, reused, -1))) {
                 throw std::runtime_error("prefix rollback failed");
             }
             const auto prefill_started = clock_type::now();
@@ -582,7 +609,9 @@ private:
         }
 
         stable_prefix = input_prefix(vocab, chat, prompt);
-        common_speculative_begin(speculative.get(), 0, history);
+        if (!target_only()) {
+            common_speculative_begin(speculative.get(), 0, history);
+        }
         auto sampler_params = sampling_params(request, chat);
         common_sampler_ptr sampler(common_sampler_init(cpu_target.get(), sampler_params));
         if (!sampler) throw std::runtime_error("sampler initialization failed");
@@ -614,6 +643,9 @@ private:
             last_token_s = elapsed_s(started);
             if (callbacks && callbacks->token_deltas) {
                 common_chat_msg parsed = common_chat_parse(raw, true, parser);
+                if (target_only()) {
+                    parsed.content = gemma_hybrid::strip_empty_think_prefix(parsed.content);
+                }
                 if (!parsed.empty()) {
                     parsed.set_tool_call_ids(tool_call_ids, [] {
                         static std::atomic<uint64_t> next_id{0};
@@ -633,6 +665,26 @@ private:
 
         while (!eog && generated.size() < static_cast<size_t>(budget)) {
             if (should_stop()) throw std::runtime_error("request cancelled");
+            if (target_only()) {
+                llama_batch batch = llama_batch_init(1, 0, 1);
+                batch.n_tokens = 1;
+                batch.token[0] = last;
+                batch.pos[0] = history.size();
+                batch.n_seq_id[0] = 1;
+                batch.seq_id[0][0] = 0;
+                batch.logits[0] = 1;
+                llama_set_abort_callback(target_ctx.get(), abort_callback, const_cast<std::function<bool()> *>(&should_stop));
+                const int32_t rc = llama_decode(target_ctx.get(), batch);
+                llama_batch_free(batch);
+                llama_set_abort_callback(target_ctx.get(), nullptr, nullptr);
+                if (rc != 0) throw std::runtime_error(should_stop() ? "request cancelled" : "target decode failed");
+                ++verified;
+                history.push_back(last);
+                last = common_sampler_sample(sampler.get(), target_ctx.get(), -1);
+                common_sampler_accept(sampler.get(), last, true);
+                emit(last);
+                continue;
+            }
             llama_tokens draft;
             auto & draft_params = common_speculative_get_draft_params(speculative.get(), 0);
             draft_params = {
@@ -679,6 +731,9 @@ private:
         }
 
         common_chat_msg message = common_chat_parse(raw, false, parser);
+        if (target_only()) {
+            message.content = gemma_hybrid::strip_empty_think_prefix(message.content);
+        }
         if (callbacks && callbacks->token_deltas) {
             message.set_tool_call_ids(tool_call_ids, [] {
                 static std::atomic<uint64_t> next_id{0};
@@ -700,7 +755,7 @@ private:
         const double wall_s = elapsed_s(started);
         const double decode_tps = generated.size() > 1 && last_token_s > first_token_s ? (generated.size() - 1) / (last_token_s - first_token_s) : 0;
         json telemetry = {
-            {"route", cold ? "vulkan_prefill_cpu_mtp" : "cpu_mtp_reuse"}, {"cold", cold}, {"round", round},
+            {"route", cpu_tool_route ? (cold ? "cpu_target_tool_fallback" : "cpu_target_tool_fallback_reuse") : target_only() ? (cold ? "vulkan_prefill_cpu_target" : "cpu_target_reuse") : (cold ? "vulkan_prefill_cpu_mtp" : "cpu_mtp_reuse")}, {"cold", cold}, {"round", round},
             {"shared_bytes", transfer.shared_bytes}, {"copied_bytes", transfer.copied_bytes}, {"zero_copy", cold && transfer.shared_bytes > 0 && transfer.copied_bytes == 0},
             {"prompt_tokens", prompt.size()}, {"cached_tokens", reused}, {"canonical_replay_tokens", replayed},
             {"generated_tokens", generated.size()}, {"verified_tokens", verified}, {"drafted", drafted}, {"accepted", accepted},
@@ -936,7 +991,7 @@ int main(int argc, char ** argv) {
         http.del("/v1/stream", reset);
         http.is_ready.store(true);
         if (!http.start()) throw std::runtime_error("HTTP bind failed");
-        std::fprintf(stderr, "GEMMA_ZERO_COPY_READY address=%s model=%s context=%d\n", http.listening_address.c_str(), cfg.alias.c_str(), cfg.context);
+        std::fprintf(stderr, "%s address=%s model=%s context=%d\n", cfg.draft_path.empty() ? "ZERO_COPY_READY" : "GEMMA_ZERO_COPY_READY", http.listening_address.c_str(), cfg.alias.c_str(), cfg.context);
         if (http.thread.joinable()) http.thread.join();
         g_http = nullptr;
         llama_backend_free();

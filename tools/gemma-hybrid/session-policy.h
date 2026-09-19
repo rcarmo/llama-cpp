@@ -4,6 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <map>
@@ -33,6 +34,42 @@ inline void normalize_request(json & request) {
     if (!request.at("tools").is_array()) {
         throw std::invalid_argument("tools must be an array");
     }
+}
+
+inline std::string normalize_tool_choice(json & request) {
+    if (!request.contains("tool_choice") || request.at("tool_choice").is_null()) {
+        return "auto";
+    }
+    const json & choice = request.at("tool_choice");
+    if (choice.is_string()) {
+        const std::string value = choice.get<std::string>();
+        if (value != "auto" && value != "none" && value != "required") {
+            throw std::invalid_argument("tool_choice must be auto, none, required or a named function");
+        }
+        return value;
+    }
+    if (!choice.is_object() || choice.value("type", std::string()) != "function" ||
+            !choice.contains("function") || !choice.at("function").is_object()) {
+        throw std::invalid_argument("invalid tool_choice object");
+    }
+    const std::string name = choice.at("function").value("name", std::string());
+    if (name.empty()) {
+        throw std::invalid_argument("tool_choice function name is required");
+    }
+    json selected = json::array();
+    for (const auto & tool : request.at("tools")) {
+        if (tool.is_object() && tool.value("type", std::string()) == "function" &&
+                tool.contains("function") && tool.at("function").is_object() &&
+                tool.at("function").value("name", std::string()) == name) {
+            selected.push_back(tool);
+        }
+    }
+    if (selected.empty()) {
+        throw std::invalid_argument("tool_choice function is not present in tools");
+    }
+    request["tools"] = std::move(selected);
+    request["tool_choice"] = "required";
+    return "required";
 }
 
 inline uint64_t sampling_override_mask(const json & request) {
@@ -71,6 +108,42 @@ inline int32_t output_budget(const json & request, int32_t configured_max) {
         throw std::invalid_argument("max_tokens must be -1 or between 1 and the configured maximum");
     }
     return requested;
+}
+
+inline std::string strip_empty_think_prefix(const std::string & content) {
+    static const std::string open = "<think>";
+    static const std::string close = "</think>";
+    size_t first = 0;
+    while (first < content.size() && std::isspace(static_cast<unsigned char>(content[first]))) {
+        ++first;
+    }
+    const size_t available = content.size() - first;
+    if (available < open.size()) {
+        return open.compare(0, available, content, first, available) == 0 ? std::string() : content;
+    }
+    if (content.compare(first, open.size(), open) != 0) {
+        return content;
+    }
+    const size_t body = first + open.size();
+    const size_t end = content.find(close, body);
+    if (end == std::string::npos) {
+        size_t candidate = body;
+        while (candidate < content.size() && std::isspace(static_cast<unsigned char>(content[candidate]))) {
+            ++candidate;
+        }
+        const size_t close_available = content.size() - candidate;
+        return close.compare(0, close_available, content, candidate, close_available) == 0 ? std::string() : content;
+    }
+    for (size_t i = body; i < end; ++i) {
+        if (!std::isspace(static_cast<unsigned char>(content[i]))) {
+            return content;
+        }
+    }
+    size_t visible = end + close.size();
+    while (visible < content.size() && std::isspace(static_cast<unsigned char>(content[visible]))) {
+        ++visible;
+    }
+    return content.substr(visible);
 }
 
 inline void check_append(const json & committed, const json & prior_tools, const json & request) {

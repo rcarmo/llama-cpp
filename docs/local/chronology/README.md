@@ -33,7 +33,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-15 -- [Gemma 32K zero-copy service qualification, persistent-model and live-stream verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
 * 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [Gemma 4 E4B QAT + MTP Q4 scheduling release and primary deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
 * 2026-09-17 -- [Huihui Gemma 4 12B local security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md), including matched MTP zero-copy, speed tuning, full UI checks and local profile switching
-* 2026-09-18 -- [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md), including PQ2/Hadamard support, CPU/Vulkan qualification, a static CPU-only test profile and an [HN/PTQ1 correction](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md)
+* 2026-09-18 / 2026-09-19 -- [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) and [PTQ1 zero-copy handoff qualification](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md), including qualified PTQ1 Vulkan kernels, target-only Vulkan prefill, CPU generation, API/SSE/UI checks and no deployment
 
 ## Current runbooks and retained operational docs
 
@@ -47,5 +47,5 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 
 * [Gemma 4 E4B QAT + MTP Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md): primary deployment, historically labelled ZC2; shorter temporary lifetimes improved confirmed sustained CPU+MTP decode by 11.56%; full zero-copy/UI qualification passed.
 * [Huihui Gemma 4 12B security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md): explicit local alternative with zero-copy, matched MTP, full embedded chat UI and `gemma-profile` switching.
-* [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md): static CPU-only alternative after correct but slower PQ2 Vulkan offload; API, tool, SSE, UI and rollback checks passed. The HN accelerated path uses PTQ1_0 and is pending.
+* [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md): static CPU-only alternative after correct but slower PQ2 Vulkan offload; API, tool, SSE, UI and rollback checks passed. [PTQ1 zero-copy handoff](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md) is qualified but not deployed.
 * [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.

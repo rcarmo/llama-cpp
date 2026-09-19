@@ -136,6 +136,7 @@ Operations and evidence:
 - [`benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md`](benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md)
 - [`benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md`](benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md)
 - [`benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md`](benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md)
+- [`benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md`](benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md)
 - [`tools/gemma-hybrid/README.md`](tools/gemma-hybrid/README.md)
 
 ### Ornith and Gemma 128K validation
