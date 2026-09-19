@@ -1,0 +1,23 @@
+0.00.029.585 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.029.695 W srv  llama_server: -----------------
+0.00.029.695 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.029.695 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.029.695 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.029.695 W srv  llama_server: -----------------
+0.00.031.023 I srv    load_model: loading model '/var/home/agent/workspace/projects/models/ternary-bonsai-2-27b/Ternary-Bonsai-2-27B-PTQ1_0.gguf'
+0.01.124.351 I cmn          init: llama threadpool init, n_threads = 12
+0.05.610.915 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.05.617.365 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.05.617.399 I srv  llama_server: model loaded
+0.05.617.403 I srv  llama_server: listening on http://127.0.0.1:18141
+0.06.060.819 W Wrong type supplied for parameter 'tool_choice', using default value: [json.exception.type_error.302] type must be string, but is object
+0.06.067.459 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.06.067.737 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+4.20.635.904 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =    263, progress = 0.92, t = 254.57 s / 1.03 tokens per second
+4.40.957.900 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =    283, progress = 0.99, t = 274.89 s / 1.03 tokens per second
+5.19.401.074 I slot print_timing: id  0 | task 0 | prompt eval time =  279248.51 ms /   287 tokens (  972.99 ms per token,     1.03 tokens per second)
+5.19.401.077 I slot print_timing: id  0 | task 0 |        eval time =   34084.79 ms /    28 tokens ( 1262.40 ms per token,     0.79 tokens per second)
+5.19.401.078 I slot print_timing: id  0 | task 0 |       total time =  313333.30 ms /   315 tokens
+5.19.401.081 I slot print_timing: id  0 | task 0 |    graphs reused =         27
+5.19.401.126 I slot      release: id  0 | task 0 | stop processing: n_tokens = 314, truncated = 0
+5.19.403.145 I srv    operator(): operator(): cleaning up before exit...

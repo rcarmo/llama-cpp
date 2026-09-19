@@ -66,6 +66,17 @@ int main() {
     CHECK((sampling_mask & COMMON_PARAMS_SAMPLING_CONFIG_MIROSTAT_ETA) != 0);
     CHECK(gemma_hybrid::sampling_override_mask(json::object()) == 0);
 
+    CHECK(gemma_hybrid::strip_empty_think_prefix("").empty());
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<thi").empty());
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<think>").empty());
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<think>\n\n</thi").empty());
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<think>\n\n</think>\n\n").empty());
+    CHECK(gemma_hybrid::strip_empty_think_prefix(" <think>\n\t</think>\nvisible") == "visible");
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<think>reasoning</think>\nvisible") == "<think>reasoning</think>\nvisible");
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<think>\nnot empty") == "<think>\nnot empty");
+    CHECK(gemma_hybrid::strip_empty_think_prefix("plain content") == "plain content");
+    CHECK(gemma_hybrid::strip_empty_think_prefix("<thinking>") == "<thinking>");
+
     json tool_request = {
         {"messages", json::array({message("user", "tool")})},
         {"tools", json::array({

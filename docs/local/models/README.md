@@ -23,8 +23,8 @@ The same work can be read by model family instead of by host. That matters whene
 
 * Bonsai 2 27B
   * Sigma operations: [static PQ2 CPU baseline](../intel-i5-1340p/gemma-local-provider-runbook.md#cpu-baseline-profile-bonsai-2-27b-pq2_0)
-  * Sigma campaign: [PQ2 correctness and CPU/Vulkan baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md)
-  * Pending accelerated path: [HN and Prism PTQ1_0 correction](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/hn-ptq1-review.md)
+  * Sigma campaigns: [PQ2 correctness and CPU/Vulkan baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md), [PTQ1 Vulkan-prefill to zero-copy CPU-generation qualification](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md)
+  * PTQ1 is qualified but not deployed; tool-bearing requests use the documented CPU fallback
 
 ## Maple and Ornith
 

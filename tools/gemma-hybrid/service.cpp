@@ -236,7 +236,7 @@ public:
             {"context_size", cfg.context},
             {"processing", false},
             {"round", round},
-            {"zero_copy_ready", round > 0 && total_shared_bytes > 0 && total_copied_bytes == 0},
+            {"zero_copy_ready", current_zero_copy_ready},
             {"mode", target_only() ? "qwen35-target" : "gemma4-mtp"},
             {"handoffs", handoffs},
             {"shared_bytes", total_shared_bytes},
@@ -311,6 +311,7 @@ private:
     size_t handoffs = 0;
     size_t total_shared_bytes = 0;
     size_t total_copied_bytes = 0;
+    bool current_zero_copy_ready = false;
 
     bool target_only() const {
         return cfg.draft_path.empty();
@@ -326,7 +327,7 @@ private:
         return model;
     }
 
-    llama_context_params context_params(bool gpu) const {
+    llama_context_params context_params(bool gpu, bool destination = false) const {
         llama_context_params params = llama_context_default_params();
         params.n_ctx = cfg.context;
         params.n_batch = cfg.batch;
@@ -341,8 +342,8 @@ private:
         params.offload_kqv = gpu;
         params.op_offload = gpu;
         params.kv_cpu_shared = gpu && !target_only();
-        params.kv_handoff_strict = target_only();
-        params.kv_handoff_destination = target_only() && !gpu;
+        params.kv_handoff_strict = target_only() && (gpu || destination);
+        params.kv_handoff_destination = target_only() && destination;
         params.n_rs_seq = target_only() ? 3 : 0;
         params.n_outputs_max = cfg.batch;
         params.n_outputs_max_per_seq = cfg.batch;
@@ -418,6 +419,7 @@ private:
         prior_tools = json::array();
         stable_prefix = 0;
         round = 0;
+        current_zero_copy_ready = false;
     }
 
     static bool abort_callback(void * data) {
@@ -480,11 +482,10 @@ private:
         inputs.enable_thinking = false;
         inputs.parallel_tool_calls = request.value("parallel_tool_calls", false);
         inputs.tool_choice = common_chat_tool_choice_parse_oaicompat(request.value("tool_choice", std::string("auto")));
-        // Build the Gemma 4 parser with reasoning channels enabled even though
-        // thinking is disabled in the rendered prompt. Huihui can repeat the
-        // template's empty thought channel before visible content; the parser
-        // must classify and remove that marker rather than expose it as text.
-        inputs.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
+        // Target-only Qwen renders with thinking disabled. Gemma retains its
+        // reasoning channel in the template; response parsing below strips an
+        // empty thought marker from either model before exposing content.
+        inputs.reasoning_format = target_only() ? COMMON_REASONING_FORMAT_NONE : COMMON_REASONING_FORMAT_DEEPSEEK;
         return common_chat_templates_apply(templates.get(), inputs);
     }
 
@@ -528,6 +529,7 @@ private:
             const std::string & completion_id) {
         const auto started = clock_type::now();
         const bool cold = !target_ctx;
+        const bool cpu_tool_route = target_only() && !request.at("tools").empty();
         const common_chat_params chat = render_chat(request);
         const auto * vocab = llama_model_get_vocab(cpu_target.get());
         std::vector<llama_token> prompt = tokenize(vocab, chat.prompt);
@@ -552,7 +554,7 @@ private:
         }
 
         if (cold) {
-            target_ctx = make_context(gpu_target.get(), context_params(true), target_threadpools);
+            target_ctx = make_context(cpu_tool_route ? cpu_target.get() : gpu_target.get(), context_params(!cpu_tool_route), target_threadpools);
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
                 const size_t count = std::min<size_t>(cfg.batch, prompt.size() - i);
@@ -564,26 +566,31 @@ private:
             llama_synchronize(target_ctx.get());
             prefill_s = elapsed_s(prefill_started);
 
-            std::unique_ptr<common_threadpools> destination_threadpools;
-            context_ptr destination = make_context(cpu_target.get(), context_params(false), destination_threadpools);
-            const auto handoff_started = clock_type::now();
-            const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
-            if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
-                throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
+            if (!cpu_tool_route) {
+                std::unique_ptr<common_threadpools> destination_threadpools;
+                context_ptr destination = make_context(cpu_target.get(), context_params(false, true), destination_threadpools);
+                const auto handoff_started = clock_type::now();
+                const bool handed_off = llama_kv_handoff_cpu(destination.get(), target_ctx.get(), false, &transfer);
+                if (!handed_off || transfer.shared_bytes == 0 || transfer.copied_bytes != 0) {
+                    throw std::runtime_error("zero-copy handoff failed: shared_bytes=" + std::to_string(transfer.shared_bytes) + " copied_bytes=" + std::to_string(transfer.copied_bytes));
+                }
+                handoff_ms = elapsed_s(handoff_started) * 1000.0;
+                reset_context(target_ctx, target_threadpools);
+                target_ctx = std::move(destination);
+                target_threadpools = std::move(destination_threadpools);
+                ++handoffs;
+                total_shared_bytes += transfer.shared_bytes;
+                total_copied_bytes += transfer.copied_bytes;
+                current_zero_copy_ready = true;
+                init_cpu_mtp();
             }
-            handoff_ms = elapsed_s(handoff_started) * 1000.0;
-            reset_context(target_ctx, target_threadpools);
-            target_ctx = std::move(destination);
-            target_threadpools = std::move(destination_threadpools);
-            ++handoffs;
-            total_shared_bytes += transfer.shared_bytes;
-            total_copied_bytes += transfer.copied_bytes;
-            init_cpu_mtp();
             history = prompt;
-            if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, prompt.size() - 1, -1)) {
-                throw std::runtime_error("prime rollback failed");
+            if (!cpu_tool_route) {
+                if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, prompt.size() - 1, -1)) {
+                    throw std::runtime_error("prime rollback failed");
+                }
+                evaluate(target_ctx.get(), prompt, prompt.size() - 1, 1, speculative.get(), should_stop);
             }
-            evaluate(target_ctx.get(), prompt, prompt.size() - 1, 1, speculative.get(), should_stop);
         } else {
             if (!llama_memory_seq_rm(llama_get_memory(target_ctx.get()), 0, reused, -1) ||
                     (!target_only() && !llama_memory_seq_rm(llama_get_memory(draft_ctx.get()), 0, reused, -1))) {
@@ -636,6 +643,9 @@ private:
             last_token_s = elapsed_s(started);
             if (callbacks && callbacks->token_deltas) {
                 common_chat_msg parsed = common_chat_parse(raw, true, parser);
+                if (target_only()) {
+                    parsed.content = gemma_hybrid::strip_empty_think_prefix(parsed.content);
+                }
                 if (!parsed.empty()) {
                     parsed.set_tool_call_ids(tool_call_ids, [] {
                         static std::atomic<uint64_t> next_id{0};
@@ -721,6 +731,9 @@ private:
         }
 
         common_chat_msg message = common_chat_parse(raw, false, parser);
+        if (target_only()) {
+            message.content = gemma_hybrid::strip_empty_think_prefix(message.content);
+        }
         if (callbacks && callbacks->token_deltas) {
             message.set_tool_call_ids(tool_call_ids, [] {
                 static std::atomic<uint64_t> next_id{0};
@@ -742,7 +755,7 @@ private:
         const double wall_s = elapsed_s(started);
         const double decode_tps = generated.size() > 1 && last_token_s > first_token_s ? (generated.size() - 1) / (last_token_s - first_token_s) : 0;
         json telemetry = {
-            {"route", target_only() ? (cold ? "vulkan_prefill_cpu_target" : "cpu_target_reuse") : (cold ? "vulkan_prefill_cpu_mtp" : "cpu_mtp_reuse")}, {"cold", cold}, {"round", round},
+            {"route", cpu_tool_route ? (cold ? "cpu_target_tool_fallback" : "cpu_target_tool_fallback_reuse") : target_only() ? (cold ? "vulkan_prefill_cpu_target" : "cpu_target_reuse") : (cold ? "vulkan_prefill_cpu_mtp" : "cpu_mtp_reuse")}, {"cold", cold}, {"round", round},
             {"shared_bytes", transfer.shared_bytes}, {"copied_bytes", transfer.copied_bytes}, {"zero_copy", cold && transfer.shared_bytes > 0 && transfer.copied_bytes == 0},
             {"prompt_tokens", prompt.size()}, {"cached_tokens", reused}, {"canonical_replay_tokens", replayed},
             {"generated_tokens", generated.size()}, {"verified_tokens", verified}, {"drafted", drafted}, {"accepted", accepted},
