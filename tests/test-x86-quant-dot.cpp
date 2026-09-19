@@ -1,5 +1,6 @@
 #include "ggml-cpu.h"
 #include "ggml.h"
+#include "quants.h"
 
 #include <cmath>
 #include <cstdio>
@@ -22,7 +23,14 @@ static int test_dot(ggml_type lhs, ggml_type rhs, const char * name) {
         return 2;
     }
 
+    std::vector<int> sizes;
     for (int n : {32, 64, 96, 128, 256, 4096, 8192}) {
+        if (n % lhs_traits->blck_size == 0 && n % rhs_traits->blck_size == 0) {
+            sizes.push_back(n);
+        }
+    }
+
+    for (int n : sizes) {
         std::vector<float> x(n), y(n);
         for (int i = 0; i < n; ++i) {
             x[i] = frand(i + 11);
@@ -47,6 +55,45 @@ static int test_dot(ggml_type lhs, ggml_type rhs, const char * name) {
         if (!(err < 1e-4f)) {
             std::fprintf(stderr, "%s dot mismatch n=%d got=%g ref=%g err/n=%g\n", name, n, got, ref, err);
             return 1;
+        }
+    }
+    return 0;
+}
+
+static int test_ptq1_dot_parity() {
+    const auto * lhs_cpu = ggml_get_type_traits_cpu(GGML_TYPE_PTQ1_0);
+    const auto * rhs_cpu = ggml_get_type_traits_cpu(GGML_TYPE_Q8_0);
+    if (!lhs_cpu || !rhs_cpu || !lhs_cpu->from_float || !rhs_cpu->from_float || !lhs_cpu->vec_dot) {
+        std::fprintf(stderr, "missing PTQ1_0 dot traits\n");
+        return 2;
+    }
+
+    if (lhs_cpu->vec_dot != ggml_vec_dot_ptq1_0_q8_0) {
+        std::fprintf(stderr, "PTQ1_0 dot did not dispatch to the x86 implementation\n");
+        return 2;
+    }
+
+    for (int seed = 0; seed < 32; ++seed) {
+        for (int n : {128, 256, 4096, 8192}) {
+            std::vector<float> x(n), y(n);
+            for (int i = 0; i < n; ++i) {
+                x[i] = frand(i + seed * 8192 + 11);
+                y[i] = frand(i + seed * 8192 + 101);
+            }
+            std::vector<unsigned char> qx(ggml_row_size(GGML_TYPE_PTQ1_0, n));
+            std::vector<unsigned char> qy(ggml_row_size(GGML_TYPE_Q8_0, n));
+            lhs_cpu->from_float(x.data(), qx.data(), n);
+            rhs_cpu->from_float(y.data(), qy.data(), n);
+
+            float got = 0.0f;
+            float ref = 0.0f;
+            lhs_cpu->vec_dot(n, &got, 0, qx.data(), 0, qy.data(), 0, 1);
+            ggml_vec_dot_ptq1_0_q8_0_generic(n, &ref, 0, qx.data(), 0, qy.data(), 0, 1);
+            const float tolerance = 1e-6f * std::fmax(1.0f, std::fabs(ref));
+            if (std::fabs(got - ref) > tolerance) {
+                std::fprintf(stderr, "ptq1_0*q8_0 SIMD mismatch seed=%d n=%d got=%g ref=%g tolerance=%g\n", seed, n, got, ref, tolerance);
+                return 1;
+            }
         }
     }
     return 0;
@@ -103,6 +150,12 @@ static int test_tq2_f32_dot() {
 int main() {
     ggml_cpu_init();
     if (int rc = test_tq2_f32_dot()) {
+        return rc;
+    }
+    if (int rc = test_ptq1_dot_parity()) {
+        return rc;
+    }
+    if (int rc = test_dot(GGML_TYPE_PTQ1_0, GGML_TYPE_Q8_0, "ptq1_0*q8_0")) {
         return rc;
     }
     if (int rc = test_dot(GGML_TYPE_Q1_0, GGML_TYPE_Q8_0, "q1_0*q8_0")) {

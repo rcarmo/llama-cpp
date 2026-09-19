@@ -1,8 +1,8 @@
-# Bonsai 2 27B PTQ1 zero-copy handoff qualification
+# Bonsai 2 27B PTQ1 zero-copy handoff diagnostic
 
-Bonsai 2 27B PTQ1 benefits from Vulkan prompt prefill followed by zero-copy CPU generation on Intel Iris Xe UMA. The accepted target-only topology reduced median active wall time by 29.15% for 256+32 fixed tokens and by 24.11% for 1024+64 fixed tokens against full Vulkan. A 2048+64 one-shot run was 17.62% faster. All accepted handoffs used non-zero shared bytes and zero copied bytes.
+This campaign proves strict target-only Vulkan-to-CPU state handoff for Bonsai 2 27B PTQ1 on Intel Iris Xe UMA. It does not qualify the topology as a performance candidate. The measured 17.62-29.15% fixed-work reductions compare against slow full-Vulkan generation inside a 256/256 batch geometry; the handoff path reached only about 12.7 prompt tok/s and 0.79 generation tok/s. Published controls are 25.5768 prompt tok/s for PTQ1 full Vulkan and 1.4846 generation tok/s for the retained PQ2 CPU profile.
 
-This work does not deploy or enable a PTQ1 service. The primary Gemma 4 E4B QAT + MTP zero-copy service remains unchanged. The existing PQ2 CPU profile remains the production Bonsai alternative because PTQ1 CPU generation is slower.
+The handoff is retained as correctness, ownership, API and lifecycle evidence. Performance status is rejected pending at least 23 prompt tok/s, 1.34 generation tok/s and the fixed-work wall-time gates in this report. No PTQ1 service is deployed or enabled. The primary Gemma 4 E4B QAT + MTP zero-copy service remains unchanged; PQ2 CPU remains the production Bonsai alternative.
 
 ## Status
 
@@ -13,7 +13,7 @@ This work does not deploy or enable a PTQ1 service. The primary Gemma 4 E4B QAT 
 | CPU continuation after Vulkan source/model destruction | Passed |
 | Exact synthetic handoff parity | Passed |
 | Trained-model logit parity | Rejected; Vulkan top IDs vary between fresh runs and differ from CPU at meaningful sizes |
-| Fixed-work performance | Passed at 256, 1024 and 2048 prompt tokens |
+| Fixed-work performance | Diagnostic only; beat a weak full-Vulkan-generation control but missed published PTQ1 prefill and PQ2 generation endpoints |
 | OpenAI-compatible API, warm reuse and SSE | Passed |
 | Forced client tool calls | Passed through an explicit CPU-only fallback |
 | Embedded UI | Passed offline with retained embedded assets |
@@ -21,6 +21,29 @@ This work does not deploy or enable a PTQ1 service. The primary Gemma 4 E4B QAT 
 | Resource and rollback controls | Passed; unit-local swap and OOM counters were zero |
 | Independent review | Passed after three publication defects were fixed |
 | Deployment | Not performed |
+
+## Performance-recovery follow-up
+
+The matched 19 September geometry screen in `recovery-geometry-20260919T085235Z/` isolated the prefill loss to chunk size rather than strict handoff context overhead. All runs used the same source, build, model, 12 threads, flash attention and Vulkan device.
+
+| Geometry or control | PTQ1 prefill tok/s |
+|---|---:|
+| strict, chunk 256, batch 256-2048, ubatch 256-512 | 12.735-12.755 |
+| strict, chunk 512, batch 2048, ubatch 512 | 25.396 |
+| strict, one 1024-token call, batch 2048, ubatch 512 | 25.401 |
+| ordinary Vulkan, one 1024-token call | 25.395 |
+| handoff, one 1024-token call | 25.344 |
+| same-build `llama-bench`, prompt 512/1024/2048 | 25.577 / 25.560 / 25.570 |
+
+The recovered handoff path passed the 23 tok/s prefill gate with `737693696` shared bytes, zero copied bytes, finite logits, correct final position, zero cgroup swap/OOM and automatic Gemma restoration. A 256-token chunk halves throughput even when logical batch and microbatch are larger; 512-token chunks recover published throughput.
+
+The AVX-VNNI PTQ1 kernel passed direct generic parity over 32 seeds at 128, 256, 4096 and 8192 elements, dispatch checks, quantization tests and the 2,560,000-element map test. Two fresh CPU `256+64` confirmations in `recovery-cpu-simd-confirm-20260919T092803Z/` reached 1.3691 and 1.3668 generation tok/s. This passes the 1.34 tok/s floor but remains 7.8% below the published PQ2 CPU result of 1.4846 tok/s. Both runs had finite logits, correct final position, zero cgroup swap/OOM and automatic Gemma restoration.
+
+The external Qwen3.8 Q4 MTP screen in `external-qwen38-mtp-20260919/` loaded the sidecar independently and passed tokenizer/output-width/context compatibility, finite output and partial-rejection rollback at depths 1-3. It did not improve fixed-work performance: the best speculative arm was about 15% slower than target-only, and deeper drafts lost more. The sidecar is rejected for Bonsai performance.
+
+Prism #165 was also rejected. Its isolated CPU-portable SiLU-gate fusion reached 1.3632 and 1.3663 tok/s versus 1.3691 and 1.3668 tok/s for the matched baseline. The remaining raw-gate fusion has no Vulkan implementation and would expand the cross-backend op contract; the reported 2.6% result is a Metal measurement. See `prism165-swiglu-cpu-20260919T100417Z/`.
+
+The final ABBA qualification in `final-fixed-work-20260919T101303Z/` passed the 1024+64 and 2048+64 gates at medians of 88.677 and 129.614 seconds but failed 256+32 at 44.426 seconds against a 35-second limit. A matched FA-off short screen was slower. The recovered candidate is therefore rejected as the final topology, and API/deployment qualification does not proceed.
 
 ## Scope
 
@@ -87,9 +110,9 @@ The trained-model harness required all of these fields for every accepted handof
 
 Trained Vulkan hashes are diagnostic. Fresh-process Vulkan top IDs varied at 256 and 1024 prompt tokens, and handoff continuation top IDs differed from Vulkan. The campaign therefore does not claim trained numerical parity. This limitation also caused the zero-copy tool route to emit malformed forced-tool output. Tool-bearing requests use the explicit CPU fallback described above.
 
-## Native fixed-work results
+## Native fixed-work diagnostic
 
-Active wall time excludes model loading and includes prefill, destination creation, handoff, required final-token re-evaluation and continuation. `n` counts accepted, counterbalanced runs. Invalid wrapper attempts in `repeat-256/invalid-*` are retained as diagnostics and excluded.
+Active wall time excludes model loading and includes prefill, destination creation, handoff, required final-token re-evaluation and continuation. `n` counts valid, counterbalanced observations. Invalid wrapper attempts in `repeat-256/invalid-*` are retained as diagnostics and excluded. These results establish internal timing and zero-copy accounting, not performance acceptance: the harness fixed logical batch, physical microbatch and decode-call size at 256, and the comparison baseline kept generation on Vulkan.
 
 | Fixed work | Profile | n | Active wall median or one-shot | Shared bytes | Copied bytes | Final position | Result |
 |---|---:|---:|---:|---:|---:|---:|---|
@@ -104,7 +127,7 @@ Active wall time excludes model loading and includes prefill, destination creati
 | 2048+64 | full Vulkan | 1 | 295.522 s | 0 | 0 | 2111 | finite control |
 | 2048+64 | handoff | 1 | 243.442 s | 825,774,080 | 0 | 2111 | 17.62% faster than full Vulkan |
 
-Accepted repeat files:
+Valid repeat files:
 
 - 256 full Vulkan: `repeat-256/02-vulkan-strict.log`, `repeat-256/03-vulkan-strict.log`, `repeat-256/06-vulkan-strict.log`;
 - 256 handoff: `repeat-256/01-handoff.log`, `repeat-256/04-handoff.log`, `repeat-256/05-handoff.log`;
@@ -112,7 +135,7 @@ Accepted repeat files:
 - 1024 handoff: `repeat-1024/01-handoff/run.log`, `repeat-1024/04-handoff/run.log`;
 - 2048 one-shot: `screen-2048/01-vulkan-strict/run.log` and `screen-2048/02-handoff/run.log`.
 
-The handoff itself took 2.3-4.6 ms in accepted runs. The meaningful gain comes from using Vulkan for prefill and CPU for generation; transfer time alone is not the performance result.
+The handoff itself took 2.3-4.6 ms in valid runs. Transfer cost is not the blocker. Prefill geometry and scalar PTQ1 CPU generation are the measured bottlenecks.
 
 ## Service gates
 
@@ -173,6 +196,20 @@ The primary Gemma service was restored after every guarded window. The final sta
   - Status: adapted
   - Implementation: target-only mode in `tools/gemma-hybrid/service.cpp` and `tests/test-qwen-target-trained-handoff.cpp`; no model-name routing or core API fork
   - Evidence: synthetic exact gate, trained 32/256/1024/2048 runs and service recovery gate
+
+- [x] Feature: PTQ1 published 512-token Vulkan prefill geometry
+  - Source: `benchmarks/intel-1340p/bonsai2-27b-integration-20260918/ptq1-qualification/README.md` and `run-prefill-geometry-matrix.sh`
+  - Applicability: the diagnostic handoff used 256-token chunks and lost half the published prefill throughput.
+  - Status: adapted
+  - Implementation: `tests/test-qwen-target-trained-handoff.cpp` and `recovery-geometry-20260919T085235Z/`
+  - Evidence: strict, ordinary and handoff 1024-token prefill reached 25.344-25.401 tok/s; same-build controls reached 25.560 tok/s
+
+- [x] Feature: PQ2 AVX-VNNI dot-product structure
+  - Source: `ggml/src/ggml-cpu/arch/x86/quants.c`, commit `8d06e815a`
+  - Applicability: PTQ1 generation previously used a scalar ternary dot product on an AVX-VNNI host.
+  - Status: adapted
+  - Implementation: `ggml_vec_dot_ptq1_0_q8_0` and `tests/test-x86-quant-dot.cpp`
+  - Evidence: direct generic-versus-SIMD parity, dispatch, quantization and 2,560,000-element mapping tests pass; sustained model throughput remains open
 
 - [x] Feature: cached coherent Intel UMA allocation and retained CPU buffer views
   - Source: `ggml/src/ggml-vulkan/ggml-vulkan.cpp`, `docs/local/intel-i5-1340p/in-memory-kv-handoff.md`, commit `d2028882b`

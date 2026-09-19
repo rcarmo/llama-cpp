@@ -8,7 +8,7 @@ if [[ $# -lt 4 ]]; then
 fi
 
 root=/var/home/agent/workspace
-worktree="$root/projects/llama-cpp-bonsai-ptq1-zero-copy"
+worktree="$root/projects/llama-cpp"
 model="$root/projects/models/ternary-bonsai-2-27b/Ternary-Bonsai-2-27B-PTQ1_0.gguf"
 image=localhost/llama-intel-build:fedora44
 output_dir=$1
@@ -16,10 +16,11 @@ prefill_tokens=$2
 continue_tokens=$3
 shift 3
 profiles=("$@")
-chunk_tokens=256
-ubatch_tokens=256
+chunk_tokens=${QWEN_CHUNK:-256}
+ubatch_tokens=${QWEN_UBATCH:-$chunk_tokens}
+batch_tokens=${QWEN_BATCH:-$chunk_tokens}
 
-if [[ $prefill_tokens -lt 256 ]]; then
+if [[ $prefill_tokens -lt $chunk_tokens ]]; then
     chunk_tokens=$prefill_tokens
     ubatch_tokens=$prefill_tokens
 fi
@@ -60,14 +61,14 @@ for profile in "${profiles[@]}"; do
         --security-opt label=disable --userns=keep-id --cpus=12 \
         --memory=24g --memory-swap=24g --pids-limit=512 \
         -v "$worktree:$worktree" -v "$model:$model:ro" -w "$worktree" \
-        -e QWEN_THREADS=12 -e QWEN_FLASH_ATTN=1 -e QWEN_GPU_LAYERS=999 \
+        -e QWEN_THREADS=12 -e QWEN_FLASH_ATTN="${QWEN_FLASH_ATTN:-1}" -e QWEN_GPU_LAYERS=999 -e QWEN_BATCH="$batch_tokens" \
         -e RUN_PROFILE="$profile" -e RUN_MODEL="$model" \
         -e RUN_PREFILL="$prefill_tokens" -e RUN_CONTINUE="$continue_tokens" \
         -e RUN_CHUNK="$chunk_tokens" -e RUN_UBATCH="$ubatch_tokens" \
         -e RUN_DIR="$run_dir" "$image" bash -lc '
             set -euo pipefail
-            export LD_LIBRARY_PATH="$PWD/build-bonsai-zc/bin"
-            build-bonsai-zc/bin/test-qwen-target-trained-handoff \
+            export LD_LIBRARY_PATH="$PWD/build-bonsai-recovery/bin"
+            build-bonsai-recovery/bin/test-qwen-target-trained-handoff \
                 "$RUN_PROFILE" "$RUN_MODEL" "$RUN_PREFILL" "$RUN_CONTINUE" "$RUN_CHUNK" "$RUN_UBATCH" \
                 > "$RUN_DIR/run.log" 2> "$RUN_DIR/run.stderr"
             rc=$?

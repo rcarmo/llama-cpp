@@ -150,9 +150,11 @@ int main(int argc, char ** argv) {
     const int32_t n_output = argc >= 5 ? parse_count(argv[4], "OUTPUT_TOKENS", 256) : 8;
     if (n_prefill < 0 || n_output < 0) return 2;
     const int32_t default_chunk = std::min<int32_t>(n_prefill, 256);
-    const int32_t n_chunk = argc >= 6 ? parse_count(argv[5], "CHUNK_TOKENS", 256) : default_chunk;
-    const int32_t n_ubatch_arg = argc >= 7 ? parse_count(argv[6], "UBATCH_TOKENS", 256) : n_chunk;
-    if (n_chunk < 0 || n_ubatch_arg < 0 || n_chunk > n_prefill || n_ubatch_arg > n_chunk) return 2;
+    const int32_t n_chunk = argc >= 6 ? parse_count(argv[5], "CHUNK_TOKENS", 2048) : default_chunk;
+    const int32_t n_ubatch_arg = argc >= 7 ? parse_count(argv[6], "UBATCH_TOKENS", 2048) : std::min<int32_t>(n_chunk, 512);
+    const char * batch_env = std::getenv("QWEN_BATCH");
+    const int32_t n_batch_arg = batch_env ? parse_count(batch_env, "QWEN_BATCH", 4096) : n_chunk;
+    if (n_chunk < 0 || n_ubatch_arg < 0 || n_batch_arg < 0 || n_chunk > n_prefill || n_chunk > n_batch_arg || n_ubatch_arg > n_batch_arg) return 2;
 
     const char * threads_env = std::getenv("QWEN_THREADS");
     const int32_t n_threads = threads_env ? parse_count(threads_env, "QWEN_THREADS", 64) : 12;
@@ -161,7 +163,7 @@ int main(int argc, char ** argv) {
     if (n_threads < 0 || n_gpu_layers < 0) return 2;
     const bool flash_attn = std::getenv("QWEN_FLASH_ATTN") && std::strcmp(std::getenv("QWEN_FLASH_ATTN"), "1") == 0;
     const uint32_t n_ctx = (uint32_t) std::max<int32_t>(32, n_prefill + n_output);
-    const uint32_t n_batch = (uint32_t) std::max<int32_t>(32, n_chunk);
+    const uint32_t n_batch = (uint32_t) std::max<int32_t>(32, n_batch_arg);
     const uint32_t n_ubatch = (uint32_t) std::max<int32_t>(32, n_ubatch_arg);
 
     ggml_backend_load_all();
@@ -268,12 +270,12 @@ int main(int argc, char ** argv) {
     if (final_pos != n_prefill + n_output - 1) return fail("final_position");
 
     std::printf(
-        "QUALIFY_RESULT profile=%s tokens_prefill=%d tokens_continue=%d chunk_tokens=%d ubatch_tokens=%u chunks=%d "
+        "QUALIFY_RESULT profile=%s tokens_prefill=%d tokens_continue=%d chunk_tokens=%d batch_tokens=%u ubatch_tokens=%u chunks=%d "
         "threads=%d gpu_layers=%d flash_attn=%d n_rs_seq=%u load_cpu_us=%lld load_gpu_us=%lld prefill_us=%lld "
         "destination_init_us=%lld handoff_us=%lld source_release_us=%lld reeval_us=%lld continuation_us=%lld active_wall_us=%lld "
         "shared_bytes=%zu copied_bytes=%zu final_pos=%d prefill_finite=1 prefill_top_id=%d prefill_hash=%016llx "
         "logits_finite=1 logits_top_id=%d logits_hash=%016llx total_us=%lld\n",
-        argv[1], n_prefill, n_output, n_chunk, n_ubatch, (n_prefill + n_chunk - 1) / n_chunk,
+        argv[1], n_prefill, n_output, n_chunk, n_batch, n_ubatch, (n_prefill + n_chunk - 1) / n_chunk,
         n_threads, use_vulkan ? n_gpu_layers : 0, flash_attn ? 1 : 0, llama_n_rs_seq(active),
         (long long) load_cpu_us, (long long) load_gpu_us, (long long) prefill_us,
         (long long) destination_init_us, (long long) handoff_us, (long long) source_release_us,
