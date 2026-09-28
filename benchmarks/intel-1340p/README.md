@@ -74,7 +74,7 @@ These directories freeze the file-mediated CPU/GPU service and decoder deploymen
 
 ## 2026-09-28 Gemma prompt-lookup experiment
 
-* [Gemma prompt-lookup cache optimisation](prompt-lookup-20260928/README.md) -- PR #2 removes per-draft follower-map copies; PR #12 skips candidates that cannot pass thresholds. Five-run CPU cache replay preserved exact draft hashes; eight matched CPU-only Gemma inference runs showed no measurable whole-request gain. The live service was not changed.
+* [Gemma prompt-lookup benchmark correction](prompt-lookup-20260928/README.md) -- large CPU loop ratios came from a manufactured high-fanout cache. Isolated CPU-only `llama-lookup` spent 0.11-0.36 ms per 7-20 second request in cache work and showed no validated request-level gain. The live Gemma MTP service does not use this lookup path and was not changed.
 
 ## 2026-09-15 to 2026-09-18 service and model integration
 

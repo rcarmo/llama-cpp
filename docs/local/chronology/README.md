@@ -34,7 +34,7 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [Gemma 4 E4B QAT + MTP Q4 scheduling release and primary deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
 * 2026-09-17 -- [Huihui Gemma 4 12B local security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md), including matched MTP zero-copy, speed tuning, full UI checks and local profile switching
 * 2026-09-18 / 2026-09-19 -- [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) and [PTQ1 zero-copy handoff diagnostic](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md): PTQ1 Vulkan/source and state-transfer correctness passed, but the topology was later rejected for performance after endpoint reconciliation; no deployment
-* 2026-09-28 -- [Gemma prompt-lookup cache experiment](../../../benchmarks/intel-1340p/prompt-lookup-20260928/README.md): faster CPU cache replay with exact draft parity; matched isolated model inference showed no measurable whole-request gain and no service deployment
+* 2026-09-28 -- [Gemma prompt-lookup benchmark correction](../../../benchmarks/intel-1340p/prompt-lookup-20260928/README.md): synthetic high-fanout cache loop improved, but isolated CPU-only `llama-lookup` spent less than 0.4 ms per 7-20 second request in cache work, with no validated request-level gain; the live Gemma MTP service was unchanged
 
 ## Current runbooks and retained operational docs
 
