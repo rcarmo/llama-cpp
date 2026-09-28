@@ -72,6 +72,10 @@ These directories freeze the file-mediated CPU/GPU service and decoder deploymen
 * [xe-master-agentic-20260914/](xe-master-agentic-20260914/)
 * [xe-zero-copy-throughput-20260914/](xe-zero-copy-throughput-20260914/)
 
+## 2026-09-28 Gemma prompt-lookup experiment
+
+* [Gemma prompt-lookup cache optimisation](prompt-lookup-20260928/README.md) -- PR #2 removes per-draft follower-map copies; PR #12 skips candidates that cannot pass thresholds. Five-run CPU cache replay preserved exact draft hashes; eight matched CPU-only Gemma inference runs showed no measurable whole-request gain. The live service was not changed.
+
 ## 2026-09-15 to 2026-09-18 service and model integration
 
 * [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- original in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
