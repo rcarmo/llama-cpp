@@ -2062,7 +2062,7 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
     bool save_static;
 
     struct seq_info {
-        size_t cache_size = 0; // number of tokens in n-gram cache
+        llama_tokens cached_tokens;
 
         common_ngram_cache ngram_cache_context;
         common_ngram_cache ngram_cache_dynamic;
@@ -2120,8 +2120,12 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         }
     }
 
-    void begin(llama_seq_id /*seq_id*/, const llama_tokens & /*prompt*/) override {
-        // noop
+    void begin(llama_seq_id seq_id, const llama_tokens & prompt) override {
+        auto & sinfo = sinfos[seq_id];
+        sinfo.ngram_cache_context.clear();
+        sinfo.cached_tokens = prompt;
+        common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                                  sinfo.cached_tokens, (int) sinfo.cached_tokens.size(), false);
     }
 
     void draft_one(
@@ -2131,34 +2135,29 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         auto & result = *dparams.result;
 
         const auto & prompt = *dparams.prompt;
-
-        if (sinfo.cache_size < prompt.size() + 1) {
-            llama_tokens tokens_new;
-            tokens_new.reserve(prompt.size() + 1 - sinfo.cache_size);
-            for (size_t j = sinfo.cache_size; j < prompt.size(); ++j) {
-                tokens_new.push_back(prompt[j]);
-            }
-            tokens_new.push_back(dparams.id_last); // add the last token
-
-            // Update context ngram cache with new dparams.prompt:
-            common_ngram_cache_update(
-                    sinfo.ngram_cache_context,
-                    LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
-                    tokens_new, tokens_new.size(), false);
-            sinfo.cache_size = prompt.size() + 1;
-        }
-
-        llama_tokens inp;
-        inp.reserve(prompt.size() + 1);
-        for (size_t j = 0; j < prompt.size(); ++j) {
-            inp.push_back(prompt[j]);
-        }
+        llama_tokens inp(prompt);
         inp.push_back(dparams.id_last);
 
+        // Rebuild after rollback, context shift or a rewritten prefix.
+        if (sinfo.cached_tokens.size() > inp.size() ||
+            !std::equal(sinfo.cached_tokens.begin(), sinfo.cached_tokens.end(), inp.begin())) {
+            sinfo.ngram_cache_context.clear();
+            sinfo.cached_tokens.clear();
+        }
+        const int n_new = (int) (inp.size() - sinfo.cached_tokens.size());
+        // Use the full sequence so n-grams crossing the appended boundary are counted.
+        common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                                  inp, n_new, false);
+        sinfo.cached_tokens = inp;
+
+        const int limit = dparams.n_max < 0 ? n_draft : std::min<int>(n_draft, dparams.n_max);
+        if (limit == 0) {
+            return;
+        }
         result.push_back(dparams.id_last);
 
         common_ngram_cache_draft(
-                inp, result, n_draft, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                inp, result, limit, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
                 sinfo.ngram_cache_context,
                 sinfo.ngram_cache_dynamic,
                 sinfo.ngram_cache_static);
