@@ -1,0 +1,166 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.006.262 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.006.464 W srv  llama_server: -----------------
+0.00.006.467 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.006.467 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.006.467 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.006.467 W srv  llama_server: -----------------
+0.00.007.763 I srv    load_model: loading model '/models/qwen.gguf'
+0.00.385.467 W model has unused tensor blk.40.attn_norm.weight (size = 8192 bytes) -- ignoring
+0.00.385.475 W model has unused tensor blk.40.post_attention_norm.weight (size = 8192 bytes) -- ignoring
+0.00.385.481 W model has unused tensor blk.40.attn_q.weight (size = 11534336 bytes) -- ignoring
+0.00.385.483 W model has unused tensor blk.40.attn_k.weight (size = 860160 bytes) -- ignoring
+0.00.385.485 W model has unused tensor blk.40.attn_v.weight (size = 860160 bytes) -- ignoring
+0.00.385.493 W model has unused tensor blk.40.attn_output.weight (size = 5767168 bytes) -- ignoring
+0.00.385.495 W model has unused tensor blk.40.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.385.497 W model has unused tensor blk.40.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.385.499 W model has unused tensor blk.40.ffn_gate_inp.weight (size = 1048576 bytes) -- ignoring
+0.00.385.502 W model has unused tensor blk.40.ffn_down_exps.weight (size = 115343360 bytes) -- ignoring
+0.00.385.505 W model has unused tensor blk.40.ffn_gate_exps.weight (size = 88080384 bytes) -- ignoring
+0.00.385.508 W model has unused tensor blk.40.ffn_up_exps.weight (size = 88080384 bytes) -- ignoring
+0.00.385.510 W model has unused tensor blk.40.ffn_gate_inp_shexp.weight (size = 4096 bytes) -- ignoring
+0.00.385.512 W model has unused tensor blk.40.ffn_gate_shexp.weight (size = 720896 bytes) -- ignoring
+0.00.385.515 W model has unused tensor blk.40.ffn_up_shexp.weight (size = 720896 bytes) -- ignoring
+0.00.385.517 W model has unused tensor blk.40.ffn_down_shexp.weight (size = 860160 bytes) -- ignoring
+0.00.385.520 W model has unused tensor blk.40.nextn.eh_proj.weight (size = 8912896 bytes) -- ignoring
+0.00.385.522 W model has unused tensor blk.40.nextn.enorm.weight (size = 8192 bytes) -- ignoring
+0.00.385.524 W model has unused tensor blk.40.nextn.hnorm.weight (size = 8192 bytes) -- ignoring
+0.00.385.531 W model has unused tensor blk.40.nextn.shared_head_norm.weight (size = 8192 bytes) -- ignoring
+0.00.907.716 I cmn          init: llama threadpool init, n_threads = 8
+0.01.039.267 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8704, kv_unified = 'false'
+0.01.043.241 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.01.043.269 I srv  llama_server: model loaded
+0.01.043.273 I srv  llama_server: listening on http://127.0.0.1:18081
+0.02.074.257 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.074.300 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.06.813.084 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=252 prompt=252 lead=0 draft=0 generation=0 synchronized=0 us=4738721 ret=0
+0.06.813.110 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =    252, progress = 0.98, t =   4.74 s / 53.18 tokens per second
+0.06.996.309 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=4 prompt=4 lead=0 draft=0 generation=0 synchronized=1 us=156141 ret=0
+0.06.997.596 I slot print_timing: id  0 | task 0 | prompt eval time =    4923.26 ms /   256 tokens (   19.23 ms per token,    52.00 tokens per second)
+0.06.997.600 I slot print_timing: id  0 | task 0 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+0.06.997.600 I slot print_timing: id  0 | task 0 |       total time =    4923.26 ms /   257 tokens
+0.06.997.603 I slot print_timing: id  0 | task 0 |    graphs reused =          0
+0.06.997.646 I slot      release: id  0 | task 0 | stop processing: n_tokens = 256, truncated = 0
+0.07.000.581 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1632512414074
+0.07.052.078 I slot launch_slot_: id  0 | task 3 | processing task, is_child = 0
+0.26.422.585 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=19368366 ret=0
+0.26.422.610 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   1024, progress = 0.25, t =  19.37 s / 52.86 tokens per second
+0.46.630.259 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=20207577 ret=0
+0.46.630.284 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   2048, progress = 0.50, t =  39.58 s / 51.75 tokens per second
+1.07.192.808 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=20562457 ret=0
+1.07.192.828 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   3072, progress = 0.75, t =  60.14 s / 51.08 tokens per second
+1.22.979.471 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=764 prompt=764 lead=0 draft=0 generation=0 synchronized=0 us=15786571 ret=0
+1.22.979.495 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   3836, progress = 0.94, t =  75.93 s / 50.52 tokens per second
+1.28.406.524 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=256 prompt=256 lead=0 draft=0 generation=0 synchronized=0 us=5398004 ret=0
+1.28.406.542 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   4092, progress = 1.00, t =  81.35 s / 50.30 tokens per second
+1.28.631.325 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=4 prompt=4 lead=0 draft=0 generation=0 synchronized=1 us=196507 ret=0
+1.28.739.352 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107332 ret=0
+1.28.842.771 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102801 ret=0
+1.28.956.169 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=112777 ret=0
+1.29.060.415 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103818 ret=0
+1.29.160.636 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99779 ret=0
+1.29.263.592 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102550 ret=0
+1.29.364.895 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100878 ret=0
+1.29.462.949 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=97655 ret=0
+1.29.562.788 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99424 ret=0
+1.29.665.922 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102728 ret=0
+1.29.766.756 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100418 ret=0
+1.29.876.311 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=109149 ret=0
+1.29.977.289 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100512 ret=0
+1.30.080.736 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103022 ret=0
+1.30.183.023 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101878 ret=0
+1.30.282.368 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=98938 ret=0
+1.30.383.902 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101124 ret=0
+1.30.492.114 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107793 ret=0
+1.30.596.447 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103716 ret=0
+1.30.697.748 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100833 ret=0
+1.30.797.780 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99611 ret=0
+1.30.896.650 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=98467 ret=0
+1.30.999.443 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102382 ret=0
+1.31.102.392 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102517 ret=0
+1.31.206.817 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103994 ret=0
+1.31.311.245 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104014 ret=0
+1.31.416.947 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105095 ret=0
+1.31.527.160 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=109547 ret=0
+1.31.631.663 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103865 ret=0
+1.31.738.376 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=106282 ret=0
+1.31.840.232 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101364 ret=0
+1.31.943.611 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102967 ret=0
+1.32.046.699 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102662 ret=0
+1.32.149.472 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102328 ret=0
+1.32.256.968 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=106871 ret=0
+1.32.363.245 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105640 ret=0
+1.32.468.041 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104360 ret=0
+1.32.568.991 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100520 ret=0
+1.32.669.225 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99836 ret=0
+1.32.773.820 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104169 ret=0
+1.32.877.671 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103456 ret=0
+1.32.981.988 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103908 ret=0
+1.33.081.702 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99311 ret=0
+1.33.183.496 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101392 ret=0
+1.33.283.327 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99402 ret=0
+1.33.384.219 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100489 ret=0
+1.33.489.605 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104985 ret=0
+1.33.590.559 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100538 ret=0
+1.33.691.883 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100919 ret=0
+1.33.792.105 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99798 ret=0
+1.33.892.476 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99969 ret=0
+1.33.993.310 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100404 ret=0
+1.34.090.691 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=96975 ret=0
+1.34.192.494 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101409 ret=0
+1.34.293.071 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100159 ret=0
+1.34.393.281 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99822 ret=0
+1.34.498.336 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104645 ret=0
+1.34.595.888 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=97111 ret=0
+1.34.693.202 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=96917 ret=0
+1.34.795.500 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101892 ret=0
+1.34.895.746 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99819 ret=0
+1.34.998.746 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102580 ret=0
+1.35.102.777 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103605 ret=0
+1.35.103.174 I slot print_timing: id  0 | task 3 | prompt eval time =   81579.89 ms /  4096 tokens (   19.92 ms per token,    50.21 tokens per second)
+1.35.103.177 I slot print_timing: id  0 | task 3 |        eval time =    6471.18 ms /    64 tokens (  102.72 ms per token,     9.74 tokens per second)
+1.35.103.178 I slot print_timing: id  0 | task 3 |       total time =   88051.07 ms /  4160 tokens
+1.35.103.180 I slot print_timing: id  0 | task 3 |    graphs reused =         62
+1.35.103.355 I slot      release: id  0 | task 3 | stop processing: n_tokens = 4159, truncated = 0
+1.35.106.722 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 1.000
+1.35.106.744 I slot launch_slot_: id  0 | task 73 | processing task, is_child = 0
+1.35.239.690 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=1 lead=0 draft=0 generation=0 synchronized=1 us=104816 ret=0
+1.35.337.476 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=97216 ret=0
+1.35.438.586 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100686 ret=0
+1.35.544.539 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105540 ret=0
+1.35.642.026 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=97080 ret=0
+1.35.744.387 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101951 ret=0
+1.35.845.041 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100209 ret=0
+1.35.948.756 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103308 ret=0
+1.36.049.341 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100185 ret=0
+1.36.154.779 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104986 ret=0
+1.36.258.675 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103471 ret=0
+1.36.362.854 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103763 ret=0
+1.36.464.901 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101628 ret=0
+1.36.572.530 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107216 ret=0
+1.36.683.873 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=110698 ret=0
+1.36.788.559 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104253 ret=0
+1.36.894.018 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105040 ret=0
+1.36.995.845 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101431 ret=0
+1.37.096.194 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99688 ret=0
+1.37.197.413 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100648 ret=0
+1.37.301.927 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104074 ret=0
+1.37.406.259 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103896 ret=0
+1.37.514.288 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107600 ret=0
+1.37.620.771 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=106046 ret=0
+1.37.726.374 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105001 ret=0
+1.37.833.423 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=106585 ret=0
+1.37.936.502 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102443 ret=0
+1.38.040.346 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103222 ret=0
+1.38.146.326 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105513 ret=0
+1.38.252.963 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=106210 ret=0
+1.38.354.615 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101043 ret=0
+1.38.462.527 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107479 ret=0
+1.38.462.955 I slot print_timing: id  0 | task 73 | prompt eval time =     133.48 ms /     1 tokens (  133.48 ms per token,     7.49 tokens per second)
+1.38.462.958 I slot print_timing: id  0 | task 73 |        eval time =    3222.71 ms /    32 tokens (  103.96 ms per token,     9.62 tokens per second)
+1.38.462.959 I slot print_timing: id  0 | task 73 |       total time =    3356.19 ms /    33 tokens
+1.38.462.960 I slot print_timing: id  0 | task 73 |    graphs reused =         94
+1.38.463.140 I slot      release: id  0 | task 73 | stop processing: n_tokens = 4191, truncated = 0
+1.38.476.038 I srv    operator(): operator(): cleaning up before exit...
