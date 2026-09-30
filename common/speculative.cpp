@@ -2121,11 +2121,17 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
     }
 
     void begin(llama_seq_id seq_id, const llama_tokens & prompt) override {
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+        const int64_t start_us = profile ? ggml_time_us() : 0;
         auto & sinfo = sinfos[seq_id];
         sinfo.ngram_cache_context.clear();
         sinfo.cached_tokens = prompt;
         common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
                                   sinfo.cached_tokens, (int) sinfo.cached_tokens.size(), false);
+        if (profile) {
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_begin seq=%d tokens=%zu us=%lld\n",
+                    seq_id, prompt.size(), (long long) (ggml_time_us() - start_us));
+        }
     }
 
     void draft_one(
@@ -2134,13 +2140,17 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         auto & sinfo = sinfos[seq_id];
         auto & result = *dparams.result;
 
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+        const int64_t start_us = profile ? ggml_time_us() : 0;
         const auto & prompt = *dparams.prompt;
         llama_tokens inp(prompt);
         inp.push_back(dparams.id_last);
 
         // Rebuild after rollback, context shift or a rewritten prefix.
-        if (sinfo.cached_tokens.size() > inp.size() ||
-            !std::equal(sinfo.cached_tokens.begin(), sinfo.cached_tokens.end(), inp.begin())) {
+        const bool rebuild = sinfo.cached_tokens.size() > inp.size() ||
+            !std::equal(sinfo.cached_tokens.begin(), sinfo.cached_tokens.end(), inp.begin());
+        const int64_t prepared_us = profile ? ggml_time_us() : 0;
+        if (rebuild) {
             sinfo.ngram_cache_context.clear();
             sinfo.cached_tokens.clear();
         }
@@ -2149,9 +2159,16 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
                                   inp, n_new, false);
         sinfo.cached_tokens = inp;
+        const int64_t updated_us = profile ? ggml_time_us() : 0;
 
         const int limit = dparams.n_max < 0 ? n_draft : std::min<int>(n_draft, dparams.n_max);
         if (limit == 0) {
+            if (profile) {
+                SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=%d tokens=%zu new=%d rebuild=%d limit=0 proposed=0 prepare_us=%lld update_us=%lld select_us=0 us=%lld\n",
+                        seq_id, inp.size(), n_new, rebuild,
+                        (long long) (prepared_us - start_us), (long long) (updated_us - prepared_us),
+                        (long long) (ggml_time_us() - start_us));
+            }
             return;
         }
         result.push_back(dparams.id_last);
@@ -2165,6 +2182,13 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         if (result.size() > 0) {
             // delete first token in result (which is the id_last token)
             result.erase(result.begin());
+        }
+        if (profile) {
+            const int64_t end_us = ggml_time_us();
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=%d tokens=%zu new=%d rebuild=%d limit=%d proposed=%zu prepare_us=%lld update_us=%lld select_us=%lld us=%lld\n",
+                    seq_id, inp.size(), n_new, rebuild, limit, result.size(),
+                    (long long) (prepared_us - start_us), (long long) (updated_us - prepared_us),
+                    (long long) (end_us - updated_us), (long long) (end_us - start_us));
         }
     }
 
