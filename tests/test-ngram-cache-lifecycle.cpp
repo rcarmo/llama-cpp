@@ -87,6 +87,13 @@ int main() {
         prefix.push_back(i % 6 + 501);
         if (!compare_draft(spec.get(), 0, prefix, 8, "boundary updates")) return 1;
     }
+    // Changing follower distributions exercise updates that a repeated cycle can hide.
+    llama_tokens varied = {701, 702, 703, 701, 702, 704, 701, 702};
+    common_speculative_begin(spec.get(), 0, varied);
+    for (int i = 0; i < 160; ++i) {
+        varied.push_back(701 + ((i * 7 + i / 9) % 5));
+        if (!compare_draft(spec.get(), 0, varied, 8, "varied append")) return 1;
+    }
     std::puts("ngram lifecycle: reset/append/rewrite/rollback/shift/two-sequence/limits PASS");
     return 0;
 }
