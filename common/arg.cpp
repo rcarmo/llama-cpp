@@ -4394,6 +4394,17 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
         }
     ).set_spec().set_examples({LLAMA_EXAMPLE_SPECULATIVE, LLAMA_EXAMPLE_SERVER, LLAMA_EXAMPLE_CLI}));
 
+    add_opt(common_arg(
+        {"--spec-ngram-cache-n-max"}, "N",
+        string_format("maximum draft tokens for ngram-cache speculative decoding; 0 disables proposals (default: %d)", params.speculative.ngram_cache.n_max),
+        [](common_params & params, int value) {
+            if (value < 0 || value > 1024) {
+                throw std::invalid_argument("ngram-cache draft limit must be between 0 and 1024 inclusive");
+            }
+            params.speculative.ngram_cache.n_max = value;
+        }
+    ).set_spec().set_examples({LLAMA_EXAMPLE_SPECULATIVE, LLAMA_EXAMPLE_SERVER, LLAMA_EXAMPLE_CLI}));
+
     //
     // removed params
     //

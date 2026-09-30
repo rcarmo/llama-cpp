@@ -297,6 +297,7 @@ For the full list of features, please refer to [server's changelog](https://gith
 | `--gpt-oss-120b-default` | use gpt-oss-120b (note: can download weights from the internet) |
 | `--vision-gemma-4b-default` | use Gemma 3 4B QAT (note: can download weights from the internet) |
 | `--vision-gemma-12b-default` | use Gemma 3 12B QAT (note: can download weights from the internet) |
+| `--spec-ngram-cache-n-max N` | maximum proposed tokens for `ngram-cache`; 0 disables its proposals (default: 8). Shorter drafts can reduce rejected target verification and checkpoint replay work. |
 | `--spec-default` | enable default speculative decoding config |
 
 <!-- HELP_END -->

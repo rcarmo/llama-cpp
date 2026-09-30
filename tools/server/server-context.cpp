@@ -3706,12 +3706,33 @@ private:
         // yield to the queue, so we can still handle metrics tasks while decoding
         // note: the sync is done here too, so that the wait is also covered by the yield
         int ret = 0;
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+        const int64_t model_start_us = profile ? ggml_time_us() : 0;
         queue_tasks.yield_to_queue([&]() {
             ret = llama_decode(ctx_tgt, batch_view);
             if (ret == 0 && has_output) {
                 llama_synchronize(ctx_tgt);
             }
         });
+        if (profile) {
+            const int64_t model_us = ggml_time_us() - model_start_us;
+            int prompt_rows = 0, lead_rows = 0, draft_rows = 0, generation_rows = 0;
+            for (int i = off; i < off + batch_view.n_tokens; ++i) {
+                const auto & token = batch.tokens[i];
+                if (token.is_prompt) {
+                    prompt_rows++;
+                    continue;
+                }
+                const auto & indices = slots[token.id_slot].spec_i_batch;
+                const auto found = std::find(indices.begin(), indices.end(), i);
+                if (found == indices.end()) generation_rows++;
+                else if (found == indices.begin()) lead_rows++;
+                else draft_rows++;
+            }
+            SRV_INF("GGML_SPECULATIVE_PROFILE phase=target_model rows=%d prompt=%d lead=%d draft=%d generation=%d synchronized=%d us=%lld ret=%d\n",
+                    batch_view.n_tokens, prompt_rows, lead_rows, draft_rows, generation_rows,
+                    has_output && ret == 0, (long long) model_us, ret);
+        }
 
         if (ret != 0) {
             {
@@ -3949,15 +3970,16 @@ private:
                             slot.smpl.get(), slot.ctx_tgt, slot.spec_i_batch, slot.spec_draft,
                             synth_probs, slot.spec_synth_rng, slot.spec_is_replay);
                 slot.spec_i_batch.clear();
-                if (mtp_profile) {
-                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=sample_accept rows=%zu accepted=%zu us=%lld\n",
-                            n_draft + 1, accepted.size() - 1,
-                            (long long) (ggml_time_us() - mtp_accept_start_us));
-                }
-
                 GGML_ASSERT(accepted.size() >= 1);
 
                 const uint32_t n_rollback = slot.spec_draft.size() + 1 - accepted.size();
+                if (mtp_profile) {
+                    const size_t accepted_raw = accepted.size() - 1;
+                    const size_t accepted_new = accepted_raw - (slot.spec_is_replay && accepted_raw > 0 ? 1 : 0);
+                    SRV_INF("GGML_SPECULATIVE_PROFILE phase=sample_accept slot=%d task=%d rows=%zu drafted=%zu accepted=%zu accepted_new=%zu rejected=%u replay=%d us=%lld\n",
+                            slot.id, slot.task->id, n_draft + 1, n_draft, accepted_raw, accepted_new,
+                            n_rollback, slot.spec_is_replay, (long long) (ggml_time_us() - mtp_accept_start_us));
+                }
 
                 const bool use_ckpt_tgt = !llama_is_handoff_strict(ctx_tgt) && (force_spec_ckpt_for_test ||
                     ctx_tgt_seq_rm_type == COMMON_CONTEXT_SEQ_RM_TYPE_FULL ||
@@ -4036,7 +4058,13 @@ private:
             slot.sampled = ids.back(); // last accepted token
             SLT_DBG(slot, "add accepted tokens: sampled=%d, ids.size=%zu, n_draft=%zu\n", slot.sampled, ids.size(), n_draft);
 
+            const bool profile_trim = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+            const int64_t trim_start_us = profile_trim ? ggml_time_us() : 0;
             slot.mem.seq_rm(slot.id, slot.prompt.tokens.pos_next(), -1);
+            if (profile_trim) {
+                SRV_INF("GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=%d task=%d discarded=%zu us=%lld\n",
+                        slot.id, slot.task->id, n_draft + 1 - ids.size(), (long long) (ggml_time_us() - trim_start_us));
+            }
 
             for (size_t i = 0; i < ids.size(); ++i) {
                 completion_token_output result;

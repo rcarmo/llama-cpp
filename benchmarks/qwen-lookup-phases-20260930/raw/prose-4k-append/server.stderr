@@ -1,0 +1,439 @@
+warning: no usable GPU found, --gpu-layers option will be ignored
+warning: one possible reason is that llama.cpp was compiled without GPU support
+warning: consult docs/build.md for compilation instructions
+0.00.004.306 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.004.562 W srv  llama_server: -----------------
+0.00.004.564 W srv  llama_server: CORS is set to allow all origins ('*') and no API key is set
+0.00.004.564 W srv  llama_server: this can be a security risk (cross-origin attacks)
+0.00.004.565 W srv  llama_server: more info: https://github.com/ggml-org/llama.cpp/pull/25655
+0.00.004.565 W srv  llama_server: -----------------
+0.00.006.131 I srv    load_model: loading model '/models/qwen.gguf'
+0.00.389.932 W model has unused tensor blk.40.attn_norm.weight (size = 8192 bytes) -- ignoring
+0.00.389.941 W model has unused tensor blk.40.post_attention_norm.weight (size = 8192 bytes) -- ignoring
+0.00.389.947 W model has unused tensor blk.40.attn_q.weight (size = 11534336 bytes) -- ignoring
+0.00.389.950 W model has unused tensor blk.40.attn_k.weight (size = 860160 bytes) -- ignoring
+0.00.389.952 W model has unused tensor blk.40.attn_v.weight (size = 860160 bytes) -- ignoring
+0.00.389.959 W model has unused tensor blk.40.attn_output.weight (size = 5767168 bytes) -- ignoring
+0.00.389.961 W model has unused tensor blk.40.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.389.963 W model has unused tensor blk.40.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.389.968 W model has unused tensor blk.40.ffn_gate_inp.weight (size = 1048576 bytes) -- ignoring
+0.00.389.971 W model has unused tensor blk.40.ffn_down_exps.weight (size = 115343360 bytes) -- ignoring
+0.00.389.975 W model has unused tensor blk.40.ffn_gate_exps.weight (size = 88080384 bytes) -- ignoring
+0.00.389.978 W model has unused tensor blk.40.ffn_up_exps.weight (size = 88080384 bytes) -- ignoring
+0.00.389.980 W model has unused tensor blk.40.ffn_gate_inp_shexp.weight (size = 4096 bytes) -- ignoring
+0.00.389.982 W model has unused tensor blk.40.ffn_gate_shexp.weight (size = 720896 bytes) -- ignoring
+0.00.389.985 W model has unused tensor blk.40.ffn_up_shexp.weight (size = 720896 bytes) -- ignoring
+0.00.389.987 W model has unused tensor blk.40.ffn_down_shexp.weight (size = 860160 bytes) -- ignoring
+0.00.389.990 W model has unused tensor blk.40.nextn.eh_proj.weight (size = 8912896 bytes) -- ignoring
+0.00.389.992 W model has unused tensor blk.40.nextn.enorm.weight (size = 8192 bytes) -- ignoring
+0.00.389.995 W model has unused tensor blk.40.nextn.hnorm.weight (size = 8192 bytes) -- ignoring
+0.00.390.002 W model has unused tensor blk.40.nextn.shared_head_norm.weight (size = 8192 bytes) -- ignoring
+0.00.909.975 I cmn          init: llama threadpool init, n_threads = 8
+0.01.036.936 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 8704, kv_unified = 'false'
+0.01.405.451 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.01.405.484 I srv  llama_server: model loaded
+0.01.405.487 I srv  llama_server: listening on http://127.0.0.1:18081
+0.02.088.114 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.088.180 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.06.861.005 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=252 prompt=252 lead=0 draft=0 generation=0 synchronized=0 us=4772738 ret=0
+0.06.861.023 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=252 us=1 ok=1
+0.06.861.067 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =    252, progress = 0.98, t =   4.77 s / 52.80 tokens per second
+0.07.045.858 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=4 prompt=4 lead=0 draft=0 generation=0 synchronized=1 us=154915 ret=0
+0.07.045.866 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=4 us=1 ok=1
+0.07.046.024 I spec        begin: GGML_SPECULATIVE_PROFILE phase=ngram_begin seq=0 tokens=256 us=127
+0.07.047.267 I slot print_timing: id  0 | task 0 | prompt eval time =    4959.05 ms /   256 tokens (   19.37 ms per token,    51.62 tokens per second)
+0.07.047.270 I slot print_timing: id  0 | task 0 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+0.07.047.271 I slot print_timing: id  0 | task 0 |       total time =    4959.05 ms /   257 tokens
+0.07.047.274 I slot print_timing: id  0 | task 0 |    graphs reused =          0
+0.07.047.330 I slot      release: id  0 | task 0 | stop processing: n_tokens = 256, truncated = 0
+0.07.051.442 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1632411717364
+0.07.102.461 I slot launch_slot_: id  0 | task 3 | processing task, is_child = 0
+0.26.571.682 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=19466553 ret=0
+0.26.571.693 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1024 us=1 ok=1
+0.26.571.730 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   1024, progress = 0.25, t =  19.47 s / 52.60 tokens per second
+0.46.832.296 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=20260489 ret=0
+0.46.832.310 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1024 us=1 ok=1
+0.46.832.331 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   2048, progress = 0.50, t =  39.73 s / 51.55 tokens per second
+1.07.454.298 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1024 prompt=1024 lead=0 draft=0 generation=0 synchronized=0 us=20621912 ret=0
+1.07.454.310 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1024 us=1 ok=1
+1.07.454.340 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   3072, progress = 0.75, t =  60.35 s / 50.90 tokens per second
+1.23.150.920 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=764 prompt=764 lead=0 draft=0 generation=0 synchronized=0 us=15696510 ret=0
+1.23.150.931 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=764 us=1 ok=1
+1.23.150.962 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   3836, progress = 0.94, t =  76.05 s / 50.44 tokens per second
+1.28.546.785 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=256 prompt=256 lead=0 draft=0 generation=0 synchronized=0 us=5365983 ret=0
+1.28.546.792 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=256 us=1 ok=1
+1.28.546.817 I slot print_timing: id  0 | task 3 | prompt processing, n_tokens =   4092, progress = 1.00, t =  81.44 s / 50.24 tokens per second
+1.28.754.582 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=4 prompt=4 lead=0 draft=0 generation=0 synchronized=1 us=180050 ret=0
+1.28.754.589 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=4 us=1 ok=1
+1.28.755.855 I spec        begin: GGML_SPECULATIVE_PROFILE phase=ngram_begin seq=0 tokens=4096 us=1232
+1.28.756.491 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4097 new=1 rebuild=0 limit=8 proposed=8 prepare_us=4 update_us=3 select_us=12 us=19
+1.28.756.493 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=8 us=23
+1.29.175.802 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=9 prompt=0 lead=1 draft=8 generation=0 synchronized=1 us=391653 ret=0
+1.29.175.808 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=9 us=1 ok=1
+1.29.175.826 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=9 us=391677 ok=1
+1.29.177.300 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=9 drafted=8 accepted=0 accepted_new=0 rejected=8 replay=0 us=426
+1.29.183.358 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=8 us=6054
+1.29.314.324 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=130933 ret=0
+1.29.314.332 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.29.314.351 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=130968 ok=1
+1.29.315.385 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=717
+1.29.315.410 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=11
+1.29.315.449 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4099 new=2 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=7 select_us=2 us=10
+1.29.315.450 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=12
+1.29.423.198 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107705 ret=0
+1.29.423.205 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.29.423.667 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4100 new=1 rebuild=0 limit=8 proposed=6 prepare_us=1 update_us=11 select_us=13 us=25
+1.29.423.669 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=6 us=30
+1.29.758.660 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=7 prompt=0 lead=1 draft=6 generation=0 synchronized=1 us=329124 ret=0
+1.29.758.667 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=7 us=1 ok=1
+1.29.758.733 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=7 us=329203 ok=1
+1.29.759.421 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=7 drafted=6 accepted=0 accepted_new=0 rejected=6 replay=0 us=406
+1.29.765.657 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=6 us=6233
+1.29.898.278 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=132585 ret=0
+1.29.898.285 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.29.898.305 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=132619 ok=1
+1.29.899.282 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=698
+1.29.899.300 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=9
+1.29.899.360 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4102 new=2 rebuild=0 limit=8 proposed=8 prepare_us=2 update_us=12 select_us=9 us=23
+1.29.899.361 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=8 us=26
+1.30.280.763 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=9 prompt=0 lead=1 draft=8 generation=0 synchronized=1 us=375406 ret=0
+1.30.280.772 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=9 us=1 ok=1
+1.30.280.795 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=9 us=375446 ok=1
+1.30.281.637 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=9 drafted=8 accepted=0 accepted_new=0 rejected=8 replay=0 us=454
+1.30.289.433 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=8 us=7784
+1.30.421.720 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=132244 ret=0
+1.30.421.726 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.30.421.755 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=132286 ok=1
+1.30.422.730 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=675
+1.30.422.746 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.30.422.799 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4104 new=2 rebuild=0 limit=8 proposed=7 prepare_us=2 update_us=11 select_us=15 us=28
+1.30.422.800 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=7 us=30
+1.30.760.738 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=8 prompt=0 lead=1 draft=7 generation=0 synchronized=1 us=331963 ret=0
+1.30.760.744 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=8 us=1 ok=1
+1.30.760.762 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=8 us=331994 ok=1
+1.30.762.326 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=8 drafted=7 accepted=3 accepted_new=3 rejected=4 replay=0 us=1294
+1.30.768.482 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=4 us=6153
+1.31.004.060 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=5 prompt=0 lead=1 draft=4 generation=0 synchronized=1 us=235543 ret=0
+1.31.004.067 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=5 us=2 ok=1
+1.31.004.087 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=5 us=235578 ok=1
+1.31.005.941 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=5 drafted=4 accepted=4 accepted_new=3 rejected=0 replay=1 us=1546
+1.31.005.958 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.31.006.017 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4109 new=5 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=19 select_us=5 us=26
+1.31.006.018 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=27
+1.31.108.222 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102180 ret=0
+1.31.108.230 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=0 ok=1
+1.31.108.873 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4110 new=1 rebuild=0 limit=8 proposed=0 prepare_us=3 update_us=10 select_us=6 us=19
+1.31.108.876 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=29
+1.31.217.163 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=108253 ret=0
+1.31.217.169 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.31.217.616 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4111 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=5 select_us=3 us=10
+1.31.217.618 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=15
+1.31.320.081 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102435 ret=0
+1.31.320.085 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.31.320.510 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4112 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=10 select_us=3 us=15
+1.31.320.513 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=18
+1.31.425.530 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104994 ret=0
+1.31.425.538 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.31.425.994 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4113 new=1 rebuild=0 limit=8 proposed=1 prepare_us=2 update_us=9 select_us=8 us=19
+1.31.425.996 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=23
+1.31.605.984 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=174022 ret=0
+1.31.605.989 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.31.606.001 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=174045 ok=1
+1.31.606.643 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=0 accepted_new=0 rejected=1 replay=0 us=349
+1.31.612.958 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=1 us=6311
+1.31.750.914 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=137907 ret=0
+1.31.750.920 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.31.750.926 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=137932 ok=1
+1.31.751.882 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=649
+1.31.751.898 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.31.751.943 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4115 new=2 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=13 select_us=4 us=19
+1.31.751.944 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=21
+1.31.855.882 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103921 ret=0
+1.31.855.889 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.31.856.330 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4116 new=1 rebuild=0 limit=8 proposed=0 prepare_us=3 update_us=10 select_us=4 us=17
+1.31.856.332 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=20
+1.31.959.349 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102999 ret=0
+1.31.959.355 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.31.959.796 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4117 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=10 select_us=3 us=15
+1.31.959.798 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=19
+1.32.064.930 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105112 ret=0
+1.32.064.935 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=0 ok=1
+1.32.065.395 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4118 new=1 rebuild=0 limit=8 proposed=2 prepare_us=2 update_us=10 select_us=14 us=26
+1.32.065.398 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=32
+1.32.245.361 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=174022 ret=0
+1.32.245.368 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.32.245.380 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=174050 ok=1
+1.32.246.661 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=1005
+1.32.246.678 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=7
+1.32.246.732 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4121 new=3 rebuild=0 limit=8 proposed=2 prepare_us=2 update_us=17 select_us=9 us=28
+1.32.246.733 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=31
+1.32.428.468 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=175775 ret=0
+1.32.428.474 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.32.428.492 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=175799 ok=1
+1.32.429.767 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=1001
+1.32.429.782 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.32.429.824 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4124 new=3 rebuild=0 limit=8 proposed=1 prepare_us=1 update_us=8 select_us=5 us=14
+1.32.429.825 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=17
+1.32.576.346 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=140492 ret=0
+1.32.576.356 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.32.576.381 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=140536 ok=1
+1.32.577.246 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=0 accepted_new=0 rejected=1 replay=0 us=475
+1.32.586.604 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=1 us=9348
+1.32.717.240 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=130589 ret=0
+1.32.717.247 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.32.717.258 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=130615 ok=1
+1.32.718.244 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=696
+1.32.718.261 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=9
+1.32.718.304 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4126 new=2 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=7 select_us=3 us=12
+1.32.718.310 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=18
+1.32.826.427 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=108077 ret=0
+1.32.826.436 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.32.827.101 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4127 new=1 rebuild=0 limit=8 proposed=2 prepare_us=2 update_us=11 select_us=18 us=31
+1.32.827.103 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=35
+1.33.032.391 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=198392 ret=0
+1.33.032.399 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.33.032.413 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=198419 ok=1
+1.33.033.681 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=997
+1.33.033.697 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.33.033.749 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4130 new=3 rebuild=0 limit=8 proposed=1 prepare_us=2 update_us=18 select_us=5 us=25
+1.33.033.751 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=27
+1.33.178.138 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=138431 ret=0
+1.33.178.146 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.33.178.161 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=138461 ok=1
+1.33.178.803 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=0 accepted_new=0 rejected=1 replay=0 us=355
+1.33.185.195 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=1 us=6388
+1.33.314.367 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=129133 ret=0
+1.33.314.373 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.33.314.384 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=129157 ok=1
+1.33.315.369 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=704
+1.33.315.385 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=7
+1.33.315.428 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4132 new=2 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=7 select_us=4 us=13
+1.33.315.429 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=13
+1.33.419.415 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103937 ret=0
+1.33.419.422 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.33.419.858 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4133 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=5 select_us=2 us=9
+1.33.419.859 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=12
+1.33.525.243 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105340 ret=0
+1.33.525.250 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.33.525.688 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4134 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=9 select_us=3 us=14
+1.33.525.690 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=18
+1.33.627.147 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101420 ret=0
+1.33.627.153 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.33.627.607 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4135 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=9 select_us=3 us=14
+1.33.627.608 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=17
+1.33.729.156 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101522 ret=0
+1.33.729.162 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.33.729.597 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4136 new=1 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=10 select_us=3 us=14
+1.33.729.599 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=17
+1.33.831.610 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101975 ret=0
+1.33.831.616 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.33.832.086 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4137 new=1 rebuild=0 limit=8 proposed=6 prepare_us=2 update_us=9 select_us=14 us=25
+1.33.832.088 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=6 us=28
+1.34.152.634 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=7 prompt=0 lead=1 draft=6 generation=0 synchronized=1 us=314587 ret=0
+1.34.152.642 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=7 us=1 ok=1
+1.34.152.648 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=7 us=314608 ok=1
+1.34.153.358 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=7 drafted=6 accepted=0 accepted_new=0 rejected=6 replay=0 us=439
+1.34.159.747 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=6 us=6385
+1.34.296.891 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=137102 ret=0
+1.34.296.898 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=2 ok=1
+1.34.296.914 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=137133 ok=1
+1.34.297.869 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=641
+1.34.297.886 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.34.297.945 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4139 new=2 rebuild=0 limit=8 proposed=2 prepare_us=1 update_us=11 select_us=13 us=25
+1.34.297.946 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=28
+1.34.472.951 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=169041 ret=0
+1.34.472.958 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.34.472.970 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=169066 ok=1
+1.34.474.375 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=1081
+1.34.474.393 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.34.474.445 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4142 new=3 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=16 select_us=4 us=22
+1.34.474.446 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=24
+1.34.581.550 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107081 ret=0
+1.34.581.564 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=2 ok=1
+1.34.582.154 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4143 new=1 rebuild=0 limit=8 proposed=8 prepare_us=2 update_us=4 select_us=13 us=19
+1.34.582.157 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=8 us=25
+1.34.960.190 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=9 prompt=0 lead=1 draft=8 generation=0 synchronized=1 us=370179 ret=0
+1.34.960.197 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=9 us=1 ok=1
+1.34.960.205 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=9 us=370202 ok=1
+1.34.960.897 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=9 drafted=8 accepted=0 accepted_new=0 rejected=8 replay=0 us=410
+1.34.967.110 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=8 us=6209
+1.35.103.978 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=136823 ret=0
+1.35.103.985 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.35.103.999 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=136858 ok=1
+1.35.104.927 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=640
+1.35.104.943 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.35.104.997 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4145 new=2 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=7 select_us=3 us=11
+1.35.104.998 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=13
+1.35.208.488 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=103428 ret=0
+1.35.208.495 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.35.209.156 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4146 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=8 select_us=4 us=14
+1.35.209.157 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=18
+1.35.308.547 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=99369 ret=0
+1.35.308.553 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.35.308.998 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4147 new=1 rebuild=0 limit=8 proposed=2 prepare_us=2 update_us=7 select_us=13 us=22
+1.35.308.999 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=26
+1.35.486.731 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=171825 ret=0
+1.35.486.744 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.35.486.759 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=171862 ok=1
+1.35.488.091 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=952
+1.35.488.109 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=10
+1.35.488.171 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4150 new=3 rebuild=0 limit=8 proposed=2 prepare_us=2 update_us=16 select_us=9 us=27
+1.35.488.172 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=30
+1.35.669.577 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=175425 ret=0
+1.35.669.583 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.35.669.602 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=175457 ok=1
+1.35.670.870 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=995
+1.35.670.887 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=8
+1.35.670.928 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4153 new=3 rebuild=0 limit=6 proposed=1 prepare_us=1 update_us=8 select_us=5 us=14
+1.35.670.931 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=18
+1.35.811.043 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=134033 ret=0
+1.35.811.050 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=2 ok=1
+1.35.811.074 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=134071 ok=1
+1.35.811.723 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=0 accepted_new=0 rejected=1 replay=0 us=353
+1.35.818.059 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=1 us=6332
+1.35.945.398 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=127306 ret=0
+1.35.945.403 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=0 ok=1
+1.35.945.424 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=127335 ok=1
+1.35.946.392 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=695
+1.35.946.406 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=7
+1.35.946.447 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4155 new=2 rebuild=0 limit=4 proposed=4 prepare_us=2 update_us=7 select_us=6 us=15
+1.35.946.448 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=4 us=16
+1.36.190.184 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=5 prompt=0 lead=1 draft=4 generation=0 synchronized=1 us=237709 ret=0
+1.36.190.191 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=5 us=2 ok=1
+1.36.190.325 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=5 us=237858 ok=1
+1.36.192.139 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=3 rows=5 drafted=4 accepted=4 accepted_new=4 rejected=0 replay=0 us=1541
+1.36.192.155 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=3 discarded=0 us=9
+1.36.192.171 I slot print_timing: id  0 | task 3 | prompt eval time =   81653.96 ms /  4096 tokens (   19.94 ms per token,    50.16 tokens per second)
+1.36.192.173 I slot print_timing: id  0 | task 3 |        eval time =    7435.71 ms /    64 tokens (  118.03 ms per token,     8.47 tokens per second)
+1.36.192.173 I slot print_timing: id  0 | task 3 |       total time =   89089.67 ms /  4160 tokens
+1.36.192.174 I slot print_timing: id  0 | task 3 |    graphs reused =         16
+1.36.192.178 I slot print_timing: id  0 | task 3 | draft acceptance = 0.30159 (   19 accepted /    63 generated), mean len =  2.12
+1.36.192.346 I slot      release: id  0 | task 3 | stop processing: n_tokens = 4159, truncated = 0
+1.36.196.729 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 1.000
+1.36.196.752 I slot launch_slot_: id  0 | task 54 | processing task, is_child = 0
+1.36.335.769 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=1 lead=0 draft=0 generation=0 synchronized=1 us=111510 ret=0
+1.36.335.779 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.36.337.429 I spec        begin: GGML_SPECULATIVE_PROFILE phase=ngram_begin seq=0 tokens=4160 us=1634
+1.36.337.999 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4161 new=1 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=2 select_us=2 us=5
+1.36.338.000 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=9
+1.36.432.523 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=94455 ret=0
+1.36.432.533 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.36.433.243 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4162 new=1 rebuild=0 limit=8 proposed=8 prepare_us=2 update_us=4 select_us=21 us=27
+1.36.433.245 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=8 us=33
+1.36.819.399 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=9 prompt=0 lead=1 draft=8 generation=0 synchronized=1 us=373218 ret=0
+1.36.819.405 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=9 us=1 ok=1
+1.36.819.467 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=9 us=373294 ok=1
+1.36.820.188 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=9 drafted=8 accepted=0 accepted_new=0 rejected=8 replay=0 us=458
+1.36.826.350 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=8 us=6157
+1.36.969.127 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=142743 ret=0
+1.36.969.135 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.36.969.157 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=142781 ok=1
+1.36.970.107 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=663
+1.36.970.125 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=10
+1.36.970.171 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4164 new=2 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=12 select_us=3 us=16
+1.36.970.172 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=19
+1.37.072.199 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102008 ret=0
+1.37.072.205 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.072.633 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4165 new=1 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=8 select_us=4 us=13
+1.37.072.635 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=19
+1.37.177.270 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104599 ret=0
+1.37.177.276 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.177.720 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4166 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=7 select_us=2 us=11
+1.37.177.722 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=16
+1.37.284.827 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107070 ret=0
+1.37.284.836 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=2 ok=1
+1.37.285.628 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4167 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=9 select_us=5 us=16
+1.37.285.631 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=34
+1.37.391.419 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105736 ret=0
+1.37.391.428 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.392.098 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4168 new=1 rebuild=0 limit=8 proposed=0 prepare_us=3 update_us=10 select_us=4 us=17
+1.37.392.100 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=22
+1.37.492.956 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100827 ret=0
+1.37.492.963 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.493.675 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4169 new=1 rebuild=0 limit=8 proposed=0 prepare_us=3 update_us=9 select_us=3 us=15
+1.37.493.678 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=22
+1.37.596.327 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=102530 ret=0
+1.37.596.333 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.596.770 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4170 new=1 rebuild=0 limit=8 proposed=1 prepare_us=2 update_us=6 select_us=6 us=14
+1.37.596.773 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=19
+1.37.739.796 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=137094 ret=0
+1.37.739.803 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.37.739.825 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=137128 ok=1
+1.37.740.505 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=2 drafted=1 accepted=0 accepted_new=0 rejected=1 replay=0 us=370
+1.37.746.813 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=1 us=6304
+1.37.877.645 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=130797 ret=0
+1.37.877.655 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.37.877.669 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=130829 ok=1
+1.37.878.719 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=2 drafted=1 accepted=1 accepted_new=0 rejected=0 replay=1 us=739
+1.37.878.741 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=9
+1.37.878.794 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4172 new=2 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=9 select_us=3 us=14
+1.37.878.795 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=16
+1.37.984.325 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=105480 ret=0
+1.37.984.334 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.37.985.078 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4173 new=1 rebuild=0 limit=8 proposed=1 prepare_us=3 update_us=8 select_us=5 us=16
+1.37.985.080 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=21
+1.38.141.586 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=148789 ret=0
+1.38.141.601 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=1 ok=1
+1.38.141.612 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=148823 ok=1
+1.38.142.947 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=2 drafted=1 accepted=1 accepted_new=1 rejected=0 replay=0 us=918
+1.38.142.982 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=23
+1.38.143.064 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4175 new=2 rebuild=0 limit=8 proposed=8 prepare_us=3 update_us=21 select_us=14 us=38
+1.38.143.066 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=8 us=42
+1.38.529.635 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=9 prompt=0 lead=1 draft=8 generation=0 synchronized=1 us=377208 ret=0
+1.38.529.648 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=9 us=5 ok=1
+1.38.529.669 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=9 us=377255 ok=1
+1.38.531.296 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=9 drafted=8 accepted=2 accepted_new=2 rejected=6 replay=0 us=1241
+1.38.539.690 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=checkpoint_restore rollback=6 us=8382
+1.38.735.215 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=4 prompt=0 lead=1 draft=3 generation=0 synchronized=1 us=195482 ret=0
+1.38.735.222 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=4 us=1 ok=1
+1.38.735.247 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=4 us=195522 ok=1
+1.38.736.826 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=4 drafted=3 accepted=3 accepted_new=2 rejected=0 replay=1 us=1305
+1.38.736.843 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=7
+1.38.736.887 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4179 new=4 rebuild=0 limit=8 proposed=0 prepare_us=1 update_us=12 select_us=4 us=17
+1.38.736.888 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=19
+1.38.845.616 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=108676 ret=0
+1.38.845.623 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.38.846.088 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4180 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=7 select_us=3 us=12
+1.38.846.089 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=16
+1.38.946.896 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=100785 ret=0
+1.38.946.904 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=2 ok=1
+1.38.947.353 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4181 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=9 select_us=2 us=13
+1.38.947.355 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=16
+1.39.048.946 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=101554 ret=0
+1.39.048.953 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=2 ok=1
+1.39.049.414 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4182 new=1 rebuild=0 limit=8 proposed=0 prepare_us=2 update_us=7 select_us=3 us=12
+1.39.049.416 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=17
+1.39.153.827 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=104365 ret=0
+1.39.153.835 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=0 ok=1
+1.39.154.522 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4183 new=1 rebuild=0 limit=8 proposed=2 prepare_us=3 update_us=10 select_us=19 us=32
+1.39.154.525 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=38
+1.39.348.553 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=187397 ret=0
+1.39.348.562 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.39.348.578 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=187431 ok=1
+1.39.350.402 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=1407
+1.39.350.430 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=14
+1.39.350.509 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4186 new=3 rebuild=0 limit=5 proposed=2 prepare_us=3 update_us=14 select_us=14 us=31
+1.39.350.511 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=2 us=34
+1.39.544.216 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=3 prompt=0 lead=1 draft=2 generation=0 synchronized=1 us=186781 ret=0
+1.39.544.226 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=3 us=1 ok=1
+1.39.544.239 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=3 us=186813 ok=1
+1.39.546.089 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=3 drafted=2 accepted=2 accepted_new=2 rejected=0 replay=0 us=1446
+1.39.546.115 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=14
+1.39.546.172 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4189 new=3 rebuild=0 limit=2 proposed=0 prepare_us=3 update_us=7 select_us=5 us=15
+1.39.546.174 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=0 us=20
+1.39.653.367 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=1 prompt=0 lead=0 draft=0 generation=1 synchronized=1 us=107160 ret=0
+1.39.653.376 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=1 us=1 ok=1
+1.39.654.041 I spec    draft_one: GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=0 tokens=4190 new=1 rebuild=0 limit=1 proposed=1 prepare_us=3 update_us=5 select_us=7 us=15
+1.39.654.043 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=draft tokens=1 us=19
+1.39.812.885 I srv        decode: GGML_SPECULATIVE_PROFILE phase=target_model rows=2 prompt=0 lead=1 draft=1 generation=0 synchronized=1 us=150430 ret=0
+1.39.812.892 I spec common_specu: GGML_SPECULATIVE_PROFILE phase=process rows=2 us=2 ok=1
+1.39.812.904 I srv  update_slots: GGML_SPECULATIVE_PROFILE phase=target_decode rows=2 us=150456 ok=1
+1.39.813.874 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=sample_accept slot=0 task=54 rows=2 drafted=1 accepted=1 accepted_new=1 rejected=0 replay=0 us=642
+1.39.813.890 I srv    operator(): GGML_SPECULATIVE_PROFILE phase=rollback_trim slot=0 task=54 discarded=0 us=8
+1.39.813.906 I slot print_timing: id  0 | task 54 | prompt eval time =     141.20 ms /     1 tokens (  141.20 ms per token,     7.08 tokens per second)
+1.39.813.907 I slot print_timing: id  0 | task 54 |        eval time =    3475.93 ms /    32 tokens (  112.13 ms per token,     8.92 tokens per second)
+1.39.813.908 I slot print_timing: id  0 | task 54 |       total time =    3617.12 ms /    33 tokens
+1.39.813.909 I slot print_timing: id  0 | task 54 |    graphs reused =         27
+1.39.813.913 I slot print_timing: id  0 | task 54 | draft acceptance = 0.34783 (    8 accepted /    23 generated), mean len =  2.14
+1.39.814.116 I slot      release: id  0 | task 54 | stop processing: n_tokens = 4191, truncated = 0
+1.39.831.900 I srv    operator(): operator(): cleaning up before exit...

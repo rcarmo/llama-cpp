@@ -2097,7 +2097,7 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
     bool save_static;
 
     struct seq_info {
-        size_t cache_size = 0; // number of tokens in n-gram cache
+        llama_tokens cached_tokens;
 
         common_ngram_cache ngram_cache_context;
         common_ngram_cache ngram_cache_dynamic;
@@ -2155,8 +2155,18 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         }
     }
 
-    void begin(llama_seq_id /*seq_id*/, const llama_tokens & /*prompt*/) override {
-        // noop
+    void begin(llama_seq_id seq_id, const llama_tokens & prompt) override {
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+        const int64_t start_us = profile ? ggml_time_us() : 0;
+        auto & sinfo = sinfos[seq_id];
+        sinfo.ngram_cache_context.clear();
+        sinfo.cached_tokens = prompt;
+        common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                                  sinfo.cached_tokens, (int) sinfo.cached_tokens.size(), false);
+        if (profile) {
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_begin seq=%d tokens=%zu us=%lld\n",
+                    seq_id, prompt.size(), (long long) (ggml_time_us() - start_us));
+        }
     }
 
     void draft_one(
@@ -2165,35 +2175,48 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         auto & sinfo = sinfos[seq_id];
         auto & result = *dparams.result;
 
+        const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
+        const int64_t start_us = profile ? ggml_time_us() : 0;
         const auto & prompt = *dparams.prompt;
+        auto & inp = sinfo.cached_tokens;
+        const size_t prefix_size = std::min(inp.size(), prompt.size());
 
-        if (sinfo.cache_size < prompt.size() + 1) {
-            llama_tokens tokens_new;
-            tokens_new.reserve(prompt.size() + 1 - sinfo.cache_size);
-            for (size_t j = sinfo.cache_size; j < prompt.size(); ++j) {
-                tokens_new.push_back(prompt[j]);
+        // Validate the full retained prefix before reusing it across rollback or rewrite.
+        const bool rebuild = inp.size() > prompt.size() + 1 ||
+            !std::equal(inp.begin(), inp.begin() + prefix_size, prompt.begin()) ||
+            (inp.size() > prompt.size() && inp.back() != dparams.id_last);
+        if (rebuild) {
+            sinfo.ngram_cache_context.clear();
+            inp.clear();
+        }
+        const size_t previous_size = inp.size();
+        if (inp.size() < prompt.size()) {
+            inp.insert(inp.end(), prompt.begin() + inp.size(), prompt.end());
+        }
+        if (inp.size() == prompt.size()) {
+            inp.push_back(dparams.id_last);
+        }
+        const int n_new = (int) (inp.size() - previous_size);
+        const int64_t prepared_us = profile ? ggml_time_us() : 0;
+        // Use the full sequence so n-grams crossing the appended boundary are counted.
+        common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                                  inp, n_new, false);
+        const int64_t updated_us = profile ? ggml_time_us() : 0;
+
+        const int limit = dparams.n_max < 0 ? n_draft : std::min<int>(n_draft, dparams.n_max);
+        if (limit == 0) {
+            if (profile) {
+                SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=%d tokens=%zu new=%d rebuild=%d limit=0 proposed=0 prepare_us=%lld update_us=%lld select_us=0 us=%lld\n",
+                        seq_id, inp.size(), n_new, rebuild,
+                        (long long) (prepared_us - start_us), (long long) (updated_us - prepared_us),
+                        (long long) (ggml_time_us() - start_us));
             }
-            tokens_new.push_back(dparams.id_last); // add the last token
-
-            // Update context ngram cache with new dparams.prompt:
-            common_ngram_cache_update(
-                    sinfo.ngram_cache_context,
-                    LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
-                    tokens_new, tokens_new.size(), false);
-            sinfo.cache_size = prompt.size() + 1;
+            return;
         }
-
-        llama_tokens inp;
-        inp.reserve(prompt.size() + 1);
-        for (size_t j = 0; j < prompt.size(); ++j) {
-            inp.push_back(prompt[j]);
-        }
-        inp.push_back(dparams.id_last);
-
         result.push_back(dparams.id_last);
 
         common_ngram_cache_draft(
-                inp, result, n_draft, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
+                inp, result, limit, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
                 sinfo.ngram_cache_context,
                 sinfo.ngram_cache_dynamic,
                 sinfo.ngram_cache_static);
@@ -2201,6 +2224,13 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         if (result.size() > 0) {
             // delete first token in result (which is the id_last token)
             result.erase(result.begin());
+        }
+        if (profile) {
+            const int64_t end_us = ggml_time_us();
+            SPC_INF("GGML_SPECULATIVE_PROFILE phase=ngram_lookup seq=%d tokens=%zu new=%d rebuild=%d limit=%d proposed=%zu prepare_us=%lld update_us=%lld select_us=%lld us=%lld\n",
+                    seq_id, inp.size(), n_new, rebuild, limit, result.size(),
+                    (long long) (prepared_us - start_us), (long long) (updated_us - prepared_us),
+                    (long long) (end_us - updated_us), (long long) (end_us - start_us));
         }
     }
 
@@ -2255,7 +2285,11 @@ static common_speculative_impl_ngram_cache create_state_ngram_cache(
         uint32_t n_seq,
         const std::string & path_static,
         const std::string & path_dynamic) {
-    uint16_t n_draft = 8; // TODO get from config?
+    const int32_t n_max = config.params.ngram_cache.n_max;
+    if (n_max < 0 || n_max > 1024) {
+        throw std::invalid_argument("ngram-cache draft limit must be between 0 and 1024 inclusive");
+    }
+    const uint16_t n_draft = (uint16_t) n_max;
 
     // TODO bool param in common/common.h to set save_static/save_dynamic?
     bool save_static = false;
@@ -2404,7 +2438,7 @@ int32_t common_speculative_n_max(const common_params_speculative * spec) {
                 n_max = std::max(n_max, std::max(0, spec->ngram_mod.n_max));
                 break;
             case COMMON_SPECULATIVE_TYPE_NGRAM_CACHE:
-                n_max = std::max(n_max, (int32_t) 8);
+                n_max = std::max(n_max, std::max(0, spec->ngram_cache.n_max));
                 break;
             case COMMON_SPECULATIVE_TYPE_NONE:
             case COMMON_SPECULATIVE_TYPE_COUNT:

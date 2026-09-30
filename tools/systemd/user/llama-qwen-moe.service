@@ -1,0 +1,27 @@
+[Unit]
+Description=Default Qwen3.6 35B-A3B CPU service (single slot, 8K populated-context)
+Documentation=file:///var/home/agent/workspace/projects/llama-cpp/docs/qwen-moe-service.md
+After=network-online.target
+Wants=network-online.target
+Conflicts=llama-gemma-zero-copy.service llama-gemma-lan-test.service llama-gemma-lan-test.socket llama-gemma-local-provider.service llama-qwen-longctx.service llama-qwen38-local-provider.service llama-qwen-moe-candidate.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/agent/workspace
+Environment=QWEN_PROFILE=plain
+Environment=QWEN_PORT=11434
+EnvironmentFile=-%h/.config/llama-qwen-moe/service.env
+ExecStart=/usr/bin/bash /var/home/agent/workspace/projects/llama-cpp/tools/run-qwen-moe-service.sh
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=90
+KillSignal=SIGTERM
+MemoryMax=16G
+MemorySwapMax=0
+CPUQuota=1600%
+TasksMax=256
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

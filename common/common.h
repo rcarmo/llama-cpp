@@ -363,6 +363,7 @@ struct common_params_speculative_ngram_map {
 };
 
 struct common_params_speculative_ngram_cache {
+    int32_t n_max = 8;
     std::string lookup_cache_static;  // path of static ngram cache file for lookup decoding
     std::string lookup_cache_dynamic; // path of dynamic ngram cache file for lookup decoding
 };
