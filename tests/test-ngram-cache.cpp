@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -68,10 +69,86 @@ static uint64_t hash_cache(const common_ngram_cache & cache) {
     return result;
 }
 
+static bool test_follower_container() {
+    common_ngram_cache_part part;
+    const std::vector<llama_token> keys = {999, 1, 4096, 17, 512, 3, 128, 42};
+    for (const auto key : keys) part.emplace(key, key + 1);
+    part.emplace(17, 9000);
+    const auto duplicate = part.find(17);
+    if (part.size() != keys.size() || duplicate == part.end() || duplicate->second != 18) return false;
+    const auto & const_part = part;
+    for (int token = -1; token <= 4097; ++token) {
+        const bool present = std::find(keys.begin(), keys.end(), token) != keys.end();
+        auto it = const_part.find(token);
+        if ((it != const_part.end()) != present || (present && it->second != token + 1)) return false;
+    }
+    part.erase(part.find(17));
+    if (part.find(17) != part.end() || part.size() != keys.size() - 1) return false;
+    part.emplace(17, 5);
+    if (part.find(17) == part.end() || part.find(17)->second != 5) return false;
+    // Odd sizes and power-of-two boundaries exercise the fixed-length search.
+    for (int n = 0; n <= 257; ++n) {
+        common_ngram_cache_part values;
+        for (int i = n - 1; i >= 0; --i) values.emplace(3 * i, i + 1);
+        const auto & const_values = values;
+        for (int token = -1; token <= 3 * n; ++token) {
+            const bool present = token >= 0 && token % 3 == 0 && token / 3 < n;
+            auto it = const_values.find(token);
+            if ((it != const_values.end()) != present || (present && it->second != token / 3 + 1)) return false;
+        }
+    }
+    return true;
+}
+
+static bool test_legacy_ties_and_duplicates() {
+    const llama_token prefix[] = {41, 42};
+    const common_ngram key(prefix, 2);
+    const auto path = std::filesystem::temp_directory_path() /
+        ("llama-ngram-legacy-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".bin");
+    // Legacy records may arrive unsorted; duplicate insertion keeps the first count.
+    const int32_t size = 3;
+    const llama_token tokens[] = {9, 3, 9};
+    const int32_t counts[] = {256, 256, 999};
+    {
+        std::ofstream file(path, std::ios::binary);
+        file.write(reinterpret_cast<const char *>(&key), sizeof(key));
+        file.write(reinterpret_cast<const char *>(&size), sizeof(size));
+        for (int i = 0; i < size; ++i) {
+            file.write(reinterpret_cast<const char *>(&tokens[i]), sizeof(tokens[i]));
+            file.write(reinterpret_cast<const char *>(&counts[i]), sizeof(counts[i]));
+        }
+    }
+    auto cache = common_ngram_cache_load(path.string());
+    std::filesystem::remove(path);
+    auto it = cache.find(key);
+    if (cache.size() != 1 || it == cache.end() || it->second.size() != 2) return false;
+    const auto high = it->second.find(9);
+    const auto low = it->second.find(3);
+    if (high == it->second.end() || low == it->second.end() || high->second != 256 || low->second != 256) return false;
+    common_ngram_cache context, dynamic;
+    std::vector<llama_token> input = {41, 42};
+    std::vector<llama_token> draft = {42};
+    common_ngram_cache_draft(input, draft, 1, 1, 2, context, dynamic, cache);
+    if (draft.size() != 2 || draft[1] != 3) return false;
+    // The primary-cache scoring path uses the same lowest-token tie rule.
+    common_ngram_cache_merge(context, cache);
+    draft = {42};
+    common_ngram_cache_draft(input, draft, 1, 1, 2, context, dynamic, cache);
+    if (draft.size() != 2 || draft[1] != 3) return false;
+    common_ngram_cache_save(cache, path.string());
+    auto reloaded = common_ngram_cache_load(path.string());
+    std::filesystem::remove(path);
+    return hash_cache(cache) == hash_cache(reloaded);
+}
+
 int main(int argc, char ** argv) {
     if (argc > 2) {
         std::fprintf(stderr, "usage: %s [MODEL.gguf]\n", argv[0]);
         return 2;
+    }
+    if (!test_follower_container() || !test_legacy_ties_and_duplicates()) {
+        std::fprintf(stderr, "follower container or legacy tie/duplicate regression failed\n");
+        return 1;
     }
     const auto pattern = tokens_for_model(argc == 2 ? argv[1] : nullptr);
     std::vector<llama_token> corpus;

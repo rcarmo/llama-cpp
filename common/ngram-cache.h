@@ -3,6 +3,7 @@
 #include "llama.h"
 
 #include <unordered_map>
+#include <utility>
 #include <string>
 #include <vector>
 
@@ -55,7 +56,64 @@ struct common_ngram_hash_function {
 };
 
 // token -> number of times token has been seen
-typedef std::unordered_map<llama_token, int32_t> common_ngram_cache_part;
+struct common_ngram_cache_part {
+    typedef std::pair<llama_token, int32_t>          value_type;
+    typedef std::vector<value_type>::iterator       iterator;
+    typedef std::vector<value_type>::const_iterator const_iterator;
+
+    // Token order makes equal-score drafting choose the lowest token ID.
+    std::vector<value_type> entries;
+
+    iterator find(const llama_token token) {
+        const iterator it = lower_bound(token);
+        return it != entries.end() && it->first == token ? it : entries.end();
+    }
+
+    const_iterator find(const llama_token token) const {
+        const const_iterator it = lower_bound(token);
+        return it != entries.end() && it->first == token ? it : entries.end();
+    }
+
+    // Legacy cache files may repeat tokens; keep the first count like unordered_map.
+    void emplace(const llama_token token, const int32_t count) {
+        const iterator it = lower_bound(token);
+        if (it == entries.end() || it->first != token) {
+            entries.insert(it, value_type(token, count));
+        }
+    }
+
+    iterator erase(iterator it) { return entries.erase(it); }
+
+    iterator       begin()       { return entries.begin(); }
+    iterator       end()         { return entries.end(); }
+    const_iterator begin() const { return entries.begin(); }
+    const_iterator end()   const { return entries.end(); }
+    size_t         size()  const { return entries.size(); }
+    bool           empty() const { return entries.empty(); }
+
+    // fixed-length binary search variant of std::lower_bound
+    static size_t lower_bound(const value_type * pairs, size_t n, const llama_token token) {
+        if (n == 0) {
+            return 0;
+        }
+        const value_type * base = pairs;
+        while (n > 1) {
+            const size_t half = n / 2;
+            base = base[half].first < token ? base + half : base;
+            n -= half;
+        }
+        return (base - pairs) + (base->first < token);
+    }
+
+private:
+    iterator lower_bound(const llama_token token) {
+        return entries.begin() + lower_bound(entries.data(), entries.size(), token);
+    }
+
+    const_iterator lower_bound(const llama_token token) const {
+        return entries.begin() + lower_bound(entries.data(), entries.size(), token);
+    }
+};
 
 // n-gram -> empirical distribution of following tokens
 typedef std::unordered_map<common_ngram, common_ngram_cache_part, common_ngram_hash_function> common_ngram_cache;
