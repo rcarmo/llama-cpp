@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <stdexcept>
 #include <vector>
 
 static llama_tokens reference_draft(const llama_tokens & input, int limit) {
@@ -116,6 +117,24 @@ int main() {
             case 6: if (tiny.size() > 3) tiny.erase(tiny.begin(), tiny.begin() + 2); break;
         }
         if (!compare_draft(spec.get(), 0, tiny, i % 4, "mixed edits")) return 1;
+    }
+    for (int limit : {0, 1, 2, 8, 16}) {
+        params.ngram_cache.n_max = limit;
+        common_speculative_ptr capped(common_speculative_init(params, 1));
+        if (common_speculative_n_max(&params) != limit || common_speculative_n_max(capped.get()) != limit) return 1;
+        auto repeated = repetition(1000, 8);
+        common_speculative_begin(capped.get(), 0, repeated);
+        if (!compare_draft(capped.get(), 0, repeated, limit, "configured limit")) return 1;
+    }
+    for (int limit : {-1, 1025}) {
+        params.ngram_cache.n_max = limit;
+        bool rejected = false;
+        try {
+            common_speculative_ptr invalid(common_speculative_init(params, 1));
+        } catch (const std::invalid_argument &) {
+            rejected = true;
+        }
+        if (!rejected) return 1;
     }
     std::puts("ngram lifecycle: reset/append/rewrite/rollback/shift/two-sequence/limits PASS");
     return 0;

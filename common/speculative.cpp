@@ -2250,7 +2250,11 @@ static common_speculative_impl_ngram_cache create_state_ngram_cache(
         uint32_t n_seq,
         const std::string & path_static,
         const std::string & path_dynamic) {
-    uint16_t n_draft = 8; // TODO get from config?
+    const int32_t n_max = config.params.ngram_cache.n_max;
+    if (n_max < 0 || n_max > 1024) {
+        throw std::invalid_argument("ngram-cache draft limit must be between 0 and 1024 inclusive");
+    }
+    const uint16_t n_draft = (uint16_t) n_max;
 
     // TODO bool param in common/common.h to set save_static/save_dynamic?
     bool save_static = false;
@@ -2399,7 +2403,7 @@ int32_t common_speculative_n_max(const common_params_speculative * spec) {
                 n_max = std::max(n_max, std::max(0, spec->ngram_mod.n_max));
                 break;
             case COMMON_SPECULATIVE_TYPE_NGRAM_CACHE:
-                n_max = std::max(n_max, (int32_t) 8);
+                n_max = std::max(n_max, std::max(0, spec->ngram_cache.n_max));
                 break;
             case COMMON_SPECULATIVE_TYPE_NONE:
             case COMMON_SPECULATIVE_TYPE_COUNT:
