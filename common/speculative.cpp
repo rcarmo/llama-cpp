@@ -2143,22 +2143,29 @@ struct common_speculative_impl_ngram_cache : public common_speculative_impl {
         const bool profile = getenv("GGML_SPECULATIVE_PROFILE") != nullptr;
         const int64_t start_us = profile ? ggml_time_us() : 0;
         const auto & prompt = *dparams.prompt;
-        llama_tokens inp(prompt);
-        inp.push_back(dparams.id_last);
+        auto & inp = sinfo.cached_tokens;
+        const size_t prefix_size = std::min(inp.size(), prompt.size());
 
-        // Rebuild after rollback, context shift or a rewritten prefix.
-        const bool rebuild = sinfo.cached_tokens.size() > inp.size() ||
-            !std::equal(sinfo.cached_tokens.begin(), sinfo.cached_tokens.end(), inp.begin());
-        const int64_t prepared_us = profile ? ggml_time_us() : 0;
+        // Validate the full retained prefix before reusing it across rollback or rewrite.
+        const bool rebuild = inp.size() > prompt.size() + 1 ||
+            !std::equal(inp.begin(), inp.begin() + prefix_size, prompt.begin()) ||
+            (inp.size() > prompt.size() && inp.back() != dparams.id_last);
         if (rebuild) {
             sinfo.ngram_cache_context.clear();
-            sinfo.cached_tokens.clear();
+            inp.clear();
         }
-        const int n_new = (int) (inp.size() - sinfo.cached_tokens.size());
+        const size_t previous_size = inp.size();
+        if (inp.size() < prompt.size()) {
+            inp.insert(inp.end(), prompt.begin() + inp.size(), prompt.end());
+        }
+        if (inp.size() == prompt.size()) {
+            inp.push_back(dparams.id_last);
+        }
+        const int n_new = (int) (inp.size() - previous_size);
+        const int64_t prepared_us = profile ? ggml_time_us() : 0;
         // Use the full sequence so n-grams crossing the appended boundary are counted.
         common_ngram_cache_update(sinfo.ngram_cache_context, LLAMA_NGRAM_MIN, LLAMA_NGRAM_MAX,
                                   inp, n_new, false);
-        sinfo.cached_tokens = inp;
         const int64_t updated_us = profile ? ggml_time_us() : 0;
 
         const int limit = dparams.n_max < 0 ? n_draft : std::min<int>(n_draft, dparams.n_max);

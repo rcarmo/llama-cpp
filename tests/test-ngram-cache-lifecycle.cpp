@@ -62,6 +62,11 @@ int main() {
         input.push_back(i % 6 + 1);
         if (!compare_draft(spec.get(), 0, input, -1, "append")) return 1;
     }
+    if (!compare_draft(spec.get(), 0, input, -1, "unchanged input")) return 1;
+    auto changed_last = input;
+    changed_last.back() = 99;
+    if (!compare_draft(spec.get(), 0, changed_last, -1, "last token rewrite")) return 1;
+    if (!compare_draft(spec.get(), 0, input, -1, "restore last token")) return 1;
     auto second = repetition(100, 4);
     common_speculative_begin(spec.get(), 0, second);
     if (!compare_draft(spec.get(), 0, second, -1, "new shorter request")) return 1;
@@ -93,6 +98,24 @@ int main() {
     for (int i = 0; i < 160; ++i) {
         varied.push_back(701 + ((i * 7 + i / 9) % 5));
         if (!compare_draft(spec.get(), 0, varied, 8, "varied append")) return 1;
+    }
+    llama_tokens tiny = {901};
+    common_speculative_begin(spec.get(), 0, {});
+    if (!compare_draft(spec.get(), 0, tiny, 8, "single token")) return 1;
+    tiny.push_back(902);
+    if (!compare_draft(spec.get(), 0, tiny, 8, "two tokens")) return 1;
+    // Each edit must give the same result as rebuilding the confirmed token stream.
+    for (int i = 0; i < 300; ++i) {
+        switch (i % 7) {
+            case 0: tiny.push_back(901 + i % 5); break;
+            case 1: tiny.back() = 906 + i % 3; break;
+            case 2: tiny.insert(tiny.end(), {901, 902, 903, 901, 902}); break;
+            case 3: tiny[0] = 920 + i % 4; break;
+            case 4: tiny.resize(std::max<size_t>(1, tiny.size() / 2)); break;
+            case 5: common_speculative_begin(spec.get(), 0, tiny); break;
+            case 6: if (tiny.size() > 3) tiny.erase(tiny.begin(), tiny.begin() + 2); break;
+        }
+        if (!compare_draft(spec.get(), 0, tiny, i % 4, "mixed edits")) return 1;
     }
     std::puts("ngram lifecycle: reset/append/rewrite/rollback/shift/two-sequence/limits PASS");
     return 0;
