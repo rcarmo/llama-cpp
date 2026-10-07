@@ -4,6 +4,9 @@ This index is for the local fork's benchmark evidence, not for upstream benchmar
 
 ## Hardware entry points
 
+* Nemotron Lightning: [Intel strict handoff, 7 October 2026](intel-1340p/nemotron-lightning-zero-copy-20261007/README.md), experimental state/lifetime and fixed-token evidence.
+
+
 * [SpaceMIT K3](k3/README.md)
 * [LattePanda Sigma / Intel Core i5-1340P](intel-1340p/README.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment, static Huihui test profile, verified Bonsai PQ2 CPU baseline with pending PTQ1 work, and dated Qwen, Ornith, Maple, Gemma and Intel Xe evidence.
 * [RTX 3060 12 GB](rtx3060/README.md)

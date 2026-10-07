@@ -4,6 +4,9 @@ This fork has accumulated a lot of host-specific work -- enough that the old fla
 
 ## Start here
 
+* Nemotron Lightning: [strict Intel handoff, 7 October 2026](intel-i5-1340p/nemotron-lightning-zero-copy-20261007.md), native correctness and fixed-token screen, not deployed.
+
+
 * [Hardware navigation](hardware/README.md) groups the work by machine first: SpaceMIT K3, LattePanda Sigma / Intel Core i5-1340P, and RTX 3060.
 * [Model navigation](models/README.md) cross-links the same material by model family.
 * [Chronology](chronology/README.md) keeps the dated campaigns in order, which matters just as much as the hardware split when later reports supersede earlier ones.
