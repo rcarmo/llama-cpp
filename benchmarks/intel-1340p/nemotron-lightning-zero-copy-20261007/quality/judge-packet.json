@@ -1,0 +1,79 @@
+{
+  "tasks": [
+    {
+      "id": "q02-lru",
+      "prompt": "Return only JavaScript defining class LRUCache. constructor(capacity) receives a nonnegative integer. get(key) returns the stored value or -1 when missing and makes an existing key most recently used. put(key,value) inserts or updates, makes the key most recent and evicts the least recent when over capacity. Zero capacity retains nothing. Support string and numeric keys, falsy values and updates without extra eviction. Operations must be O(1) average. No external packages.",
+      "expected": {
+        "function": "LRUCache"
+      },
+      "outputs": [
+        {
+          "profile": "cpu",
+          "content": "```javascript\nclass LRUCache {\n  /**\n   * @param {number} capacity\n   */\n  constructor(capacity) {\n    if (capacity < 0) {\n      throw new Error('capacity must be non‑negative');\n    }\n    this.capacity = capacity;\n    this.map = new Map(); // key -> { value, prev, next }\n    this.head = new Node(); // dummy head (most recent)\n    this.tail = new Node(); // dummy tail (least recent)\n    this.head.next = this.tail;\n    this.tail.prev = this.head;\n  }\n\n  /**\n   * @param {*} key\n   * @returns {*}\n   */\n  get(key) {\n    if (this.capacity === 0) return -1;\n    const node = this.map.get(key);\n    if (!node) return -1;\n    this._moveToHead(node);\n    return node.value;\n  }\n\n  /**\n   * @param {*} key\n   * @param {*} value\n   */\n  put(key, value) {\n    if (this.capacity === 0) return;\n\n    let node = this.map.get(key);\n    if (node) {\n      // update existing\n      node.value = value;\n      this._moveToHead(node);\n      return;\n    }\n\n    // insert new\n    node = new Node(value);\n    this.map.set(key, node);\n    this._addToHead(node);\n\n    if (this.map.size > this.capacity) {\n      // evict least recent (tail.prev)\n      const last = this.tail.prev;\n      this._remove(last);\n      this.map.delete(last.key);\n    }\n  }\n\n  _addToHead(node) {\n    node.next = this.head.next;\n    node.prev = this.head;\n    this.head.next.prev = node;\n    this.head.next = node;\n  }\n\n  _remove(node) {\n    node.prev.next = node.next;\n    node.next.prev = node.prev;\n    node.next = node.prev = null; // help GC\n  }\n\n  _moveToHead(node) {\n    this._remove(node);\n    this._addToHead(node);\n  }\n}\n\n/** Simple doubly‑linked list node */\nclass Node {\n  constructor(value) {\n    this.key = undefined; // set by LRUCache when inserted\n    this.value = value;\n    this.prev = null;\n    this.next = null;\n  }\n}\n```"
+        },
+        {
+          "profile": "handoff",
+          "content": "```javascript\nclass LRUCache {\n  constructor(capacity) {\n    if (capacity < 0) throw new Error('capacity must be nonnegative');\n    this.capacity = capacity;\n    this.map = new Map();\n  }\n\n  get(key) {\n    const node = this.map.get(key);\n    if (!node) return -1;\n    // Move to the end (most recently used)\n    this.map.delete(key);\n    this.map.set(key, node);\n    return node.value;\n  }\n\n  put(key, value) {\n    if (this.capacity === 0) return;\n\n    const node = this.map.get(key);\n    if (node) {\n      // Update existing key and move to end\n      node.value = value;\n      this.map.delete(key);\n      this.map.set(key, node);\n      return;\n    }\n\n    // Insert new entry\n    if (this.map.size >= this.capacity) {\n      // Evict the least recently used (first entry in Map)\n      const firstKey = this.map.keys().next().value;\n      this.map.delete(firstKey);\n    }\n\n    this.map.set(key, { key, value });\n  }\n}\n```"
+        }
+      ]
+    },
+    {
+      "id": "q04-policy",
+      "prompt": "Use only this policy and these records. A standard expense is reimbursable only if it has a receipt, was submitted no later than 30 days after purchase, and is not alcohol. A manager exception waives only the deadline, never the receipt or alcohol exclusions. Exactly day 30 counts as timely. For a claim with multiple failing conditions choose the reason in this priority: alcohol, missing_receipt, late. Accepted claims use reason approved. Do not infer facts.\nClaims:\nA: amount 80 EUR, receipt yes, submitted day 30, category meal, manager exception no.\nB: amount 40 EUR, receipt yes, submitted day 31, category travel, manager exception yes.\nC: amount 25 EUR, receipt no, submitted day 5, category meal, manager exception yes.\nD: amount 60 EUR, receipt yes, submitted day 1, category alcohol, manager exception yes.\nE: amount 100 EUR, receipt yes, submitted day 31, category travel, manager exception no.\nF: amount 15 EUR, receipt yes, submitted day 0, category supplies, manager exception no.\nReturn only JSON with keys approved_ids (alphabetically sorted), total_eur (number), reasons (object mapping rejected IDs to reason).",
+      "expected": {
+        "approved_ids": [
+          "A",
+          "B",
+          "F"
+        ],
+        "total_eur": 135,
+        "reasons": {
+          "C": "missing_receipt",
+          "D": "alcohol",
+          "E": "late"
+        }
+      },
+      "outputs": [
+        {
+          "profile": "cpu",
+          "content": "{\n  \"approved_ids\": [\"A\", \"F\"],\n  \"total_eur\": 95,\n  \"reasons\": {\n    \"B\": \"late\",\n    \"C\": \"missing_receipt\",\n    \"D\": \"alcohol\",\n    \"E\": \"late\"\n  }\n}"
+        },
+        {
+          "profile": "handoff",
+          "content": "{\n  \"approved_ids\": [\"A\", \"F\"],\n  \"total_eur\": 95,\n  \"reasons\": {\n    \"B\": \"late\",\n    \"C\": \"missing_receipt\",\n    \"D\": \"alcohol\",\n    \"E\": \"late\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "id": "q05-conflicts",
+      "prompt": "Answer only from the documents below, using exact source IDs. Do not resolve an unresolved conflict by guessing.\n[D1] On 3 October the release note says Cedar 2.4 supports offline mode on all platforms.\n[D2] On 4 October the platform matrix says offline mode is supported on Linux and macOS, but not Windows. It does not say D1 was withdrawn.\n[D3] The admin guide says encryption-at-rest is enabled by default. Customers can turn it off.\n[D4] The security FAQ says encryption-at-rest cannot be disabled. No publication date or precedence is given for D3 or D4.\n[D5] No supplied document discusses Android.\nReturn only JSON with keys offline_linux (yes/no/unknown), offline_windows (yes/no/unknown), encryption_can_disable (yes/no/unknown), android_offline (yes/no/unknown), conflict_sources (array of two arrays listing the conflicting source IDs, ordered offline then encryption). Unknown is required where the supplied sources conflict without explicit precedence.",
+      "expected": {
+        "offline_linux": "yes",
+        "offline_windows": "unknown",
+        "encryption_can_disable": "unknown",
+        "android_offline": "unknown",
+        "conflict_sources": [
+          [
+            "D1",
+            "D2"
+          ],
+          [
+            "D3",
+            "D4"
+          ]
+        ]
+      },
+      "outputs": [
+        {
+          "profile": "cpu",
+          "content": "{\n  \"offline_linux\": \"yes\",\n  \"offline_windows\": \"no\",\n  \"encryption_can_disable\": \"no\",\n  \"android_offline\": \"unknown\",\n  \"conflict_sources\": [\n    [\"D1\", \"D2\"],\n    [\"D3\", \"D4\"]\n  ]\n}"
+        },
+        {
+          "profile": "handoff",
+          "content": "{\n  \"offline_linux\": \"yes\",\n  \"offline_windows\": \"no\",\n  \"encryption_can_disable\": \"no\",\n  \"android_offline\": \"unknown\",\n  \"conflict_sources\": [\n    [\"D1\", \"D2\"],\n    [\"D3\", \"D4\"]\n  ]\n}"
+        }
+      ]
+    }
+  ],
+  "cpu_lru_failure": "64 |     this.head.next.prev = node;\n65 |     this.head.next = node;\n66 |   }\n67 | \n68 |   _remove(node) {\n69 |     node.prev.next = node.next;\n              ^\nTypeError: null is not an object (evaluating 'node.prev.next = node.next')\n      at _remove (/var/home/agent/workspace/tmp/llama-cpp/runs/nemotron-zero-copy-fdfd814abcb3/llama-cpp-182732430/source/task-quality/check-cpu-q02-lru.js:69:10)\n      at _moveToHead (/var/home/agent/workspace/tmp/llama-cpp/runs/nemotron-zero-copy-fdfd814abcb3/llama-cpp-182732430/source/task-quality/check-cpu-q02-lru.js:75:10)\n      at get (/var/home/agent/workspace/tmp/llama-cpp/runs/nemotron-zero-copy-fdfd814abcb3/llama-cpp-182732430/source/task-quality/check-cpu-q02-lru.js:29:10)\n      at /var/home/agent/workspace/tmp/llama-cpp/runs/nemotron-zero-copy-fdfd814abcb3/llama-cpp-182732430/source/task-quality/check-cpu-q02-lru.js:89:88\n\nBun v1.4.2 (Linux x64)\n"
+}

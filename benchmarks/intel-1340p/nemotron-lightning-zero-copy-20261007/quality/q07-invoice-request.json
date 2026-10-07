@@ -1,0 +1,84 @@
+{
+  "thinking": false,
+  "temperature": 0,
+  "max_tokens": 256,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Fetch invoice INV-204 and tell me its total in EUR. Use tools for both lookup and conversion; do not invent a rate."
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_invoice",
+        "description": "Read an invoice by its ID. Amount is in its recorded currency.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "invoice_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "invoice_id"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "convert_currency",
+        "description": "Convert an amount between currencies.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "from_currency": {
+              "type": "string"
+            },
+            "to_currency": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "amount",
+            "from_currency",
+            "to_currency"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ],
+  "tool_required": true,
+  "followups": [
+    [
+      {
+        "role": "tool",
+        "tool_call_id": "$last_tool_call_id",
+        "content": "{\"invoice_id\":\"INV-204\",\"total\":125,\"currency\":\"USD\"}"
+      },
+      {
+        "role": "user",
+        "content": "Now use convert_currency to convert that full invoice total to EUR."
+      }
+    ],
+    [
+      {
+        "role": "tool",
+        "tool_call_id": "$last_tool_call_id",
+        "content": "{\"amount\":125,\"from_currency\":\"USD\",\"to_currency\":\"EUR\",\"converted_amount\":115}"
+      },
+      {
+        "role": "user",
+        "content": "Return only JSON with invoice_id and total_eur using the tool result."
+      }
+    ]
+  ]
+}
