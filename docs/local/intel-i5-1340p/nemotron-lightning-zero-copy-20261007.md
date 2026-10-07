@@ -97,3 +97,9 @@ Every exact-model handoff run reaches the 20 GiB cgroup ceiling and records `mem
 Native containers/processes are drained; DRM clients empty. Compute reservation released to `@whisper`. Qwen 11434/8094, Gemma and speech remain stopped; persistent disabled state was preserved. No default-branch merge, persistent deployment or automatic service restoration is part of this checkpoint. Unrelated path-policy edits in the primary checkout remain untouched.
 
 Next: natural prompt/code/tool quality, long and cached append workloads, native cancellation/crash recovery, bounded serving admission and a better-powered end-to-end comparison. The current primitive is a tested experiment, not a production profile.
+
+## Native semantic supplement
+
+The [semantic supplement](../../../benchmarks/intel-1340p/nemotron-lightning-zero-copy-20261007/semantic/README.md) extends, not repeats, this checkpoint: five CPU/handoff fixture pairs pass native arithmetic/warm follow-up, executable code,1324-token positional recall, required weather tool/result follow-up and thinking arithmetic. Follow-ups reuse33/304 prompt tokens on CPU after GPU-owner destruction. These are one observation per fixture/profile, not broad task-quality or speed qualification.
+
+SIGKILL during marked native prefill and CPU generation exits137 and drains; a fresh handoff correctly answers9x9=81. This establishes discard-and-fresh-process recovery, not driver crash, graceful API cancellation, queued requests or exactly-once external tools. All services remain off and compute is released. Future serving/capacity/native driver-failure work remains unqualified.

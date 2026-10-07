@@ -13,6 +13,10 @@
 - `evidence/*-resources.tsv`, `*-memory.events`, `*-manifest.txt`: sampled host reserve, cgroup memory/swap/events, native library hashes and arguments.
 - [Invalid serialized rollback reference](evidence/invalid-serialized-rollback-reference.log): retained failure. Wire serialization omits historical recurrent rows; the corrected synthetic test independently computes and rolls Vulkan control state before restoring current state into CPU reference. All corrected state comparisons are bit-exact.
 
+## Semantic supplement
+
+[Native semantic and interruption evidence](semantic/README.md): ten CPU/handoff observations, executable code, thinking/recall/tool warm append and SIGKILL/fresh recovery. No service deployment or broad quality/performance claim.
+
 ## Reproduction
 
 The [qualifier](reproduce/qualifier-mmap.cpp) is an isolated extension of `tests/test-qwen-target-trained-handoff.cpp`. Both model owners explicitly use `LLAMA_LOAD_MODE_MMAP`. `NEMOTRON_COPY_REFERENCE=1` enables full-vocabulary logit equality for a copied reference after rollback. Timed observations omit that diagnostic. Legacy `QWEN_*` environment names belong to the reused harness; no Qwen model or service is involved.
