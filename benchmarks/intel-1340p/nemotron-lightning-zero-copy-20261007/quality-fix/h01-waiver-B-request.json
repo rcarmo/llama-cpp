@@ -1,0 +1,17 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+    },
+    {
+      "role": "user",
+      "content": "Returns are eligible only if unopened, with a receipt, and within14 days of delivery. A shipping-delay waiver changes only the14-day limit, not the unopened/receipt requirements. Records:R1 unopened,receiptyes,day20,waiveryes;R2 opened,receiptyes,day10,waiveryes;R3 unopened,receiptno,day3,waiveryes;R4 unopened,receiptyes,day14,waiverno. Return JSON only:eligible(sortedIDs),denied(objectID->reason;opened takes priority over missing_receipt then late)."
+    }
+  ],
+  "thinking": true,
+  "temperature": 1,
+  "reasoning_budget": 512,
+  "max_tokens": 1536,
+  "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n"
+}

@@ -107,3 +107,7 @@ SIGKILL during marked native prefill and CPU generation exits137 and drains; a f
 ## Eight-task quality screen
 
 [Prespecified paired task results](../../../benchmarks/intel-1340p/nemotron-lightning-zero-copy-20261007/quality/README.md): CPU4/8 and handoff5/8. Both pass interval merging, topological sorting, sequential invoice tools and untrusted-tool-data handling. CPU LRU code fails execution; handoff passes. Both fail scoped policy exceptions and contradiction abstention; both thinking incident responses exhaust the768-token budget before answering. Original failures retained, frozen scoring verified and an independent judge agrees on LRU/policy/conflict decisions. No task tuning/retries or source/backend changes. All model/speech services stay off; compute drained/released. This does not qualify a serving default.
+
+## Quality-fix investigation
+
+[Reasoning-budget correction](../../../benchmarks/intel-1340p/nemotron-lightning-zero-copy-20261007/quality-fix/README.md) wires existing native sampler controls and reserves final-answer capacity. Original thinking truncation is addressed, but bounded-policy candidates still misapply exceptions, disregard conflicts or regress on code; a held-out CPU answer invents a record. Controls remain opt-in, no general quality fix or serving promotion. Original failures and all new results are retained.

@@ -13,6 +13,10 @@
 - `evidence/*-resources.tsv`, `*-memory.events`, `*-manifest.txt`: sampled host reserve, cgroup memory/swap/events, native library hashes and arguments.
 - [Invalid serialized rollback reference](evidence/invalid-serialized-rollback-reference.log): retained failure. Wire serialization omits historical recurrent rows; the corrected synthetic test independently computes and rolls Vulkan control state before restoring current state into CPU reference. All corrected state comparisons are bit-exact.
 
+## Quality-fix investigation
+
+[Opt-in reasoning-budget correction and retained failures](quality-fix/README.md): native sampler wiring/answer reserve fixed, but two bounded-policy candidates fail original/held-out accuracy checks and are not promoted.
+
 ## Task-quality screen
 
 [Eight-task paired quality evidence](quality/README.md): CPU4/8, handoff5/8; policy exception/source-conflict failures on both, thinking-budget truncations on both and CPU LRU execution failure retained. One observation/profile/task, not broad quality noninferiority or promotion.
