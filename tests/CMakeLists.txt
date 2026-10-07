@@ -322,6 +322,8 @@ endif()
 if (NOT WIN32 OR NOT BUILD_SHARED_LIBS)
     llama_build_and_test(test-kv-handoff.cpp)
     llama_build_and_test(test-hybrid-handoff.cpp)
+    add_test(NAME test-context-handoff-nemotron-destination COMMAND test-context-handoff --nemotron-strict-destination)
+    add_test(NAME test-context-handoff-nemotron-moe-destination COMMAND test-context-handoff --nemotron-moe-strict-destination)
     llama_build_and_test(test-hidden-state.cpp)
     llama_build_and_test(test-context-handoff.cpp)
     # Manual exact-model qualification harnesses; built on demand and never registered with CTest.

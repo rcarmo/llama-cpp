@@ -124,6 +124,7 @@ public:
 private:
     //const llama_model & model;
     const llama_hparams & hparams;
+    const llm_arch handoff_arch;
 
     const uint32_t n_seq_max = 1;
 
