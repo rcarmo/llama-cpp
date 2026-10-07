@@ -67,6 +67,10 @@ int main(int argc, char ** argv) {
     try {
         common_init(); ggml_backend_load_all(); llama_backend_init();
         std::ifstream input(argv[3]); const json request = json::parse(input);
+        const int max_tokens = request.value("max_tokens", 256);
+        const int reasoning_budget = request.value("reasoning_budget", -1);
+        require(max_tokens > 0 && reasoning_budget >= -1, "invalid_generation_budget");
+        require(reasoning_budget < 0 || (request.value("thinking", false) && max_tokens > 64 && reasoning_budget < max_tokens - 64), "missing_answer_reserve");
         const bool handoff = std::string(argv[1]) == "handoff";
         auto mp = llama_model_default_params(); mp.load_mode = LLAMA_LOAD_MODE_MMAP; mp.n_gpu_layers = 0;
         model_ptr cpu(llama_model_load_from_file(argv[2], mp), llama_model_free); require(bool(cpu), "cpu_model");
@@ -126,6 +130,18 @@ int main(int argc, char ** argv) {
             sp.grammar = chat.grammar.empty() ? common_grammar() : common_grammar(COMMON_GRAMMAR_TYPE_TOOL_CALLS, chat.grammar);
             sp.grammar_lazy = chat.grammar_lazy; sp.grammar_triggers = chat.grammar_triggers;
             sp.generation_prompt = chat.generation_prompt;
+            if (reasoning_budget >= 0) {
+                require(!chat.thinking_start_tag.empty() && !chat.thinking_end_tags.empty(), "missing_reasoning_tags");
+                sp.reasoning_budget_tokens = reasoning_budget;
+                sp.reasoning_budget_start = common_tokenize(vocab, chat.thinking_start_tag, false, true);
+                for (const auto & tag : chat.thinking_end_tags) {
+                    sp.reasoning_budget_end.push_back(common_tokenize(vocab, tag, false, true));
+                }
+                require(!sp.reasoning_budget_start.empty() && !sp.reasoning_budget_end.front().empty(), "empty_reasoning_tokens");
+                sp.reasoning_budget_forced = common_tokenize(vocab, request.value("reasoning_budget_message", std::string()), false, true);
+                const auto & end = sp.reasoning_budget_end.front();
+                sp.reasoning_budget_forced.insert(sp.reasoning_budget_forced.end(), end.begin(), end.end());
+            }
             for (const auto & text : chat.preserved_tokens) {
                 auto ids = common_tokenize(vocab, text, false, true);
                 if (ids.size() == 1) sp.preserved_tokens.insert(ids[0]);
@@ -135,7 +151,7 @@ int main(int argc, char ** argv) {
             for (auto id : tokens) common_sampler_accept(sampler.get(), id, false);
             std::string raw; std::vector<llama_token> generated;
             bool ended = false;
-            const int limit = request.value("max_tokens", 256);
+            const int limit = max_tokens;
             const auto generation_start = std::chrono::steady_clock::now();
             report["phase"] = "generation_started"; save();
             for (int i = 0; i < limit; ++i) {
@@ -156,7 +172,7 @@ int main(int argc, char ** argv) {
             for (const auto type : sp.samplers) sampler_names.push_back(common_sampler_type_to_str(type));
             json row = {{"round", round}, {"chat_format", common_chat_format_name(chat.format)}, {"generation_prompt", chat.generation_prompt}, {"rendered_prompt", chat.prompt}, {"prompt_tokens", tokens},
                 {"cached_tokens", common}, {"evaluated_tokens", tokens.size()-common}, {"generated_tokens", generated},
-                {"sampling", {{"temperature", sp.temp}, {"top_k", sp.top_k}, {"top_p", sp.top_p}, {"min_p", sp.min_p}, {"seed", sp.seed}, {"chain", sampler_names}}},
+                {"sampling", {{"temperature", sp.temp}, {"top_k", sp.top_k}, {"top_p", sp.top_p}, {"min_p", sp.min_p}, {"seed", sp.seed}, {"chain", sampler_names}, {"reasoning_budget", sp.reasoning_budget_tokens}, {"reasoning_budget_message", request.value("reasoning_budget_message", std::string())}, {"max_tokens", max_tokens}}},
                 {"raw", raw}, {"parsed", assistant}, {"finish", ended ? "eog" : "length"},
                 {"final_pos", llama_memory_seq_pos_max(llama_get_memory(active.get()), 0)},
                 {"generation_ms", std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-generation_start).count()}};
