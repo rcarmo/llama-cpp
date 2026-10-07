@@ -329,6 +329,7 @@ if (NOT WIN32 OR NOT BUILD_SHARED_LIBS)
     # Manual exact-model qualification harnesses; built on demand and never registered with CTest.
     llama_build(test-qwen-mtp-trained-handoff.cpp)
     llama_build(test-qwen-target-trained-handoff.cpp)
+    llama_build(test-nemotron-semantic-handoff.cpp)
     llama_test(test-context-handoff NAME test-context-handoff-gemma ARGS --gemma)
     llama_test(test-context-handoff NAME test-context-handoff-qwen-strict-destination ARGS --qwen-strict-destination)
     llama_test(test-context-handoff NAME test-context-handoff-qwen-mtp-roundtrip ARGS --qwen-mtp-roundtrip)
