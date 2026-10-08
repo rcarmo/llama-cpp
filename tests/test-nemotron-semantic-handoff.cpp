@@ -2,7 +2,9 @@
 #include "chat.h"
 #include "common.h"
 #include "sampling.h"
+#include "reasoning-budget.h"
 #include "json-schema-to-grammar.h"
+#include "../src/llama-grammar.h"
 #include "nlohmann/json.hpp"
 
 #include <algorithm>
@@ -67,6 +69,277 @@ static void test_schema_transition_suffixes() {
     require(!should_activate_answer_schema(true, {7, 101, 102, 103}, ends), "schema_eog_does_not_transition");
 }
 
+static void switch_to_answer_schema(
+        sampler_ptr & sampler,
+        const llama_model * model,
+        const common_params_sampling & current,
+        const std::string & answer_grammar) {
+    auto answer = current;
+    answer.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, answer_grammar);
+    answer.grammar_lazy = false;
+    answer.grammar_triggers.clear();
+    answer.generation_prompt.clear();
+    answer.reasoning_budget_tokens = -1;
+    answer.reasoning_budget_start.clear();
+    answer.reasoning_budget_end.clear();
+    answer.reasoning_budget_forced.clear();
+    answer.reasoning_budget_message.clear();
+    answer.reasoning_control = false;
+    sampler.reset(common_sampler_init(model, answer));
+    require(bool(sampler), "answer_schema_sampler");
+}
+
+static bool maybe_switch_to_answer_schema(
+        sampler_ptr & sampler,
+        const llama_model * model,
+        const common_params_sampling & reasoning,
+        const std::string & answer_grammar,
+        bool eog,
+        const std::vector<llama_token> & generated,
+        const std::vector<llama_tokens> & end_sequences) {
+    if (!should_activate_answer_schema(eog, generated, end_sequences)) return false;
+    switch_to_answer_schema(sampler, model, reasoning, answer_grammar);
+    return true;
+}
+
+static std::vector<llama_token> tokenize(const llama_vocab * vocab, const std::string & text) {
+    return common_tokenize(vocab, text, false, true);
+}
+
+static void accept_sampler_text(common_sampler * sampler, const llama_vocab * vocab, const std::string & text) {
+    for (const auto token : tokenize(vocab, text)) common_sampler_accept(sampler, token, true);
+}
+
+static llama_token sample_forced_token(llama_sampler * sampler, const llama_vocab * vocab) {
+    const int32_t n_vocab = llama_vocab_n_tokens(vocab);
+    std::vector<llama_token_data> data;
+    data.reserve(n_vocab);
+    for (int32_t i = 0; i < n_vocab; ++i) data.push_back({i, 0.0f, 0.0f});
+    llama_token_data_array candidates = {data.data(), data.size(), -1, false};
+    llama_sampler_apply(sampler, &candidates);
+    llama_token selected = LLAMA_TOKEN_NULL;
+    size_t finite = 0;
+    for (const auto & candidate : data) {
+        if (std::isfinite(candidate.logit)) {
+            selected = candidate.id;
+            finite++;
+        }
+    }
+    require(finite == 1, "forced_sampler_single_candidate");
+    return selected;
+}
+
+static void accept_reasoning_tokens(llama_sampler * sampler, const std::vector<llama_token> & tokens) {
+    for (const auto token : tokens) llama_sampler_accept(sampler, token);
+}
+
+static bool grammar_accepts_complete(const llama_vocab * vocab, const std::string & grammar_text, const std::string & text) {
+    std::unique_ptr<llama_grammar, decltype(&llama_grammar_free_impl)> grammar(
+        llama_grammar_init_impl(vocab, grammar_text.c_str(), "root", false, nullptr, 0, nullptr, 0),
+        llama_grammar_free_impl);
+    require(bool(grammar), "test_answer_grammar");
+    try {
+        for (const auto token : tokenize(vocab, text)) {
+            llama_grammar_accept_token(*grammar, token, common_token_to_piece(vocab, token, true));
+        }
+    } catch (const std::runtime_error &) {
+        return false;
+    }
+    const auto & stacks = llama_grammar_get_stacks(grammar.get());
+    return std::any_of(stacks.begin(), stacks.end(), [](const llama_grammar_stack & stack) { return stack.empty(); });
+}
+
+static void test_schema_sampler_lifecycle(const llama_model * model) {
+    const auto * vocab = llama_model_get_vocab(model);
+    require(vocab != nullptr, "test_schema_vocab");
+    const auto start = tokenize(vocab, "<think>");
+    const auto end = tokenize(vocab, "</think>");
+    require(!start.empty() && !end.empty(), "test_schema_tags");
+    const common_json schema = common_json::parse(R"({"type":"object","properties":{"ok":{"type":"boolean"}},"required":["ok"],"additionalProperties":false})");
+    const std::string grammar = json_schema_to_grammar(schema);
+    common_params_sampling reasoning;
+    reasoning.temp = 0;
+    reasoning.reasoning_budget_tokens = 32;
+    reasoning.reasoning_budget_start = start;
+    reasoning.reasoning_budget_end = {end};
+    reasoning.reasoning_budget_forced = end;
+    const auto thought = tokenize(vocab, "Let me check.");
+
+    // Direct common reasoning-budget sampler must observe the natural close as DONE; separately
+    // the coupled common_sampler below tests how that completed end is replayed into lazy grammar.
+    std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)> natural_budget(
+        common_reasoning_budget_init(vocab, {start}, {end}, end, 32), llama_sampler_free);
+    accept_reasoning_tokens(natural_budget.get(), start);
+    accept_reasoning_tokens(natural_budget.get(), thought);
+    for (size_t i = 0; i < end.size(); ++i) {
+        llama_sampler_accept(natural_budget.get(), end[i]);
+        require(common_reasoning_budget_get_state(natural_budget.get()) ==
+            (i + 1 == end.size() ? REASONING_BUDGET_DONE : REASONING_BUDGET_COUNTING), "natural_budget_end_boundary");
+    }
+    require(common_reasoning_budget_get_state(natural_budget.get()) == REASONING_BUDGET_DONE, "natural_budget_done");
+    const auto * natural_match = common_reasoning_budget_get_end_match(natural_budget.get());
+    require(natural_match && *natural_match == end, "natural_budget_end_match");
+
+    // Configure the actual coupled lazy-grammar/reasoning-budget sampler. Grammar remains awaiting
+    // its start trigger while thinking; common_sampler_accept must replay the matched end sequence
+    // into the grammar state when reasoning reaches DONE.
+    auto coupled_params = reasoning;
+    const std::string trigger = regex_escape(common_token_to_piece(vocab, end.front(), true)) + "[\\s\\S]*?(\\{)";
+    coupled_params.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, grammar);
+    coupled_params.grammar_lazy = true;
+    coupled_params.grammar_triggers = {{COMMON_GRAMMAR_TRIGGER_TYPE_PATTERN, trigger}};
+    sampler_ptr coupled(common_sampler_init(model, coupled_params), common_sampler_free);
+    require(bool(coupled), "coupled_lazy_sampler");
+    for (auto token : start) common_sampler_accept(coupled.get(), token, true);
+    for (auto token : thought) common_sampler_accept(coupled.get(), token, true);
+    require(common_sampler_reasoning_budget_state_get(coupled.get()) == REASONING_BUDGET_COUNTING, "coupled_still_counting");
+    std::vector<llama_token> coupled_seen = start;
+    coupled_seen.insert(coupled_seen.end(), thought.begin(), thought.end());
+    for (size_t i = 0; i < end.size(); ++i) {
+        common_sampler_accept(coupled.get(), end[i], true);
+        coupled_seen.push_back(end[i]);
+        require(should_activate_answer_schema(false, coupled_seen, {end}) == (i + 1 == end.size()), "coupled_end_boundary");
+    }
+    require(common_sampler_reasoning_budget_state_get(coupled.get()) == REASONING_BUDGET_DONE, "coupled_budget_done_after_natural_end");
+    // Do not manually replace this sampler: this tests the existing budget->grammar end replay
+    // and lazy '{' trigger as tokens flow through the same common_sampler instance.
+    accept_sampler_text(coupled.get(), vocab, R"({"ok":true})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":true})"), "coupled_lazy_grammar_valid_answer");
+    common_sampler_reset(coupled.get());
+    for (auto token : start) common_sampler_accept(coupled.get(), token, true);
+    for (auto token : thought) common_sampler_accept(coupled.get(), token, true);
+    for (auto token : end) common_sampler_accept(coupled.get(), token, true);
+    bool coupled_invalid_rejected = false;
+    try {
+        accept_sampler_text(coupled.get(), vocab, R"({"ok":maybe})");
+    } catch (const std::runtime_error &) {
+        coupled_invalid_rejected = true;
+    }
+    require(coupled_invalid_rejected, "coupled_lazy_grammar_rejects_invalid_answer");
+
+    // The common sampler path likewise remains in reasoning through a partial marker, then switches after the whole marker.
+    auto natural_params = reasoning;
+    const std::string trigger_pattern = regex_escape(common_token_to_piece(vocab, end.front(), true)) + "[\\s\\S]*?(\\{)";
+    natural_params.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, grammar);
+    natural_params.grammar_lazy = true;
+    natural_params.grammar_triggers = {{COMMON_GRAMMAR_TRIGGER_TYPE_PATTERN, trigger_pattern}};
+    sampler_ptr natural(common_sampler_init(model, natural_params), common_sampler_free);
+    require(bool(natural), "natural_reasoning_sampler");
+    for (auto token : start) common_sampler_accept(natural.get(), token, true);
+    for (auto token : thought) common_sampler_accept(natural.get(), token, true);
+    std::vector<llama_token> seen = start;
+    seen.insert(seen.end(), thought.begin(), thought.end());
+    bool natural_switched = false;
+    for (size_t i = 0; i < end.size(); ++i) {
+        common_sampler_accept(natural.get(), end[i], true);
+        seen.push_back(end[i]);
+        require(should_activate_answer_schema(false, seen, {end}) == (i + 1 == end.size()), "natural_end_stage_boundary");
+        if (!natural_switched) {
+            natural_switched = maybe_switch_to_answer_schema(natural, model, natural_params, grammar, false, seen, {end});
+            require(natural_switched == (i + 1 == end.size()), "natural_only_switch_after_complete_end");
+        }
+    }
+    require(natural_switched, "natural_full_stage_switch");
+    accept_sampler_text(natural.get(), vocab, R"({"ok":true})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":true})"), "natural_answer_complete");
+    common_sampler_reset(natural.get());
+    accept_sampler_text(natural.get(), vocab, R"({"ok":false})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":false})"), "answer_grammar_reset_reusable");
+    common_sampler_reset(natural.get());
+    accept_sampler_text(natural.get(), vocab, "{");
+    bool second_open_accepted = true;
+    try {
+        accept_sampler_text(natural.get(), vocab, "{");
+    } catch (const std::runtime_error &) {
+        second_open_accepted = false;
+    }
+    require(!second_open_accepted, "answer_grammar_state_advanced");
+    common_sampler_reset(natural.get());
+    bool root_restored = true;
+    try {
+        accept_sampler_text(natural.get(), vocab, "{");
+    } catch (const std::runtime_error &) {
+        root_restored = false;
+    }
+    require(root_restored, "same_instance_partial_answer_reset");
+    common_sampler_reset(natural.get());
+    accept_sampler_text(natural.get(), vocab, R"({"ok":false})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":false})"), "reset_after_partial_answer_reusable");
+    require(!grammar_accepts_complete(vocab, grammar, R"({"ok":)"), "truncated_answer_rejected");
+    require(!grammar_accepts_complete(vocab, grammar, R"({"ok":maybe})"), "invalid_answer_rejected");
+
+    // The actual common reasoning-budget sampler must force each configured message/end token and report DONE.
+    auto forced_params = reasoning;
+    const auto notice = tokenize(vocab, "Stop.");
+    forced_params.reasoning_budget_forced = notice;
+    forced_params.reasoning_budget_forced.insert(forced_params.reasoning_budget_forced.end(), end.begin(), end.end());
+    std::unique_ptr<llama_sampler, decltype(&llama_sampler_free)> forced_budget(
+        common_reasoning_budget_init(vocab, {start}, {end}, forced_params.reasoning_budget_forced, 32), llama_sampler_free);
+    accept_reasoning_tokens(forced_budget.get(), start);
+    const auto lead = tokenize(vocab, "x");
+    accept_reasoning_tokens(forced_budget.get(), lead);
+    require(common_reasoning_budget_force(forced_budget.get()), "manual_reasoning_force");
+    for (const auto token : forced_params.reasoning_budget_forced) {
+        require(sample_forced_token(forced_budget.get(), vocab) == token, "forced_budget_token_matches");
+        llama_sampler_accept(forced_budget.get(), token);
+    }
+    require(common_reasoning_budget_get_state(forced_budget.get()) == REASONING_BUDGET_DONE, "forced_budget_done");
+    const auto * forced_match = common_reasoning_budget_get_end_match(forced_budget.get());
+    require(forced_match && *forced_match == end, "forced_budget_end_match");
+
+    // Exercise the common sampler's force API and the same D3 stage-switch helper.
+    auto forced_sampler_params = forced_params;
+    forced_sampler_params.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, grammar);
+    forced_sampler_params.grammar_lazy = true;
+    forced_sampler_params.grammar_triggers = {{COMMON_GRAMMAR_TRIGGER_TYPE_PATTERN, trigger_pattern}};
+    sampler_ptr forced(common_sampler_init(model, forced_sampler_params), common_sampler_free);
+    for (auto token : start) common_sampler_accept(forced.get(), token, true);
+    for (auto token : lead) common_sampler_accept(forced.get(), token, true);
+    require(common_sampler_reasoning_budget_force(forced.get()), "common_manual_reasoning_force");
+    std::vector<llama_token> forced_seen = start;
+    forced_seen.insert(forced_seen.end(), lead.begin(), lead.end());
+    bool forced_switched = false;
+    for (size_t i = 0; i < forced_params.reasoning_budget_forced.size(); ++i) {
+        const auto token = forced_params.reasoning_budget_forced[i];
+        common_sampler_accept(forced.get(), token, true);
+        forced_seen.push_back(token);
+        if (!forced_switched) {
+            forced_switched = maybe_switch_to_answer_schema(
+                forced, model, forced_sampler_params, grammar, false, forced_seen, {end});
+            const bool end_complete = i + 1 == forced_params.reasoning_budget_forced.size();
+            require(forced_switched == end_complete, "forced_only_switch_after_complete_end");
+        }
+    }
+    require(forced_switched, "forced_full_stage_switch");
+    accept_sampler_text(forced.get(), vocab, R"({"ok":false})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":false})"), "forced_answer_complete");
+
+    // Reset is the interruption/retry boundary: discard partial reasoning and re-arm the real budget sampler.
+    sampler_ptr reset_sampler(common_sampler_init(model, natural_params), common_sampler_free);
+    for (auto token : start) common_sampler_accept(reset_sampler.get(), token, true);
+    require(common_sampler_reasoning_budget_state_get(reset_sampler.get()) == REASONING_BUDGET_COUNTING, "reset_test_enters_counting");
+    if (start.size() > 1) common_sampler_accept(reset_sampler.get(), start.front(), true);
+    common_sampler_reset(reset_sampler.get());
+    require(common_sampler_reasoning_budget_state_get(reset_sampler.get()) == REASONING_BUDGET_IDLE, "reset_clears_budget_state");
+    for (auto token : end) common_sampler_accept(reset_sampler.get(), token, true);
+    require(common_sampler_reasoning_budget_state_get(reset_sampler.get()) == REASONING_BUDGET_IDLE, "reset_ignores_stale_end_marker");
+    for (auto token : start) common_sampler_accept(reset_sampler.get(), token, true);
+    require(common_sampler_reasoning_budget_state_get(reset_sampler.get()) == REASONING_BUDGET_COUNTING, "reset_rearms_on_fresh_start");
+    for (size_t i = 0; i < end.size(); ++i) {
+        common_sampler_accept(reset_sampler.get(), end[i], true);
+        require(should_activate_answer_schema(false, std::vector<llama_token>(end.begin(), end.begin() + i + 1), {end}) == (i + 1 == end.size()), "reset_rearms_stage_boundary");
+    }
+    require(common_sampler_reasoning_budget_state_get(reset_sampler.get()) == REASONING_BUDGET_DONE, "reset_fresh_close_reaches_done");
+    require(should_activate_answer_schema(false, end, {end}), "reset_natural_end");
+    auto reset_answer_params = natural_params;
+    switch_to_answer_schema(reset_sampler, model, reset_answer_params, grammar);
+    accept_sampler_text(reset_sampler.get(), vocab, R"({"ok":true})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":true})"), "reset_answer_complete");
+    common_sampler_reset(reset_sampler.get());
+    accept_sampler_text(reset_sampler.get(), vocab, R"({"ok":false})");
+    require(grammar_accepts_complete(vocab, grammar, R"({"ok":false})"), "reset_answer_grammar_reusable");
+}
+
 static void decode(llama_context * ctx, const std::vector<llama_token> & ids, size_t begin, size_t end) {
     for (size_t off = begin; off < end; off += 128) {
         const size_t n = std::min<size_t>(128, end - off);
@@ -87,18 +360,37 @@ static void decode(llama_context * ctx, const std::vector<llama_token> & ids, si
 }
 
 int main(int argc, char ** argv) {
-    if (argc == 2 && std::string(argv[1]) == "--test-schema-transition") {
+    const std::string test_mode = argc > 1 ? argv[1] : "";
+    if (test_mode == "--test-schema-transition" && argc == 2) {
         try {
             test_schema_transition_suffixes();
-            std::printf("schema transition suffix tests: PASS (7 cases)\n");
+            std::printf("schema transition suffix predicate tests: PASS (7 cases)\n");
             return 0;
         } catch (const std::exception & e) {
-            std::fprintf(stderr, "schema transition suffix tests: FAIL (%s)\n", e.what());
+            std::fprintf(stderr, "schema transition suffix predicate tests: FAIL (%s)\n", e.what());
+            return 1;
+        }
+    }
+    if (test_mode == "--test-schema-lifecycle" && argc == 3) {
+        try {
+            common_init(); ggml_backend_load_all(); llama_backend_init();
+            auto mp = llama_model_default_params();
+            mp.vocab_only = true;
+            mp.n_gpu_layers = 0;
+            model_ptr model(llama_model_load_from_file(argv[2], mp), llama_model_free);
+            require(bool(model), "schema_test_vocabulary_load");
+            test_schema_sampler_lifecycle(model.get());
+            llama_backend_free();
+            test_schema_transition_suffixes();
+            std::printf("schema transition lifecycle tests: PASS (predicate + natural/forced sampler lifecycle, invalid/truncated JSON, reset)\n");
+            return 0;
+        } catch (const std::exception & e) {
+            std::fprintf(stderr, "schema transition lifecycle tests: FAIL (%s)\n", e.what());
             return 1;
         }
     }
     if (argc != 5 || (std::string(argv[1]) != "cpu" && std::string(argv[1]) != "handoff")) {
-        std::fprintf(stderr, "usage: %s cpu|handoff MODEL REQUEST.json OUTPUT.json\n", argv[0]);
+        std::fprintf(stderr, "usage: %s cpu|handoff MODEL REQUEST.json OUTPUT.json | --test-schema-transition | --test-schema-lifecycle MODEL\n", argv[0]);
         return 2;
     }
     json report = {{"profile", argv[1]}, {"turns", json::array()}, {"shared_bytes", 0}, {"copied_bytes", 0}};
@@ -217,23 +509,8 @@ int main(int argc, char ** argv) {
                 generated.push_back(id); raw += common_token_to_piece(vocab, id, true);
                 history.push_back(id); decode(active.get(), history, history.size()-1, history.size());
                 if (answer_schema && !answer_schema_active) {
-                    if (should_activate_answer_schema(false, generated, answer_end_sequences)) {
-                        common_params_sampling answer_sp = sp;
-                        answer_sp.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, answer_schema_grammar);
-                        answer_sp.grammar_lazy = false;
-                        answer_sp.grammar_triggers.clear();
-                        answer_sp.generation_prompt.clear();
-                        answer_sp.reasoning_budget_tokens = -1;
-                        answer_sp.reasoning_budget_start.clear();
-                        answer_sp.reasoning_budget_end.clear();
-                        answer_sp.reasoning_budget_forced.clear();
-                        answer_sp.reasoning_budget_message.clear();
-                        answer_sp.reasoning_control = false;
-                        sampler.reset(common_sampler_init(cpu.get(), answer_sp));
-                        require(bool(sampler), "answer_schema_sampler");
-                        // The JSON grammar begins after the reasoning close token. Do not replay the prior reasoning text into its parser.
-                        answer_schema_active = true;
-                    }
+                    answer_schema_active = maybe_switch_to_answer_schema(
+                        sampler, cpu.get(), sp, answer_schema_grammar, false, generated, answer_end_sequences);
                 }
             }
             require(answer_schema_active, "answer_schema_not_entered");
