@@ -38,6 +38,35 @@ static llama_context_params context_params(bool gpu, bool destination) {
     return p;
 }
 
+static bool token_sequence_is_suffix(const std::vector<llama_token> & tokens, const std::vector<llama_token> & suffix) {
+    return !suffix.empty() && tokens.size() >= suffix.size() &&
+        std::equal(suffix.rbegin(), suffix.rend(), tokens.rbegin());
+}
+
+static bool should_activate_answer_schema(
+        bool eog,
+        const std::vector<llama_token> & generated,
+        const std::vector<llama_tokens> & end_sequences) {
+    if (eog) return false;
+    return std::any_of(end_sequences.begin(), end_sequences.end(), [&](const llama_tokens & seq) {
+        return token_sequence_is_suffix(generated, seq);
+    });
+}
+
+static void test_schema_transition_suffixes() {
+    const llama_tokens end_a = {101, 102, 103};
+    const llama_tokens end_b = {201, 202};
+    const std::vector<llama_tokens> ends = {end_a, end_b};
+    require(!should_activate_answer_schema(false, {7, 101, 102}, ends), "schema_partial_end_not_triggered");
+    require(should_activate_answer_schema(false, {7, 101, 102, 103}, ends), "schema_natural_multitoken_end");
+    // A forced budget ending emits the same configured token sequence and takes the same transition.
+    require(should_activate_answer_schema(false, {5, 201, 202}, ends), "schema_forced_alternate_end");
+    require(!should_activate_answer_schema(false, {7, 101, 102, 104}, ends), "schema_near_end_not_triggered");
+    require(!should_activate_answer_schema(false, {101, 102}, ends), "schema_short_prefix_not_triggered");
+    require(!should_activate_answer_schema(false, {7}, {}), "schema_empty_end_not_triggered");
+    require(!should_activate_answer_schema(true, {7, 101, 102, 103}, ends), "schema_eog_does_not_transition");
+}
+
 static void decode(llama_context * ctx, const std::vector<llama_token> & ids, size_t begin, size_t end) {
     for (size_t off = begin; off < end; off += 128) {
         const size_t n = std::min<size_t>(128, end - off);
@@ -58,6 +87,16 @@ static void decode(llama_context * ctx, const std::vector<llama_token> & ids, si
 }
 
 int main(int argc, char ** argv) {
+    if (argc == 2 && std::string(argv[1]) == "--test-schema-transition") {
+        try {
+            test_schema_transition_suffixes();
+            std::printf("schema transition suffix tests: PASS (7 cases)\n");
+            return 0;
+        } catch (const std::exception & e) {
+            std::fprintf(stderr, "schema transition suffix tests: FAIL (%s)\n", e.what());
+            return 1;
+        }
+    }
     if (argc != 5 || (std::string(argv[1]) != "cpu" && std::string(argv[1]) != "handoff")) {
         std::fprintf(stderr, "usage: %s cpu|handoff MODEL REQUEST.json OUTPUT.json\n", argv[0]);
         return 2;
@@ -178,10 +217,7 @@ int main(int argc, char ** argv) {
                 generated.push_back(id); raw += common_token_to_piece(vocab, id, true);
                 history.push_back(id); decode(active.get(), history, history.size()-1, history.size());
                 if (answer_schema && !answer_schema_active) {
-                    const auto matched = std::find_if(answer_end_sequences.begin(), answer_end_sequences.end(), [&](const llama_tokens & seq) {
-                        return generated.size() >= seq.size() && std::equal(seq.rbegin(), seq.rend(), generated.rbegin());
-                    });
-                    if (matched != answer_end_sequences.end()) {
+                    if (should_activate_answer_schema(false, generated, answer_end_sequences)) {
                         common_params_sampling answer_sp = sp;
                         answer_sp.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, answer_schema_grammar);
                         answer_sp.grammar_lazy = false;
