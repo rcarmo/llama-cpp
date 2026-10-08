@@ -2,6 +2,7 @@
 #include "chat.h"
 #include "common.h"
 #include "sampling.h"
+#include "json-schema-to-grammar.h"
 #include "nlohmann/json.hpp"
 
 #include <algorithm>
@@ -101,6 +102,9 @@ int main(int argc, char ** argv) {
             if (request.contains("tools")) ci.tools = common_chat_tools_parse_oaicompat(common_json::parse(request.at("tools").dump()));
             ci.tool_choice = round == 0 && request.value("tool_required", false) ? COMMON_CHAT_TOOL_CHOICE_REQUIRED : COMMON_CHAT_TOOL_CHOICE_AUTO;
             const auto chat = common_chat_templates_apply(templates.get(), ci);
+            const std::string answer_schema_grammar = request.contains("json_schema")
+                ? json_schema_to_grammar(common_json::parse(request.at("json_schema").dump()))
+                : std::string();
             const auto tokens = common_tokenize(vocab, chat.prompt, true, true);
             require(tokens.size() > 1 && tokens.size() + request.value("max_tokens", 256) < 4096, "context_bound");
             size_t common = 0;
@@ -127,8 +131,12 @@ int main(int argc, char ** argv) {
             }
             common_params_sampling sp;
             sp.temp = request.value("temperature", 0.0f); sp.top_p = 0.95f; sp.min_p = 0.0f; sp.seed = 42;
-            sp.grammar = chat.grammar.empty() ? common_grammar() : common_grammar(COMMON_GRAMMAR_TYPE_TOOL_CALLS, chat.grammar);
-            sp.grammar_lazy = chat.grammar_lazy; sp.grammar_triggers = chat.grammar_triggers;
+            const bool answer_schema = request.contains("json_schema");
+            require(!answer_schema || (reasoning_budget >= 0 && !answer_schema_grammar.empty()), "schema_requires_bounded_reasoning");
+            sp.grammar = !answer_schema && !chat.grammar.empty()
+                ? common_grammar(COMMON_GRAMMAR_TYPE_TOOL_CALLS, chat.grammar)
+                : common_grammar();
+            sp.grammar_lazy = !answer_schema && chat.grammar_lazy; sp.grammar_triggers = !answer_schema ? chat.grammar_triggers : std::vector<common_grammar_trigger>{};
             sp.generation_prompt = chat.generation_prompt;
             if (reasoning_budget >= 0) {
                 require(!chat.thinking_start_tag.empty() && !chat.thinking_end_tags.empty(), "missing_reasoning_tags");
@@ -151,6 +159,15 @@ int main(int argc, char ** argv) {
             for (auto id : tokens) common_sampler_accept(sampler.get(), id, false);
             std::string raw; std::vector<llama_token> generated;
             bool ended = false;
+            bool answer_schema_active = !answer_schema;
+            std::vector<llama_tokens> answer_end_sequences;
+            if (answer_schema) {
+                for (const auto & tag : chat.thinking_end_tags) {
+                    auto seq = common_tokenize(vocab, tag, false, true);
+                    if (!seq.empty()) answer_end_sequences.push_back(std::move(seq));
+                }
+                require(!answer_end_sequences.empty(), "missing_reasoning_tags");
+            }
             const int limit = max_tokens;
             const auto generation_start = std::chrono::steady_clock::now();
             report["phase"] = "generation_started"; save();
@@ -160,7 +177,30 @@ int main(int argc, char ** argv) {
                 if (llama_vocab_is_eog(vocab, id)) { ended = true; break; }
                 generated.push_back(id); raw += common_token_to_piece(vocab, id, true);
                 history.push_back(id); decode(active.get(), history, history.size()-1, history.size());
+                if (answer_schema && !answer_schema_active) {
+                    const auto matched = std::find_if(answer_end_sequences.begin(), answer_end_sequences.end(), [&](const llama_tokens & seq) {
+                        return generated.size() >= seq.size() && std::equal(seq.rbegin(), seq.rend(), generated.rbegin());
+                    });
+                    if (matched != answer_end_sequences.end()) {
+                        common_params_sampling answer_sp = sp;
+                        answer_sp.grammar = common_grammar(COMMON_GRAMMAR_TYPE_OUTPUT_FORMAT, answer_schema_grammar);
+                        answer_sp.grammar_lazy = false;
+                        answer_sp.grammar_triggers.clear();
+                        answer_sp.generation_prompt.clear();
+                        answer_sp.reasoning_budget_tokens = -1;
+                        answer_sp.reasoning_budget_start.clear();
+                        answer_sp.reasoning_budget_end.clear();
+                        answer_sp.reasoning_budget_forced.clear();
+                        answer_sp.reasoning_budget_message.clear();
+                        answer_sp.reasoning_control = false;
+                        sampler.reset(common_sampler_init(cpu.get(), answer_sp));
+                        require(bool(sampler), "answer_schema_sampler");
+                        // The JSON grammar begins after the reasoning close token. Do not replay the prior reasoning text into its parser.
+                        answer_schema_active = true;
+                    }
+                }
             }
+            require(answer_schema_active, "answer_schema_not_entered");
             common_chat_parser_params pp(chat); pp.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
             pp.parser.load(chat.parser);
             auto parsed = common_chat_parse(raw, false, pp);

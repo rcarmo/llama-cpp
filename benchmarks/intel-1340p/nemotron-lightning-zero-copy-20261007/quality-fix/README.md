@@ -38,6 +38,38 @@ B LRU handoff uses `if (!value)` for Map membership, so cached0 is incorrectly r
 
 B policy CPU again omits the valid manager exception (95 vs135). B handoff over-applies it to missing receipt C (160 vs135). B CPU conflicting sources still declares Windows offline=no rather than requiredunknown; B handoff now preserves uncertainty. A policy handoff has correct facts but Markdown/prose instead of requested JSON, so remains a failure. Both B incident responses are complete, correctly formatted and contain the expected evidence/uncertainty facts.
 
+## Next safeguards tested
+
+### Deterministic policy/source validation
+`verify-rules.ts` reads the user-visible facts from the same frozen suite and passes checks for receipt/alcohol/deadline precedence, scoped deadline waiver, day30 boundary, exact return-ID set, opened/receipt exception ordering, contradictions, source-ID provenance and unknown absent Solaris facts. Negative check injects fabricated `R20` and fails validation. The reference/evaluator returns A/B/F total€135; returns R1/R4; FreeBSD, audit-default and Solaris `unknown`; conflicts S1/S2 and S3/S4. This is a deterministic task-specific workflow guard, not a claim of better model reasoning. Reuse for a real workflow would require independent rule-owner review, versioned source provenance and input/data validation.
+
+### Bounded code repair
+The frozen B LRU CPU answer already passes 260 checks; its handoff answer fails because `if (!node)` confuses cached `0` with a missing entry. One repair only, based on the observed runtime assertion: replace that existence check with `this.#map.has(key)`; do not change algorithm or tests. Both CPU and handoff repaired outputs pass all260 existing randomized, falsy-key/value, update, eviction and zero-capacity assertions in networkless read-only Bun1/256MiB/1CPU/10s sandbox. Repaired code is a new clearly labelled output, not the original model result, and cannot improve the policy task or establish general model accuracy.
+
+### Answer-phase schema failure
+Original/Candidate outputs preserved under `reference/schema-transition/`. Ten original/held-out CPU+handoff attempts and three CPU C2 retries all fail before a generated turn. Ordinary grammar rejects `</think>`; lazy grammar rejects end-of-reasoning or answer-opening `{`. Harness experiment restored, no source change/commit from the experiment. Common grammar unit/conversion tests pass, but they do not test the two-stage transition. Need explicit staged sampler design with synthetic natural/forced-ending acceptance tests before more model runs; not yet implemented.
+
+## Repeat R1
+
+The original eight-task prompts/oracles and A settings were rerun once per CPU/handoff profile with a20GiB cap,CPU4,fixed original request token budgets and identical model SHA. This is one additional observation, not an equivalence/noninferiority claim. Full response/check evidence is in [repeat-R1](repeat-R1/README.md); parent suite is unchanged.
+
+| Task | CPU | Handoff |
+|---|---|---|
+| Intervals | Pass85 | Pass85 |
+| LRU | Fail linked-list removal TypeError | Pass260 |
+| Topological sort | Fail duplicate indegree causes false cycle | Pass185 |
+| Policy | Fail manager waiver; total95 vs135 | Fail |
+| Conflicting sources | Fail, guesses precedence | Fail |
+| Incident | Fail:768-token reasoning truncation | Fail |
+| Invoice tools | Pass | Pass |
+| Tool injection | Pass | Pass |
+
+Repeat score CPU3/8, handoff5/8. Incident bounded-budget completion in candidateA was not carried into original frozen request; do not confuse those series. handoff accounting shared268937728/copy0 across repeat runs, but no separate R1 cgroup memory log exists; report only enforced20GiB container cap/final empty DRM checks, not exact per-run peak/swap/OOM. Existing Docker service containers persisted, not changed. No source edit, commit or deploy in this repeat.
+
+## Experimental staged JSON-answer constraint (D3)
+
+After C/D2 failed, a bounded D3 local harness experiment now starts the schema grammar after a generated reasoning-close sequence and does not replay reasoning into that grammar. Both CPU and Intel/Vulkan builds pass; existing reasoning-budget, grammar integration and JSON-schema tests pass3/3 for each. Five original/heldout fact tasks each CPU and handoff produce valid schema-constrained JSON and EOG. Exact answer comparison is still only CPU3/5/H3/5; errors swap by backend and both profiles fail the two-rule return edge cases. Schema correctness is not factual correctness. This is harness-only/uncommitted and not a production feature. Natural/forced multi-token endings, partial tags, cancellation, malformed output and sampler-state transition lack synthetic coverage. **Do not adopt more broadly** until those transition tests and independent review pass. See [D3 artifacts](schema-transition-D3/README.md).
+
 ## Safety, reuse and limits
 
 20 new model runs: A8,B12. CPU4/20GiB/no swap/host reserve>=6GiB/renderD128/F16KV/FAoff/rs3/batch512/ub128/4096ctx/mmap unchanged;180s per native run. No driver/kernel/layout or production configuration changes. All handoffs retain268937728 shared bytes/copy0/GPU-owner destruction before generation. Native completion19/20, but score counts task formatting/meaning/code separately. Minimum sampled host available12,106,424KiB, maximum peak20GiB, zero sampled process swap/OOM/OOM-kill. Counters sampled, not necessarily final reclaim counts. No thermal/affinity or full CI qualification.

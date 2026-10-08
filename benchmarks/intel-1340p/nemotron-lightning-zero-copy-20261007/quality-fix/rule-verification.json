@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "checks": [
+    "expense precedence/day-30/scoped waiver",
+    "exception interaction tests",
+    "exact record-set enforcement; R20 injection rejected",
+    "conflict abstention/source-ID provenance",
+    "unknown for absent Solaris evidence"
+  ],
+  "output": {
+    "expense": {
+      "approved_ids": [
+        "A",
+        "B",
+        "F"
+      ],
+      "total_eur": 135,
+      "reasons": {
+        "C": "missing_receipt",
+        "D": "alcohol",
+        "E": "late"
+      }
+    },
+    "returns": {
+      "eligible": [
+        "R1",
+        "R4"
+      ],
+      "denied": {
+        "R2": "opened",
+        "R3": "missing_receipt"
+      }
+    },
+    "evidence": {
+      "freebsd_supported": "unknown",
+      "audit_log_default": "unknown",
+      "solar_is_supported": "unknown",
+      "conflicts": [
+        [
+          "S1",
+          "S2"
+        ],
+        [
+          "S3",
+          "S4"
+        ]
+      ]
+    }
+  }
+}
