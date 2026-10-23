@@ -433,10 +433,12 @@ int main(int argc, char ** argv) {
             if (request.contains("tools")) ci.tools = common_chat_tools_parse_oaicompat(common_json::parse(request.at("tools").dump()));
             ci.tool_choice = round == 0 && request.value("tool_required", false) ? COMMON_CHAT_TOOL_CHOICE_REQUIRED : COMMON_CHAT_TOOL_CHOICE_AUTO;
             const auto chat = common_chat_templates_apply(templates.get(), ci);
+            common_chat_session session(templates.get(), vocab, ci);
+            require(session.prompt().str() == chat.prompt.str(), "chat_session_prompt_parity");
             const std::string answer_schema_grammar = request.contains("json_schema")
                 ? json_schema_to_grammar(common_json::parse(request.at("json_schema").dump()))
                 : std::string();
-            const auto tokens = common_tokenize(vocab, chat.prompt, true, true);
+            const auto tokens = common_tokenize(vocab, chat.prompt.str(), true, true);
             require(tokens.size() > 1 && tokens.size() + request.value("max_tokens", 256) < 4096, "context_bound");
             size_t common = 0;
             while (common < history.size() && common < tokens.size() && history[common] == tokens[common]) ++common;
@@ -489,6 +491,7 @@ int main(int argc, char ** argv) {
             require(bool(sampler), "sampler");
             for (auto id : tokens) common_sampler_accept(sampler.get(), id, false);
             std::string raw; std::vector<llama_token> generated;
+            common_chat_input generated_input;
             bool ended = false;
             bool answer_schema_active = !answer_schema;
             std::vector<llama_tokens> answer_end_sequences;
@@ -506,7 +509,9 @@ int main(int argc, char ** argv) {
                 const auto id = common_sampler_sample(sampler.get(), active.get(), -1);
                 common_sampler_accept(sampler.get(), id, true);
                 if (llama_vocab_is_eog(vocab, id)) { ended = true; break; }
-                generated.push_back(id); raw += common_token_to_piece(vocab, id, true);
+                generated.push_back(id);
+                const auto piece = common_token_to_piece(vocab, id, true);
+                raw += piece; generated_input.append(piece, id);
                 history.push_back(id); decode(active.get(), history, history.size()-1, history.size());
                 if (answer_schema && !answer_schema_active) {
                     answer_schema_active = maybe_switch_to_answer_schema(
@@ -514,16 +519,14 @@ int main(int argc, char ** argv) {
                 }
             }
             require(answer_schema_active, "answer_schema_not_entered");
-            common_chat_parser_params pp(chat); pp.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
-            pp.parser.load(chat.parser);
-            auto parsed = common_chat_parse(raw, false, pp);
+            auto parsed = session.finish(generated_input);
             for (size_t i = 0; i < parsed.tool_calls.size(); ++i) {
                 if (parsed.tool_calls[i].id.empty()) parsed.tool_calls[i].id = "call_native_" + std::to_string(round) + "_" + std::to_string(i);
             }
             auto assistant = json::parse(parsed.to_json_oaicompat().dump()); assistant["role"] = "assistant";
             json sampler_names = json::array();
             for (const auto type : sp.samplers) sampler_names.push_back(common_sampler_type_to_str(type));
-            json row = {{"round", round}, {"chat_format", common_chat_format_name(chat.format)}, {"generation_prompt", chat.generation_prompt}, {"rendered_prompt", chat.prompt}, {"prompt_tokens", tokens},
+            json row = {{"round", round}, {"chat_format", common_chat_format_name(chat.format)}, {"generation_prompt", chat.generation_prompt}, {"rendered_prompt", chat.prompt.str()}, {"prompt_tokens", tokens},
                 {"cached_tokens", common}, {"evaluated_tokens", tokens.size()-common}, {"generated_tokens", generated},
                 {"sampling", {{"temperature", sp.temp}, {"top_k", sp.top_k}, {"top_p", sp.top_p}, {"min_p", sp.min_p}, {"seed", sp.seed}, {"chain", sampler_names}, {"reasoning_budget", sp.reasoning_budget_tokens}, {"reasoning_budget_message", request.value("reasoning_budget_message", std::string())}, {"max_tokens", max_tokens}}},
                 {"raw", raw}, {"parsed", assistant}, {"finish", ended ? "eog" : "length"},

@@ -184,7 +184,7 @@ static void benchmark(llama_context * ctx, const llama_model * model, const llam
 }
 
 
-static void coding(llama_context * ctx, const llama_model * model, const llama_vocab * vocab) {
+static void coding(llama_context * ctx, const llama_model * model, const llama_vocab * vocab, bool unlimited, int64_t startup_us) {
     const char * input_path = std::getenv("FLINT_CODING_CASE"), * output_path = std::getenv("FLINT_CODING_OUTPUT");
     require(input_path && output_path, "coding paths");
     std::ifstream input(input_path); require(input.good(), "coding input");
@@ -192,11 +192,14 @@ static void coding(llama_context * ctx, const llama_model * model, const llama_v
     auto tmpls = common_chat_templates_init(model, "");
     common_chat_templates_inputs inputs;
     common_chat_msg user; user.role = "user"; user.content = spec.at("prompt").get<std::string>();
-    inputs.messages.push_back(user); inputs.enable_thinking = false;
+    inputs.messages.push_back(user); inputs.enable_thinking = unlimited;
+    if (unlimited) inputs.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
     common_chat_session session(tmpls.get(), vocab, inputs);
     const auto prompt = common_tokenize(vocab, session.prompt().str(), true, true);
-    constexpr int max_output = 1024;
-    require(!prompt.empty() && prompt.size()+max_output < 2048, "coding context budget");
+    const int max_output = unlimited ? -1 : 1024;
+    const int n_ctx = llama_n_ctx(ctx);
+    require(!prompt.empty() && prompt.size() < size_t(n_ctx), "coding prompt context");
+    if (!unlimited) require(prompt.size()+max_output < size_t(n_ctx), "coding context budget");
     common_params_sampling sampling;
     sampling.temp = 1; sampling.top_k = 20; sampling.top_p = 0.95f; sampling.min_p = 0; sampling.seed = 42;
     session.apply_sampling(sampling);
@@ -209,29 +212,42 @@ static void coding(llama_context * ctx, const llama_model * model, const llama_v
     const auto start = llama_time_us();
     decode(ctx, prompt, 0); finite();
     const auto prefilled = llama_time_us();
-    common_chat_input generated_input; int generated = 0; bool eog = false;
+    common_chat_input generated_input; int generated = 0; bool eog = false, context_full = false;
+    std::ofstream raw_output(std::string(output_path)+".raw.txt"); require(raw_output.good(), "coding raw output");
     int64_t decode_us = 0; double first_token_ms = 0;
-    for (; generated < max_output; ++generated) {
+    for (; unlimited || generated < max_output; ++generated) {
         const auto token = common_sampler_sample(sampler.get(), ctx, -1);
         common_sampler_accept(sampler.get(), token, true);
         if (!generated) first_token_ms = double(llama_time_us()-start)/1000;
         if (llama_vocab_is_eog(vocab, token)) { eog = true; break; }
-        generated_input.append(common_token_to_piece(vocab, token), token);
+        const auto piece = common_token_to_piece(vocab, token);
+        generated_input.append(piece, token); raw_output << piece;
+        // No output/time cap in unlimited mode. The finite context and resource guards still apply.
+        if (prompt.size()+generated >= size_t(n_ctx)) { context_full = true; ++generated; break; }
+        if ((generated+1)%128 == 0) {
+            raw_output.flush();
+            nlohmann::json progress = {{"id",spec.at("id")},{"generated",generated+1},{"status","generating"},{"context",n_ctx},{"elapsed_ms",double(llama_time_us()-start)/1000}};
+            std::ofstream(std::string(output_path)+".progress.json") << progress.dump(2) << '\n';
+            std::printf("CODING_PROGRESS id=%s generated=%d elapsed_ms=%.3f\n",spec.at("id").get<std::string>().c_str(),generated+1,double(llama_time_us()-start)/1000); std::fflush(stdout);
+        }
         const auto step = llama_time_us();
         decode(ctx, {token}, prompt.size()+generated); decode_us += llama_time_us()-step;
         finite();
     }
-    const auto finished = llama_time_us();
+    const auto finished = llama_time_us(); raw_output.close();
     const auto & parsed = session.finish(generated_input);
+    const char * stop = eog ? "eog" : context_full ? "context_capacity" : "limit";
     nlohmann::json result = {
         {"id",spec.at("id")}, {"prompt",prompt.size()}, {"generated",generated}, {"max_output",max_output},
-        {"stop",eog?"eog":"limit"}, {"raw",generated_input.text}, {"content",parsed.content}, {"reasoning",parsed.reasoning_content},
+        {"stop",stop}, {"context",n_ctx}, {"unlimited",unlimited}, {"startup_ms",double(startup_us)/1000},
+        {"rendered_prompt",session.prompt().str()}, {"prompt_tokens",prompt},
+        {"raw",generated_input.text}, {"content",parsed.content}, {"reasoning",parsed.reasoning_content},
         {"pp_ms",double(prefilled-start)/1000}, {"tg_ms",double(finished-prefilled)/1000},
         {"decode_only_ms",double(decode_us)/1000}, {"wall_ms",double(finished-start)/1000}, {"first_token_ms",first_token_ms},
-        {"finite",true}, {"thinking",false}, {"seed",42}, {"temp",1}, {"top_k",20}, {"top_p",0.95}, {"min_p",0}
+        {"finite",true}, {"thinking",unlimited}, {"seed",42}, {"temp",1}, {"top_k",20}, {"top_p",0.95}, {"min_p",0}
     };
     std::ofstream output(output_path); require(output.good(), "coding output"); output << result.dump(2) << '\n'; output.close();
-    std::printf("CODING_RESULT id=%s generated=%d stop=%s pp_ms=%.3f tg_ms=%.3f finite=1\n",spec.at("id").get<std::string>().c_str(),generated,eog?"eog":"limit",double(prefilled-start)/1000,double(finished-prefilled)/1000);
+    std::printf("CODING_RESULT id=%s generated=%d stop=%s pp_ms=%.3f tg_ms=%.3f finite=1\n",spec.at("id").get<std::string>().c_str(),generated,stop,double(prefilled-start)/1000,double(finished-prefilled)/1000);
 }
 
 static void test_override_admission(const char * path) {
@@ -269,7 +285,7 @@ int main(int argc, char ** argv) {
         require(gpu || mode == "cpu", "mode");
         const int cache_mib = argc > 3 ? std::stoi(argv[3]) : 0;
         require(cache_mib >= 0 && cache_mib <= 4096, "limits");
-        const int n_ctx = synthetic ? 768 : 2048;
+        const int n_ctx = synthetic ? 768 : task == "coding-unlimited" ? 16384 : 2048;
         if (synthetic) test_override_admission(argv[1]);
         const auto start = llama_time_us();
         auto mp = llama_model_default_params(); mp.n_gpu_layers = 0;
@@ -302,9 +318,9 @@ int main(int argc, char ** argv) {
         }
         require(bool(source), "source context");
         const auto source_ready = llama_time_us();
-        if (task == "coding") {
+        if (task == "coding" || task == "coding-unlimited") {
             require(!gpu && cache_mib == 0, "coding CPU-only");
-            coding(source.get(), cpu.get(), vocab);
+            coding(source.get(), cpu.get(), vocab, task == "coding-unlimited", llama_time_us()-start);
             source.reset(); cpu.reset(); llama_backend_free();
             std::printf("RESULT PASS coding native execution; score separately\n");
             return 0;
