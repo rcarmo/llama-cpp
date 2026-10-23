@@ -13,12 +13,20 @@
 using model_ptr=std::unique_ptr<llama_model,decltype(&llama_model_free)>;
 using context_ptr=std::unique_ptr<llama_context,decltype(&llama_free)>;
 using sampler_ptr=std::unique_ptr<llama_sampler,decltype(&llama_sampler_free)>;
+static bool process_speculative(common_speculative * spec, llama_context * ctx, const llama_batch & input) {
+    common_batch batch(ctx);
+    for (int32_t i = 0; i < input.n_tokens; ++i) {
+        batch.add(input.token[i], input.pos[i], input.seq_id[i][0], input.logits[i]);
+    }
+    return common_speculative_process(spec, batch);
+}
+
 static void decode(llama_context * ctx,std::vector<llama_token> & tokens,int start,int count, common_speculative * spec=nullptr) {
     auto b=llama_batch_init(count,0,1);
     for(int i=0;i<count;++i) { b.token[i]=tokens[start+i];b.pos[i]=start+i;b.n_seq_id[i]=1;b.seq_id[i][0]=0;b.logits[i]=(i==count-1); }
     b.n_tokens=count;
     int rc=llama_decode(ctx,b);
-    bool processed=rc==0 && (!spec || common_speculative_process(spec,b));
+    bool processed=rc==0 && (!spec || process_speculative(spec,ctx,b));
     llama_batch_free(b);
     if(!processed)throw std::runtime_error("decode/process failed: "+std::to_string(rc));
 }
@@ -101,7 +109,7 @@ int main(int argc,char ** argv) {
                 auto batch=llama_batch_init(1+draft.size(),0,1);
                 batch.n_tokens=1+draft.size();
                 for(int i=0;i<batch.n_tokens;++i){batch.token[i]=i?draft[i-1]:last;batch.pos[i]=past+i;batch.n_seq_id[i]=1;batch.seq_id[i][0]=0;batch.logits[i]=1;}
-                const int rc=llama_decode(dst.get(),batch);const bool ok=rc==0 && common_speculative_process(spec.get(),batch);llama_batch_free(batch);if(!ok)throw std::runtime_error("MTP target verify failed");
+                const int rc=llama_decode(dst.get(),batch);const bool ok=rc==0 && process_speculative(spec.get(), dst.get(), batch);llama_batch_free(batch);if(!ok)throw std::runtime_error("MTP target verify failed");
                 std::vector<llama_token> ids;
                 for(size_t i=0;i<=draft.size();++i){auto token=llama_sampler_sample(sampler.get(),dst.get(),i);llama_sampler_accept(sampler.get(),token);ids.push_back(token);if(llama_vocab_is_eog(cpu_vocab,token)||i==draft.size()||token!=draft[i])break;}
                 const int matched=ids.size()-1;accepted+=matched;common_speculative_accept(spec.get(),0,matched);

@@ -23,6 +23,14 @@ struct batch_owner {
     ~batch_owner() { llama_batch_free(batch); }
 };
 
+static bool process_speculative(common_speculative * spec, llama_context * ctx, const llama_batch & input) {
+    common_batch batch(ctx);
+    for (int32_t i = 0; i < input.n_tokens; ++i) {
+        batch.add(input.token[i], input.pos[i], input.seq_id[i][0], input.logits[i]);
+    }
+    return common_speculative_process(spec, batch);
+}
+
 static int fail(const char * phase) {
     std::fprintf(stderr, "QUALIFY_FAIL phase=%s\n", phase);
     return 1;
@@ -145,7 +153,7 @@ int main(int argc, char ** argv) {
     if (llama_decode(src_tgt.get(), prompt.batch) != 0) return fail("prefill_target");
     llama_synchronize(src_tgt.get());
     const int64_t prefill_target_done = llama_time_us();
-    if (!common_speculative_process(spec.get(), prompt.batch)) return fail("prefill_mtp");
+    if (!process_speculative(spec.get(), src_tgt.get(), prompt.batch)) return fail("prefill_mtp");
     llama_synchronize(src_mtp.get());
     const int64_t prefill_mtp_done = llama_time_us();
 
@@ -187,7 +195,7 @@ int main(int argc, char ** argv) {
     if (llama_decode(active_tgt, next.batch) != 0) return fail("continuation_target");
     llama_synchronize(active_tgt);
     const int64_t continuation_target_done = llama_time_us();
-    if (!common_speculative_process(spec.get(), next.batch)) return fail("continuation_mtp");
+    if (!process_speculative(spec.get(), active_tgt, next.batch)) return fail("continuation_mtp");
     llama_synchronize(active_mtp);
     const int64_t continuation_mtp_done = llama_time_us();
 

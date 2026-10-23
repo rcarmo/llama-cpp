@@ -2,6 +2,10 @@
 
 Some local work was never about one machine. These reports track scheduler behaviour, staging, SIMD and Vulkan across several backends, so they stay together instead of being forced under a single host.
 
+## Upstream integration
+
+* [23 October 2026 upstream merge](upstream-sync-20261023.md)
+
 ## Scheduling and memory placement
 
 * [Generalised async CPU scheduler](general-async-cpu.md)

@@ -380,3 +380,18 @@ General llama.cpp references remain available in this tree:
 ## Upstream and licence
 
 This is a downstream hardware-optimisation fork of [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.cpp). Fork changes retain the project's [MIT licence](LICENSE).
+
+## Upstream installation
+
+```bash
+# curl
+curl -LsSf https://llama.app/install.sh | sh
+
+# powershell
+irm https://llama.app/install.ps1 | iex
+```
+
+- Visit https://llama.app and follow the instructions
+- Run with Docker - see our [Docker documentation](docs/docker.md)
+- Download pre-built binaries from the [releases page](https://github.com/ggml-org/llama.cpp/releases)
+- Build from source by cloning this repository - check out [our build guide](docs/build.md)

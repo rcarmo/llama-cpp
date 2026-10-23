@@ -33,6 +33,14 @@ static std::atomic<bool> g_stop(false);
 static std::atomic<uint64_t> g_completion_id(0);
 static server_http_context * g_http = nullptr;
 
+static bool process_speculative(common_speculative * spec, llama_context * ctx, const llama_batch & input) {
+    common_batch batch(ctx);
+    for (int32_t i = 0; i < input.n_tokens; ++i) {
+        batch.add(input.token[i], input.pos[i], input.seq_id[i][0], input.logits[i]);
+    }
+    return common_speculative_process(spec, batch);
+}
+
 static void signal_handler(int) {
     g_stop.store(true);
     if (g_http) {
@@ -100,7 +108,7 @@ static std::string token_piece(const llama_vocab * vocab, llama_token token) {
 }
 
 static size_t input_prefix(const llama_vocab * vocab, const common_chat_params & chat, const std::vector<llama_token> & prompt) {
-    std::string text = chat.prompt;
+    std::string text = chat.prompt.str();
     if (text.size() < chat.generation_prompt.size() || text.compare(text.size() - chat.generation_prompt.size(), chat.generation_prompt.size(), chat.generation_prompt) != 0) {
         throw std::runtime_error("generation suffix mismatch");
     }
@@ -437,7 +445,7 @@ private:
         }
         batch.n_tokens = count;
         const int32_t rc = llama_decode(context, batch);
-        const bool processed = rc == 0 && (!spec || common_speculative_process(spec, batch));
+        const bool processed = rc == 0 && (!spec || process_speculative(spec, context, batch));
         llama_batch_free(batch);
         llama_set_abort_callback(context, nullptr, nullptr);
         if (!processed) {
@@ -524,7 +532,7 @@ private:
         route_state.begin(route, cold);
         const common_chat_params chat = render_chat(request);
         const auto * vocab = llama_model_get_vocab(cpu_target.get());
-        std::vector<llama_token> prompt = tokenize(vocab, chat.prompt);
+        std::vector<llama_token> prompt = tokenize(vocab, chat.prompt.str());
         const int32_t budget = gemma_hybrid::output_budget(request, cfg.max_output);
         const int32_t draft_headroom = target_only() ? 0 : cfg.draft_max;
         if (prompt.size() + budget + draft_headroom + 1 > static_cast<size_t>(cfg.context)) {
@@ -618,9 +626,7 @@ private:
         double last_token_s = -1;
         bool eog = false;
         common_chat_parser_params parser(chat);
-        parser.reasoning_format = COMMON_REASONING_FORMAT_DEEPSEEK;
-        parser.parse_tool_calls = true;
-        parser.parser.load(chat.parser);
+        parser.parser = chat.parser;
         common_chat_msg partial_message;
         std::vector<std::string> tool_call_ids;
         auto emit = [&](llama_token token) {
@@ -634,7 +640,7 @@ private:
             if (first_token_s < 0) first_token_s = elapsed_s(started);
             last_token_s = elapsed_s(started);
             if (callbacks && callbacks->token_deltas) {
-                common_chat_msg parsed = common_chat_parse(raw, true, parser);
+                common_chat_msg parsed = common_chat_parse(common_chat_input_tokenize(vocab, raw), true, parser);
                 if (target_only()) {
                     parsed.content = gemma_hybrid::strip_empty_think_prefix(parsed.content);
                 }
@@ -701,7 +707,7 @@ private:
             }
             llama_set_abort_callback(target_ctx.get(), abort_callback, const_cast<std::function<bool()> *>(&should_stop));
             const int32_t rc = llama_decode(target_ctx.get(), batch);
-            const bool processed = rc == 0 && common_speculative_process(speculative.get(), batch);
+            const bool processed = rc == 0 && process_speculative(speculative.get(), target_ctx.get(), batch);
             verified += batch.n_tokens;
             llama_batch_free(batch);
             llama_set_abort_callback(target_ctx.get(), nullptr, nullptr);
@@ -722,7 +728,7 @@ private:
             }
         }
 
-        common_chat_msg message = common_chat_parse(raw, false, parser);
+        common_chat_msg message = common_chat_parse(common_chat_input_tokenize(vocab, raw), false, parser);
         if (target_only()) {
             message.content = gemma_hybrid::strip_empty_think_prefix(message.content);
         }
@@ -918,7 +924,7 @@ int main(int argc, char ** argv) {
         persistent_session session(cfg);
 
         common_params http_params;
-        http_params.hostname = cfg.host;
+        http_params.hostnames = {cfg.host};
         http_params.port = cfg.port;
         http_params.n_parallel = 1;
         http_params.n_threads_http = 4;
@@ -983,8 +989,8 @@ int main(int argc, char ** argv) {
         http.del("/v1/stream", reset);
         http.is_ready.store(true);
         if (!http.start()) throw std::runtime_error("HTTP bind failed");
-        std::fprintf(stderr, "%s address=%s model=%s context=%d\n", cfg.draft_path.empty() ? "ZERO_COPY_READY" : "GEMMA_ZERO_COPY_READY", http.listening_address.c_str(), cfg.alias.c_str(), cfg.context);
-        if (http.thread.joinable()) http.thread.join();
+        std::fprintf(stderr, "%s address=%s model=%s context=%d\n", cfg.draft_path.empty() ? "ZERO_COPY_READY" : "GEMMA_ZERO_COPY_READY", http.listening_addresses.front().c_str(), cfg.alias.c_str(), cfg.context);
+        http.join();
         g_http = nullptr;
         llama_backend_free();
         return 0;

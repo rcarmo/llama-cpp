@@ -84,7 +84,7 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
         hparams.no_alloc || src->hparams.no_alloc || !handoff_buffers.empty() ||
         v_trans!=src->v_trans || n_seq_max!=src->n_seq_max || n_stream!=src->n_stream || n_pad!=src->n_pad ||
         n_swa!=src->n_swa || swa_type!=src->swa_type || get_size()!=src->get_size() ||
-        attn_rot_k!=src->attn_rot_k || attn_rot_v!=src->attn_rot_v || map_layer_ids!=src->map_layer_ids ||
+        n_rot_k!=src->n_rot_k || n_rot_v!=src->n_rot_v || map_layer_ids!=src->map_layer_ids ||
         layers.size()!=src->layers.size() || !sc_info.empty() || !src->sc_info.empty() || get_has_shift() || src->get_has_shift()) return nullptr;
     for (const auto & c : v_cells) if (c.get_used()) return nullptr;
     // Check every layout before acquiring buffers or copying payloads.

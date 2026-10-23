@@ -2,6 +2,10 @@
 
 This directory is the raw evidence spine for the `sigma` work. It covers the July Qwen CPU/Vulkan campaign, the August Maple and Ornith/Gemma studies, the September Gemma optimisation series and the later Intel Xe handoff work.
 
+## Upstream integration
+
+* [23 October 2026 upstream sync](upstream-sync-20261023/README.md): CPU regressions and CPU/Vulkan compilation; no model downloads or service changes
+
 ## Start here
 
 * [July Qwen campaign](final-report-20260731.md)

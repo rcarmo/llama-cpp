@@ -36,6 +36,10 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-18 / 2026-09-19 -- [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) and [PTQ1 zero-copy handoff diagnostic](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md): PTQ1 Vulkan/source and state-transfer correctness passed, but the topology was later rejected for performance after endpoint reconciliation; no deployment
 * 2026-09-28 -- [Gemma prompt-lookup benchmark correction](../../../benchmarks/intel-1340p/prompt-lookup-20260928/README.md): synthetic high-fanout cache loop improved, but isolated CPU-only `llama-lookup` spent less than 0.4 ms per 7-20 second request in cache work, with no validated request-level gain; the live Gemma MTP service was unchanged
 
+## 2026-10
+
+* 2026-10-23 -- [Upstream merge and model-free validation](../cross-platform/upstream-sync-20261023.md); no weights, service restoration or deployment
+
 ## Current runbooks and retained operational docs
 
 * [Qwen 128K on Sigma](../intel-i5-1340p/intel-1340p-qwen-longctx-runbook.md)
