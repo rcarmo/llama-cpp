@@ -8,9 +8,13 @@ The harness deliberately refuses to run when:
 - `llama-gemma-e2b-qat.service` is active;
 - the worktree is dirty, unless `ALLOW_DIRTY=1` is explicitly set.
 
-## Baseline example
+## Agent paths and baseline example
+
+Agent builds and scratch use the resolved root's `tmp/llama-cpp/{build,cache,runs}` layout. Resolution is explicit existing `WORKSPACE_ROOT`, enclosing `.pi`/`.piclaw` workspace, existing CI checkout, then repository/common Git worktree root. CI needs no PiClaw markers; missing named children are created, with no `/tmp` or unrelated `.cache` fallback. `BUILD_VARIANT=k3-release` separates toolchain/config caches. Existing build trees may be supplied with `BUILD_DIR` as read-only inputs; do not move or clear them.
 
 ```bash
+make agent-configure BUILD_VARIANT=k3-release CMAKE_ARGS='-DGGML_RISCV64_SPACEMIT=ON'
+make agent-build BUILD_VARIANT=k3-release BUILD_ARGS='--target llama-bench'
 MODEL=/home/me/models/gguf-misc/gemma-4-E2B-it-qat-UD-Q4_K_XL.gguf \
   scripts/bench-k3-matmul.sh gemma-baseline
 ```
@@ -24,7 +28,7 @@ THREADS=8 \
   scripts/bench-k3-matmul.sh quick-check
 ```
 
-Each run creates a timestamped directory under `benchmarks/k3-matmul/` containing:
+Each run creates a timestamped directory under `tmp/llama-cpp/runs/k3-matmul-<source-ref>/<worktree-id>/k3-release/` containing:
 
 - `metadata.json`: commit, model hash, parameters and SpaceMIT environment;
 - `system.txt`: CPU, memory, compiler, CMake, governor and frequency data;
@@ -37,19 +41,23 @@ Summarize one or more raw files with:
 
 ```bash
 jq -rs -f scripts/summarize-k3-matmul.jq \
-  benchmarks/k3-matmul/*/llama-bench.json
+  "$LLAMA_RUN_DIR"/*/llama-bench.json
 ```
 
 ## Matmul shape tracing
 
-Build with the campaign telemetry commit, then enable structured thread-zero tracing for a short isolated workload:
+Build with the campaign telemetry commit, then enable structured thread-zero tracing for a short isolated workload. Resolve the same scoped paths before direct commands; publish selected durable evidence to `benchmarks/k3-matmul/` only after review.
 
 ```bash
+export BUILD_VARIANT=k3-release RUN_PURPOSE=k3-matmul
+source scripts/agent-paths.sh
+llama_agent_init_paths
+llama_agent_prepare_paths
 GGML_RISCV64_SPACEMIT_MATMUL_TRACE=1 \
-  build-upstream/bin/llama-bench -m /path/model.gguf -p 32 -n 0 -r 1 -o jsonl \
-  >trace.jsonl 2>trace.log
+  "$LLAMA_BUILD_DIR/bin/llama-bench" -m /path/model.gguf -p 32 -n 0 -r 1 -o jsonl \
+  >"$LLAMA_RUN_DIR/trace.jsonl" 2>"$LLAMA_RUN_DIR/trace.log"
 
-scripts/summarize-k3-matmul-trace.awk trace.log
+scripts/summarize-k3-matmul-trace.awk "$LLAMA_RUN_DIR/trace.log"
 ```
 
 Each `SPACEMIT_MATMUL` line records the selected path, operation, types, M/N/K, batch dimensions and thread count. The summarizer reports both call frequency and relative MAC weight; MAC weight is a prioritization estimate, not elapsed time. Tracing is disabled by default and cached once per process.
@@ -71,7 +79,7 @@ Forced TCM modes fall through to the direct scheduler when their capacity constr
 Use the opt-in aggregate profiler for short, isolated requests:
 
 ```bash
-GGML_CPU_WHOLE_TOKEN_PROFILE=1 build-upstream/bin/llama-server ...
+GGML_CPU_WHOLE_TOKEN_PROFILE=1 "$LLAMA_BUILD_DIR/bin/llama-server" ...
 ```
 
 It emits cumulative process totals at exit for matrix, attention, recurrent, copy and other work, including node wall time, summed active-thread time, thread capacity, estimated idle/synchronization time and logical source/destination bytes. Profiling mode adds barriers at node boundaries to make wall measurements well-defined, so use separately measured unprofiled throughput for performance claims and use active-thread shares to locate dominant families. Fused nodes are attributed to the first operation in the fused pair. In a tiny 100-process fixture, profiler-enabled and disabled wall time was indistinguishable (36.633 s versus 36.640 s), but this does not bound enabled overhead on a model graph with many short nodes. The environment-unset path retains the original barrier schedule.
@@ -87,12 +95,12 @@ GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=0
 # Direct IQ2/IQ3/IQ4 packing into IME2 tiles with a bounded cache
 GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1 \
 GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=8192 \
-  build-upstream/bin/llama-server ...
+  "$LLAMA_BUILD_DIR/bin/llama-server" ...
 
 # Exercise IME2 scratch packing without cross-request cache reuse
 GGML_RISCV64_SPACEMIT_IQ_IME2_TILE=1 \
 GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_MB=0 \
-  build-upstream/bin/test-spacemit-iq-moe-correctness 8
+  "$LLAMA_BUILD_DIR/bin/test-spacemit-iq-moe-correctness" 8
 ```
 
 `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_BYTES` sets an exact byte ceiling and takes precedence over the MiB setting. The cache budget is shared across IQ2, IQ3 and IQ4 formats. `GGML_RISCV64_SPACEMIT_IQ_IME2_CACHE_ADMIT_ROUTES`, `GGML_RISCV64_SPACEMIT_IQ_IME2_PROTECTED_PCT` and `GGML_RISCV64_SPACEMIT_IQ_IME2_LAYER_RESERVE_PCT` expose diagnostic admission/protection policies; global tile LRU with a 0% protected pool is the default because tested protected-expert and whole-expert policies regressed Qwen.

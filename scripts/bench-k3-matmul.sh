@@ -3,9 +3,18 @@
 set -euo pipefail
 
 ROOT=$(git rev-parse --show-toplevel)
-BUILD_DIR=${BUILD_DIR:-"${ROOT}/build-upstream"}
+# shellcheck source=agent-paths.sh
+source "${ROOT}/scripts/agent-paths.sh"
+BUILD_VARIANT=${BUILD_VARIANT:-k3-release}
+RUN_PURPOSE=${RUN_PURPOSE:-k3-matmul}
+# BUILD_DIR is a read-only executable input; retained builds may stay in place.
+if [[ -n ${BUILD_DIR:-} ]]; then retained_build=$BUILD_DIR; fi
+if [[ -n ${RESULTS_ROOT:-} ]]; then LLAMA_RUN_DIR=$RESULTS_ROOT; fi
+llama_agent_init_paths
+llama_agent_prepare_paths
+BUILD_DIR=${retained_build:-$LLAMA_BUILD_DIR}
 BENCH=${BENCH:-"${BUILD_DIR}/bin/llama-bench"}
-RESULTS_ROOT=${RESULTS_ROOT:-"${ROOT}/benchmarks/k3-matmul"}
+RESULTS_ROOT=$LLAMA_RUN_DIR
 detected_cpu_list=$(awk '/^Cpus_allowed_list:/ { print $2 }' /proc/self/status)
 THREADS=${THREADS:-8}
 REPETITIONS=${REPETITIONS:-5}
@@ -23,8 +32,10 @@ usage() {
 Usage: MODEL=/path/model.gguf $0 [label]
 
 Environment:
-  BUILD_DIR       build tree (default: build-upstream)
-  RESULTS_ROOT    result root (default: benchmarks/k3-matmul)
+  WORKSPACE_ROOT  physical workspace containing .pi and .piclaw
+  BUILD_VARIANT   named build/cache variant (default: k3-release)
+  BUILD_DIR       read-only build input (default: project-scoped build directory)
+  RESULTS_ROOT    writable output root inside workspace/tmp/llama-cpp/runs/
   THREADS         llama-bench threads (default: 8)
   REPETITIONS     measured repetitions (default: 5)
   PROMPTS         comma-separated prompt sizes (default: 32,128,512)
