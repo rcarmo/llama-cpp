@@ -1,0 +1,241 @@
+[
+  {
+    "task": "q04-policy-D",
+    "profile": "cpu",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 0,
+    "copied_bytes": 0,
+    "generated_tokens": 589,
+    "answer": {
+      "approved_ids": [
+        "A",
+        "B",
+        "F"
+      ],
+      "reasons": {
+        "C": "missing_receipt",
+        "D": "alcohol",
+        "E": "late"
+      },
+      "total_eur": 135
+    }
+  },
+  {
+    "task": "q04-policy-D",
+    "profile": "handoff",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": false,
+    "error": "structured_answer_mismatch",
+    "shared_bytes": 268937728,
+    "copied_bytes": 0,
+    "generated_tokens": 583,
+    "answer": {
+      "approved_ids": [
+        "A",
+        "B",
+        "C",
+        "F"
+      ],
+      "reasons": {
+        "D": "alcohol",
+        "E": "late"
+      },
+      "total_eur": 160
+    }
+  },
+  {
+    "task": "q05-conflicts-D",
+    "profile": "cpu",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": false,
+    "error": "structured_answer_mismatch",
+    "shared_bytes": 0,
+    "copied_bytes": 0,
+    "generated_tokens": 601,
+    "answer": {
+      "android_offline": "unknown",
+      "conflict_sources": [
+        [
+          "D1",
+          "D2"
+        ],
+        [
+          "D3",
+          "D4"
+        ]
+      ],
+      "encryption_can_disable": "unknown",
+      "offline_linux": "yes",
+      "offline_windows": "no"
+    }
+  },
+  {
+    "task": "q05-conflicts-D",
+    "profile": "handoff",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 268937728,
+    "copied_bytes": 0,
+    "generated_tokens": 601,
+    "answer": {
+      "android_offline": "unknown",
+      "conflict_sources": [
+        [
+          "D1",
+          "D2"
+        ],
+        [
+          "D3",
+          "D4"
+        ]
+      ],
+      "encryption_can_disable": "unknown",
+      "offline_linux": "yes",
+      "offline_windows": "unknown"
+    }
+  },
+  {
+    "task": "q06-incident-D",
+    "profile": "cpu",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 0,
+    "copied_bytes": 0,
+    "generated_tokens": 592,
+    "answer": {
+      "causality_proven": false,
+      "cpu_saturation_supported": false,
+      "leading_change": "timeout_reduction",
+      "missing_measurement": "request_latency_distribution",
+      "recovery_evidence": [
+        "E4",
+        "E5"
+      ]
+    }
+  },
+  {
+    "task": "q06-incident-D",
+    "profile": "handoff",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 268937728,
+    "copied_bytes": 0,
+    "generated_tokens": 592,
+    "answer": {
+      "causality_proven": false,
+      "cpu_saturation_supported": false,
+      "leading_change": "timeout_reduction",
+      "missing_measurement": "request_latency_distribution",
+      "recovery_evidence": [
+        "E4",
+        "E5"
+      ]
+    }
+  },
+  {
+    "task": "h01-waiver-D",
+    "profile": "cpu",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": false,
+    "error": "structured_answer_mismatch",
+    "shared_bytes": 0,
+    "copied_bytes": 0,
+    "generated_tokens": 575,
+    "answer": {
+      "denied": {
+        "R2": "opened",
+        "R3": "missing_receipt",
+        "R4": "late"
+      },
+      "eligible": [
+        "R1"
+      ]
+    }
+  },
+  {
+    "task": "h01-waiver-D",
+    "profile": "handoff",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": false,
+    "error": "structured_answer_mismatch",
+    "shared_bytes": 268937728,
+    "copied_bytes": 0,
+    "generated_tokens": 583,
+    "answer": {
+      "denied": {
+        "R2": "opened",
+        "R3": "missing_receipt",
+        "R1": "late",
+        "R4": "late"
+      },
+      "eligible": [
+        "R4"
+      ]
+    }
+  },
+  {
+    "task": "h02-evidence-D",
+    "profile": "cpu",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 0,
+    "copied_bytes": 0,
+    "generated_tokens": 589,
+    "answer": {
+      "audit_log_default": "unknown",
+      "conflicts": [
+        [
+          "S1",
+          "S2"
+        ],
+        [
+          "S3",
+          "S4"
+        ]
+      ],
+      "freebsd_supported": "unknown",
+      "solar_is_supported": "unknown"
+    }
+  },
+  {
+    "task": "h02-evidence-D",
+    "profile": "handoff",
+    "native_completed": true,
+    "schema_valid": true,
+    "expected_answer": true,
+    "error": null,
+    "shared_bytes": 268937728,
+    "copied_bytes": 0,
+    "generated_tokens": 589,
+    "answer": {
+      "audit_log_default": "unknown",
+      "conflicts": [
+        [
+          "S1",
+          "S2"
+        ],
+        [
+          "S3",
+          "S4"
+        ]
+      ],
+      "freebsd_supported": "unknown",
+      "solar_is_supported": "unknown"
+    }
+  }
+]

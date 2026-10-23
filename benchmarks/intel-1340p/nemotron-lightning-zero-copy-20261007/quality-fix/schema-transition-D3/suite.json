@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "q04-policy-D",
+      "kind": "json",
+      "expected": {
+        "approved_ids": [
+          "A",
+          "B",
+          "F"
+        ],
+        "total_eur": 135,
+        "reasons": {
+          "C": "missing_receipt",
+          "D": "alcohol",
+          "E": "late"
+        }
+      },
+      "request": {
+        "thinking": true,
+        "temperature": 1,
+        "max_tokens": 1536,
+        "messages": [
+          {
+            "role": "system",
+            "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+          },
+          {
+            "role": "user",
+            "content": "Use only this policy and these records. A standard expense is reimbursable only if it has a receipt, was submitted no later than 30 days after purchase, and is not alcohol. A manager exception waives only the deadline, never the receipt or alcohol exclusions. Exactly day 30 counts as timely. For a claim with multiple failing conditions choose the reason in this priority: alcohol, missing_receipt, late. Accepted claims use reason approved. Do not infer facts.\nClaims:\nA: amount 80 EUR, receipt yes, submitted day 30, category meal, manager exception no.\nB: amount 40 EUR, receipt yes, submitted day 31, category travel, manager exception yes.\nC: amount 25 EUR, receipt no, submitted day 5, category meal, manager exception yes.\nD: amount 60 EUR, receipt yes, submitted day 1, category alcohol, manager exception yes.\nE: amount 100 EUR, receipt yes, submitted day 31, category travel, manager exception no.\nF: amount 15 EUR, receipt yes, submitted day 0, category supplies, manager exception no.\nReturn only JSON with keys approved_ids (alphabetically sorted), total_eur (number), reasons (object mapping rejected IDs to reason)."
+          }
+        ],
+        "reasoning_budget": 512,
+        "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n",
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "approved_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "total_eur": {
+              "type": "number"
+            },
+            "reasons": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "approved_ids",
+            "total_eur",
+            "reasons"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "id": "q05-conflicts-D",
+      "kind": "json",
+      "expected": {
+        "offline_linux": "yes",
+        "offline_windows": "unknown",
+        "encryption_can_disable": "unknown",
+        "android_offline": "unknown",
+        "conflict_sources": [
+          [
+            "D1",
+            "D2"
+          ],
+          [
+            "D3",
+            "D4"
+          ]
+        ]
+      },
+      "request": {
+        "thinking": true,
+        "temperature": 1,
+        "max_tokens": 1536,
+        "messages": [
+          {
+            "role": "system",
+            "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+          },
+          {
+            "role": "user",
+            "content": "Answer only from the documents below, using exact source IDs. Do not resolve an unresolved conflict by guessing.\n[D1] On 3 October the release note says Cedar 2.4 supports offline mode on all platforms.\n[D2] On 4 October the platform matrix says offline mode is supported on Linux and macOS, but not Windows. It does not say D1 was withdrawn.\n[D3] The admin guide says encryption-at-rest is enabled by default. Customers can turn it off.\n[D4] The security FAQ says encryption-at-rest cannot be disabled. No publication date or precedence is given for D3 or D4.\n[D5] No supplied document discusses Android.\nReturn only JSON with keys offline_linux (yes/no/unknown), offline_windows (yes/no/unknown), encryption_can_disable (yes/no/unknown), android_offline (yes/no/unknown), conflict_sources (array of two arrays listing the conflicting source IDs, ordered offline then encryption). Unknown is required where the supplied sources conflict without explicit precedence."
+          }
+        ],
+        "reasoning_budget": 512,
+        "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n",
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "offline_linux": {
+              "type": "string"
+            },
+            "offline_windows": {
+              "type": "string"
+            },
+            "encryption_can_disable": {
+              "type": "string"
+            },
+            "android_offline": {
+              "type": "string"
+            },
+            "conflict_sources": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "offline_linux",
+            "offline_windows",
+            "encryption_can_disable",
+            "android_offline",
+            "conflict_sources"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "id": "q06-incident-D",
+      "kind": "json",
+      "expected": {
+        "leading_change": "timeout_reduction",
+        "causality_proven": false,
+        "cpu_saturation_supported": false,
+        "recovery_evidence": [
+          "E4",
+          "E5"
+        ],
+        "missing_measurement": "request_latency_distribution"
+      },
+      "request": {
+        "thinking": true,
+        "temperature": 1,
+        "max_tokens": 1536,
+        "messages": [
+          {
+            "role": "system",
+            "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+          },
+          {
+            "role": "user",
+            "content": "Use only these evidence lines. Distinguish correlation from a proved cause. Respond with the specified JSON only.\n[E1] 10:00 deployment changes request timeout from 30s to 5s.\n[E2] 10:03 timeout responses rise from 0.2% to 12%.\n[E3] 10:04 CPU utilisation remains at its previous 45%; memory remains at 60%.\n[E4] 10:08 rollback restores the 30s timeout.\n[E5] 10:10 timeout responses fall to 0.3%.\n[E6] No controlled experiment, request-latency histogram or downstream trace was captured.\nQuestions: Which change is the leading hypothesis? Is causality proved? Is CPU saturation supported? Which two evidence IDs bracket the recovery intervention and outcome? Name the missing request measurement needed to test whether more requests exceeded the new limit. The most useful next diagnostic should measure the latency distribution under comparable load rather than assert an unobserved outage.\nJSON keys: leading_change (exactly timeout_reduction), causality_proven (boolean), cpu_saturation_supported (boolean), recovery_evidence (two IDs), missing_measurement (exactly request_latency_distribution)."
+          }
+        ],
+        "reasoning_budget": 512,
+        "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n",
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "leading_change": {
+              "type": "string"
+            },
+            "causality_proven": {
+              "type": "boolean"
+            },
+            "cpu_saturation_supported": {
+              "type": "boolean"
+            },
+            "recovery_evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "missing_measurement": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "leading_change",
+            "causality_proven",
+            "cpu_saturation_supported",
+            "recovery_evidence",
+            "missing_measurement"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "id": "h01-waiver-D",
+      "kind": "json",
+      "expected": {
+        "eligible": [
+          "R1",
+          "R4"
+        ],
+        "denied": {
+          "R2": "opened",
+          "R3": "missing_receipt"
+        }
+      },
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+          },
+          {
+            "role": "user",
+            "content": "Returns are eligible only if unopened, with a receipt, and within14 days of delivery. A shipping-delay waiver changes only the14-day limit, not the unopened/receipt requirements. Records:R1 unopened,receiptyes,day20,waiveryes;R2 opened,receiptyes,day10,waiveryes;R3 unopened,receiptno,day3,waiveryes;R4 unopened,receiptyes,day14,waiverno. Return JSON only:eligible(sortedIDs),denied(objectID->reason;opened takes priority over missing_receipt then late)."
+          }
+        ],
+        "thinking": true,
+        "temperature": 1,
+        "reasoning_budget": 512,
+        "max_tokens": 1536,
+        "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n",
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "eligible": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "denied": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "eligible",
+            "denied"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "id": "h02-evidence-D",
+      "kind": "json",
+      "expected": {
+        "freebsd_supported": "unknown",
+        "audit_log_default": "unknown",
+        "solar_is_supported": "unknown",
+        "conflicts": [
+          [
+            "S1",
+            "S2"
+          ],
+          [
+            "S3",
+            "S4"
+          ]
+        ]
+      },
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+          },
+          {
+            "role": "user",
+            "content": "Use supplied notes only. [S1] ProductBeacon4 supportsFreeBSD. [S2] ProductBeacon4 doesnot supportFreeBSD. [S3] Auditlogging is onbydefault. [S4] Auditlogging is offbydefault. None has a date/authority/precedence,and no source discussesSolaris. Explicitly useunknown for missing or contradictory facts. Return JSON only:freebsd_supported(yes/no/unknown),audit_log_default(on/off/unknown),solar_is_supported(yes/no/unknown),conflicts(twoarrays ofsourceIDs forFreeBSD thenauditlogging)."
+          }
+        ],
+        "thinking": true,
+        "temperature": 1,
+        "reasoning_budget": 512,
+        "max_tokens": 1536,
+        "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n",
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "freebsd_supported": {
+              "type": "string"
+            },
+            "audit_log_default": {
+              "type": "string"
+            },
+            "solar_is_supported": {
+              "type": "string"
+            },
+            "conflicts": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": [
+            "freebsd_supported",
+            "audit_log_default",
+            "solar_is_supported",
+            "conflicts"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

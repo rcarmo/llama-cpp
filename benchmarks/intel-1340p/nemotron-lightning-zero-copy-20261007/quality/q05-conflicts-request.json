@@ -1,0 +1,11 @@
+{
+  "thinking": false,
+  "temperature": 0,
+  "max_tokens": 256,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Answer only from the documents below, using exact source IDs. Do not resolve an unresolved conflict by guessing.\n[D1] On 3 October the release note says Cedar 2.4 supports offline mode on all platforms.\n[D2] On 4 October the platform matrix says offline mode is supported on Linux and macOS, but not Windows. It does not say D1 was withdrawn.\n[D3] The admin guide says encryption-at-rest is enabled by default. Customers can turn it off.\n[D4] The security FAQ says encryption-at-rest cannot be disabled. No publication date or precedence is given for D3 or D4.\n[D5] No supplied document discusses Android.\nReturn only JSON with keys offline_linux (yes/no/unknown), offline_windows (yes/no/unknown), encryption_can_disable (yes/no/unknown), android_offline (yes/no/unknown), conflict_sources (array of two arrays listing the conflicting source IDs, ordered offline then encryption). Unknown is required where the supplied sources conflict without explicit precedence."
+    }
+  ]
+}

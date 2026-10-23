@@ -26,11 +26,11 @@ llama_memory_recurrent::llama_memory_recurrent(
                  uint32_t   n_seq_max,
                  uint32_t   n_rs_seq,
     const layer_filter_cb & filter,
-    const llama_memory_init & init) : hparams(model.hparams), n_seq_max(n_seq_max) {
+    const llama_memory_init & init) : hparams(model.hparams), handoff_arch(model.arch), n_seq_max(n_seq_max) {
     handoff_strict = init.strict || init.deferred;
     handoff_deferred = init.deferred;
-    if (handoff_strict && (n_seq_max != 1 || mem_size != 1 || model.arch != LLM_ARCH_QWEN35 || hparams.no_alloc)) {
-        throw std::runtime_error("strict recurrent handoff requires one Qwen35 sequence");
+    if (handoff_strict && (n_seq_max != 1 || mem_size != 1 || !model.supports_strict_state_handoff() || hparams.no_alloc)) {
+        throw std::runtime_error("strict recurrent handoff requires one supported sequence");
     }
     if (n_rs_seq == UINT32_MAX || (uint64_t) mem_size * (1ull + n_rs_seq) > INT32_MAX) {
         throw std::runtime_error("recurrent snapshot row count overflow");

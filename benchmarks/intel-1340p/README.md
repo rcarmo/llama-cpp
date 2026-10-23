@@ -8,6 +8,9 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## Start here
 
+* [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007/README.md) -- exact native state/rollback, 32-1024-token model gates and 512/1024 ABBA; experimental, no serving change.
+
+
 * [July Qwen campaign](final-report-20260731.md)
 * [Maple Preview evidence](maple-preview/README.md)
 * [Maple, Gemma and Qwen campaign](maple-qwen-campaign/README.md)

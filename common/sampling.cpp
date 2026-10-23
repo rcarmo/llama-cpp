@@ -127,7 +127,12 @@ struct common_sampler {
 
     void reset() {
         prev.clear();
+        std::fill(cur.begin(), cur.end(), llama_token_data{});
+        cur_p = {cur.data(), cur.size(), -1, false};
 
+        // These stateful samplers live outside the main chain and must reset with it.
+        llama_sampler_reset(grmr);
+        llama_sampler_reset(rbudget);
         llama_sampler_reset(chain);
     }
 
@@ -858,6 +863,10 @@ bool common_sampler_reasoning_budget_force(struct common_sampler * gsmpl) {
     }
 
     return common_reasoning_budget_force(gsmpl->rbudget);
+}
+
+common_reasoning_budget_state common_sampler_reasoning_budget_state_get(const struct common_sampler * gsmpl) {
+    return gsmpl ? common_reasoning_budget_get_state(gsmpl->rbudget) : REASONING_BUDGET_IDLE;
 }
 
 // helpers
