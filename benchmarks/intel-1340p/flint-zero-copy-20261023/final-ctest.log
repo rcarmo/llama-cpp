@@ -1,0 +1,23 @@
+bash "/var/home/agent/workspace/projects/llama-cpp/scripts/agent-build.sh" test --fixture-exclude-any generate-models -R ^\(test-context-handoff.*\|test-flint-handoff-synthetic\|test-vulkan-cpu-view\)$
+Test project /var/home/agent/workspace/tmp/llama-cpp/build/source-1309921403/flint-vulkan
+    Start 50: test-context-handoff
+1/6 Test #50: test-context-handoff ...........................   Passed    0.10 sec
+    Start 51: test-flint-handoff-synthetic
+2/6 Test #51: test-flint-handoff-synthetic ...................   Passed    0.67 sec
+    Start 52: test-context-handoff-gemma
+3/6 Test #52: test-context-handoff-gemma .....................   Passed    0.06 sec
+    Start 53: test-context-handoff-qwen-strict-destination
+4/6 Test #53: test-context-handoff-qwen-strict-destination ...   Passed    0.04 sec
+    Start 54: test-context-handoff-qwen-mtp-roundtrip
+5/6 Test #54: test-context-handoff-qwen-mtp-roundtrip ........   Passed    0.04 sec
+    Start 55: test-vulkan-cpu-view
+6/6 Test #55: test-vulkan-cpu-view ...........................   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+behavior    =   0.67 sec*proc (1 test)
+main        =   0.24 sec*proc (4 tests)
+vulkan      =   0.05 sec*proc (1 test)
+
+Total Test time (real) =   0.96 sec

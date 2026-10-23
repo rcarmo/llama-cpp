@@ -1,25 +1,31 @@
 # Gemma hybrid tools
 
+**Sigma operating state, 23 October 2026:** model-serving units and installed runtimes were removed. This page documents retained implementations and historical profiles. [Current status](../../docs/local/intel-i5-1340p/model-serving-status-20261023.md) applies before any startup or rollback instructions below. No service was restored by this source integration.
+
 `llama-gemma-zero-copy-server` owns a persistent single-slot Gemma session. A cold chat request prefills with Vulkan, moves the K/V cache into a CPU context in process, destroys the consumed Vulkan context while retaining the Vulkan model owner, creates the CPU MTP borrower and generates the response. The request fails unless `shared_bytes > 0` and `copied_bytes == 0`.
 
 Build and run it with:
 
 ```sh
-cmake --build build --target llama-gemma-zero-copy-server
-build/bin/llama-gemma-zero-copy-server \
+BUILD_VARIANT=gemma-vulkan make agent-configure \
+  CMAKE_ARGS='-DGGML_VULKAN=ON -DLLAMA_USE_PREBUILT_UI=OFF'
+BUILD_VARIANT=gemma-vulkan make agent-build \
+  BUILD_ARGS='--target llama-gemma-zero-copy-server'
+build_dir=$(BUILD_VARIANT=gemma-vulkan bash scripts/agent-paths.sh --get LLAMA_BUILD_DIR)
+"$build_dir/bin/llama-gemma-zero-copy-server" \
   --model target.gguf --draft assistant.gguf \
   --host 127.0.0.1 --port 18094 --ctx-size 32768 \
   --draft-max 3 --draft-min 1 \
   --threadpools 0 --model-sampling 1
 ```
 
-`--model-sampling 1` reads GGUF sampling defaults for request fields the client does not set. Request overrides still win. `--draft-min 1` matches the retained MTP policy. `--threadpools 0` is the Sigma primary setting: attached target/draft pools are implemented for diagnostics, but the eight-run comparison measured 1.98% lower decode throughput when they were enabled. The primary Gemma 4 E4B QAT + MTP environment also sets `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1`; its historical campaign label is ZC2. This option changes temporary lifetimes in the four-row Q4 target kernel without changing its arithmetic or output layout.
+`--model-sampling 1` reads GGUF sampling defaults for request fields the client does not set. Request overrides still win. `--draft-min 1` matches the retained MTP policy. `--threadpools 0` was the retained Sigma primary setting: attached target/draft pools are implemented for diagnostics, but the eight-run comparison measured 1.98% lower decode throughput when they were enabled. The historical primary Gemma 4 E4B QAT + MTP environment also set `GGML_CPU_EXPERIMENTAL_Q4_N4_SCHEDULE=1`; its historical campaign label is ZC2. This option changes temporary lifetimes in the four-row Q4 target kernel without changing its arithmetic or output layout.
 
 The server provides the embedded UI, `/health`, `/props`, `/v1/models` and `/v1/chat/completions`. It accepts OpenAI messages and tools, parses tool calls and reuses K/V only when the request exactly appends to the committed history. An edited, regenerated or otherwise divergent branch resets the slot and runs cold, including requests with the same `X-Conversation-Id`. It is serial and replaces the resident conversation when a different conversation starts. Client disconnects abort the active decode and clear the slot. `DELETE /v1/stream` also clears the owning slot.
 
 `/health` reports the current resident slot through `route`, `zero_copy_ready`, `current_shared_bytes` and `current_copied_bytes`, including while `processing=true`. `handoffs_total`, `shared_bytes_total` and `copied_bytes_total` are process-lifetime diagnostics. The older `handoffs`, `shared_bytes` and `copied_bytes` names remain as aliases when the session lock is available. A reset changes the current route to `idle` without erasing lifetime totals.
 
-The service accepts non-streaming requests and live SSE responses. Streaming sends an initial OpenAI chunk immediately, `prompt_progress` after each prompt batch, parsed content/reasoning/tool-call deltas during generation, then final usage, timings and zero-copy telemetry. It does not retain server-side replay data after a stream disconnect. Maximum request JSON is 16 MiB. Admission allows at most eight outstanding HTTP requests, including the active request. Context and output limits come from `--ctx-size` and `--max-output`. Use an external supervisor for memory, swap and process limits. The Sigma profile uses `MemoryMax=16G`, `MemorySwapMax=0` and one 32K slot.
+The service accepts non-streaming requests and live SSE responses. Streaming sends an initial OpenAI chunk immediately, `prompt_progress` after each prompt batch, parsed content/reasoning/tool-call deltas during generation, then final usage, timings and zero-copy telemetry. It does not retain server-side replay data after a stream disconnect. Maximum request JSON is 16 MiB. Admission allows at most eight outstanding HTTP requests, including the active request. Context and output limits come from `--ctx-size` and `--max-output`. Use an external supervisor for memory, swap and process limits. The historical Sigma profile used `MemoryMax=16G`, `MemorySwapMax=0` and one 32K slot.
 
 Run `bun tools/gemma-hybrid/verify-stream.ts` for incremental content/progress verification and `bun tools/gemma-hybrid/verify-stream-tool.ts` for streamed tool-call assembly. Set `GEMMA_ZERO_COPY_URL` to check a non-default endpoint such as the LAN proxy.
 
@@ -27,7 +33,15 @@ See [the original Gemma zero-copy service qualification](../../benchmarks/intel-
 
 `llama-gemma-in-memory` is the one-request native diagnostic. It retains target history and sampling in RAM and reports shared/copied bytes.
 
-The TypeScript adapter below is the older file-mediated loopback implementation. It is retained for historical reproduction and is not used by the zero-copy LAN service.
+The TypeScript adapter below is the older file-mediated loopback implementation, retained for historical reproduction.
+
+## Target-only mode and retained Qwen fixes
+
+Omit `--draft` to select target-only decoding. `--reasoning-effort none|low|medium|xhigh` defaults to `none`; other values enable the template's thinking mode. `--release-gpu-after-handoff 1` releases the source GPU context/model after successful handoff. Both non-default reasoning effort and GPU release are rejected when `--draft` is set. Target-only loading uses explicit mmap; the admitted shared-buffer owners preserve CPU continuation after source-owner destruction.
+
+Non-streaming responses assign missing tool-call IDs. SSE uses identity content encoding. `POST /v1/streams/lookup` returns an empty array for the UI probe; server-side stream replay is still unavailable. These implementation fixes do not qualify a new model/profile or deploy a service.
+
+The [Flint coding runner](../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/plan.md) uses a separate diagnostic harness. Its uncapped generation policy does not change this server's `--max-output` admission limit.
 
 ## File-mediated adapter
 

@@ -1,5 +1,7 @@
 # Ornith 1.5 local provider on LattePanda Sigma
 
+**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+
 Ornith 1.5 35B-A3B Q4_K_M is a validated but disabled Sigma profile. When enabled, it listens on `127.0.0.1:8095` and exposes a 131,072-token context through `local-ornith/ornith-1.5-35b-a3b-q4-k-m`. The current service is [Gemma zero-copy](gemma-local-provider-runbook.md).
 
 ## Selected profile

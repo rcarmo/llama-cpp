@@ -1,5 +1,7 @@
 # Intel i5-1340P Ornith 1.0 35B runbook
 
+**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+
 This runbook defines the validated 128K candidate profile for Ornith 1.0 35B on `sigma`: one 131,072-token slot, embedded MTP depth 2, F16 KV cache and Flash Attention disabled.
 
 ## Hardware and software

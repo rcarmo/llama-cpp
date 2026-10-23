@@ -1,5 +1,7 @@
 # Model navigation
 
+**Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. Sigma deployment statements below describe historical profiles. The [dated operating status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes their startup and rollback instructions; other hosts are unchanged.
+
 The same work can be read by model family instead of by host. That matters whenever one model appears on more than one machine or when a newer report keeps an older one only as rollback context.
 
 ## Qwen

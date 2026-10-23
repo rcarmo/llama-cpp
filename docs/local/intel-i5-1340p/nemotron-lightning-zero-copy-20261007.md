@@ -1,5 +1,7 @@
 # Nemotron Lightning strict handoff, 7 October 2026
 
+**Publication note, 23 October 2026:** the dated measurements and quality failures below are retained unchanged. The implementation is integrated with the current upstream merge, with the native semantic test adapted to the current chat-session API. No trained Nemotron quality rerun or service restoration occurred. [Operating status](model-serving-status-20261023.md) supersedes historical serving and branch-publication statements.
+
 Experimental strict Intel Vulkan-to-CPU state transfer passes native correctness gates for Nemotron-H and Nemotron-H-MoE. It is not deployed. The fixed-token timing screen favours CPU at 512 tokens and handoff at 1024 tokens when model loading is included. This does not establish task quality, a serving crossover or a general speedup.
 
 ## Scope and source

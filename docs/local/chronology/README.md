@@ -39,8 +39,9 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 ## 2026-10
 
 * 2026-10-23 -- [Upstream merge and model-free validation](../cross-platform/upstream-sync-20261023.md); no weights, service restoration or deployment
+* 2026-10-23 -- [Model-serving removal/status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes older deployment statements. [Flint throughput, strict zero-copy and coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md): 50.43/13.09 prompt/decode tok/s; capped coding calibration retained, completion-driven evaluation running; no deployment.
 
-## Current runbooks and retained operational docs
+## Retained operational docs
 
 * [Qwen 128K on Sigma](../intel-i5-1340p/intel-1340p-qwen-longctx-runbook.md)
 * [Local Gemma, Huihui and Bonsai profiles on Sigma](../intel-i5-1340p/gemma-local-provider-runbook.md)

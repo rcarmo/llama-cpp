@@ -1,17 +1,19 @@
 # Nemotron Lightning strict zero-copy evidence
 
+**Publication note, 23 October 2026:** the dated measurements and quality failures below are retained unchanged. The implementation is integrated with the current upstream merge, with the native semantic test adapted to the current chat-session API. No trained Nemotron quality rerun or service restoration occurred. [Operating status](../../../docs/local/intel-i5-1340p/model-serving-status-20261023.md) supersedes historical serving and branch-publication statements.
+
 7 October 2026, Sigma Intel i5-1340P / Iris Xe. Experimental branch, not deployed. [Report and prior-feature reuse checklist](../../../docs/local/intel-i5-1340p/nemotron-lightning-zero-copy-20261007.md).
 
 - Implementation checkpoint: `47368961c64c4518f1f02a77f0cfecb957f5a371`.
 
 - Source parent: `fdfd814abcb34915b23a5f206c88c834f0f1333f`; [source manifest](evidence/source-manifest.txt).
 - [Structured results](evidence/results.json): fixed token IDs, model/load/prefill/handoff/re-evaluation/continuation timing and sampled cgroup resources.
-- [CPU suite](evidence/final-cpu-tests.log): 13/13 focused tests.
-- `evidence/final-native-*.log`: six Nemotron-H/MoE rollback/lifetime tests and existing Qwen target/paired-MTP regressions.
+- The historical CPU suite reports 13/13 focused tests. Its `evidence/final-cpu-tests.log` capture is absent from this checkout.
+- Structured `evidence/final-native-*-state.json` captures retain the six Nemotron-H/MoE rollback/lifetime tests and existing Qwen target/paired-MTP regressions. The historical `.log` names listed below are not included in this checkout; resource samples and manifests are retained.
 - `evidence/handoff-p*-ref1.log`: exact Lightning mmap, positive shared bytes/zero copied bytes, finite logits, last-token re-evaluation and two exact all-vocabulary CPU continuation steps against copied state after source/GPU-model destruction.
 - `evidence/*-abba*.log`: fresh-process CPU/handoff/handoff/CPU, two observations per profile, 512 and 1024 prefill tokens.
 - `evidence/*-resources.tsv`, `*-memory.events`, `*-manifest.txt`: sampled host reserve, cgroup memory/swap/events, native library hashes and arguments.
-- [Invalid serialized rollback reference](evidence/invalid-serialized-rollback-reference.log): retained failure. Wire serialization omits historical recurrent rows; the corrected synthetic test independently computes and rolls Vulkan control state before restoring current state into CPU reference. All corrected state comparisons are bit-exact.
+- The campaign recorded an invalid serialized rollback reference; `evidence/invalid-serialized-rollback-reference.log` is absent from this checkout. Wire serialization omits historical recurrent rows; the corrected synthetic test independently computes and rolls Vulkan control state before restoring current state into CPU reference. The original report records bit-exact corrected state comparisons.
 
 ## Quality-fix investigation
 

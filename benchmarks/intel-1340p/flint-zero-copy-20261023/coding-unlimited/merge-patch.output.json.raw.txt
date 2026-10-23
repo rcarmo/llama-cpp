@@ -1,0 +1,208 @@
+<think>We need answer only code block. Need implement CommonJS module. Export exactly requested function with module.exports = functionName. Function name? likely mergePatch. "module.exports = functionName" means module.exports = mergePatch; probably.
+
+Need no imports deps fs network. Return only one fenced javascript code block, no explanation.
+
+Need implement mergePatch(target, patch) RFC 7396. Details.
+
+We need be careful: If patch is not a non-null non-array object, return deep copy of patch. Otherwise start from deep copy of target if it is such an object, else {}. For each patch key, null deletes that key; every other value recursively applies mergePatch to that property. Arrays are replaced, not merged. Inputs JSON values. Do not mutate or share mutable arrays/objects with either input.
+
+Interpret "non-null non-array object" means plain object? JSON values include objects, arrays, strings, numbers, booleans, null. So patch should be object non-null non-array to merge. If not, return deep copy of patch.
+
+Target deep copy if it is such an object (plain object non-null non-array?) else {}. For each patch key. If patch key null deletes. Every other value recursively applies mergePatch to that property.
+
+Need deep copy JSON values to avoid mutation/share. Could implement isPlainObject? Since JSON values, object means plain object. Arrays are objects? They explicitly say arrays replaced, not merged, and patch not non-null non-array object. So treat arrays as non-merge? For patch array, return deep copy of patch (since patch is array, not object for merge). For target array? If target is array, not such object? They said start from deep copy of target if it is such an object, else {}. Such object likely plain object non-null non-array. So target array -> {}.
+
+Deep copy: JSON.parse(JSON.stringify(value)) works for JSON values but may not preserve undefined? Inputs JSON values so okay. But null etc. Could use structuredClone? No dependency but maybe environment. Better custom deepCopy.
+
+Need not mutate/share. We'll create result deep copy.
+
+Algorithm:
+
+function isPlainObjectLike(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function deepCopy(value) {
+  if (Array.isArray(value)) return value.map(deepCopy);
+  if (isPlainObjectLike(value)) {
+    const out = {};
+    for (const key of Object.keys(value)) out[key] = deepCopy(value[key]);
+    return out;
+  }
+  return value;
+}
+
+function mergePatch(target, patch) {
+  if (!isPlainObjectLike(patch)) {
+    return deepCopy(patch);
+  }
+  const result = isPlainObjectLike(target) ? deepCopy(target) : {};
+  // Ensure result is object; if target was array/null/etc -> {}
+  for (const key of Object.keys(patch)) {
+    const value = patch[key];
+    if (value === null) {
+      delete result[key];
+    } else {
+      result[key] = mergePatch(result[key], value); // Wait target for property should be existing property in result? Or original target? Since result is deep copy of target, result[key] is deep copy. But if key not exists, result[key] undefined. mergePatch will handle non-object target -> {}? But if value is object, we want merge into existing property. If result[key] undefined, should start {}. That's okay. But careful: if result[key] is array? isPlainObjectLike false -> {} so replace. Good.
+    }
+  }
+  return result;
+}
+
+module.exports = mergePatch;
+
+Check RFC: For each key in patch, if value null remove; else mergePatch recursively. If patch has key with object, merge with target property. Using result[key] as target is correct because result starts as copy of target. But if target had key, result[key] is deep copy. If target didn't, undefined. Good.
+
+But potential issue: if patch key value is array, mergePatch(patchValue?) Wait call mergePatch(result[key], value). Since value is array, isPlainObjectLike(value) false, so returns deepCopy(value) -> replaces. Good.
+
+If patch value is primitive, mergePatch(result[key], value) -> patch not object -> deepCopy(value). Good.
+
+If patch value is null, delete.
+
+If patch itself is null or array or primitive -> deepCopy(patch). If patch is array, deepCopy array. Good. If patch is null, deepCopy null -> null.
+
+Target: if target is object plain, deep copy. If target is array? isPlainObjectLike false -> {}. Good.
+
+Need deep copy for result? We do deepCopy target. But when assigning result[key] = mergePatch(result[key], value), mergePatch may return deep copy of patch if patch not object. That's fine.
+
+But mutation? We delete from result only, not target. deepCopy ensures new. Good.
+
+No imports. CommonJS.
+
+Return only one fenced javascript code block, no explanation. Should include module.exports = mergePatch; and function maybe named functionName? The prompt: "Export exactly the requested function with module.exports = functionName." Probably they mean module.exports = mergePatch; So function named mergePatch.
+
+Should we include 'use strict'? Not necessary.
+
+Potential edge: deepCopy object key order? Object.keys only own enumerable. JSON values fine.
+
+Potential edge: deepCopy should handle undefined? Inputs JSON values, so no undefined. But patch could be undefined? JSON no. If patch undefined, isPlainObjectLike false, deepCopy undefined returns undefined. Fine.
+
+Potential edge: deepCopy of object with nested arrays. Works.
+
+Potential edge: deepCopy of null. isPlainObjectLike(null) false, Array false, return value.
+
+Potential edge: deepCopy of number/string/boolean. return value.
+
+Potential edge: deepCopy of object should not include prototype. Object.keys only. Fine.
+
+Potential edge: recursive cycles? JSON values no cycles.
+
+Now final answer should be just code block. No explanation.
+
+Check if need module.exports = functionName exactly? Could be module.exports = mergePatch; That's fine.
+
+Let's consider if they want function named functionName? No, "Export exactly the requested function with module.exports = functionName." Maybe placeholder: module.exports = functionName; but likely they mean mergePatch. We'll use module.exports = mergePatch.
+
+Let's write code.
+
+One concern: In mergePatch, for each patch key, if value is null delete. Else result[key] = mergePatch(result[key], value). But if value is an object and target property doesn't exist, result[key] is undefined, mergePatch returns deep copy of value. Good. If value is object and target property exists as object, merges. Good.
+
+But what if patch key value is an array? mergePatch(result[key], value) -> patch is array, not plain object, returns deepCopy(value). Good.
+
+What if patch key value is null? delete. Good.
+
+What if patch key value is boolean/string/number? deepCopy. Good.
+
+Now deepCopy: should not use Object.keys? For JSON objects, fine. But if target has properties with undefined? not JSON.
+
+Implementation:
+
+function isMergeableObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function deepCopy(value) {
+  if (Array.isArray(value)) {
+    const arr = [];
+    for (let i = 0; i < value.length; i++) arr[i] = deepCopy(value[i]);
+    return arr;
+  }
+  if (isMergeableObject(value)) {
+    const obj = {};
+    for (const key of Object.keys(value)) {
+      obj[key] = deepCopy(value[key]);
+    }
+    return obj;
+  }
+  return value;
+}
+
+function mergePatch(target, patch) {
+  if (!isMergeableObject(patch)) {
+    return deepCopy(patch);
+  }
+  const result = isMergeableObject(target) ? deepCopy(target) : {};
+  for (const key of Object.keys(patch)) {
+    const value = patch[key];
+    if (value === null) {
+      delete result[key];
+    } else {
+      result[key] = mergePatch(result[key], value);
+    }
+  }
+  return result;
+}
+
+module.exports = mergePatch;
+
+Wait: If target is plain object, result deep copy. If target is null or primitive or array, result {}. Good.
+
+But there's subtle bug: When patch has key with object value, we call mergePatch(result[key], value). But result[key] might be undefined, and mergePatch sees patch (value) as object, so it creates result2 = isMergeableObject(target) ? deepCopy(target) : {}; Here target = result[key] which is undefined, so result2 = {}. Then iterates patch. Good.
+
+But when patch value is object and target property is an array, isMergeableObject(target) false, so starts {}. Arrays replaced, correct.
+
+Now deepCopy of result? We don't deep copy result again, but we built from deepCopy target and assigned deep copies from recursive calls. For keys where patch value is object, we assign result2 which is deep copy of target property or new. For keys where patch value is primitive, deepCopy. For keys where patch value null, delete. So result is fully deep copied. Good.
+
+No mutation of inputs. We delete from result, not target. deepCopy target ensures result independent.
+
+Now final code block. Ensure no extra text.
+
+Use fenced javascript code block. Could include ```javascript.
+
+Let's final.</think>```javascript
+function isMergeableObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function deepCopy(value) {
+  if (Array.isArray(value)) {
+    const copy = [];
+    for (let i = 0; i < value.length; i++) {
+      copy[i] = deepCopy(value[i]);
+    }
+    return copy;
+  }
+
+  if (isMergeableObject(value)) {
+    const copy = {};
+    for (const key of Object.keys(value)) {
+      copy[key] = deepCopy(value[key]);
+    }
+    return copy;
+  }
+
+  return value;
+}
+
+function mergePatch(target, patch) {
+  if (!isMergeableObject(patch)) {
+    return deepCopy(patch);
+  }
+
+  const result = isMergeableObject(target) ? deepCopy(target) : {};
+
+  for (const key of Object.keys(patch)) {
+    const value = patch[key];
+
+    if (value === null) {
+      delete result[key];
+    } else {
+      result[key] = mergePatch(result[key], value);
+    }
+  }
+
+  return result;
+}
+
+module.exports = mergePatch;
+```

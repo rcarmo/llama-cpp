@@ -1,5 +1,7 @@
 # Intel i5-1340P Qwen3.6 128K service runbook
 
+**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+
 > Retained disabled profile. The current primary is [Gemma 4 E4B QAT + MTP zero-copy](gemma-local-provider-runbook.md). Stop the primary model and its LAN socket before starting Qwen, and restore the primary with `gemma-profile primary` afterward.
 
 This runbook defines the validated Qwen3.6-35B-A3B service on `sigma`: one 131,072-token slot, native MTP, an embedded Web UI and a LAN endpoint on port 8090.
