@@ -1,0 +1,11 @@
+{
+  "thinking": true,
+  "temperature": 1,
+  "max_tokens": 768,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Use only these evidence lines. Distinguish correlation from a proved cause. Respond with the specified JSON only.\n[E1] 10:00 deployment changes request timeout from 30s to 5s.\n[E2] 10:03 timeout responses rise from 0.2% to 12%.\n[E3] 10:04 CPU utilisation remains at its previous 45%; memory remains at 60%.\n[E4] 10:08 rollback restores the 30s timeout.\n[E5] 10:10 timeout responses fall to 0.3%.\n[E6] No controlled experiment, request-latency histogram or downstream trace was captured.\nQuestions: Which change is the leading hypothesis? Is causality proved? Is CPU saturation supported? Which two evidence IDs bracket the recovery intervention and outcome? Name the missing request measurement needed to test whether more requests exceeded the new limit. The most useful next diagnostic should measure the latency distribution under comparable load rather than assert an unobserved outage.\nJSON keys: leading_change (exactly timeout_reduction), causality_proven (boolean), cpu_saturation_supported (boolean), recovery_evidence (two IDs), missing_measurement (exactly request_latency_distribution)."
+    }
+  ]
+}

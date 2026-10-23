@@ -1,0 +1,17 @@
+{
+  "thinking": true,
+  "temperature": 1,
+  "max_tokens": 1536,
+  "messages": [
+    {
+      "role": "system",
+      "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+    },
+    {
+      "role": "user",
+      "content": "Use only this policy and these records. A standard expense is reimbursable only if it has a receipt, was submitted no later than 30 days after purchase, and is not alcohol. A manager exception waives only the deadline, never the receipt or alcohol exclusions. Exactly day 30 counts as timely. For a claim with multiple failing conditions choose the reason in this priority: alcohol, missing_receipt, late. Accepted claims use reason approved. Do not infer facts.\nClaims:\nA: amount 80 EUR, receipt yes, submitted day 30, category meal, manager exception no.\nB: amount 40 EUR, receipt yes, submitted day 31, category travel, manager exception yes.\nC: amount 25 EUR, receipt no, submitted day 5, category meal, manager exception yes.\nD: amount 60 EUR, receipt yes, submitted day 1, category alcohol, manager exception yes.\nE: amount 100 EUR, receipt yes, submitted day 31, category travel, manager exception no.\nF: amount 15 EUR, receipt yes, submitted day 0, category supplies, manager exception no.\nReturn only JSON with keys approved_ids (alphabetically sorted), total_eur (number), reasons (object mapping rejected IDs to reason)."
+    }
+  ],
+  "reasoning_budget": 512,
+  "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n"
+}

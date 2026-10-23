@@ -1,0 +1,437 @@
+<think>We need answer only code block. Need parse CSV row CommonJS module. Must export exactly requested function with module.exports = functionName. functionName likely parseCsvRow. No imports deps fs network. Return only one fenced javascript code block, no explanation.
+
+Need ensure behavior. Let's reason thoroughly to craft correct implementation.
+
+Requirements:
+- CommonJS JS module.
+- Export exactly requested function with module.exports = functionName.
+- Use no imports, dependencies, filesystem or network.
+- Return only one fenced javascript code block, with no explanation.
+
+Implement parseCsvRow(row), returning string cells for one CSV row. Commas delimit cells. A cell beginning with a double quote is quoted; doubled quotes inside it represent one quote. A closing quote must be followed by a comma or end of row. Quotes in an unquoted cell, unclosed quotes, characters after a closing quote, or any CR/LF are invalid: throw Error. Preserve empty cells and spaces. Empty input returns [""].
+
+Need likely parse a single row string, maybe row can be undefined? Empty input returns [""].
+
+We need decide validation. CSV row maybe string. Commas delimit. Cell beginning with double quote is quoted. Doubled quotes inside represent one quote. Closing quote must be followed by comma or end. Quotes in unquoted cell invalid. Unclosed quotes invalid. Characters after closing quote invalid. Any CR/LF invalid. Preserve empty cells and spaces. Empty input returns [""].
+
+Implement state machine.
+
+Edge cases:
+- "" -> one empty quoted cell? Or empty input? If row is empty string, return [""] per requirement. But CSV row empty string could mean one empty cell or zero cells? They specify empty input returns [""]. So parse("") => [""].
+
+- "," -> ["", ""]? Two empty cells.
+- "a,b" -> ["a","b"]
+- "a,,b" -> ["a","","b"]
+- " a , b " -> [" a "," b "] preserve spaces.
+- "\"a\"b" invalid because chars after closing quote before comma/end. Actually closing quote at end? For `"a"b`, closing quote followed by b -> invalid.
+- "\"a\"" -> ["a"].
+- "\"a""b\"" -> quoted cell with quote? Let's parse: opening quote, content a, doubled quote -> literal ", content b, closing quote? String `"a""b"` chars: " a " " b "? Actually sequence: opening ", a, ", ", b, ". Doubled quotes inside: first two quotes after a represent one quote, then b, then closing ". So result `a"b`? Let's check: opening quote, content: a, then two quotes -> one quote, b, closing quote. The final quote closes. Result `a"b`. Yes.
+- `"a""` -> opening, a, doubled? Need closing? chars: " a " " maybe? Ambbling. If quoted content ends with quote, it must be doubled then closing. So `"a"""` = opening, a, doubled quote, closing => `a"`. Good.
+
+- Quotes in unquoted cell: e.g. `a"b` invalid. Even quote not at beginning? Yes invalid.
+- Unclosed quote: `"abc` invalid.
+- Any CR/LF invalid. Even in quoted? They said any CR/LF invalid, so throw.
+- Closing quote must be followed by comma or end of row. So `"a",b` valid. `"a"x` invalid. `"a""`? Hmm if doubled? We'll handle.
+
+State machine approach:
+If input is empty string? return [""]. But maybe row === "" => [""].
+If row contains \r or \n, throw Error.
+
+We need split into cells respecting quotes. Simpler state machine scanning char by char.
+
+Initialize cells = [], current = "", inQuotes = false, quoted = false? Actually need know if current cell began quoted. For unquoted, quote invalid. For quoted, after closing quote only comma or end allowed.
+
+Let's design.
+
+function parseCsvRow(row) {
+  if (row === "" || row === undefined?) return [""]; Probably empty input means empty string. If undefined maybe empty? Could return [""].
+  if (typeof row !== "string") throw Error? Maybe not required but okay.
+  if (row.includes("\r") || row.includes("\n")) throw Error;
+  const cells = [];
+  let cell = "";
+  let i = 0;
+  let inQuotes = false; // currently inside quoted section
+  let quoted = false; // current cell was quoted? Or after closing?
+  let closed = false; // closing quote seen for current quoted cell? Or just closed state.
+
+Better state:
+- Start cell. If char is `"`, enter quoted mode, set wasQuoted = true, start quoted content. Need handle doubled quotes.
+- If not in quotes and char is `"` after some unquoted content -> invalid.
+- If in quotes:
+  - if char is `"`:
+    - if next char is `"`: append `"` and skip next.
+    - else: closing quote. Set inQuotes = false. Now expect comma or end. If next char not comma/end -> invalid. (We can check after loop or at next iteration).
+  - else: append char (but no CR/LF allowed already checked; comma in quotes is literal? In CSV, comma inside quotes is part of cell, not delimiter. Should allow comma in quotes. Yes.)
+- If not in quotes:
+  - if char is `"`: if cell is empty? Or if current cell hasn't had any content? The rule: A cell beginning with a double quote is quoted. So if at start of cell and no chars yet, quote begins quoted. But after closing quote, we are in not inQuotes but cell has content and closed. We should not re-enter. Use state.
+  - if char is `,`: push cell, reset cell="", wasQuoted=false, closed=false.
+  - else if cell is empty and not quoted? Actually to allow quote at beginning, we can check if cell === "" and not closed? But empty cell with quote? If cell is "" and not closed, quote can start. However after comma, cell empty, quote starts. After closing, cell has content, not empty. After unquoted empty? If we see quote in empty cell after? That's start quoted. Good.
+  - else if char === `"` and cell.length > 0 -> invalid (quote in unquoted cell or after closing? after closing cell length >0 anyway).
+  - else append char.
+
+But need handle closing quote followed by comma or end. After closing, we can set state to closed. Then if next char is comma, push cell. If next char is end, push cell. If next char is anything else, invalid.
+
+Let's create state variables:
+let cells = [];
+let cell = "";
+let inQuotes = false;
+let quoted = false; // true if current cell started with quote? Or just in quoted? After closing, quoted remains true? Need to allow comma.
+let closed = false; // closing quote seen? Actually for quoted cell, after closing we expect delimiter.
+let i = 0;
+const len = row.length;
+
+while (i < len) {
+  const ch = row[i];
+  if (inQuotes) {
+    if (ch === '"') {
+      // lookahead
+      if (i + 1 < len && row[i+1] === '"') {
+        cell += '"';
+        i += 2;
+      } else {
+        // closing quote
+        inQuotes = false;
+        closed = true;
+        i++;
+        // after closing, must be comma or end; check next char
+        if (i < len && row[i] !== ',') {
+          throw Error('Invalid character after closing quote');
+        }
+        // if comma, will handle next iteration? But next iteration ch is comma, not inQuotes, not closed? We need handle.
+        // We can just continue; next iteration will process comma.
+      }
+    } else {
+      cell += ch;
+      i++;
+    }
+  } else {
+    // not in quotes
+    if (ch === ',') {
+      cells.push(cell);
+      cell = "";
+      closed = false;
+      quoted = false;
+      i++;
+    } else if (ch === '"') {
+      // can only start quoted if at beginning of cell and not already quoted/closed
+      if (cell === "" && !quoted && !closed) {
+        inQuotes = true;
+        quoted = true;
+        i++;
+      } else {
+        // quote in unquoted or after content
+        throw Error('Invalid quote');
+      }
+    } else {
+      // normal char
+      if (closed) {
+        // after closing quote, any normal char invalid
+        throw Error('Invalid character after closing quote');
+      }
+      cell += ch;
+      i++;
+    }
+  }
+}
+// end loop
+if (inQuotes) throw Error('Unclosed quote');
+// if closed or not, push cell?
+cells.push(cell);
+return cells;
+
+But there is issue: For quoted cell, after closing quote, we set closed=true. Next char is comma or end. If comma, next iteration not inQuotes, ch=',', we push cell, reset. Good. If end, loop ends, push cell.
+
+But what about quoted cell with no closing? inQuotes true at end -> throw.
+
+What about empty input? row = "". len=0. Loop doesn't run. inQuotes false. cells.push("") => [""]. Good. That matches.
+
+What about row = ","? Loop:
+i=0 ch=',' not inQuotes, not quote, cell==="" closed=false -> push cell "", reset, i=1.
+i=1 ch=',' -> push "", reset, i=2. End push "" => ["",""]. Good.
+
+What about row = "a,b"? Works: a append, comma push, b append, end push.
+
+What about row = '"a"'. i=0 ch='"' cell=="" quoted false closed false -> inQuotes true quoted true i=1.
+i=1 ch='a' inQuotes -> cell='a' i=2.
+i=2 ch='"' inQuotes -> next? i+1=3 len=3 no, so closing. inQuotes=false closed=true i=3. loop ends. push cell 'a'. Good.
+
+What about row = '"a"",b'? Let's test. String: " a " " , b? Actually `"a"",b`:
+chars: 0 ", 1 a, 2 ", 3 ", 4 ,, 5 b? Wait `"a"",b` length? opening, a, doubled quote? Let's write: " a " " , b? Actually sequence: `"a"",b` -> characters: `"`, `a`, `"`, `"`, `,`, `b`? No, string literal: double quote, a, double quote, double quote, comma, b? Let's not get confused.
+
+Better test quoted content with escaped quote: `"a""b"` -> opening, a, doubled quote, b, closing. Our algorithm:
+i=0 " start inQuotes i=1
+i=1 a -> cell a i=2
+i=2 " -> next is i=3 which is " so append ", i=4
+i=4 b -> cell a" i=5
+i=5 " -> next i=6 len=6 no closing -> inQuotes=false closed=true i=6 end push a". Good.
+
+What about `"a"""` -> opening, a, doubled quote, closing? chars: 0 ", 1 a, 2 ", 3 ", 4 "? Wait to represent a" as quoted: opening ", a, doubled quote (two quotes), closing quote (one quote). That's four quotes? Actually content: a" -> opening quote, a, two quotes for literal, closing quote = `"a"""` which is chars: 0 ", 1 a, 2 ", 3 ", 4 ". Yes. Algorithm:
+i=0 start inQuotes i=1
+i=1 a -> cell a i=2
+i=2 " -> next i=3 is " -> append ", i=4
+i=4 " -> next i=5 len=5 no -> closing, inQuotes=false closed=true i=5 end push a". Good.
+
+Now unquoted quote: `a"b` -> i=0 a append i=1; i=1 ch='"' not inQuotes, cell='a' not empty, closed false -> throw. Good.
+
+Closing quote followed by char: `"a"b` -> after closing at i=2? chars: 0 ",1 a,2 ",3 b. i=0 start; i=1 a; i=2 " -> closing, closed=true, i=3; check i<len and row[3] !== ',' -> throw. Good.
+
+Unclosed: `"a` -> i=0 start; i=1 a; end loop, inQuotes true -> throw.
+
+Any CR/LF: check at start if row includes \r or \n -> throw. Good.
+
+Preserve empty cells and spaces. Our algorithm appends spaces as normal chars, so `" a "`? Actually quoted: opening, space, a, space, closing -> cell " a " preserved. Unquoted: ` a ` -> cell " a " preserved.
+
+Empty cells: `a,,b` -> works.
+
+Now, what about row is not string? Maybe throw Error. But requirement says parseCsvRow(row). Could just handle empty input. If undefined, row.includes would fail. Better check if row is empty? The problem likely expects string. But to be safe, if row === "" return [""]; if row == null? Maybe return [""]? But not specified. We can just use `const input = typeof row === 'string' ? row : '';`? But if number passed, maybe invalid? Not needed.
+
+Need module.exports = parseCsvRow; exactly requested function. They said "Export exactly the requested function with module.exports = functionName." So function name should be parseCsvRow? They said Implement parseCsvRow(row). So define `function parseCsvRow(row) { ... }` and `module.exports = parseCsvRow;`.
+
+Return only one fenced javascript code block, with no explanation. So final answer should be:
+
+```javascript
+function parseCsvRow(row) {
+  ...
+}
+
+module.exports = parseCsvRow;
+```
+
+No extra text.
+
+Let's ensure code is correct and no syntax errors.
+
+Let's write final code.
+
+Potential pitfalls:
+- The check for CR/LF: `if (row.includes("\r") || row.includes("\n")) throw Error;` But if row is not string, row.includes may fail. We can do `if (typeof row !== "string") throw Error("Invalid input");` But empty input? If row is empty string, okay. If undefined, maybe throw. The requirement: Empty input returns [""]. Could interpret empty string. I'll do:
+```
+function parseCsvRow(row) {
+  const input = typeof row === "string" ? row : "";
+  if (input.includes("\r") || input.includes("\n")) throw Error("Invalid row");
+  ...
+}
+```
+But if input is "", returns [""] via loop. Actually with input = "", loop doesn't run, push "", return [""]. Good. If row is undefined, input = "", returns [""]. Might be okay.
+
+Wait: If I use `const input = typeof row === "string" ? row : "";`, then for undefined it returns [""]. But maybe not expected. But safe? The spec says empty input returns [""]. Could be fine.
+
+But also need preserve spaces. Using input variable.
+
+Let's code:
+
+```javascript
+function parseCsvRow(row) {
+  const input = typeof row === "string" ? row : "";
+  if (input.includes("\r") || input.includes("\n")) {
+    throw Error("Invalid row");
+  }
+
+  const cells = [];
+  let cell = "";
+  let inQuotes = false;
+  let quoted = false;
+  let closed = false;
+  let i = 0;
+
+  while (i < input.length) {
+    const ch = input[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (input[i + 1] === '"') {
+          cell += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          closed = true;
+          i += 1;
+          if (i < input.length && input[i] !== ',') {
+            throw Error("Invalid character after closing quote");
+          }
+        }
+      } else {
+        cell += ch;
+        i += 1;
+      }
+    } else {
+      if (ch === ',') {
+        cells.push(cell);
+        cell = "";
+        quoted = false;
+        closed = false;
+        i += 1;
+      } else if (ch === '"') {
+        if (cell === "" && !quoted && !closed) {
+          inQuotes = true;
+          quoted = true;
+          i += 1;
+        } else {
+          throw Error("Invalid quote");
+        }
+      } else {
+        if (closed) {
+          throw Error("Invalid character after closing quote");
+        }
+        cell += ch;
+        i += 1;
+      }
+    }
+  }
+
+  if (inQuotes) {
+    throw Error("Unclosed quote");
+  }
+
+  cells.push(cell);
+  return cells;
+}
+
+module.exports = parseCsvRow;
+```
+
+Wait, there's a bug: In the quoted branch, when we encounter closing quote, we set closed=true and i+=1, then check if next char is not comma -> throw. But if next char is comma, we continue. The next iteration will be not inQuotes, ch=',', we push cell, reset. Good. If end, loop ends, push cell.
+
+But what about quoted cell followed by comma? Example `"a",b`. After closing at i=2? Let's trace:
+input: `"a",b`
+i=0 ch='"' not inQuotes, cell==="" !quoted !closed -> inQuotes=true, quoted=true, i=1
+i=1 ch='a' inQuotes -> cell='a', i=2
+i=2 ch='"' inQuotes -> input[3] is ','? Actually input[3] is ','? String: index0 ",1 a,2 ",3 ,,4 b. input[3] is ',' not '"', so closing. inQuotes=false, closed=true, i=3. Check i<len and input[3] !== ',' -> false. Continue.
+i=3 ch=',' not inQuotes, ch==',' -> push cell 'a', reset, i=4.
+i=4 ch='b' not inQuotes, not quote, closed false, cell='b', append, i=5. End push 'b'. cells ['a','b']. Good.
+
+What about `"a""`? Let's trace to ensure no bug.
+input: `"a""` (chars: 0 ",1 a,2 ",3 "). Actually length 4? Opening, a, doubled quote? Wait `"a""` is opening, a, two quotes? That's length 4: indices 0 ",1 a,2 ",3 ". But to represent a" we need `"a"""` length 5. Let's not worry.
+
+Test `"a"""` length 5: chars 0 ",1 a,2 ",3 ",4 ".
+i=0 start inQuotes i=1
+i=1 a -> cell a i=2
+i=2 " -> input[3] is " -> append ", i=4
+i=4 " -> input[5] undefined -> closing, inQuotes=false closed=true i=5. Check i<5? false. End push a". Good.
+
+Now, what about unquoted cell with quote after closing? Not possible because after closing, we expect comma/end. If we have `"a""b"`? Let's trace: chars: 0 ",1 a,2 ",3 ",4 b,5 ". i=0 start; i=1 a; i=2 " -> input[3] is " -> append ", i=4; i=4 b -> cell a" ; i=5 " -> closing? input[6] undefined -> closing, closed=true i=6 end push a"b. That is correct? Wait `"a""b"` should be quoted content `a"b`? Let's parse CSV: opening quote, content: a, then doubled quote -> literal ", then b, then closing quote. Yes, result `a"b`. Good.
+
+Now, what about `"a"b`? chars: 0 ",1 a,2 ",3 b. i=0 start; i=1 a; i=2 " -> input[3] is b not " -> closing, inQuotes=false closed=true i=3; check i<4 and input[3] !== ',' -> true, throw. Good.
+
+What about `a"b`? i=0 a append; i=1 " not inQuotes, cell='a' not empty, closed false -> throw. Good.
+
+What about `"a` -> i=0 start; i=1 a; end loop, inQuotes true -> throw.
+
+What about `a,b` -> works.
+
+What about `""` -> i=0 start inQuotes i=1; i=1 ch='"' -> input[2] undefined -> closing, closed=true i=2; end push cell "" -> [""]. Is that correct? A quoted empty cell should be empty string, so result [""]. Yes.
+
+What about `"" ,`? Actually `"" ,` has space after closing? chars: 0 ",1 ",2 space,3 ,. i=0 start; i=1 " -> closing? input[2] is space not " -> closing, closed=true i=2; check i<4 and input[2] !== ',' -> true, throw. Correct because chars after closing quote invalid.
+
+What about `"a",`? chars: 0 ",1 a,2 ",3 ,. i=0 start; i=1 a; i=2 " -> closing, closed=true i=3; check input[3] !== ','? input[3] is ',' so ok; next iteration i=3 ch=',' push. End push empty? Wait after comma, cell reset, end push empty. Result ["a",""]. That's correct: `"a",` -> cell a, empty cell.
+
+What about `,` -> handled.
+
+Now, the requirement: "A closing quote must be followed by a comma or end of row." In our code, after closing we check next char. If next is comma, okay. If end, okay. If next is something else, throw. Good.
+
+"Quotes in an unquoted cell, unclosed quotes, characters after a closing quote, or any CR/LF are invalid: throw Error. Preserve empty cells and spaces. Empty input returns [""]."
+
+Our code throws Error with messages. Good.
+
+Potential issue: The state variable `closed` is not reset for unquoted cells? We reset it when we push on comma. Initially false. When we append normal chars, closed remains false. When we start quoted, we set quoted=true, inQuotes=true, closed? We didn't set closed=false. It should be false initially. But after closing, we set closed=true. When comma pushes, we set closed=false. So for a new cell, closed is false. Good.
+
+But when we start quoted, we didn't reset closed? At start of cell, closed should be false. For first cell, false. After comma, we set false. So okay.
+
+What about quoted cell followed by comma: after closing, closed=true. Next iteration sees comma, pushes, resets closed=false. Good.
+
+What about unquoted cell with comma? Comma pushes, resets. Good.
+
+Now, what about spaces before quote? e.g. ` "a"` -> cell starts with space, then quote. According to CSV, a cell beginning with double quote is quoted. If there's a space before quote, is it beginning? The cell begins with space, so quote is not at beginning, should be invalid (quote in unquoted cell). Our code: i=0 ch=' ' -> not inQuotes, not comma, not quote, closed false -> cell=' ', i=1; i=1 ch='"' -> cell not empty, closed false -> throw. Correct.
+
+What about quote after closing? Already handled.
+
+Now, check empty input: input = "". while loop skipped. inQuotes false. cells.push("") -> [""]. Good.
+
+Now, check CR/LF: `if (input.includes("\r") || input.includes("\n")) throw Error;` Good.
+
+Now, final answer should be only code block. No explanation. Ensure fenced javascript code block. Use ```javascript.
+
+Let's consider if we should use `module.exports = parseCsvRow;` exactly. Yes.
+
+One more edge case: What if input is `"a""`? Actually let's test with our algorithm for `"a""` (opening, a, two quotes? Wait length 4? `"a""` -> chars: 0 ",1 a,2 ",3 ". Let's trace:
+i=0 start inQuotes i=1
+i=1 a -> cell a i=2
+i=2 " -> input[3] is " -> append ", i=4. End loop? i=4, len=4, loop ends. inQuotes is still true! Because we treated the second quote as part of doubled quote, not closing. So we end with inQuotes true -> throw unclosed. Is that correct? Input `"a""` means opening quote, content a, then two quotes? Actually to represent a" you need `"a"""` (opening, a, doubled, closing). `"a""` is opening, a, doubled? No, the last two quotes are doubled? The string is: quote, a, quote, quote. The first quote after a is a potential closing, but since next is also quote, it's a doubled quote, so content becomes a". Then we reach end without closing quote. So unclosed is correct. Good.
+
+Now, final code.
+
+Wait, there's a subtle bug: In the quoted branch, when we encounter a quote and the next is a quote, we do `cell += '"'; i += 2;`. But what if the doubled quote is actually the closing quote followed by a comma? No, closing quote must be followed by comma or end. Doubled quote means two quotes inside content, so it's not closing. The algorithm correctly checks next char. If next is quote, it's doubled. If next is not quote, it's closing. Good.
+
+Another subtle bug: After closing quote, we set `closed = true` and `i += 1`, then check if `i < input.length && input[i] !== ','` throw. But what if the next char is a quote? e.g. `"a""`? That would have been handled as doubled before reaching closing. So after closing, next cannot be quote? Actually if input is `"a"""`? Let's trace: chars 0 ",1 a,2 ",3 ",4 ". i=0 start; i=1 a; i=2 " -> next is i=3 which is " -> doubled, append, i=4; i=4 " -> next i=5 undefined -> closing, closed=true, i=5, check i<5? false, end push a". Correct. So after closing, next is end or comma. The check is fine.
+
+Now, final answer. Only code block.
+
+Let's write final.</think>```javascript
+function parseCsvRow(row) {
+  const input = typeof row === "string" ? row : "";
+  if (input.includes("\r") || input.includes("\n")) {
+    throw Error("Invalid row");
+  }
+
+  const cells = [];
+  let cell = "";
+  let inQuotes = false;
+  let quoted = false;
+  let closed = false;
+  let i = 0;
+
+  while (i < input.length) {
+    const ch = input[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (input[i + 1] === '"') {
+          cell += '"';
+          i += 2;
+        } else {
+          inQuotes = false;
+          closed = true;
+          i += 1;
+          if (i < input.length && input[i] !== ',') {
+            throw Error("Invalid character after closing quote");
+          }
+        }
+      } else {
+        cell += ch;
+        i += 1;
+      }
+    } else {
+      if (ch === ',') {
+        cells.push(cell);
+        cell = "";
+        quoted = false;
+        closed = false;
+        i += 1;
+      } else if (ch === '"') {
+        if (cell === "" && !quoted && !closed) {
+          inQuotes = true;
+          quoted = true;
+          i += 1;
+        } else {
+          throw Error("Invalid quote");
+        }
+      } else {
+        if (closed) {
+          throw Error("Invalid character after closing quote");
+        }
+        cell += ch;
+        i += 1;
+      }
+    }
+  }
+
+  if (inQuotes) {
+    throw Error("Unclosed quote");
+  }
+
+  cells.push(cell);
+  return cells;
+}
+
+module.exports = parseCsvRow;
+```

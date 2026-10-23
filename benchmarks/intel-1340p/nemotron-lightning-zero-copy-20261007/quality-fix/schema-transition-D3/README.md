@@ -1,0 +1,22 @@
+# Experimental D3 staged schema and reset correction
+
+Manual qualification harness only—not a production server feature. User request requires thinking, bounded reasoning and explicit JSON schema. Existing reasoning budget runs first; only after a recognized generated end tag does the harness initialize a fresh output-format grammar at root; thought is never replayed into answer grammar. D3 produces 10/10 schema-valid outputs but exact semantic accuracy is 3/5 on CPU and 3/5 on handoff. Failures include scoped policy and return eligibility. Formatting control is not a truth/quality fix.
+
+## Reset bug discovered and fixed
+Independent review discovered `common_sampler_reset()` reset only `chain`; standalone `grmr` and `rbudget` state remained live. It now resets grammar, reasoning budget and main chain. Added lifecycle state getter and tests for resetting a partial reasoning state to IDLE, ignoring a dangling end, rearming on fresh start and natural end. Replays the actual forced message/end tokens via logits and validates DONE/end_match.
+
+The first reset test claim tested only suffix math; it was expanded: vocab-only CTest exercises real `common_sampler` with coupled lazy output grammar + reasoning budget, close-sequence replay into grammar, manual budget force, JSON validity/truncation/wrong type, grammar reset after partial answer on the same object, and reuse. No model generation is performed. The coupled natural-end case passes valid JSON through the lazy grammar with no sampler replacement after close and rejects an invalid answer after a reset/rearm. Separate forced-budget and explicit fresh-stage sampler cases verify forced ending.
+
+CMake registers two tests: a model-free 7-case end-suffix predicate test, plus optional `test-nemotron-schema-transition-lifecycle` requiring explicit `-DNEMOTRON_TEST_MODEL=<existing GGUF>` (or the same environment variable). When explicitly provided, CMake checks the file exists; runtime vocab-only load fails if invalid. It is not silently skipped in a configured run. Default builds without that variable still run existing tests and simply omit the large-model lifecycle test.
+
+Latest correctly configured separate CPU and Intel/Vulkan CTest suites pass five each: `test-reasoning-budget`, `test-grammar-integration`, `test-json-schema-to-grammar`, predicate test, vocab-only lifecycle test. These use no model weights/inference (metadata+vocabulary only); the Q4 GGUF path is explicit and reused without download. Full logs, exact source snapshots and CTest definition retained beside this README and mirrored in `../schema-transition-D3/` report artifacts.
+
+## Independent review record
+- Review 1 caught the original reset leak and weak lifecycle claims; reset was corrected.
+- Review 2 confirmed reset/test/model path behavior after fix; recommended replace hard-coded path, now done.
+- Later review attempts timed out after further changes; do not claim independent sign-off for exact latest source.
+
+Latest lifecycle coverage (2026-10-08): corrected `common_sampler_reset` to reset `grmr`, `rbudget`, main chain, prior-token history and candidate buffer. Added state getter for assertions. Coupled lazy-grammar + reasoning-budget case checks natural close replay then constrained valid JSON through the same sampler; after reset/rearm it rejects invalid JSON. Forced close, malformed JSON and same-instance partial grammar reset are also covered. Explicit vocabulary-only CTest `NEMOTRON_TEST_MODEL` uses CMake FILEPATH or environment and validates file existence. CPU and Intel/Vulkan each pass the targeted five-test set and direct lifecycle invocation. Review 1 caught reset gap; follow-up confirmed core fix/path after changes, but latest iteration review timed out; don't claim latest diff received independent final approval. See `test-reset-checkpoint.md`.
+
+## Limits
+This verifies host common-sampler reset and transitions, not GPU/backend grammar sampler state, server streaming/cancel, malformed server schema request, concurrent slots or production service. No complete cache/driver recovery/serving pressure claim. The D3 quality suite remains 3/5 exact semantics/profile. Trusted BF16 comparison still blocked by 63.18GB file vs 57.4GiB available disk, host RAM32.6GB and current20GiB execution cap; no hosted unpinned inference. No production defaults, deployment, push or merge. Report the real D3 semantic failures. Qwen/Gemma/speech stay off.

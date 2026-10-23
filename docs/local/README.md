@@ -1,8 +1,15 @@
 # Local fork documentation
 
-This fork has accumulated a lot of host-specific work -- enough that the old flat `docs/` list was getting in the way. The local material now sits under `docs/local/`, while the upstream llama.cpp documentation stays at `docs/`.
+Host-specific experiments and retained operating notes are under `docs/local/`. Upstream llama.cpp documentation stays under `docs/`.
+
+**Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. [Operating status](intel-i5-1340p/model-serving-status-20261023.md) supersedes the older deployment instructions. No model service was restored by the source merge.
 
 ## Start here
+
+* [Flint throughput and zero-copy](intel-i5-1340p/flint-throughput-20261023.md): best measured CPU replay 50.43 prompt / 13.09 decode tok/s. [Coding evaluation](../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md) preserves the initial output-budget failures separately from the completion-driven series.
+
+* Nemotron Lightning: [strict Intel handoff, 7 October 2026](intel-i5-1340p/nemotron-lightning-zero-copy-20261007.md), native correctness and fixed-token screen, not deployed.
+
 
 * [Hardware navigation](hardware/README.md) groups the work by machine first: SpaceMIT K3, LattePanda Sigma / Intel Core i5-1340P, and RTX 3060.
 * [Model navigation](models/README.md) cross-links the same material by model family.
@@ -11,8 +18,8 @@ This fork has accumulated a lot of host-specific work -- enough that the old fla
 
 ## Reading order
 
-* For the current Sigma serving setup, start with the [local model profiles runbook](intel-i5-1340p/gemma-local-provider-runbook.md). It covers the primary Gemma service and static Huihui/PQ2 Bonsai profiles. Dated benchmark reports preserve the service state observed during their campaign; they are not current rollback instructions.
-* If you are trying to understand how a result evolved, use the chronology page first and treat undated runbooks as current operational state, not as dated benchmark claims.
+* For Sigma's operating state, read the dated [model-serving status](intel-i5-1340p/model-serving-status-20261023.md) first. The [local model profiles runbook](intel-i5-1340p/gemma-local-provider-runbook.md) retains the former Gemma, Huihui and Bonsai configurations.
+* Use the chronology to follow results across campaigns. Dated reports preserve their original measurements and service state; undated runbooks require revalidation before any future deployment.
 * If you need raw logs, JSON, thermal CSVs or reproduction scripts, prefer the benchmark tree over the prose reports. The reports summarise measured outcomes; the benchmark directories keep the evidence.
 
 ## Scope notes

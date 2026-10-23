@@ -1,5 +1,7 @@
 # Hardware navigation
 
+**Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. Sigma deployment statements below describe historical profiles. The [dated operating status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes their startup and rollback instructions; other hosts are unchanged.
+
 The local work spans three main machines plus a few cross-cutting notes that apply to more than one backend. Start with the machine, then drill into reports and raw evidence.
 
 ## Platforms

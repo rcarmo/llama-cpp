@@ -1304,6 +1304,7 @@ struct llama_model::impl {
     std::vector<layer_dev> dev_layer;
 
     bool has_tensor_overrides;
+    bool handoff_safe_expert_override = false;
 
     std::vector<float> tensor_split_owned;
 };
@@ -1366,6 +1367,31 @@ llama_model::llama_model(const llama_model_params & params) : params(params), pi
         this->params.tensor_split = pimpl->tensor_split_owned.data();
     }
     pimpl->has_tensor_overrides = params.tensor_buft_overrides && params.tensor_buft_overrides[0].pattern;
+    if (pimpl->has_tensor_overrides && params.tensor_buft_overrides[1].pattern == nullptr) {
+        const auto & placement = params.tensor_buft_overrides[0];
+        pimpl->handoff_safe_expert_override =
+                std::strcmp(placement.pattern, "\\.ffn_(up|down|gate|gate_up)_(ch|)exps") == 0 &&
+                placement.buft == ggml_backend_cpu_buffer_type();
+    }
+}
+
+bool llama_model::supports_strict_state_handoff() const {
+    if (arch == LLM_ARCH_QWEN35) return true;
+    if (arch != LLM_ARCH_NEMOTRON_H && arch != LLM_ARCH_NEMOTRON_H_MOE) return false;
+    // Admit only the Mamba2 geometry covered by the strict snapshot contract.
+    if (hparams.n_layer_nextn != 0 || hparams.ple_conv_state() != 0 ||
+        hparams.ssm_d_conv != 4 || hparams.ssm_d_state != 128 ||
+        hparams.ssm_d_inner == 0 || hparams.ssm_dt_rank == 0 || hparams.ssm_n_group == 0 ||
+        hparams.ssm_d_inner % hparams.ssm_dt_rank != 0 ||
+        hparams.ssm_d_inner / hparams.ssm_dt_rank != 64 ||
+        hparams.ssm_d_inner % hparams.ssm_n_group != 0 ||
+        hparams.ssm_dt_rank % hparams.ssm_n_group != 0) return false;
+    bool has_recurrent = false, has_attention = false;
+    for (uint32_t il = 0; il < hparams.n_layer(); ++il) {
+        has_recurrent |= hparams.is_recr(il);
+        has_attention |= !hparams.is_recr(il) && hparams.n_head_kv(il) > 0;
+    }
+    return has_recurrent && has_attention;
 }
 
 bool llama_model::shared_residency_enabled() const {
@@ -3026,6 +3052,11 @@ bool llama_model::has_tensor_overrides() const {
     return pimpl->has_tensor_overrides;
 }
 
+bool llama_model::handoff_safe_tensor_placement() const {
+    return !pimpl->has_tensor_overrides ||
+            (arch == LLM_ARCH_FLINT && pimpl->handoff_safe_expert_override);
+}
+
 const ggml_tensor * llama_model::get_tensor(const char * name) const {
     auto it = std::find_if(tensors_by_name.begin(), tensors_by_name.end(),
             [name](const std::pair<std::string, ggml_tensor *> & it) {
@@ -3063,21 +3094,26 @@ ggml_tensor * llama_model::get_rope_factors(const llama_cparams & cparams, int i
 
 llama_memory_i * llama_model::create_memory(const llama_memory_params & params, const llama_cparams & cparams) const {
     if (params.init.strict || params.init.deferred) {
-        if (arch != LLM_ARCH_QWEN35 || cparams.n_seq_max != 1 || hparams.no_alloc || hparams.swa_type != LLAMA_SWA_TYPE_NONE) {
-            throw std::runtime_error("unsupported strict Qwen memory");
+        if (!supports_strict_state_handoff() || cparams.n_seq_max != 1 || hparams.no_alloc || hparams.swa_type != LLAMA_SWA_TYPE_NONE) {
+            throw std::runtime_error("unsupported strict state handoff memory");
         }
         if (cparams.ctx_type == LLAMA_CONTEXT_TYPE_DEFAULT) {
+            llama_memory_i::layer_filter_cb attn = nullptr, recurrent = nullptr;
+            if (arch == LLM_ARCH_NEMOTRON_H || arch == LLM_ARCH_NEMOTRON_H_MOE) {
+                attn = [&](uint32_t il) { return !hparams.is_recr(il) && hparams.n_ff(il) == 0; };
+                recurrent = [&](uint32_t il) { return hparams.is_recr(il) && hparams.n_ff(il) == 0; };
+            }
             return new llama_memory_hybrid(*this, params.type_k, params.type_v, !cparams.flash_attn,
                     cparams.n_ctx_seq, 1, hparams.n_swa, hparams.swa_type,
                     GGML_TYPE_F32, GGML_TYPE_F32, 1, 1, cparams.n_rs_seq, cparams.offload_kqv,
-                    cparams.kv_unified, nullptr, nullptr, params.init);
+                    cparams.kv_unified, attn, recurrent, params.init);
         }
-        if (cparams.ctx_type == LLAMA_CONTEXT_TYPE_MTP) {
+        if (arch == LLM_ARCH_QWEN35 && cparams.ctx_type == LLAMA_CONTEXT_TYPE_MTP) {
             return new llama_kv_cache(*this, hparams, params.type_k, params.type_v, !cparams.flash_attn,
                     cparams.offload_kqv, cparams.kv_unified, cparams.n_ctx_seq, 1, 1, hparams.n_swa,
                     hparams.swa_type, nullptr, [&](int32_t il) { return il >= hparams.n_layer(); }, nullptr, nullptr, "mtp_", params.init);
         }
-        throw std::runtime_error("unsupported strict Qwen context type");
+        throw std::runtime_error("unsupported strict state handoff context type");
     }
     llama_memory_i * res;
 

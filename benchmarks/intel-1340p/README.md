@@ -2,11 +2,18 @@
 
 This directory is the raw evidence spine for the `sigma` work. It covers the July Qwen CPU/Vulkan campaign, the August Maple and Ornith/Gemma studies, the September Gemma optimisation series and the later Intel Xe handoff work.
 
+**Current operating state:** [23 October model-serving status](../../docs/local/intel-i5-1340p/model-serving-status-20261023.md). Older service and deployment statements below are historical; model-serving units and installed runtimes were removed, not restored by these experiments.
+
 ## Upstream integration
 
 * [23 October 2026 upstream sync](upstream-sync-20261023/README.md): CPU regressions and CPU/Vulkan compilation; no model downloads or service changes
 
 ## Start here
+
+* [Flint throughput, strict zero-copy and coding, 23 October 2026](flint-zero-copy-20261023/README.md) -- CPU 50.43 prompt / 13.09 decode tok/s; GPU caches lose throughput; capped coding calibration retained and completion-driven evaluation running; no deployment.
+
+* [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007/README.md) -- exact native state/rollback, 32-1024-token model gates and 512/1024 ABBA; experimental, no serving change.
+
 
 * [July Qwen campaign](final-report-20260731.md)
 * [Maple Preview evidence](maple-preview/README.md)

@@ -2,7 +2,9 @@
 
 This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM, and a lot of CPU-first experiments that spilled across Qwen, Ornith, Gemma, Maple and later Intel Xe handoff work. The old flat `docs/` list made it too easy to lose chronology, so the benchmark-heavy material is now linked from one page.
 
-## Start with the current roles
+**Current state:** [23 October 2026 model-serving status](model-serving-status-20261023.md). Model-serving units and installed runtimes were removed. The roles and deployment statements below are historical; this source integration does not restore them.
+
+## Retained roles and runbooks
 
 * [Local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment plus static Huihui security-audit and verified Bonsai 2 27B PQ2 CPU-baseline profiles, with health-checked switching and one LAN UI/API on port 11434.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
@@ -10,6 +12,11 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.
 
 ## Campaigns and design notes
+
+* [Flint throughput, 23 October 2026](flint-throughput-20261023.md) -- CPU 50.43 prompt / 13.09 decode tok/s; cache and strict zero-copy evidence. [Coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/README.md): completion-driven evaluation running; initial capped calibration retained; no deployment.
+
+* [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007.md) -- native H/MoE rollback/lifetime gates and exact Q4 state transfer; fixed-token timing screen only, not deployed.
+
 
 * [Ornith and Gemma optimisation campaign](intel-1340p-ornith-gemma-campaign.md)
 * [Gemma and Ornith agentic comparison, 22 August 2026](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md)

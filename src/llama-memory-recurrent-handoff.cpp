@@ -89,7 +89,7 @@ llama_memory_transfer_ptr llama_memory_recurrent::prepare_handoff(llama_memory_i
         const llama_memory_view_cb & view, bool allow_copy, size_t & shared, size_t & copied) {
     auto * src = dynamic_cast<llama_memory_recurrent *>(&source);
     if (!src || src == this || typeid(*src) != typeid(llama_memory_recurrent) || typeid(*this) != typeid(llama_memory_recurrent) ||
-        allow_copy || !handoff_strict || !handoff_deferred || !src->handoff_state_valid() ||
+        allow_copy || handoff_arch != src->handoff_arch || !handoff_strict || !handoff_deferred || !src->handoff_state_valid() ||
         used != 0 || !handoff_buffers.empty() || size != src->size || n_seq_max != src->n_seq_max || n_rs_seq != src->n_rs_seq ||
         r_l.size() != src->r_l.size() || s_l.size() != src->s_l.size() || p_l.size() != src->p_l.size()) return nullptr;
     for (const auto & c : cells) if (!c.is_empty() || c.pos != -1) return nullptr;

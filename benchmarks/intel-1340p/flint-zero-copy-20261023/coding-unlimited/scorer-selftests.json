@@ -1,0 +1,32 @@
+[
+  {
+    "id": "thought",
+    "stop": "eog",
+    "content": "<think>reasoning with ```code``` inside</think>\n```javascript\nfunction parseCsvRow(row){if(/[\\r\\n]/.test(row))throw Error();let out=[],i=0;while(true){let v='';if(row[i]==='\"'){i++;let closed=false;while(i<row.length){if(row[i]==='\"'){if(row[i+1]==='\"'){v+='\"';i+=2;}else{i++;closed=true;break;}}else v+=row[i++];}if(!closed||(i<row.length&&row[i]!==','))throw Error();}else{while(i<row.length&&row[i]!==','){if(row[i]==='\"')throw Error();v+=row[i++];}}out.push(v);if(i===row.length)return out;i++;}}module.exports=parseCsvRow;\n```",
+    "pass": true
+  },
+  {
+    "id": "unfinished",
+    "stop": "context_capacity",
+    "content": "```javascript\nfunction parseCsvRow(row){if(/[\\r\\n]/.test(row))throw Error();let out=[],i=0;while(true){let v='';if(row[i]==='\"'){i++;let closed=false;while(i<row.length){if(row[i]==='\"'){if(row[i+1]==='\"'){v+='\"';i+=2;}else{i++;closed=true;break;}}else v+=row[i++];}if(!closed||(i<row.length&&row[i]!==','))throw Error();}else{while(i<row.length&&row[i]!==','){if(row[i]==='\"')throw Error();v+=row[i++];}}out.push(v);if(i===row.length)return out;i++;}}module.exports=parseCsvRow;\n```",
+    "pass": false
+  },
+  {
+    "id": "unclosed-thought",
+    "stop": "eog",
+    "content": "<think>unfinished\n```javascript\nfunction parseCsvRow(row){if(/[\\r\\n]/.test(row))throw Error();let out=[],i=0;while(true){let v='';if(row[i]==='\"'){i++;let closed=false;while(i<row.length){if(row[i]==='\"'){if(row[i+1]==='\"'){v+='\"';i+=2;}else{i++;closed=true;break;}}else v+=row[i++];}if(!closed||(i<row.length&&row[i]!==','))throw Error();}else{while(i<row.length&&row[i]!==','){if(row[i]==='\"')throw Error();v+=row[i++];}}out.push(v);if(i===row.length)return out;i++;}}module.exports=parseCsvRow;\n```",
+    "pass": false
+  },
+  {
+    "id": "extra-explanation",
+    "stop": "eog",
+    "content": "<think>done</think>\nHere is the code:\n```javascript\nfunction parseCsvRow(row){if(/[\\r\\n]/.test(row))throw Error();let out=[],i=0;while(true){let v='';if(row[i]==='\"'){i++;let closed=false;while(i<row.length){if(row[i]==='\"'){if(row[i+1]==='\"'){v+='\"';i+=2;}else{i++;closed=true;break;}}else v+=row[i++];}if(!closed||(i<row.length&&row[i]!==','))throw Error();}else{while(i<row.length&&row[i]!==','){if(row[i]==='\"')throw Error();v+=row[i++];}}out.push(v);if(i===row.length)return out;i++;}}module.exports=parseCsvRow;\n```",
+    "pass": false
+  },
+  {
+    "id": "literal-marker",
+    "stop": "eog",
+    "content": "```js\nconst marker=\"<think>literal</think>\";\nfunction parseCsvRow(row){if(/[\\r\\n]/.test(row))throw Error();let out=[],i=0;while(true){let v='';if(row[i]==='\"'){i++;let closed=false;while(i<row.length){if(row[i]==='\"'){if(row[i+1]==='\"'){v+='\"';i+=2;}else{i++;closed=true;break;}}else v+=row[i++];}if(!closed||(i<row.length&&row[i]!==','))throw Error();}else{while(i<row.length&&row[i]!==','){if(row[i]==='\"')throw Error();v+=row[i++];}}out.push(v);if(i===row.length)return out;i++;}}module.exports=parseCsvRow;\n```",
+    "pass": true
+  }
+]

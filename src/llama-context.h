@@ -78,6 +78,7 @@ struct llama_context {
 
     llama_memory_t get_memory() const;
     bool is_handoff_strict() const;
+    void print_moe_cache_stats(const char * phase) const;
     bool set_hidden_state_peer(llama_context * peer);
     bool kv_handoff_cpu(llama_context & src, bool allow_copy, llama_kv_handoff_result & result);
     bool kv_handoff_cpu_mtp(

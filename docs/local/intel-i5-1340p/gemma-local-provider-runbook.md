@@ -1,5 +1,7 @@
 # Local model profiles on Sigma
 
+**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+
 **Gemma 4 E4B QAT + MTP zero-copy** is the primary local deployment on `sigma`. Its service is enabled at boot and its immutable runtime is `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
 
 Two static profiles are available for explicit tests: **Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** for security audits and **Bonsai 2 27B PQ2_0** for CPU-only ternary-model tests. All three profiles use `http://192.168.1.70:11434/` without authentication and are mutually exclusive. Huihui and Bonsai bind the LAN address directly; the primary binds loopback and reaches the LAN through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
@@ -150,7 +152,7 @@ A client disconnect aborts active inference and clears the resident slot. `DELET
 
 ## API surface
 
-The current service provides:
+The retained service implementation provides:
 
 - `GET /health` and `GET /v1/health`;
 - `GET /props`;
@@ -188,7 +190,7 @@ Retained evidence: [original zero-copy qualification](../../../benchmarks/intel-
 
 A replacement Gemma serving path must preserve the accepted generation baseline or record an isolated matched reason for each difference. On 16 September 2026, the current-service audit reread all 48 `README.md` and `report.md` files under the indexed Gemma benchmark campaigns, the August [completion audit](../../../benchmarks/intel-1340p/ornith-gemma-optimization/completion-audit.md), the September [B0 baseline ledger](../../../benchmarks/intel-1340p/gemma-optimization-plan-20260911/baselines.md), the historical [512-prompt/64-output result](../../../benchmarks/intel-1340p/maple-qwen-campaign/performance/gemma/response-generation.json), and the current source, build and live process state. Future work starts from this table instead of reconstructing the decisions from chat history.
 
-Status terms in this table are exact: `live` means enabled in `llama-gemma-zero-copy.service`; `excluded` means measured evidence does not support enabling it; `conditional-not-run` means a required parent failed before the candidate was reached; `research` means the result is too small or narrow for the current default. The [16 September Q4 scheduling campaign](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) is the current deployment record; generation parity is its baseline.
+This table records the historical 16 September configuration: `live` meant enabled in `llama-gemma-zero-copy.service`; `excluded` means measured evidence does not support enabling it; `conditional-not-run` means a required parent failed before the candidate was reached; `research` means the result is too small or narrow for the current default. The [16 September Q4 scheduling campaign](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) records that historical deployment; generation parity is its baseline.
 
 | Factor | Retained evidence | Current zero-copy state | Required action |
 |---|---|---|---|

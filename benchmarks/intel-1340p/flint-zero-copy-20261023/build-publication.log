@@ -1,0 +1,274 @@
+bash "/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/scripts/agent-build.sh" build 
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- llama.cpp version: 0.7.0-dev
+CMAKE_BUILD_TYPE=Release
+-- ccache found, compilation results will be cached. Disable with GGML_CCACHE=OFF.
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- Vulkan found
+-- GL_KHR_cooperative_matrix supported by glslc
+-- GL_NV_cooperative_matrix2 supported by glslc
+-- GL_NV_cooperative_matrix_decode_vector not supported by glslc
+-- GL_EXT_integer_dot_product supported by glslc
+-- GL_EXT_bfloat16 supported by glslc
+-- GL_EXT_float_e2m1 not supported by glslc
+-- GL_EXT_float_e4m3 supported by glslc
+-- Including Vulkan backend
+-- ggml version: 0.27.0
+-- ggml commit:  8999b4061
+-- Nemotron sampler lifecycle CTest disabled; set -DNEMOTRON_TEST_MODEL=<existing GGUF> to enable it
+-- Generating embedded license file for target: llama-app
+-- Configuring done (0.9s)
+-- Generating done (0.2s)
+-- Build files have been written to: /var/home/agent/workspace/tmp/llama-cpp/build/source-1309921403/flint-vulkan
+[0/4] Re-checking globbed directories...
+[1/209] Provisioning UI assets
+CMake Warning at /var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/scripts/ui-assets.cmake:584 (message):
+  UI: no assets available - building without an embedded UI.  In a
+  disconnected environment, download the pre-built UI from a llama.cpp
+  release at https://github.com/ggml-org/llama.cpp/releases and extract to
+  tools/ui/dist.
+
+
+-- UI: assets unchanged, skipping embedding
+[2/205] Performing build step for 'vulkan-shaders-gen'
+ninja: no work to do.
+[3/205] Performing install step for 'vulkan-shaders-gen'
+-- Up-to-date: /var/home/agent/workspace/tmp/llama-cpp/build/source-1309921403/flint-vulkan/Release/./vulkan-shaders-gen
+[4/205] Completed 'vulkan-shaders-gen'
+[5/205] Building CXX object tools/mtmd/CMakeFiles/llama-llava-cli.dir/deprecation-warning.cpp.o
+[6/205] Building CXX object tests/CMakeFiles/test-sched-async-cpu.dir/test-sched-async-cpu.cpp.o
+[7/205] Building CXX object tests/CMakeFiles/test-tiled-mulmat.dir/test-tiled-mulmat.cpp.o
+[8/205] Building CXX object tests/CMakeFiles/test-model-load-cancel.dir/test-model-load-cancel.cpp.o
+[9/205] Building CXX object tests/CMakeFiles/test-autorelease.dir/test-autorelease.cpp.o
+[10/205] Building CXX object tests/CMakeFiles/test-backend-sampler.dir/test-backend-sampler.cpp.o
+[11/205] Building CXX object tests/CMakeFiles/test-barrier.dir/test-barrier.cpp.o
+[12/205] Building CXX object tests/CMakeFiles/test-quantize-fns.dir/test-quantize-fns.cpp.o
+[13/205] Building CXX object tests/CMakeFiles/test-quantize-perf.dir/test-quantize-perf.cpp.o
+[14/205] Building CXX object tests/CMakeFiles/test-rope.dir/test-rope.cpp.o
+[15/205] Building CXX object tests/CMakeFiles/test-col2im-1d.dir/test-col2im-1d.cpp.o
+[16/205] Building CXX object tests/CMakeFiles/test-conv-1d.dir/test-conv-1d.cpp.o
+[17/205] Building CXX object tests/CMakeFiles/test-gelu-quick.dir/test-gelu-quick.cpp.o
+[18/205] Building CXX object tests/CMakeFiles/test-ptq1_0-element-map.dir/test-ptq1_0-element-map.cpp.o
+[19/205] Building CXX object tests/CMakeFiles/test-expert-io-plan.dir/test-expert-io-plan.cpp.o
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-expert-io-plan.cpp: In function ‘void test_advice_invalid_args()’:
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-expert-io-plan.cpp:64:9: warning: unused variable ‘value’ [-Wunused-variable]
+   64 |     int value = 0;
+      |         ^~~~~
+[20/205] Building CXX object tests/CMakeFiles/test-x86-quant-dot.dir/test-x86-quant-dot.cpp.o
+[21/205] Building CXX object tests/CMakeFiles/test-ngram-cache.dir/test-ngram-cache.cpp.o
+[22/205] Building CXX object tests/CMakeFiles/test-ngram-cache-lifecycle.dir/test-ngram-cache-lifecycle.cpp.o
+[23/205] Building C object tests/CMakeFiles/test-mtmd-c-api.dir/test-mtmd-c-api.c.o
+[24/205] Building CXX object tests/CMakeFiles/test-mtmd-impl.dir/test-mtmd-impl.cpp.o
+[25/205] Building C object tests/CMakeFiles/test-c.dir/test-c.c.o
+[26/205] Building CXX object tests/CMakeFiles/test-gguf.dir/test-gguf.cpp.o
+[27/205] Building CXX object tests/CMakeFiles/test-alloc.dir/test-alloc.cpp.o
+[28/205] Building CXX object tests/CMakeFiles/test-export-graph-ops.dir/test-export-graph-ops.cpp.o
+[29/205] Building CXX object examples/batched/CMakeFiles/llama-batched.dir/batched.cpp.o
+[30/205] Building CXX object tests/CMakeFiles/test-backend-ops.dir/test-backend-ops.cpp.o
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp: In function ‘std::string var_to_str(ggml_scale_mode)’:
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:444:14: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+  444 |     if (mode & GGML_SCALE_FLAG_ALIGN_CORNERS) {
+      |         ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:447:14: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+  447 |     if (mode & GGML_SCALE_FLAG_ANTIALIAS) {
+      |         ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp: In constructor ‘test_mul_mat_id::test_mul_mat_id(ggml_type, ggml_type, int, int, bool, int64_t, int64_t, int64_t, float, int64_t, bool, bool)’:
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:5679:16: warning: ‘test_mul_mat_id::ids_offset’ will be initialized after [-Wreorder]
+ 5679 |     const bool ids_offset;
+      |                ^~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:5676:16: warning:   ‘const bool test_mul_mat_id::skip_ids’ [-Wreorder]
+ 5676 |     const bool skip_ids; // masked hot/cold expert routes
+      |                ^~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:5704:5: warning:   when initialized here [-Wreorder]
+ 5704 |     test_mul_mat_id(ggml_type type_a = GGML_TYPE_F32, ggml_type type_b = GGML_TYPE_F32,
+      |     ^~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp: In function ‘std::vector<std::unique_ptr<test_case> > make_test_cases_eval()’:
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:12077:151: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+12077 |     for (ggml_scale_mode mode : {GGML_SCALE_MODE_NEAREST, GGML_SCALE_MODE_BILINEAR, GGML_SCALE_MODE_BICUBIC, ggml_scale_mode(GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)}) {
+      |                                                                                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:12084:123: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+12084 |         test_cases.emplace_back(new test_interpolate(GGML_TYPE_F32, {2, 5, 7, 11}, {5, 7, 11, 13}, (ggml_scale_mode)(mode | GGML_SCALE_FLAG_ALIGN_CORNERS)));
+      |                                                                                                                      ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:12085:120: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+12085 |         test_cases.emplace_back(new test_interpolate(GGML_TYPE_F32, {1, 4, 3, 2}, {2, 8, 3, 2}, (ggml_scale_mode)(mode | GGML_SCALE_FLAG_ALIGN_CORNERS)));
+      |                                                                                                                   ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/tmp/llama-cpp/runs/flint-trial-20261023-be9528654612/source/tests/test-backend-ops.cpp:12086:120: warning: bitwise operation between different enumeration types ‘ggml_scale_mode’ and ‘ggml_scale_flag’ is deprecated [-Wdeprecated-enum-enum-conversion]
+12086 |         test_cases.emplace_back(new test_interpolate(GGML_TYPE_F32, {4, 1, 3, 2}, {1, 1, 3, 2}, (ggml_scale_mode)(mode | GGML_SCALE_FLAG_ALIGN_CORNERS)));
+      |                                                                                                                   ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[31/205] Building CXX object examples/debug/CMakeFiles/llama-debug.dir/debug.cpp.o
+[32/205] Building CXX object examples/eval-callback/CMakeFiles/llama-eval-callback.dir/eval-callback.cpp.o
+[33/205] Building CXX object examples/embedding/CMakeFiles/llama-embedding.dir/embedding.cpp.o
+[34/205] Building CXX object examples/gguf-hash/CMakeFiles/llama-gguf-hash.dir/gguf-hash.cpp.o
+[35/205] Building CXX object examples/gguf/CMakeFiles/llama-gguf.dir/gguf.cpp.o
+[36/205] Building CXX object examples/idle/CMakeFiles/llama-idle.dir/idle.cpp.o
+[37/205] Building CXX object examples/lookahead/CMakeFiles/llama-lookahead.dir/lookahead.cpp.o
+[38/205] Building CXX object examples/lookup/CMakeFiles/llama-lookup.dir/lookup.cpp.o
+[39/205] Building CXX object examples/lookup/CMakeFiles/llama-lookup-create.dir/lookup-create.cpp.o
+[40/205] Building CXX object examples/lookup/CMakeFiles/llama-lookup-merge.dir/lookup-merge.cpp.o
+[41/205] Building CXX object examples/lookup/CMakeFiles/llama-lookup-stats.dir/lookup-stats.cpp.o
+[42/205] Building CXX object examples/parallel/CMakeFiles/llama-parallel.dir/parallel.cpp.o
+[43/205] Building CXX object examples/passkey/CMakeFiles/llama-passkey.dir/passkey.cpp.o
+[44/205] Building CXX object examples/simple/CMakeFiles/llama-simple.dir/simple.cpp.o
+[45/205] Building CXX object examples/simple-chat/CMakeFiles/llama-simple-chat.dir/simple-chat.cpp.o
+[46/205] Building CXX object examples/retrieval/CMakeFiles/llama-retrieval.dir/retrieval.cpp.o
+[47/205] Building CXX object examples/speculative-simple/CMakeFiles/llama-speculative-simple.dir/speculative-simple.cpp.o
+[48/205] Building CXX object examples/speculative/CMakeFiles/llama-speculative.dir/speculative.cpp.o
+[49/205] Building CXX object examples/gen-docs/CMakeFiles/llama-gen-docs.dir/gen-docs.cpp.o
+[50/205] Linking CXX static library examples/diffusion/libllama-diffusion.a
+[51/205] Building CXX object examples/training/CMakeFiles/llama-finetune.dir/finetune.cpp.o
+[52/205] Building CXX object examples/convert-llama2c-to-ggml/CMakeFiles/llama-convert-llama2c-to-ggml.dir/convert-llama2c-to-ggml.cpp.o
+[53/205] Building CXX object examples/diffusion/CMakeFiles/llama-diffusion-cli.dir/diffusion-cli.cpp.o
+[54/205] Building CXX object pocs/vdot/CMakeFiles/llama-vdot.dir/vdot.cpp.o
+[55/205] Linking CXX shared library bin/libllama-batched-bench-impl.so
+[56/205] Building CXX object tools/batched-bench/CMakeFiles/llama-batched-bench.dir/main.cpp.o
+[57/205] Building CXX object pocs/vdot/CMakeFiles/llama-q8dot.dir/q8dot.cpp.o
+[58/205] Building CXX object tools/gguf-split/CMakeFiles/llama-gguf-split.dir/gguf-split.cpp.o
+[59/205] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-in-memory.dir/in-memory.cpp.o
+[60/205] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-zero-copy-server.dir/service.cpp.o
+[61/205] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-zero-copy-server.dir/service.cpp.o
+[62/205] Linking CXX shared library bin/libllama-bench-impl.so
+[63/205] Building CXX object tools/llama-bench/CMakeFiles/llama-bench.dir/main.cpp.o
+[64/205] Building CXX object tools/moe-trace/CMakeFiles/llama-moe-trace.dir/moe-trace.cpp.o
+[65/205] Linking CXX shared library bin/libllama-completion-impl.so
+[66/205] Building CXX object tools/completion/CMakeFiles/llama-completion.dir/main.cpp.o
+[67/205] Linking CXX shared library bin/libllama-perplexity-impl.so
+[68/205] Building CXX object tools/perplexity/CMakeFiles/llama-perplexity.dir/main.cpp.o
+[69/205] Linking CXX shared library bin/libllama-quantize-impl.so
+[70/205] Building CXX object tools/quantize/CMakeFiles/llama-quantize.dir/main.cpp.o
+[71/205] Linking CXX shared library bin/libllama-cli-impl.so
+[72/205] Building CXX object tools/cli/CMakeFiles/llama-cli.dir/main.cpp.o
+[73/205] Building CXX object tools/server/CMakeFiles/llama-server.dir/main.cpp.o
+[74/205] Building CXX object tools/tokenize/CMakeFiles/llama-tokenize.dir/tokenize.cpp.o
+[75/205] Building CXX object tools/imatrix/CMakeFiles/llama-imatrix.dir/imatrix.cpp.o
+[76/205] Building CXX object tools/mtmd/CMakeFiles/llama-gemma3-cli.dir/deprecation-warning.cpp.o
+[77/205] Building CXX object tools/tts/CMakeFiles/llama-tts.dir/tts.cpp.o
+[78/205] Building CXX object tools/mtmd/CMakeFiles/llama-minicpmv-cli.dir/deprecation-warning.cpp.o
+[79/205] Building CXX object tools/mtmd/CMakeFiles/llama-qwen2vl-cli.dir/deprecation-warning.cpp.o
+[80/205] Building CXX object tools/mtmd/CMakeFiles/llama-mtmd-debug.dir/debug/mtmd-debug.cpp.o
+[81/205] Building CXX object tools/mtmd/CMakeFiles/llama-mtmd-cli.dir/mtmd-cli.cpp.o
+[82/205] Building CXX object tools/cvector-generator/CMakeFiles/llama-cvector-generator.dir/cvector-generator.cpp.o
+[83/205] Linking CXX shared library bin/libllama-fit-params-impl.so
+[84/205] Building CXX object tools/fit-params/CMakeFiles/llama-fit-params.dir/main.cpp.o
+[85/205] Building CXX object tools/export-lora/CMakeFiles/llama-export-lora.dir/export-lora.cpp.o
+[86/205] Building CXX object tools/results/CMakeFiles/llama-results.dir/results.cpp.o
+[87/205] Building CXX object app/CMakeFiles/llama-app.dir/llama.cpp.o
+[88/205] Building CXX object app/CMakeFiles/llama-app.dir/__/license.cpp.o
+[89/205] Linking CXX executable bin/test-tokenizer-0
+[90/205] Linking CXX executable bin/test-llama-context
+[91/205] Linking CXX executable bin/test-unicode
+[92/205] Linking CXX executable bin/test-sampling
+[93/205] Linking CXX executable bin/test-reasoning-budget
+[94/205] Linking CXX executable bin/test-grammar-parser
+[95/205] Linking CXX executable bin/test-grammar-integration
+[96/205] Linking CXX executable bin/test-llama-grammar
+[97/205] Linking CXX executable bin/test-batch-alloc
+[98/205] Linking CXX executable bin/test-chat
+[99/205] Linking CXX executable bin/test-server-component
+[100/205] Linking CXX executable bin/test-json-schema-to-grammar
+[101/205] Linking CXX executable bin/test-quantize-stats
+[102/205] Linking CXX executable bin/test-gbnf-validator
+[103/205] Building CXX object app/CMakeFiles/llama-app.dir/download.cpp.o
+[104/205] Linking CXX executable bin/test-tokenizer-1-bpe
+[105/205] Linking CXX executable bin/test-tokenizer-1-spm
+[106/205] Linking CXX executable bin/test-llama-archs
+[107/205] Linking CXX executable bin/test-fusion
+[108/205] Linking CXX executable bin/test-chat-peg-parser
+[109/205] Linking CXX executable bin/test-jinja
+[110/205] Linking CXX executable bin/test-json-schema
+[111/205] Linking CXX executable bin/test-chat-auto-parser
+[112/205] Linking CXX executable bin/test-chat-template
+[113/205] Linking CXX executable bin/test-chat-analysis
+[114/205] Linking CXX executable bin/test-log
+[115/205] Linking CXX executable bin/test-peg-parser
+[116/205] Linking CXX executable bin/test-thread-safety
+[117/205] Linking CXX executable bin/test-arg-parser
+[118/205] Linking CXX executable bin/test-model-resolution
+[119/205] Linking CXX executable bin/test-opt
+[120/205] Linking CXX executable bin/test-gemma-hybrid-session-policy
+[121/205] Linking CXX executable bin/test-prefetch-budget
+[122/205] Linking CXX executable bin/test-q6-pair
+[123/205] Linking CXX executable bin/test-hybrid-handoff
+[124/205] Linking CXX executable bin/test-kv-handoff
+[125/205] Linking CXX executable bin/test-hidden-state
+[126/205] Linking CXX executable bin/test-qwen-mtp-trained-handoff
+[127/205] Linking CXX executable bin/test-qwen-target-trained-handoff
+[128/205] Linking CXX executable bin/test-sched-async-cpu
+[129/205] Linking CXX executable bin/test-tiled-mulmat
+[130/205] Linking CXX executable bin/test-backend-ops
+[131/205] Linking CXX executable bin/test-model-load-cancel
+[132/205] Linking CXX executable bin/test-autorelease
+[133/205] Linking CXX executable bin/test-backend-sampler
+[134/205] Linking CXX executable bin/test-barrier
+[135/205] Linking CXX executable bin/test-quantize-fns
+[136/205] Linking CXX executable bin/test-quantize-perf
+[137/205] Linking CXX executable bin/test-col2im-1d
+[138/205] Linking CXX executable bin/test-rope
+[139/205] Linking CXX executable bin/test-gelu-quick
+[140/205] Linking CXX executable bin/test-conv-1d
+[141/205] Linking CXX executable bin/test-ptq1_0-element-map
+[142/205] Linking CXX executable bin/test-expert-io-plan
+[143/205] Linking CXX executable bin/test-x86-quant-dot
+[144/205] Linking CXX executable bin/test-ngram-cache
+[145/205] Linking C executable bin/test-mtmd-c-api
+[146/205] Linking CXX executable bin/test-ngram-cache-lifecycle
+[147/205] Linking C executable bin/test-c
+[148/205] Linking CXX executable bin/test-mtmd-impl
+[149/205] Linking CXX executable bin/test-gguf
+[150/205] Linking CXX executable bin/test-alloc
+[151/205] Linking CXX executable bin/test-export-graph-ops
+[152/205] Linking CXX executable bin/llama-batched
+[153/205] Linking CXX executable bin/llama-debug
+[154/205] Linking CXX executable bin/llama-embedding
+[155/205] Linking CXX executable bin/llama-eval-callback
+[156/205] Linking CXX executable bin/llama-gguf-hash
+[157/205] Linking CXX executable bin/llama-gguf
+[158/205] Linking CXX executable bin/llama-idle
+[159/205] Linking CXX executable bin/llama-lookahead
+[160/205] Linking CXX executable bin/llama-lookup
+[161/205] Linking CXX executable bin/llama-lookup-create
+[162/205] Linking CXX executable bin/llama-lookup-merge
+[163/205] Linking CXX executable bin/llama-parallel
+[164/205] Linking CXX executable bin/llama-lookup-stats
+[165/205] Linking CXX executable bin/llama-passkey
+[166/205] Linking CXX executable bin/llama-retrieval
+[167/205] Linking CXX executable bin/llama-simple
+[168/205] Linking CXX executable bin/llama-simple-chat
+[169/205] Linking CXX executable bin/llama-speculative
+[170/205] Linking CXX executable bin/llama-speculative-simple
+[171/205] Linking CXX executable bin/llama-gen-docs
+[172/205] Linking CXX executable bin/llama-finetune
+[173/205] Linking CXX executable bin/llama-convert-llama2c-to-ggml
+[174/205] Linking CXX executable bin/llama-diffusion-cli
+[175/205] Linking CXX executable bin/llama-q8dot
+[176/205] Linking CXX executable bin/llama-vdot
+[177/205] Linking CXX executable bin/llama-batched-bench
+[178/205] Linking CXX executable bin/llama-gguf-split
+[179/205] Linking CXX executable bin/llama-gemma-in-memory
+[180/205] Linking CXX executable bin/llama-gemma-zero-copy-server
+[181/205] Linking CXX executable bin/llama-zero-copy-server
+[182/205] Linking CXX executable bin/llama-imatrix
+[183/205] Linking CXX executable bin/llama-bench
+[184/205] Linking CXX executable bin/llama-moe-trace
+[185/205] Linking CXX executable bin/llama-completion
+[186/205] Linking CXX executable bin/llama-perplexity
+[187/205] Linking CXX executable bin/llama-quantize
+[188/205] Linking CXX executable bin/llama-cli
+[189/205] Linking CXX executable bin/llama-server
+[190/205] Linking CXX executable bin/llama-tokenize
+[191/205] Linking CXX executable bin/llama-llava-cli
+[192/205] Linking CXX executable bin/llama-tts
+[193/205] Linking CXX executable bin/llama-gemma3-cli
+[194/205] Linking CXX executable bin/llama-minicpmv-cli
+[195/205] Linking CXX executable bin/llama-qwen2vl-cli
+[196/205] Linking CXX executable bin/llama-mtmd-cli
+[197/205] Linking CXX executable bin/llama-mtmd-debug
+[198/205] Linking CXX executable bin/llama-cvector-generator
+[199/205] Linking CXX executable bin/llama-export-lora
+[200/205] Linking CXX executable bin/llama-fit-params
+[201/205] Linking CXX executable bin/llama-results
+[202/205] Linking CXX executable bin/llama

@@ -1,0 +1,4 @@
+{
+  "id": "merge-patch",
+  "prompt": "Write a CommonJS JavaScript module. Export exactly the requested function with module.exports = functionName. Use no imports, dependencies, filesystem or network. Return only one fenced javascript code block, with no explanation.\n\nImplement mergePatch(target, patch) according to JSON Merge Patch (RFC 7396). If patch is not a non-null non-array object, return a deep copy of patch. Otherwise start from a deep copy of target if it is such an object, else {}. For each patch key, null deletes that key; every other value recursively applies mergePatch to that property. Arrays are replaced, not merged. Inputs are JSON values. Do not mutate or share mutable arrays/objects with either input."
+}

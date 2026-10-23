@@ -907,6 +907,7 @@ struct llama_model {
     ggml_backend_buffer_type_t select_buft(int il) const;
 
     bool has_tensor_overrides() const;
+    bool handoff_safe_tensor_placement() const;
 
     const struct ggml_tensor * get_tensor(const char * name) const;
 
@@ -919,6 +920,7 @@ struct llama_model {
 
     ggml_cgraph * build_graph(const llm_graph_params & params) const;
 
+    bool supports_strict_state_handoff() const;
     bool shared_residency_enabled() const;
     std::unique_lock<std::recursive_mutex> lock_residency() const;
     void register_residency_context(llama_context * ctx) const;

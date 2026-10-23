@@ -1,5 +1,7 @@
 # Maple Preview local Pi provider
 
+**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+
 > Retained disabled profile. The current primary is [Gemma 4 E4B QAT + MTP zero-copy](gemma-local-provider-runbook.md). Stop the primary model and its LAN socket before starting Maple, and restore the primary with `gemma-profile primary` afterward.
 
 The user service `llama-maple-local-provider.service` exposes Maple Preview on `127.0.0.1:8093`. Pi registers the model as `local-maple/maple-preview-tq2-exact-head`. The hosted default stays unchanged.
