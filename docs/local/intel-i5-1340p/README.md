@@ -11,6 +11,9 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Campaigns and design notes
 
+* [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007.md) -- native H/MoE rollback/lifetime gates and exact Q4 state transfer; fixed-token timing screen only, not deployed.
+
+
 * [Ornith and Gemma optimisation campaign](intel-1340p-ornith-gemma-campaign.md)
 * [Gemma and Ornith agentic comparison, 22 August 2026](../../../benchmarks/intel-1340p/gemma-ornith-agentic-20260822/README.md)
 * [Historical Gemma 128K runbook](intel-1340p-gemma4-runbook.md)

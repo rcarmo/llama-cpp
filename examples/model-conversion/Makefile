@@ -1,5 +1,13 @@
 MAKEFLAGS += --no-print-directory
 
+# Wrap existing recipes so their temporary/package caches stay project-scoped.
+.DEFAULT_GOAL := causal-convert-model-bf16
+AGENT_GOAL ?=
+.PHONY: agent-run
+agent-run:
+	@test -n "$(AGENT_GOAL)" || { echo 'Set AGENT_GOAL to an existing conversion target.' >&2; exit 2; }
+	BUILD_VARIANT=model-conversion RUN_PURPOSE=model-conversion bash ../../scripts/agent-build.sh exec $(MAKE) $(AGENT_GOAL)
+
 define validate_model_path
 	@if [ -z "$(MODEL_PATH)" ]; then \
 		echo "Error: MODEL_PATH must be provided either as:"; \

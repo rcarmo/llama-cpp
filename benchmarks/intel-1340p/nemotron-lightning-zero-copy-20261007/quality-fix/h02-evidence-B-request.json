@@ -1,0 +1,17 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Follow the user’s stated rules exactly. Do not introduce unstated precedence or exceptions. Check boundary cases and interactions before answering. If the supplied evidence conflicts and the user requires uncertainty, preserve that uncertainty. For code, verify state updates, eviction and edge cases. After reasoning, provide only the requested final answer, without continuing the analysis."
+    },
+    {
+      "role": "user",
+      "content": "Use supplied notes only. [S1] ProductBeacon4 supportsFreeBSD. [S2] ProductBeacon4 doesnot supportFreeBSD. [S3] Auditlogging is onbydefault. [S4] Auditlogging is offbydefault. None has a date/authority/precedence,and no source discussesSolaris. Explicitly useunknown for missing or contradictory facts. Return JSON only:freebsd_supported(yes/no/unknown),audit_log_default(on/off/unknown),solar_is_supported(yes/no/unknown),conflicts(twoarrays ofsourceIDs forFreeBSD thenauditlogging)."
+    }
+  ],
+  "thinking": true,
+  "temperature": 1,
+  "reasoning_budget": 512,
+  "max_tokens": 1536,
+  "reasoning_budget_message": "\nReasoning budget reached. Stop analysis and give the final answer in the requested format.\n"
+}

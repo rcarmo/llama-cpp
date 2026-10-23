@@ -7,8 +7,8 @@
 #include <stdexcept>
 
 struct toy_model : llama_model {
-    toy_model() : llama_model(llama_model_default_params()) {
-        arch = LLM_ARCH_QWEN35;
+    toy_model(llm_arch architecture = LLM_ARCH_QWEN35) : llama_model(llama_model_default_params()) {
+        arch = architecture;
         hparams.n_layer_all = 2;
         hparams.n_embd = 32;
         hparams.n_embd_head_k_full = 32;
@@ -20,6 +20,12 @@ struct toy_model : llama_model {
         hparams.ssm_d_inner = 8;
         hparams.ssm_d_state = 4;
         hparams.ssm_n_group = 1;
+        if (arch == LLM_ARCH_NEMOTRON_H || arch == LLM_ARCH_NEMOTRON_H_MOE) {
+            hparams.ssm_d_inner = 128;
+            hparams.ssm_d_state = 128;
+            hparams.ssm_dt_rank = 2;
+            hparams.ssm_n_group = 2;
+        }
     }
     void load_stats(llama_model_loader &) override {}
     void load_hparams(llama_model_loader &) override {}
@@ -86,8 +92,18 @@ static llama_memory_view_cb view(std::shared_ptr<llama_memory_hybrid> owner, int
     };
 }
 
-int main() {
-    toy_model model;
+static void exercise(llm_arch arch) {
+    toy_model model(arch);
+    GGML_ASSERT(model.supports_strict_state_handoff());
+    if(arch!=LLM_ARCH_QWEN35){
+        toy_model conv(arch);conv.hparams.ssm_d_conv=3;GGML_ASSERT(!conv.supports_strict_state_handoff());
+        toy_model inner(arch);inner.hparams.ssm_d_inner=96;GGML_ASSERT(!inner.supports_strict_state_handoff());
+        toy_model rank(arch);rank.hparams.ssm_dt_rank=0;GGML_ASSERT(!rank.supports_strict_state_handoff());
+        toy_model group(arch);group.hparams.ssm_n_group=0;GGML_ASSERT(!group.supports_strict_state_handoff());
+        toy_model head_group(arch);head_group.hparams.ssm_n_group=4;GGML_ASSERT(!head_group.supports_strict_state_handoff());
+        toy_model mtp(arch);mtp.hparams.n_layer_nextn=1;GGML_ASSERT(!mtp.supports_strict_state_handoff());
+        toy_model attention(arch);attention.hparams.is_recr_impl[1]=true;GGML_ASSERT(!attention.supports_strict_state_handoff());
+    }
     {
         auto src = make(model, false), dst = make(model, true);
         populate(*src);
@@ -144,5 +160,35 @@ int main() {
         catch (const std::runtime_error &) { rejected = true; }
         GGML_ASSERT(rejected);
     }
-    std::puts("PASS: strict hybrid descriptor-only allocation, complete R/S planes, pending rollback, copy-zero coverage, atomic failed/abandoned prepare, source lifetime and stale snapshot rejection");
+    if (arch != LLM_ARCH_QWEN35) {
+        toy_model other(arch == LLM_ARCH_NEMOTRON_H ? LLM_ARCH_NEMOTRON_H_MOE : LLM_ARCH_NEMOTRON_H);
+        auto src = make(model, false), dst = make(other, true);
+        populate(*src);
+        int count = 0; auto cb = view(src, count); size_t shared = 0, copied = 0;
+        GGML_ASSERT(!dst->prepare_handoff(*src, cb, false, shared, copied));
+        GGML_ASSERT(shared == 0 && copied == 0 && !dst->get_mem_recr()->r_l[0]->data);
+        // Matching byte geometry must not bypass recurrent architecture identity.
+        for (int depth = 1; depth <= 3; ++depth) {
+            auto source = make(model, false), target = make(model, true);
+            populate(*source);
+            GGML_ASSERT(source->seq_rm(0, 9 - depth, -1));
+            auto before = state(*source); int views = 0; auto aliases = view(source, views);
+            size_t s = 0, c = 0; auto tx = target->prepare_handoff(*source, aliases, false, s, c);
+            GGML_ASSERT(tx && s > 0 && c == 0);
+            tx->commit(); tx.reset(); aliases = {}; source.reset();
+            GGML_ASSERT(state(*target) == before && target->get_mem_recr()->rs_idx[0] == (uint32_t) depth);
+        }
+        model.hparams.ssm_d_state = 64;
+        GGML_ASSERT(!model.supports_strict_state_handoff());
+        bool rejected = false;
+        try { auto invalid = make(model, true); } catch (const std::runtime_error &) { rejected = true; }
+        GGML_ASSERT(rejected);
+    }
+}
+
+int main() {
+    exercise(LLM_ARCH_QWEN35);
+    exercise(LLM_ARCH_NEMOTRON_H);
+    exercise(LLM_ARCH_NEMOTRON_H_MOE);
+    std::puts("PASS: Qwen and Nemotron strict hybrid planes, rollback depths 1-3, copy-zero, atomic failures, source lifetime and architecture/shape rejection");
 }

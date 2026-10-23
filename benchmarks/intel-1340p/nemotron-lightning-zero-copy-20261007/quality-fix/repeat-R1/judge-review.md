@@ -1,0 +1,3 @@
+# Independent R1 scoring review
+
+Judge independently compared repeat responses, generated code, expected output/tests and `results-R1.json`. It verified the scorer reads the frozen suite and current R1 outputs only, and is correct. R1 pass table: q01 CPU/H pass; q02 CPU fail (null dereference in list removal), H pass; q03 CPU fail (increments indegree for duplicate edge and returns null for valid DAG), H pass; q04 CPU/H fail (manager exception ignored; 95 instead of135); q05 CPU/H fail (guesses conflict precedence); q06 CPU/H fail (768-token truncation); q07 CPU/H pass; q08 CPU/H pass. Totals CPU3/8,H5/8. No score-only or prompt edits. This is one repeat/profile, not statistical qualification.

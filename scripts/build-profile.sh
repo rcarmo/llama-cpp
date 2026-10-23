@@ -27,15 +27,25 @@ for arg in "$@"; do
     esac
 done
 
+# shellcheck source=agent-paths.sh
+source "${SCRIPT_DIR}/agent-paths.sh"
+BUILD_VARIANT=${BUILD_VARIANT:-clang-profile-$([ "${FULL}" -eq 1 ] && echo full || echo baseline)}
+RUN_PURPOSE=${RUN_PURPOSE:-profile}
+llama_agent_init_paths
+ROOT_DIR=$LLAMA_SOURCE_DIR
+BUILD_DIR="${LLAMA_BUILD_DIR}"
+if [[ -d $BUILD_DIR && -n $(ls -A "$BUILD_DIR") ]]; then
+    echo "error: profiling needs a new BUILD_VARIANT; preserving existing build: $BUILD_DIR" >&2
+    exit 1
+fi
+llama_agent_prepare_paths
 if [ "${FULL}" -eq 1 ]; then
-    BUILD_DIR="${ROOT_DIR}/build-profile-full"
-    REPORT="${BUILD_DIR}/profile-report-full.txt"
+    REPORT="${LLAMA_RUN_DIR}/profile-report-full.txt"
 else
-    BUILD_DIR="${ROOT_DIR}/build-profile-baseline"
-    REPORT="${BUILD_DIR}/profile-report.txt"
+    REPORT="${LLAMA_RUN_DIR}/profile-report.txt"
 fi
 
-OUTPUT_BIN="${BUILD_DIR}/clang_analysis.bin"
+OUTPUT_BIN="${LLAMA_RUN_DIR}/clang_analysis.bin"
 
 if ! command -v clang++ &>/dev/null; then
     echo "error: clang++ not found" >&2
@@ -56,11 +66,7 @@ echo "output   : ${OUTPUT_BIN}"
 echo "jobs     : ${JOBS}"
 echo
 
-if command -v ccache &>/dev/null; then
-    echo "clearing ccache..."
-    ccache -C -z
-fi
-
+# Profiling bypasses ccache without clearing existing caches.
 export CCACHE_DISABLE=1
 
 cmake --fresh \

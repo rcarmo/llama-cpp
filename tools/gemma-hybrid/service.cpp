@@ -128,6 +128,7 @@ static size_t input_prefix(const llama_vocab * vocab, const common_chat_params &
 struct config {
     std::string model_path;
     std::string draft_path;
+    std::string reasoning_effort = "none";
     std::string alias = "gemma-4-e4b-qat-mtp-zero-copy";
     std::string host = "127.0.0.1";
     int32_t port = 18094;
@@ -141,10 +142,11 @@ struct config {
     int32_t max_output = 2048;
     bool threadpools = false;
     bool model_sampling = true;
+    bool release_gpu_after_handoff = false;
 };
 
 static void usage(const char * name) {
-    std::fprintf(stderr, "usage: %s --model MODEL.gguf [--draft ASSISTANT.gguf] [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--draft-min N] [--threadpools 0|1] [--model-sampling 0|1] [--max-output N]\n", name);
+    std::fprintf(stderr, "usage: %s --model MODEL.gguf [--draft ASSISTANT.gguf] [--host HOST] [--port PORT] [--alias NAME] [--ctx-size N] [--batch-size N] [--ubatch-size N] [--threads N] [--threads-batch N] [--draft-max N] [--draft-min N] [--threadpools 0|1] [--model-sampling 0|1] [--max-output N] [--reasoning-effort none|low|medium|xhigh] [--release-gpu-after-handoff 0|1]\n", name);
 }
 
 static config parse_args(int argc, char ** argv) {
@@ -161,6 +163,7 @@ static config parse_args(int argc, char ** argv) {
         const std::string value = argv[++i];
         if (key == "--model") result.model_path = value;
         else if (key == "--draft") result.draft_path = value;
+        else if (key == "--reasoning-effort") result.reasoning_effort = value;
         else if (key == "--host") result.host = value;
         else if (key == "--port") result.port = std::stoi(value);
         else if (key == "--alias") result.alias = value;
@@ -179,11 +182,22 @@ static config parse_args(int argc, char ** argv) {
             const int parsed = std::stoi(value);
             if (parsed != 0 && parsed != 1) throw std::invalid_argument("--model-sampling must be 0 or 1");
             result.model_sampling = parsed == 1;
+        } else if (key == "--release-gpu-after-handoff") {
+            const int parsed = std::stoi(value);
+            if (parsed != 0 && parsed != 1) throw std::invalid_argument("--release-gpu-after-handoff must be 0 or 1");
+            result.release_gpu_after_handoff = parsed == 1;
         } else if (key == "--max-output") result.max_output = std::stoi(value);
         else throw std::invalid_argument("unknown option " + key);
     }
     if (result.model_path.empty()) {
         throw std::invalid_argument("--model is required");
+    }
+    if (result.reasoning_effort != "none" && result.reasoning_effort != "low" &&
+        result.reasoning_effort != "medium" && result.reasoning_effort != "xhigh") {
+        throw std::invalid_argument("invalid --reasoning-effort");
+    }
+    if (!result.draft_path.empty() && (result.reasoning_effort != "none" || result.release_gpu_after_handoff)) {
+        throw std::invalid_argument("reasoning effort and GPU release require target-only mode");
     }
     if (result.port < 1 || result.port > 65535 || result.context < 1024 || result.batch < 32 || result.ubatch < 32 || result.ubatch > result.batch || result.threads < 1 || result.threads_batch < 1 || result.draft_max < 1 || result.draft_max > 16 || result.draft_min < 0 || result.draft_min > result.draft_max || result.max_output < 1) {
         throw std::invalid_argument("invalid numeric option");
@@ -315,9 +329,12 @@ private:
         return cfg.draft_path.empty();
     }
 
-    static model_ptr load_model(const std::string & path, bool gpu) {
+    static model_ptr load_model(const std::string & path, bool gpu, bool mmap = false) {
         llama_model_params params = llama_model_default_params();
         params.n_gpu_layers = gpu ? 999 : 0;
+        if (mmap) {
+            params.load_mode = LLAMA_LOAD_MODE_MMAP;
+        }
         model_ptr model(llama_model_load_from_file(path.c_str(), params), llama_model_free);
         if (!model) {
             throw std::runtime_error("model load failed: " + path);
@@ -382,11 +399,13 @@ private:
     }
 
     void load_models() {
-        cpu_target = load_model(cfg.model_path, false);
+        cpu_target = load_model(cfg.model_path, false, target_only());
         if (!target_only()) {
             draft_model = load_model(cfg.draft_path, false);
         }
-        gpu_target = load_model(cfg.model_path, true);
+        if (!cfg.release_gpu_after_handoff) {
+            gpu_target = load_model(cfg.model_path, true, target_only());
+        }
         char target_arch[64] = {};
         llama_model_meta_val_str(cpu_target.get(), "general.architecture", target_arch, sizeof(target_arch));
         if (target_only()) {
@@ -412,6 +431,9 @@ private:
         speculative.reset();
         reset_context(draft_ctx, draft_threadpools);
         reset_context(target_ctx, target_threadpools);
+        if (cfg.release_gpu_after_handoff) {
+            gpu_target.reset();
+        }
         history.clear();
         committed = json::array();
         prior_tools = json::array();
@@ -477,13 +499,15 @@ private:
         inputs.messages = common_chat_msgs_parse_oaicompat(common_json::parse(request.at("messages").dump()));
         inputs.tools = common_chat_tools_parse_oaicompat(common_json::parse(request.at("tools").dump()));
         inputs.add_generation_prompt = true;
-        inputs.enable_thinking = false;
+        inputs.enable_thinking = target_only() && cfg.reasoning_effort != "none";
+        if (inputs.enable_thinking) {
+            inputs.chat_template_kwargs["reasoning_effort"] = json(cfg.reasoning_effort).dump();
+        }
         inputs.parallel_tool_calls = request.value("parallel_tool_calls", false);
         inputs.tool_choice = common_chat_tool_choice_parse_oaicompat(request.value("tool_choice", std::string("auto")));
-        // Target-only Qwen renders with thinking disabled. Gemma retains its
-        // reasoning channel in the template; response parsing below strips an
-        // empty thought marker from either model before exposing content.
-        inputs.reasoning_format = target_only() ? COMMON_REASONING_FORMAT_NONE : COMMON_REASONING_FORMAT_DEEPSEEK;
+        // Preserve the existing non-thinking target-only default.
+        inputs.reasoning_format = target_only() && !inputs.enable_thinking ?
+            COMMON_REASONING_FORMAT_NONE : COMMON_REASONING_FORMAT_DEEPSEEK;
         return common_chat_templates_apply(templates.get(), inputs);
     }
 
@@ -554,6 +578,9 @@ private:
         }
 
         if (cold) {
+            if (!cpu_tool_route && !gpu_target) {
+                gpu_target = load_model(cfg.model_path, true, target_only());
+            }
             target_ctx = make_context(cpu_tool_route ? cpu_target.get() : gpu_target.get(), context_params(!cpu_tool_route), target_threadpools);
             const auto prefill_started = clock_type::now();
             for (size_t i = 0; i < prompt.size(); i += cfg.batch) {
@@ -578,6 +605,9 @@ private:
                 reset_context(target_ctx, target_threadpools);
                 target_ctx = std::move(destination);
                 target_threadpools = std::move(destination_threadpools);
+                if (cfg.release_gpu_after_handoff) {
+                    gpu_target.reset();
+                }
                 ++handoffs;
                 total_shared_bytes += transfer.shared_bytes;
                 total_copied_bytes += transfer.copied_bytes;
@@ -732,11 +762,11 @@ private:
         if (target_only()) {
             message.content = gemma_hybrid::strip_empty_think_prefix(message.content);
         }
+        message.set_tool_call_ids(tool_call_ids, [] {
+            static std::atomic<uint64_t> next_id{0};
+            return "call_gemma_" + std::to_string(next_id.fetch_add(1));
+        });
         if (callbacks && callbacks->token_deltas) {
-            message.set_tool_call_ids(tool_call_ids, [] {
-                static std::atomic<uint64_t> next_id{0};
-                return "call_gemma_" + std::to_string(next_id.fetch_add(1));
-            });
             const auto diffs = common_chat_msg_diff::compute_diffs(partial_message, message);
             if (!diffs.empty()) {
                 callbacks->token_deltas(diffs, generated.size(), elapsed_s(started) * 1000.0);
@@ -795,6 +825,7 @@ public:
         : state(std::move(state)), worker(std::move(worker)) {
         content_type = "text/event-stream; charset=utf-8";
         headers["Cache-Control"] = "no-cache";
+        headers["Content-Encoding"] = "identity";
         next = [stream_state = this->state](std::string & output) {
             std::unique_lock<std::mutex> lock(stream_state->mutex);
             stream_state->ready.wait(lock, [&] { return !stream_state->chunks.empty() || stream_state->finished; });
@@ -966,6 +997,9 @@ int main(int argc, char ** argv) {
         http.get("/health", health);
         http.get("/v1/health", health);
         http.get("/props", props);
+        http.post("/v1/streams/lookup", safe_handler([](const server_http_req &) {
+            return response_json(json::array());
+        }));
         http.get("/models", models);
         http.get("/v1/models", models);
         auto tools_disabled = safe_handler([&](const server_http_req &) {

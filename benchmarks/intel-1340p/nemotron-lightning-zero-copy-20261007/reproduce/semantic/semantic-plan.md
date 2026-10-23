@@ -1,0 +1,9 @@
+# Supplemental native semantic qualification
+
+Completed primitive tests and 512/1024 ABBA results are retained, not rerun. New question: does the strict handoff produce usable natural-prompt answers and keep CPU ownership through follow-up requests? No service deployment.
+
+Reuse existing common native Jinja renderer/parser and common sampler (not hand-authored template), mmap/load-release qualifier, strict handoff transaction, retained API uniqueStable/arithmetic fixtures, resource guard/180s host timeout. Extend only the test harness. Native chat render includes exact model template, parse reasoning/tool calls; save rendered bytes/token IDs and sampled outputs. Not an API/browser stream or server lifecycle claim.
+
+CPU/handoff paired screening, seed42, top-p0.95/min-p0/temp1 for retained thinking fixture; explicit nonthinking greedy control separate series. First arithmetic short nonthinking + warm follow-up (42 then40); then nonthinking uniqueStable executable correctness, then positional recall (deterministic table), then native tool weather round-trip if renderer/parser support it. Bounded output256/nonthinking and1024/thinking as needed, single process180s. Independent scorer rejects truncation and runs generated code in isolated Bun process (not agent host eval). Cross-backend token equality diagnostic, not quality requirement. No speed claims from few responses.
+
+CPU4/build4GiB/model20GiB/no swap/host>=6GiB/renderD128/FAoff/F16KV/rs3/batch512/ub128/mmap. Reservation newly granted @whisper20:18Z, competing decoder held until explicit drain/release. Qwen/Gemma/speech OFF; preserve primary policy edits. Stop on contention/nonfinite/memory/ownership failure. Initial minimal new harness smoke, then semantic pairs; no broader auto campaign. Cancellation/crash test must name actual phase/native process, discard uncertain context, prove clean restart and drain; mocked callback is not driver-crash qualification.

@@ -201,12 +201,13 @@ llama_context::llama_context(
 
     kv_handoff_strict = params.kv_handoff_strict || params.kv_handoff_destination;
     kv_handoff_pending = params.kv_handoff_destination;
-    if (kv_handoff_strict && (model.arch != LLM_ARCH_QWEN35 || cparams.n_seq_max != 1 ||
+    if (kv_handoff_strict && (!model.supports_strict_state_handoff() || cparams.n_seq_max != 1 ||
         (params.ctx_type != LLAMA_CONTEXT_TYPE_DEFAULT && params.ctx_type != LLAMA_CONTEXT_TYPE_MTP) || params.ctx_other || hparams.no_alloc ||
         model.shared_residency_enabled() || hparams.swa_type != LLAMA_SWA_TYPE_NONE ||
+        (model.arch != LLM_ARCH_QWEN35 && params.ctx_type != LLAMA_CONTEXT_TYPE_DEFAULT) ||
         (params.ctx_type == LLAMA_CONTEXT_TYPE_MTP && cparams.n_rs_seq != 0) ||
         (kv_handoff_pending && (model.n_gpu_layers() != 0 || params.offload_kqv || params.op_offload)))) {
-        throw std::runtime_error("unsupported strict Qwen handoff context");
+        throw std::runtime_error("unsupported strict state handoff context");
     }
     cparams.n_rs_seq = params.n_rs_seq;
     if (cparams.n_rs_seq > 0 && !llm_arch_supports_rs_rollback(model.arch)) {

@@ -7,19 +7,19 @@ set -euo pipefail
 #
 # WARNING: This is quite IO intensive, because a fresh venv is set up for every
 # python script. As of 2023-12-22, this writes ~2.7GB of data. An adequately
-# sized tmpfs /tmp or ramdisk is recommended if running this frequently.
+# sized project-scoped run directory is required when running this frequently.
 #
 # usage:    check-requirements.sh [<working_dir>]
 #           check-requirements.sh nocleanup [<working_dir>]
 #
 # where:
 #           - <working_dir> is a directory that can be used as the base for
-#               setting up the venvs. Defaults to `/tmp`.
+#               setting up the venvs. Must be inside workspace/tmp/llama-cpp/runs/.
 #           - 'nocleanup' as the first argument will disable automatic cleanup
 #               of the files created by this script.
 #
 # requires:
-#           - bash >= 3.2.57
+#           - bash >= 4.3, GNU realpath (shared agent path validation)
 #           - shellcheck
 #
 # For each script, it creates a fresh venv, `pip install`s the requirements, and
@@ -72,17 +72,24 @@ fi
 this=$(realpath -- "$0"); readonly this
 cd "$(dirname "$this")/.." # PWD should stay in llama.cpp project directory
 
+# shellcheck source=agent-paths.sh
+source "$(dirname "$this")/agent-paths.sh"
+BUILD_VARIANT=${BUILD_VARIANT:-python-requirements}
+RUN_PURPOSE=${RUN_PURPOSE:-requirements}
+llama_agent_init_paths
+cd "$LLAMA_SOURCE_DIR"
+llama_agent_prepare_paths
 shellcheck "$this"
 
 readonly reqs_dir=requirements
 
 if [[ ${1+x} ]]; then
     tmp_dir=$(realpath -- "$1")
-    if [[ ! ( -d $tmp_dir && -w $tmp_dir ) ]]; then
-        fatal "$tmp_dir is not a writable directory"
+    if [[ $tmp_dir != "$PROJECT_TMP_ROOT/runs/"* || ! ( -d $tmp_dir && -w $tmp_dir ) ]]; then
+        fatal "$tmp_dir must be a writable project run directory"
     fi
 else
-    tmp_dir=/tmp
+    tmp_dir=$TMPDIR
 fi
 
 workdir=$(mktemp -d "$tmp_dir/check-requirements.XXXX"); readonly workdir

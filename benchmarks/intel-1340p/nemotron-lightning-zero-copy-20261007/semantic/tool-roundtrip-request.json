@@ -1,0 +1,45 @@
+{
+  "thinking": false,
+  "temperature": 0,
+  "max_tokens": 128,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Use get_weather to fetch the weather for Lisbon."
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Fetch weather for a city.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "city"
+          ]
+        }
+      }
+    }
+  ],
+  "tool_required": true,
+  "followups": [
+    [
+      {
+        "role": "tool",
+        "tool_call_id": "$last_tool_call_id",
+        "content": "{\"city\":\"Lisbon\",\"temperature_c\":21,\"condition\":\"sunny\"}"
+      },
+      {
+        "role": "user",
+        "content": "State only the returned temperature in Celsius."
+      }
+    ]
+  ]
+}
