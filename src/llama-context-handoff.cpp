@@ -13,7 +13,7 @@ bool llama_context::kv_handoff_cpu(llama_context & src, bool allow_copy, llama_k
         model.shared_residency_enabled() || src.model.shared_residency_enabled() ||
         model.n_gpu_layers()!=0 || cparams.offload_kqv || cparams.op_offload ||
         (kv_handoff_strict && (src.model.n_gpu_layers()==0 || !src.cparams.offload_kqv || !src.cparams.op_offload)) ||
-        model.has_tensor_overrides() || src.model.has_tensor_overrides() ||
+        !model.handoff_safe_tensor_placement() || !src.model.handoff_safe_tensor_placement() ||
         opt_ctx || src.opt_ctx || kv_cvec_modified || src.kv_cvec_modified ||
         (loras && !loras->empty()) || (src.loras && !src.loras->empty()) || !sampling.samplers.empty() || !src.sampling.samplers.empty()) return false;
     if (&model!=&src.model && (model.kv_handoff_identity.empty() || model.kv_handoff_identity!=src.model.kv_handoff_identity)) return false;

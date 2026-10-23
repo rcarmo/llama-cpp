@@ -1304,6 +1304,7 @@ struct llama_model::impl {
     std::vector<layer_dev> dev_layer;
 
     bool has_tensor_overrides;
+    bool handoff_safe_expert_override = false;
 
     std::vector<float> tensor_split_owned;
 };
@@ -1366,6 +1367,12 @@ llama_model::llama_model(const llama_model_params & params) : params(params), pi
         this->params.tensor_split = pimpl->tensor_split_owned.data();
     }
     pimpl->has_tensor_overrides = params.tensor_buft_overrides && params.tensor_buft_overrides[0].pattern;
+    if (pimpl->has_tensor_overrides && params.tensor_buft_overrides[1].pattern == nullptr) {
+        const auto & placement = params.tensor_buft_overrides[0];
+        pimpl->handoff_safe_expert_override =
+                std::strcmp(placement.pattern, "\\.ffn_(up|down|gate|gate_up)_(ch|)exps") == 0 &&
+                placement.buft == ggml_backend_cpu_buffer_type();
+    }
 }
 
 bool llama_model::shared_residency_enabled() const {
@@ -3024,6 +3031,11 @@ ggml_backend_buffer_type_t llama_model::select_buft(int il) const {
 
 bool llama_model::has_tensor_overrides() const {
     return pimpl->has_tensor_overrides;
+}
+
+bool llama_model::handoff_safe_tensor_placement() const {
+    return !pimpl->has_tensor_overrides ||
+            (arch == LLM_ARCH_FLINT && pimpl->handoff_safe_expert_override);
 }
 
 const ggml_tensor * llama_model::get_tensor(const char * name) const {

@@ -1068,6 +1068,10 @@ llama_memory_t llama_context::get_memory() const {
     return kv_consumed || kv_handoff_pending ? nullptr : memory.get();
 }
 
+void llama_context::print_moe_cache_stats(const char * phase) const {
+    if (moe_cache) moe_cache->print_stats(phase);
+}
+
 bool llama_context::is_handoff_strict() const {
     return kv_handoff_strict;
 }

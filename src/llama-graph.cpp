@@ -2396,7 +2396,7 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
     // the video's CPU/GPU overlap possible: one uninterrupted cold CPU chain,
     // one uninterrupted hot GPU chain, and one merge. Keep it decode-only;
     // prompt batches lose more to remapping and merging than overlap saves.
-    const bool use_moe_packs = n_tokens <= 8 && moe_cache && expert_cache->moe_map_hot && !gate_up_exps &&
+    const bool use_moe_packs = n_tokens <= 8 && expert_cache && expert_cache->moe_map_hot && !gate_up_exps &&
         !up_exps_s && !gate_exps_s && !down_exps_s && !up_exps_b && !gate_exps_b &&
         !down_exps_b && type_op == LLM_FFN_SILU && gate_exps && !weight_before_ffn &&
         hparams.swiglu_clamp_exp[il] <= 1e-6f;

@@ -659,6 +659,17 @@ int64_t llama_moe_cache::copy_experts(ggml_backend_t backend, const ggml_tensor 
     return pimpl->copy_experts(backend, w, dst, e, last);
 }
 
+void llama_moe_cache::print_stats(const char * phase) const {
+    LLAMA_LOG_INFO("EXPERT_CACHE phase=%s small_hits=%zu small_misses=%zu small_uploaded=%zu large_hits=%zu large_misses=%zu large_uploaded=%zu copied_hits=%zu copied_bytes=%zu\n",
+            phase, pimpl->stats_small.hits, pimpl->stats_small.misses, pimpl->stats_small.bytes,
+            pimpl->stats_large.hits, pimpl->stats_large.misses, pimpl->stats_large.bytes,
+            pimpl->stats_copy.hits, pimpl->stats_copy.bytes);
+    for (const auto & g : pimpl->groups) {
+        LLAMA_LOG_INFO("EXPERT_CACHE_GROUP phase=%s device=%d layers=%zu slots=%d expert_tensor_count=%zu host_bytes=%zu\n",
+                phase, g.id, g.layers.size(), g.n_slots, g.ref.size(), g.host_bytes);
+    }
+}
+
 std::map<ggml_backend_buffer_type_t, size_t> llama_moe_cache::memory_breakdown() const {
     std::map<ggml_backend_buffer_type_t, size_t> res;
     for (const auto & d : pimpl->devices) {
