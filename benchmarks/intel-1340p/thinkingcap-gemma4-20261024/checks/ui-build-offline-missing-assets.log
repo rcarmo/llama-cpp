@@ -1,0 +1,776 @@
+bash "/var/home/agent/workspace/projects/llama-cpp/scripts/agent-build.sh" build 
+[1/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/299] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[3/299] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[4/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[5/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[6/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[7/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[8/299] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-turbo-quant.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-turbo-quant.c:28:14: warning: 'turbo3_cpu_wht_group_size' initialized and declared 'extern'
+   28 | GGML_API int turbo3_cpu_wht_group_size = 0;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~
+[9/299] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[10/299] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[11/299] Linking CXX shared library bin/libggml-base.so.0.27.0
+[12/299] Creating library symlink bin/libggml-base.so.0 bin/libggml-base.so
+[13/299] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[14/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[15/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[16/299] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[17/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/q6-pair.cpp.o
+[18/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[19/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[20/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[21/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[22/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o
+[23/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o
+[24/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[25/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp: In function 'void ggml_vec_dot_f16_4(int, float*, const ggml_fp16_t*, size_t, const ggml_fp16_t*)':
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:35: warning: cast from type 'const char*' to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:305:83: warning: cast from type 'const ggml_fp16_t* __restrict__' {aka 'const short unsigned int* __restrict__'} to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  305 |     ggml_vec_dot_f16(n, &s[0], 0, (ggml_fp16_t *) ((const char *) x + 0 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                   ^~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:35: warning: cast from type 'const char*' to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:306:83: warning: cast from type 'const ggml_fp16_t* __restrict__' {aka 'const short unsigned int* __restrict__'} to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  306 |     ggml_vec_dot_f16(n, &s[1], 0, (ggml_fp16_t *) ((const char *) x + 1 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                   ^~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:35: warning: cast from type 'const char*' to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:307:83: warning: cast from type 'const ggml_fp16_t* __restrict__' {aka 'const short unsigned int* __restrict__'} to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  307 |     ggml_vec_dot_f16(n, &s[2], 0, (ggml_fp16_t *) ((const char *) x + 2 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                   ^~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:35: warning: cast from type 'const char*' to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:308:83: warning: cast from type 'const ggml_fp16_t* __restrict__' {aka 'const short unsigned int* __restrict__'} to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  308 |     ggml_vec_dot_f16(n, &s[3], 0, (ggml_fp16_t *) ((const char *) x + 3 * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                   ^~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp: In function 'void ggml_vec_dot_f16_8(int, float*, const ggml_fp16_t*, size_t, const ggml_fp16_t*)':
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:39: warning: cast from type 'const char*' to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/vec.cpp:371:96: warning: cast from type 'const ggml_fp16_t* __restrict__' {aka 'const short unsigned int* __restrict__'} to type 'ggml_fp16_t*' {aka 'short unsigned int*'} casts away qualifiers [-Wcast-qual]
+  371 |         ggml_vec_dot_f16(n, &s[r], 0, (ggml_fp16_t *) ((const char *) x + (size_t) r * bx), 0, (ggml_fp16_t *) y, 0, 1);
+      |                                                                                                ^~~~~~~~~~~~~~~~~
+[26/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[27/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/recurrent-profile.cpp.o
+[28/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-plan.cpp.o
+[29/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/expert-io-advice.cpp.o
+[30/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/whole-token-profile.cpp.o
+[31/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
+[32/299] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/arch/x86/quants.c: In function 'ggml_vec_dot_ptq1_0_q8_0':
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/arch/x86/quants.c:670:40: warning: unused variable 'y' [-Wunused-variable]
+  670 |     const block_q8_0   * GGML_RESTRICT y = vy;
+      |                                        ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/arch/x86/quants.c:669:40: warning: unused variable 'x' [-Wunused-variable]
+  669 |     const block_ptq1_0 * GGML_RESTRICT x = vx;
+      |                                        ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/arch/x86/quants.c:660:15: warning: unused variable 'nb' [-Wunused-variable]
+  660 |     const int nb = n / qk;
+      |               ^~
+[33/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp: In function 'void ggml_compute_forward_clamp(const ggml_compute_params*, ggml_tensor*)':
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:6237:12: warning: enumeration value 'GGML_TYPE_TURBO2_0' not handled in switch [-Wswitch]
+ 6237 |     switch (src0->type) {
+      |            ^
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:6237:12: warning: enumeration value 'GGML_TYPE_TURBO3_0' not handled in switch [-Wswitch]
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:6237:12: warning: enumeration value 'GGML_TYPE_TURBO4_0' not handled in switch [-Wswitch]
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:6237:12: warning: enumeration value 'GGML_TYPE_TQ3_1S' not handled in switch [-Wswitch]
+/var/home/agent/workspace/projects/llama-cpp/ggml/src/ggml-cpu/ops.cpp:6237:12: warning: enumeration value 'GGML_TYPE_TQ4_1S' not handled in switch [-Wswitch]
+[34/299] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o
+[35/299] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[36/299] Linking CXX shared library bin/libggml-cpu.so.0.27.0
+[37/299] Creating library symlink bin/libggml-cpu.so.0 bin/libggml-cpu.so
+[38/299] Building CXX object ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o
+[39/299] Linking CXX shared library bin/libggml.so.0.27.0
+[40/299] Creating library symlink bin/libggml.so.0 bin/libggml.so
+[41/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_10_cxx.cxx.o
+[42/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_9_cxx.cxx.o
+[43/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_8_cxx.cxx.o
+[44/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_7_cxx.cxx.o
+[45/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_6_cxx.cxx.o
+[46/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_5_cxx.cxx.o
+[47/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_4_cxx.cxx.o
+[48/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_3_cxx.cxx.o
+[49/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_2_cxx.cxx.o
+[50/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_0_cxx.cxx.o
+[51/299] Building CXX object src/CMakeFiles/llama.dir/Unity/unity_1_cxx.cxx.o
+[52/299] Building CXX object src/CMakeFiles/llama.dir/llama.cpp.o
+[53/299] Building CXX object src/CMakeFiles/llama.dir/llama-arch.cpp.o
+[54/299] Building CXX object src/CMakeFiles/llama.dir/llama-adapter.cpp.o
+[55/299] Building CXX object src/CMakeFiles/llama.dir/llama-chat.cpp.o
+[56/299] Building CXX object src/CMakeFiles/llama.dir/llama-batch.cpp.o
+[57/299] Building CXX object src/CMakeFiles/llama.dir/llama-context-handoff.cpp.o
+[58/299] Building CXX object src/CMakeFiles/llama.dir/llama-cparams.cpp.o
+[59/299] Building CXX object src/CMakeFiles/llama.dir/llama-context.cpp.o
+[60/299] Building CXX object src/CMakeFiles/llama.dir/llama-grammar.cpp.o
+[61/299] Building CXX object src/CMakeFiles/llama.dir/llama-hidden-state.cpp.o
+[62/299] Building CXX object src/CMakeFiles/llama.dir/llama-hparams.cpp.o
+[63/299] Building CXX object src/CMakeFiles/llama.dir/llama-impl.cpp.o
+[64/299] Building CXX object src/CMakeFiles/llama.dir/llama-io.cpp.o
+[65/299] Building CXX object src/CMakeFiles/llama.dir/llama-graph.cpp.o
+[66/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-handoff.cpp.o
+[67/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-iswa.cpp.o
+[68/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa.cpp.o
+[69/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache.cpp.o
+[70/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsa-iswa.cpp.o
+[71/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-msa.cpp.o
+[72/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory.cpp.o
+[73/299] Building CXX object src/CMakeFiles/llama.dir/llama-moe-cache.cpp.o
+[74/299] Building CXX object src/CMakeFiles/llama.dir/llama-kv-cache-dsv4.cpp.o
+[75/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid.cpp.o
+[76/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-iswa.cpp.o
+[77/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory-recurrent.cpp.o
+[78/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory-hybrid-idx.cpp.o
+[79/299] Building CXX object src/CMakeFiles/llama.dir/llama-memory-recurrent-handoff.cpp.o
+[80/299] Building CXX object src/CMakeFiles/llama.dir/llama-mmap.cpp.o
+[81/299] Building CXX object src/CMakeFiles/llama.dir/llama-model-saver.cpp.o
+[82/299] Building CXX object src/CMakeFiles/llama.dir/llama-model-loader.cpp.o
+[83/299] Building CXX object src/CMakeFiles/llama.dir/llama-model.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/src/llama-model.cpp: In lambda function:
+/var/home/agent/workspace/projects/llama-cpp/src/llama-model.cpp:3114:76: warning: comparison of integer expressions of different signedness: 'int32_t' {aka 'int'} and 'uint32_t' {aka 'unsigned int'} [-Wsign-compare]
+ 3114 |                     hparams.swa_type, nullptr, [&](int32_t il) { return il >= hparams.n_layer(); }, nullptr, nullptr, "mtp_", params.init);
+      |                                                                         ~~~^~~~~~~~~~~~~~~~~~~~
+[84/299] Building CXX object src/CMakeFiles/llama.dir/llama-quant.cpp.o
+[85/299] Building CXX object src/CMakeFiles/llama.dir/llama-vocab.cpp.o
+[86/299] Building CXX object src/CMakeFiles/llama.dir/llama-sampler.cpp.o
+[87/299] Building CXX object src/CMakeFiles/llama.dir/unicode-data.cpp.o
+[88/299] Building CXX object vendor/hash/CMakeFiles/vendor-hash.dir/hash.cpp.o
+[89/299] Building C object vendor/hash/CMakeFiles/vendor-hash.dir/xxhash/xxhash.c.o
+[90/299] Building CXX object vendor/hash/CMakeFiles/vendor-hash.dir/sha1/sha1.c.o
+[91/299] Building C object vendor/hash/CMakeFiles/vendor-hash.dir/sha256/sha256.c.o
+[92/299] Building CXX object src/CMakeFiles/llama.dir/unicode.cpp.o
+[93/299] Linking CXX shared library bin/libllama.so.0.7.0
+[94/299] Building CXX object common/CMakeFiles/llama-common-base.dir/build-info.cpp.o
+[95/299] Creating library symlink bin/libllama.so.0 bin/libllama.so
+[96/299] Linking CXX static library vendor/hash/libvendor-hash.a
+[97/299] Linking CXX static library common/libllama-common-base.a
+[98/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/parsers.cpp.o
+[99/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/cohere2moe.cpp.o
+[100/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/deepseek.cpp.o
+[101/299] Building CXX object vendor/cpp-httplib/CMakeFiles/cpp-httplib.dir/httplib.cpp.o
+[102/299] Linking CXX static library vendor/cpp-httplib/libcpp-httplib.a
+[103/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/functionary-v3-2.cpp.o
+[104/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gigachat-v3.cpp.o
+[105/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gemma4.cpp.o
+[106/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/gpt-oss.cpp.o
+[107/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/harmony-xml.cpp.o
+[108/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/k2-horizon.cpp.o
+[109/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/kimi-k2.cpp.o
+[110/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/kimi-k3.cpp.o
+[111/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/ling3.cpp.o
+[112/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/lfm2.cpp.o
+[113/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/llm-jp-harmony.cpp.o
+[114/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/minicpm5.cpp.o
+[115/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/minimax-m3.cpp.o
+[116/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/ministral3.cpp.o
+[117/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/muse-glimmer.cpp.o
+[118/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/muse-spark.cpp.o
+[119/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/qwen3-coder.cpp.o
+[120/299] Building CXX object common/CMakeFiles/llama-common.dir/parsers/translate-gemma.cpp.o
+[121/299] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-generator.cpp.o
+[122/299] Building CXX object common/CMakeFiles/llama-common.dir/chat-auto-parser-helpers.cpp.o
+[123/299] Building CXX object common/CMakeFiles/llama-common.dir/chat-diff-analyzer.cpp.o
+[124/299] Building CXX object common/CMakeFiles/llama-common.dir/arg.cpp.o
+[125/299] Building CXX object common/CMakeFiles/llama-common.dir/chat-peg-parser.cpp.o
+[126/299] Building CXX object common/CMakeFiles/llama-common.dir/chat.cpp.o
+[127/299] Building CXX object common/CMakeFiles/llama-common.dir/console.cpp.o
+[128/299] Building CXX object common/CMakeFiles/llama-common.dir/common.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/common/common.cpp: In function 'std::filesystem::__cxx11::path fs_get_cache_file(const std::string&)':
+/var/home/agent/workspace/projects/llama-cpp/common/common.cpp:1034:53: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 1034 |     return cache_directory / std::filesystem::u8path(filename);
+      |                              ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/common.cpp:6:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[129/299] Building CXX object common/CMakeFiles/llama-common.dir/debug.cpp.o
+[130/299] Building CXX object common/CMakeFiles/llama-common.dir/fit.cpp.o
+[131/299] Building CXX object common/CMakeFiles/llama-common.dir/download.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp: In function 'void write_etag(const std::string&, const std::string&)':
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp:47:44: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+   47 |     fs_write_atomic(std::filesystem::u8path(etag_path), etag);
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/arg.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/download.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp: In function 'int common_download_file_single_online(const std::string&, const std::string&, const common_download_opts&, bool)':
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp:264:77: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  264 |     const bool file_exists = std::filesystem::exists(std::filesystem::u8path(path));
+      |                                                      ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp: In function 'int common_download_file_single(const std::string&, const std::string&, const common_download_opts&, bool)':
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp:465:57: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  465 |     if (!std::filesystem::exists(std::filesystem::u8path(path))) {
+      |                                  ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp: In function 'bool common_download_remove_sidecars(const std::string&, const common_download_opts&)':
+/var/home/agent/workspace/projects/llama-cpp/common/download.cpp:1165:59: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 1165 |             to_remove.emplace_back(std::filesystem::u8path(f.local_path));
+      |                                    ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[132/299] Building CXX object common/CMakeFiles/llama-common.dir/imatrix-loader.cpp.o
+[133/299] Building CXX object common/CMakeFiles/llama-common.dir/hf-cache.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp: In function 'std::string hf_cache::get_repo_commit(const std::string&, const std::string&)':
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp:236:50: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  236 |             const fs::path candidate = fs::u8path(_name);
+      |                                        ~~~~~~~~~~^~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp:4:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp: In function 'hf_cache::hf_files hf_cache::get_repo_files(const std::string&, const std::string&)':
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp:311:48: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  311 |             const fs::path subpath = fs::u8path(file.path);
+      |                                      ~~~~~~~~~~^~~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp: In function 'std::string hf_cache::finalize_file(const hf_file&)':
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp:444:37: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  444 |     fs::path local_path = fs::u8path(file.local_path);
+      |                           ~~~~~~~~~~^~~~~~~~~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/common/hf-cache.cpp:445:37: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  445 |     fs::path final_path = fs::u8path(file.final_path);
+      |                           ~~~~~~~~~~^~~~~~~~~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[134/299] Building CXX object common/CMakeFiles/llama-common.dir/json-schema.cpp.o
+[135/299] Building CXX object common/CMakeFiles/llama-common.dir/json-schema-to-grammar.cpp.o
+[136/299] Building CXX object common/CMakeFiles/llama-common.dir/llguidance.cpp.o
+[137/299] Building CXX object common/CMakeFiles/llama-common.dir/log.cpp.o
+[138/299] Building CXX object common/CMakeFiles/llama-common.dir/json.cpp.o
+[139/299] Building CXX object common/CMakeFiles/llama-common.dir/ngram-cache.cpp.o
+[140/299] Building CXX object common/CMakeFiles/llama-common.dir/ngram-mod.cpp.o
+[141/299] Building CXX object common/CMakeFiles/llama-common.dir/ngram-map.cpp.o
+[142/299] Building CXX object common/CMakeFiles/llama-common.dir/preset.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/common/preset.cpp: In member function 'common_presets common_preset_context::load_from_models_dir(const std::string&) const':
+/var/home/agent/workspace/projects/llama-cpp/common/preset.cpp:388:62: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  388 |     const std::filesystem::path dir = std::filesystem::u8path(models_dir);
+      |                                       ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/arg.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/preset.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[143/299] Building CXX object common/CMakeFiles/llama-common.dir/reasoning-budget.cpp.o
+[144/299] Building CXX object common/CMakeFiles/llama-common.dir/peg-parser.cpp.o
+[145/299] Building CXX object common/CMakeFiles/llama-common.dir/sampling.cpp.o
+[146/299] Building CXX object common/CMakeFiles/llama-common.dir/subproc.cpp.o
+[147/299] Building CXX object common/CMakeFiles/llama-common.dir/trie.cpp.o
+[148/299] Building CXX object common/CMakeFiles/llama-common.dir/unicode.cpp.o
+[149/299] Building CXX object common/CMakeFiles/llama-common.dir/speculative.cpp.o
+[150/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/lexer.cpp.o
+[151/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/parser.cpp.o
+[152/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/runtime.cpp.o
+[153/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/string.cpp.o
+[154/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/caps.cpp.o
+[155/299] Building CXX object common/CMakeFiles/llama-common.dir/jinja/value.cpp.o
+[156/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/mtmd-audio.cpp.o
+[157/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/mtmd.cpp.o
+[158/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/mtmd-image.cpp.o
+[159/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/mtmd-helper-gen.cpp.o
+[160/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/mtmd-helper.cpp.o
+[161/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/cogvlm.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/cogvlm.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[162/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/conformer.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/conformer.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[163/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/deepseek4v.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/deepseek4v.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[164/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/dots3note.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/dots3note.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[165/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/clip.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/clip.cpp:4:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[166/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/dotsocr.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/dotsocr.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[167/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/exaone4_5.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/exaone4_5.cpp:2:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[168/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4a.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/gemma4a.cpp:8:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[169/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4v.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/gemma4v.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[170/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4ua.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/gemma4ua.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[171/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/gemma4uv.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/gemma4uv.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[172/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/glm4v.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/glm4v.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[173/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/granite-speech.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/granite-speech.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[174/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/granite4-vision.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/granite4-vision.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[175/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/hunyuanvl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/hunyuanvl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[176/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/internvl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/internvl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[177/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/kimivl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/kimivl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[178/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/kimik25.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/kimik25.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[179/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/nemotron-v2-vl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/nemotron-v2-vl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[180/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/nemotron-omni.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/nemotron-omni.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[181/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/muse-glimmer.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/muse-glimmer.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[182/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/muse-spark-audio.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/muse-spark-audio.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[183/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/llama4.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/llama4.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[184/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/llava.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/llava.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[185/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/minicpmv.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/minicpmv.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[186/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/paddleocr.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/paddleocr.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[187/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/pixtral.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/pixtral.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[188/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/qwen2vl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen2vl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[189/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/sensenova-u1.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/sensenova-u1.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[190/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/minimax-m3.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/minimax-m3.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[191/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3vl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3vl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3vl.cpp: In member function 'virtual ggml_cgraph* clip_graph_qwen3vl::build()':
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3vl.cpp:40:90: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   40 |     ggml_tensor * learned_pos_embd = resize_position_embeddings(GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ALIGN_CORNERS);
+      |                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[192/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/ling3vl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/ling3vl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/ling3vl.cpp: In member function 'virtual ggml_cgraph* clip_graph_ling3vl::build()':
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/ling3vl.cpp:41:90: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   41 |     ggml_tensor * learned_pos_embd = resize_position_embeddings(GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ALIGN_CORNERS);
+      |                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[193/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/mimovl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/mimovl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[194/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3a.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3a.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[195/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/mimo-audio.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/mimo-audio.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[196/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3tts-spkenc.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3tts-spkenc.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[197/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/pockettts-seanet.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/pockettts-seanet.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[198/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/qwen3tts-gen.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/qwen3tts-gen.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[199/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/pockettts-spkenc.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/pockettts-spkenc.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[200/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/step3vl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/step3vl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[201/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/pockettts-gen.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/pockettts-gen.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[202/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/siglip.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/siglip.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[203/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/whisper-enc.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/whisper-enc.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[204/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/voxtral-rt.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/voxtral-rt.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[205/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/deepseekocr.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/deepseekocr.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[206/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/deepseekocr2.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/deepseekocr2.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[207/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/mobilenetv5.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/mobilenetv5.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[208/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/youtuvl.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/youtuvl.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[209/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/yasa2.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/yasa2.cpp:4:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[210/299] Building CXX object tools/mtmd/CMakeFiles/mtmd.dir/models/parakeet.cpp.o
+In file included from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/models.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/parakeet.cpp:1:
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:12:62: warning: bitwise operation between different enumeration types 'ggml_scale_mode' and 'ggml_scale_flag' is deprecated [-Wdeprecated-enum-enum-conversion]
+   12 | #define DEFAULT_INTERPOLATION_MODE (GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/mtmd/models/../clip-graph.h:84:76: note: in expansion of macro 'DEFAULT_INTERPOLATION_MODE'
+   84 |     ggml_tensor * resize_position_embeddings(uint32_t interpolation_mode = DEFAULT_INTERPOLATION_MODE);
+      |                                                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+[211/299] Linking CXX shared library bin/libllama-common.so.0.7.0
+[212/299] Provisioning UI assets
+FAILED: [code=1] tools/ui/CMakeFiles/llama-ui-assets tools/ui/ui.cpp tools/ui/ui.h /var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui/CMakeFiles/llama-ui-assets /var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui/ui.cpp /var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui/ui.h 
+cd /var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui && /usr/sbin/cmake -DUI_SOURCE_DIR=/var/home/agent/workspace/projects/llama-cpp/tools/ui -DUI_BINARY_DIR=/var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui -DLLAMA_SOURCE_DIR=/var/home/agent/workspace/projects/llama-cpp -DLLAMA_BUILD_NUMBER=12485 -DHF_BUCKET=ggml-org/llama-ui -DHF_VERSION=b12485 -DHF_ENABLED=ON -DBUILD_UI=ON -DLLAMA_UI_GZIP=ON -P /var/home/agent/workspace/projects/llama-cpp/scripts/ui-assets.cmake
+-- UI: npm not found, skipping npm build
+-- UI: downloading from b12485: https://huggingface.co/buckets/ggml-org/llama-ui/resolve/b12485/dist.tar.gz
+-- UI: download dist.tar.gz.sha256 from b12485 failed: "Could not resolve hostname"
+-- UI: downloading from latest: https://huggingface.co/buckets/ggml-org/llama-ui/resolve/latest/dist.tar.gz
+-- UI: download dist.tar.gz.sha256 from latest failed: "Could not resolve hostname"
+-- UI: HF download failed
+CMake Error at /var/home/agent/workspace/projects/llama-cpp/scripts/ui-assets.cmake:584 (message):
+  UI: embedded UI requested but no assets are available.  Install npm
+  dependencies or provide verified pre-built assets in tools/ui/dist.
+
+
+[213/299] Linking CXX shared library bin/libmtmd.so.0.7.0
+ninja: build stopped: subcommand failed.
+make: *** [Makefile:29: agent-build] Error 1

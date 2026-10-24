@@ -2,7 +2,7 @@
 
 This directory is the raw evidence spine for the `sigma` work. It covers the July Qwen CPU/Vulkan campaign, the August Maple and Ornith/Gemma studies, the September Gemma optimisation series and the later Intel Xe handoff work.
 
-**Current operating state:** [23 October model-serving status](../../docs/local/intel-i5-1340p/model-serving-status-20261023.md). Older service and deployment statements below are historical; model-serving units and installed runtimes were removed, not restored by these experiments.
+**Current operating state:** [23 October model-serving status](../../docs/local/intel-i5-1340p/model-serving-status-20261023.md). ThinkingCap is now the authorised64k/8P-SMT service. Older service statements below are historical; the source merge did not restore them.
 
 ## Upstream integration
 
@@ -10,7 +10,9 @@ This directory is the raw evidence spine for the `sigma` work. It covers the Jul
 
 ## Start here
 
-* [Flint throughput, strict zero-copy and coding, 23 October 2026](flint-zero-copy-20261023/README.md) -- CPU 50.43 prompt / 13.09 decode tok/s; GPU caches lose throughput; capped coding calibration retained and completion-driven evaluation running; no deployment.
+* [ThinkingCap and five-model comparison,24October](thinkingcap-gemma4-20261024/README.md) -- frozen coding6/6,8P-SMT confirmation,raw results and resource groups.
+
+* [Flint throughput, strict zero-copy and coding, 23 October 2026](flint-zero-copy-20261023/README.md) -- CPU 50.43 prompt / 13.09 decode tok/s; GPU caches lose throughput; capped coding calibration retained and uncapped coding complete6/6,1053assertions; historical serving state; see current operating status.
 
 * [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007/README.md) -- exact native state/rollback, 32-1024-token model gates and 512/1024 ABBA; experimental, no serving change.
 

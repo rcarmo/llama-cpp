@@ -4,7 +4,7 @@ The best measured CPU configuration achieved **50.43 prompt tok/s and 13.09 deco
 
 These are controlled token-replay measurements, not a general quality score or serving qualification. No service was deployed. The measurements predate the combined source integration; [later build and regression verification](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/integration-verification.md) is recorded separately.
 
-The initial [capped coding series](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding/README.md) exhausted 1,024 output tokens on all six tasks. The model emitted thoughts despite `enable_thinking=false`. The user rejected that budget; a separate [completion-driven evaluation](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/README.md) now runs without output-token or generation-time caps. Its final results are not established.
+The initial [capped coding series](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding/README.md) exhausted 1,024 output tokens on all six tasks. The model emitted thoughts despite `enable_thinking=false`. The user rejected that budget; a separate [completion-driven evaluation](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/README.md) completed all six tasks and1053assertions without output-token or generation-time caps. ThinkingCap later replaced its UI with user authorisation; see [current operating status](model-serving-status-20261023.md).
 
 ## Best measured configuration
 

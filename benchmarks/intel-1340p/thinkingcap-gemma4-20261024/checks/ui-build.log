@@ -1,0 +1,166 @@
+bash "/var/home/agent/workspace/projects/llama-cpp/scripts/agent-build.sh" build 
+[1/87] Creating library symlink bin/libllama-common.so.0 bin/libllama-common.so
+[2/87] Provisioning UI assets
+-- UI: npm output up-to-date, skipping build
+-- UI: gzip compression applied (/var/home/agent/workspace/tmp/llama-cpp/build/llama-cpp-182732430/webui-default-validation/tools/ui/ui-gzip/_gzip)
+-- UI: embedded 70 assets
+[3/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-chat.cpp.o
+[4/87] Building CXX object tools/ui/CMakeFiles/llama-ui.dir/ui.cpp.o
+[5/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-queue.cpp.o
+[6/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-task.cpp.o
+[7/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-common.cpp.o
+[8/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-decision.cpp.o
+[9/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-stream.cpp.o
+[10/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-context.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp: In member function 'bool server_context_impl::save_slot_checkpoints(const std::string&, const server_slot&, size_t&) const':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp:2793:50: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 2793 |         std::ofstream ofs(std::filesystem::u8path(filepath), std::ios::binary | std::ios::app);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/./common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-task.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.h:4,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp: In member function 'size_t server_context_impl::load_slot_checkpoints(const std::string&, size_t, server_slot&) const':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp:2824:50: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 2824 |         std::ifstream ifs(std::filesystem::u8path(filepath), std::ios::binary | std::ios::ate);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp: In member function 'bool server_context_impl::save_slot_draft(const std::string&, const server_slot&, size_t&) const':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp:2899:50: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 2899 |         std::ofstream ofs(std::filesystem::u8path(filepath), std::ios::binary | std::ios::app);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp: In member function 'size_t server_context_impl::load_slot_draft(const std::string&, size_t, server_slot&) const':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-context.cpp:2925:50: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+ 2925 |         std::ifstream ifs(std::filesystem::u8path(filepath), std::ios::binary | std::ios::ate);
+      |                           ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[11/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-tools.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-tools.cpp: In function 'std::filesystem::__cxx11::path path_from_utf8(const std::string&)':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-tools.cpp:102:22: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  102 |     return fs::u8path(s);
+      |            ~~~~~~~~~~^~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/./common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-common.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-tools.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-tools.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[12/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-mcp.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-mcp.cpp: In member function 'void server_mcp::start(const common_params&)':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-mcp.cpp:692:48: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  692 |         std::ifstream f(std::filesystem::u8path(params.mcp_servers_config), std::ios::in);
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/./common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-common.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-mcp.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-mcp.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[13/87] Creating library symlink bin/libmtmd.so.0 bin/libmtmd.so
+[14/87] Linking CXX static library tools/ui/libllama-ui.a
+[15/87] Building CXX object tools/server/CMakeFiles/server-context.dir/server-schema.cpp.o
+[16/87] Linking CXX static library tools/server/libserver-context.a
+[17/87] Building CXX object tools/server/CMakeFiles/llama-server-impl.dir/server-connect.cpp.o
+[18/87] Building CXX object tools/server/CMakeFiles/llama-server-impl.dir/server.cpp.o
+[19/87] Building CXX object tools/server/CMakeFiles/llama-server-impl.dir/server-http.cpp.o
+[20/87] Building CXX object tools/batched-bench/CMakeFiles/llama-batched-bench-impl.dir/batched-bench.cpp.o
+[21/87] Building CXX object tools/server/CMakeFiles/llama-server-impl.dir/server-models.cpp.o
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-models.cpp: In member function 'void server_unfinished_downloads::save()':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-models.cpp:763:48: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  763 |         fs_write_atomic(std::filesystem::u8path(unfinished_downloads_path()), data.dump());
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/16/filesystem:55,
+                 from /var/home/agent/workspace/projects/llama-cpp/common/./common.h:20,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-common.h:3,
+                 from /var/home/agent/workspace/projects/llama-cpp/tools/server/server-models.cpp:1:
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-models.cpp: In member function 'void server_unfinished_downloads::delete_partials(const std::vector<common_download_partial>&)':
+/var/home/agent/workspace/projects/llama-cpp/tools/server/server-models.cpp:780:56: warning: 'std::filesystem::__cxx11::path std::filesystem::__cxx11::u8path(const _Source&) [with _Source = std::__cxx11::basic_string<char>; _Require = path; _CharT = char]' is deprecated: use 'path((const char8_t*)&*source)' instead [-Wdeprecated-declarations]
+  780 |         std::filesystem::remove(std::filesystem::u8path(p.path), ec);
+      |                                 ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~
+/usr/include/c++/16/bits/fs_path.h:847:5: note: declared here
+  847 |     u8path(const _Source& __source)
+      |     ^~~~~~
+[22/87] Building CXX object tools/completion/CMakeFiles/llama-completion-impl.dir/completion.cpp.o
+[23/87] Building CXX object tools/llama-bench/CMakeFiles/llama-bench-impl.dir/llama-bench.cpp.o
+[24/87] Building CXX object tools/quantize/CMakeFiles/llama-quantize-impl.dir/quantize.cpp.o
+[25/87] Building CXX object tools/perplexity/CMakeFiles/llama-perplexity-impl.dir/perplexity.cpp.o
+[26/87] Building CXX object tools/cli/CMakeFiles/llama-cli-impl.dir/cli.cpp.o
+[27/87] Building CXX object tools/cli/CMakeFiles/llama-cli-impl.dir/cli-client.cpp.o
+[28/87] Linking CXX shared library bin/libllama-server-impl.so
+[29/87] Building CXX object tools/fit-params/CMakeFiles/llama-fit-params-impl.dir/fit-params.cpp.o
+[30/87] Linking CXX shared library bin/libllama-batched-bench-impl.so
+[31/87] Building CXX object tools/batched-bench/CMakeFiles/llama-batched-bench.dir/main.cpp.o
+[32/87] Building CXX object tools/gguf-split/CMakeFiles/llama-gguf-split.dir/gguf-split.cpp.o
+[33/87] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-in-memory.dir/in-memory.cpp.o
+[34/87] Building CXX object tools/cli/CMakeFiles/llama-cli-impl.dir/cli-context.cpp.o
+[35/87] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-gemma-zero-copy-server.dir/service.cpp.o
+[36/87] Building CXX object tools/gemma-hybrid/CMakeFiles/llama-zero-copy-server.dir/service.cpp.o
+[37/87] Linking CXX shared library bin/libllama-bench-impl.so
+[38/87] Building CXX object tools/llama-bench/CMakeFiles/llama-bench.dir/main.cpp.o
+[39/87] Building CXX object tools/moe-trace/CMakeFiles/llama-moe-trace.dir/moe-trace.cpp.o
+[40/87] Linking CXX shared library bin/libllama-completion-impl.so
+[41/87] Building CXX object tools/completion/CMakeFiles/llama-completion.dir/main.cpp.o
+[42/87] Linking CXX shared library bin/libllama-perplexity-impl.so
+[43/87] Building CXX object tools/perplexity/CMakeFiles/llama-perplexity.dir/main.cpp.o
+[44/87] Linking CXX shared library bin/libllama-quantize-impl.so
+[45/87] Building CXX object tools/quantize/CMakeFiles/llama-quantize.dir/main.cpp.o
+[46/87] Linking CXX shared library bin/libllama-cli-impl.so
+[47/87] Building CXX object tools/cli/CMakeFiles/llama-cli.dir/main.cpp.o
+[48/87] Building CXX object tools/server/CMakeFiles/llama-server.dir/main.cpp.o
+[49/87] Building CXX object tools/tokenize/CMakeFiles/llama-tokenize.dir/tokenize.cpp.o
+[50/87] Building CXX object tools/tts/CMakeFiles/llama-tts.dir/tts.cpp.o
+[51/87] Building CXX object tools/mtmd/CMakeFiles/llama-llava-cli.dir/deprecation-warning.cpp.o
+[52/87] Building CXX object tools/mtmd/CMakeFiles/llama-gemma3-cli.dir/deprecation-warning.cpp.o
+[53/87] Building CXX object tools/imatrix/CMakeFiles/llama-imatrix.dir/imatrix.cpp.o
+[54/87] Building CXX object tools/mtmd/CMakeFiles/llama-minicpmv-cli.dir/deprecation-warning.cpp.o
+[55/87] Building CXX object tools/mtmd/CMakeFiles/llama-qwen2vl-cli.dir/deprecation-warning.cpp.o
+[56/87] Building CXX object tools/mtmd/CMakeFiles/llama-mtmd-debug.dir/debug/mtmd-debug.cpp.o
+[57/87] Building CXX object tools/mtmd/CMakeFiles/llama-mtmd-cli.dir/mtmd-cli.cpp.o
+[58/87] Building CXX object tools/cvector-generator/CMakeFiles/llama-cvector-generator.dir/cvector-generator.cpp.o
+[59/87] Linking CXX shared library bin/libllama-fit-params-impl.so
+[60/87] Building CXX object tools/fit-params/CMakeFiles/llama-fit-params.dir/main.cpp.o
+[61/87] Building CXX object tools/export-lora/CMakeFiles/llama-export-lora.dir/export-lora.cpp.o
+[62/87] Building CXX object tools/results/CMakeFiles/llama-results.dir/results.cpp.o
+[63/87] Linking CXX executable bin/llama-batched-bench
+[64/87] Linking CXX executable bin/llama-gguf-split
+[65/87] Linking CXX executable bin/llama-gemma-in-memory
+[66/87] Linking CXX executable bin/llama-gemma-zero-copy-server
+[67/87] Linking CXX executable bin/llama-zero-copy-server
+[68/87] Linking CXX executable bin/llama-imatrix
+[69/87] Linking CXX executable bin/llama-bench
+[70/87] Linking CXX executable bin/llama-moe-trace
+[71/87] Linking CXX executable bin/llama-completion
+[72/87] Linking CXX executable bin/llama-perplexity
+[73/87] Linking CXX executable bin/llama-quantize
+[74/87] Linking CXX executable bin/llama-cli
+[75/87] Linking CXX executable bin/llama-server
+[76/87] Linking CXX executable bin/llama-tokenize
+[77/87] Linking CXX executable bin/llama-tts
+[78/87] Linking CXX executable bin/llama-llava-cli
+[79/87] Linking CXX executable bin/llama-minicpmv-cli
+[80/87] Linking CXX executable bin/llama-gemma3-cli
+[81/87] Linking CXX executable bin/llama-qwen2vl-cli
+[82/87] Linking CXX executable bin/llama-mtmd-cli
+[83/87] Linking CXX executable bin/llama-mtmd-debug
+[84/87] Linking CXX executable bin/llama-cvector-generator
+[85/87] Linking CXX executable bin/llama-export-lora
+[86/87] Linking CXX executable bin/llama-fit-params
+[87/87] Linking CXX executable bin/llama-results

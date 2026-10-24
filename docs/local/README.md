@@ -4,6 +4,12 @@ Host-specific experiments and retained operating notes are under `docs/local/`. 
 
 **Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. [Operating status](intel-i5-1340p/model-serving-status-20261023.md) supersedes the older deployment instructions. No model service was restored by the source merge.
 
+**Sigma status,24 October2026:** ThinkingCap Gemma4 replaced Flint at `http://192.168.1.70:11434/`:64k physical context,8P-SMT CPU workers,unlimited output/reasoning,HTML/API smoke passed. Other removed services remain stopped; boot startup is disabled. See the [five-model comparison](intel-i5-1340p/thinkingcap-gemma4-20261024.md).
+
+## Web UI build default
+
+Server builds default to `LLAMA_BUILD_UI=ON`, with `LLAMA_USE_PREBUILT_UI=ON` as a verified-download fallback. The agent configure wrapper explicitly sets both options to override old disabled cache values. A requested UI build fails if no assets can be supplied. Builds with `LLAMA_BUILD_SERVER=OFF` do not provision UI assets. This policy does not replace the active ThinkingCap runtime.
+
 ## Start here
 
 * [Flint throughput and zero-copy](intel-i5-1340p/flint-throughput-20261023.md): best measured CPU replay 50.43 prompt / 13.09 decode tok/s. [Coding evaluation](../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md) preserves the initial output-budget failures separately from the completion-driven series.

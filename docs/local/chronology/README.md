@@ -38,8 +38,10 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 
 ## 2026-10
 
+* 2026-10-24 -- [ThinkingCap and five-model comparison](../intel-i5-1340p/thinkingcap-gemma4-20261024.md): uncapped coding6/6,8P-SMT confirmation,20/23.25GiB groups and current64k ThinkingCap service.
+
 * 2026-10-23 -- [Upstream merge and model-free validation](../cross-platform/upstream-sync-20261023.md); no weights, service restoration or deployment
-* 2026-10-23 -- [Model-serving removal/status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes older deployment statements. [Flint throughput, strict zero-copy and coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md): 50.43/13.09 prompt/decode tok/s; capped coding calibration retained, completion-driven evaluation running; no deployment.
+* 2026-10-23 -- [Model-serving removal/status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes older deployment statements. [Flint throughput, strict zero-copy and coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md): 50.43/13.09 prompt/decode tok/s; capped coding calibration retained, uncapped coding complete6/6,1053assertions; historical serving state; see current operating status.
 
 ## Retained operational docs
 

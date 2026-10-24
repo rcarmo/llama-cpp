@@ -1,16 +1,18 @@
 # Benchmark tree
 
-**Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. Sigma deployment statements below describe historical profiles. The [dated operating status](../docs/local/intel-i5-1340p/model-serving-status-20261023.md) supersedes their startup and rollback instructions; other hosts are unchanged.
+**Sigma status, 24 October 2026:** user-authorised ThinkingCap is live with 64k context and eight P-core SMT workers. Other Sigma deployment statements below describe historical profiles. The [dated operating status](../docs/local/intel-i5-1340p/model-serving-status-20261023.md) supersedes their startup and rollback instructions; other hosts are unchanged.
 
 This index is for the local fork's benchmark evidence, not for upstream benchmarking guidance. It keeps the navigation symmetrical with `docs/local/`: hardware first, but with enough chronology and model hints that later campaigns do not bury earlier evidence.
 
 ## Hardware entry points
 
+* [ThinkingCap and five-model comparison, 24 October](intel-1340p/thinkingcap-gemma4-20261024/README.md) -- current 64k service and completed CPU measurements.
+
 * Nemotron Lightning: [Intel strict handoff, 7 October 2026](intel-1340p/nemotron-lightning-zero-copy-20261007/README.md), experimental state/lifetime and fixed-token evidence.
 
 
 * [SpaceMIT K3](k3/README.md)
-* [LattePanda Sigma / Intel Core i5-1340P](intel-1340p/README.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment, static Huihui test profile, verified Bonsai PQ2 CPU baseline with pending PTQ1 work, and dated Qwen, Ornith, Maple, Gemma and Intel Xe evidence.
+* [LattePanda Sigma / Intel Core i5-1340P](intel-1340p/README.md) -- current ThinkingCap operations, five-model comparison, and retained Gemma, Huihui, Bonsai, Qwen, Ornith, Maple and Intel Xe evidence.
 * [RTX 3060 12 GB](rtx3060/README.md)
 
 ## Cross-links back into docs

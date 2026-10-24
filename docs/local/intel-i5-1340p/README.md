@@ -2,7 +2,7 @@
 
 This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM, and a lot of CPU-first experiments that spilled across Qwen, Ornith, Gemma, Maple and later Intel Xe handoff work. The old flat `docs/` list made it too easy to lose chronology, so the benchmark-heavy material is now linked from one page.
 
-**Current state:** [23 October 2026 model-serving status](model-serving-status-20261023.md). Model-serving units and installed runtimes were removed. The roles and deployment statements below are historical; this source integration does not restore them.
+**Current state,24 October2026:** [operating status](model-serving-status-20261023.md). User-authorised ThinkingCap64k/8P-SMT is live; the other roles below are historical. [Five-model comparison](thinkingcap-gemma4-20261024.md): separate20/23.25GiB groups,coding6/6 for ThinkingCap and historicalFlint.
 
 ## Retained roles and runbooks
 
@@ -13,7 +13,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 
 ## Campaigns and design notes
 
-* [Flint throughput, 23 October 2026](flint-throughput-20261023.md) -- CPU 50.43 prompt / 13.09 decode tok/s; cache and strict zero-copy evidence. [Coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/README.md): completion-driven evaluation running; initial capped calibration retained; no deployment.
+* [Flint throughput, 23 October 2026](flint-throughput-20261023.md) -- CPU 50.43 prompt / 13.09 decode tok/s; cache and strict zero-copy evidence. [Coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/coding-unlimited/README.md): uncapped coding complete6/6,1053assertions; initial capped calibration retained; historical serving state; see current operating status.
 
 * [Nemotron Lightning strict zero-copy, 7 October 2026](nemotron-lightning-zero-copy-20261007.md) -- native H/MoE rollback/lifetime gates and exact Q4 state transfer; fixed-token timing screen only, not deployed.
 
