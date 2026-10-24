@@ -27,7 +27,7 @@ for arg in "$@"; do
 done
 llama_agent_prepare_paths
 case $action in
-    configure) exec cmake -S "$LLAMA_SOURCE_DIR" -B "$LLAMA_BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON "$@";;
+    configure) exec cmake -S "$LLAMA_SOURCE_DIR" -B "$LLAMA_BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLLAMA_BUILD_UI=ON -DLLAMA_USE_PREBUILT_UI=ON "$@";;
     build) exec cmake --build "$LLAMA_BUILD_DIR" --parallel "${JOBS:-2}" "$@";;
     test) exec ctest --test-dir "$LLAMA_BUILD_DIR" --output-on-failure "$@";;
     profile) exec bash "$(dirname "${BASH_SOURCE[0]}")/build-profile.sh" "$@";;

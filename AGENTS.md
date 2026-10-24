@@ -23,6 +23,12 @@ This is Rui Carmo's development fork. The owner permits AI-assisted implementati
 - Durable published evidence stays in its established `benchmarks/`, `reports/` or notes paths; transient staging belongs in the project run root. Existing service launchers and slot-cache directories are runtime state, not permission to create new build/scratch folders there. A new model download's partial files use the project run root; completed model data remains in its model directory.
 - Before parallel work, name one owner for policy/build files and coordinate child worktrees. Containers must mount the resolved workspace/CI/repository path at the same absolute location, or explicitly resolve a valid root inside the container. A missing workspace must select the checkout fallback, never `/tmp` or unrelated `.cache`. Check `make -n`, path assertions and relevant tests before reporting completion. Policy changes do not authorise builds on busy hardware, publication, deployment or restarts.
 
+## Mandatory Web UI build default
+
+- Always include the embedded Web UI when building `llama-server`. `LLAMA_BUILD_UI=ON` and `LLAMA_USE_PREBUILT_UI=ON` are the fork and agent-configure defaults, including reconfiguration of an old cache.
+- Reuse verified pre-built assets or build the UI from source. If neither is available, fail the requested UI build; do not silently produce a server without its UI. Do not disable UI options unless the owner explicitly requests that exception. Builds with `LLAMA_BUILD_SERVER=OFF` do not need UI assets.
+- Apply this default to future builds without overwriting active binaries, clearing caches or interrupting a running service.
+
 ## Mandatory prior-feature reuse review
 
 - Before planning or implementing any feature, optimisation, model integration or backend campaign, you MUST inspect earlier fork work for beneficial features that can be reused. Search the relevant source, Git history, local documentation, benchmark reports and indexed project notes. Do not treat the requested patch or the most obvious runtime flags as the complete design space.

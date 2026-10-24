@@ -29,4 +29,20 @@ if (clear_paths; WORKSPACE_ROOT="$fixture/workspace"; LLAMA_SOURCE_DIR="$fixture
 mkdir -p "$fixture/standalone/project"
 WORKSPACE_ROOT= LLAMA_SOURCE_DIR="$fixture/standalone/project" LLAMA_BUILD_DIR= LLAMA_CACHE_DIR= LLAMA_RUN_DIR= bash "$helper" --print > "$fixture/standalone-paths.txt"
 grep -q "WORKSPACE_ROOT=$WORKSPACE_ROOT" "$fixture/standalone-paths.txt"
-printf 'PASS: defaults, missing-workspace fallback, enclosing-workspace detection, build escape, variant traversal, symlink rejection and Bun temp\n'
+mkdir -p "$fixture/bin" "$fixture/wrapper-workspace/project"
+cat > "$fixture/bin/cmake" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" > "$CMAKE_CAPTURE"
+EOF
+chmod +x "$fixture/bin/cmake"
+(
+    clear_paths
+    export WORKSPACE_ROOT="$fixture/wrapper-workspace" LLAMA_SOURCE_DIR="$fixture/wrapper-workspace/project"
+    export CMAKE_CAPTURE="$fixture/cmake-arguments.txt"
+    export PATH="$fixture/bin:$PATH"
+    bash "$(dirname "$helper")/agent-build.sh" configure -DLLAMA_BUILD_TESTS=OFF
+)
+grep -Fxq -- '-DLLAMA_BUILD_UI=ON' "$fixture/cmake-arguments.txt"
+grep -Fxq -- '-DLLAMA_USE_PREBUILT_UI=ON' "$fixture/cmake-arguments.txt"
+grep -Fxq -- '-DLLAMA_BUILD_TESTS=OFF' "$fixture/cmake-arguments.txt"
+printf 'PASS: defaults, missing-workspace fallback, enclosing-workspace detection, build escape, variant traversal, symlink rejection, Bun temp and Web UI configure defaults\n'

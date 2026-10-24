@@ -17,7 +17,7 @@ REQUIREMENTS_ARGS ?=
 
 .PHONY: help agent-paths agent-configure agent-build agent-test agent-profile agent-requirements
 help:
-	@printf '%s\n' 'The legacy Make build was replaced by CMake.' 'Agent workflow: make agent-paths agent-configure agent-build agent-test' 'Paths: physical workspace/tmp/llama-cpp/{build,cache,runs}; isolated by worktree and BUILD_VARIANT.' 'Overrides: WORKSPACE_ROOT LLAMA_SOURCE_DIR BUILD_VARIANT RUN_PURPOSE JOBS CMAKE_ARGS BUILD_ARGS TEST_ARGS.' 'Root fallback: explicit existing workspace > enclosing workspace > CI checkout > repository/common worktree root.' 'CI needs no .pi/.piclaw; missing tmp children are created, never /tmp or unrelated .cache.' 'Existing build/cache/runtime state is not moved or cleaned.'
+	@printf '%s\n' 'The legacy Make build was replaced by CMake.' 'Agent workflow: make agent-paths agent-configure agent-build agent-test' 'Web UI: enabled for server builds; agent-configure resets old disabled UI cache values.' 'Paths: physical workspace/tmp/llama-cpp/{build,cache,runs}; isolated by worktree and BUILD_VARIANT.' 'Overrides: WORKSPACE_ROOT LLAMA_SOURCE_DIR BUILD_VARIANT RUN_PURPOSE JOBS CMAKE_ARGS BUILD_ARGS TEST_ARGS.' 'Root fallback: explicit existing workspace > enclosing workspace > CI checkout > repository/common worktree root.' 'CI needs no .pi/.piclaw; missing tmp children are created, never /tmp or unrelated .cache.' 'Existing build/cache/runtime state is not moved or cleaned.'
 
 agent-paths:
 	bash "$(SOURCE_ROOT)/scripts/agent-build.sh" paths

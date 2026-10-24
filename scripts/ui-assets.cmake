@@ -575,11 +575,14 @@ if(NOT provisioned AND HF_ENABLED)
 endif()
 
 # ---------------------------------------------------------------------------
-# 4. Fallback: warn about stale or missing assets, then emit whatever we have
+# 4. Fallback: reuse stale assets or fail a requested UI with no assets
 # ---------------------------------------------------------------------------
 if(NOT provisioned)
     if(EXISTS "${DIST_DIR}/index.html")
         message(WARNING "UI: provisioning failed; embedding stale assets from ${DIST_DIR}")
+    elseif(BUILD_UI)
+        message(FATAL_ERROR "UI: embedded UI requested but no assets are available. "
+                            "Install npm dependencies or provide verified pre-built assets in tools/ui/dist.")
     else()
         message(WARNING "UI: no assets available - building without an embedded UI. "
                         "In a disconnected environment, download the pre-built UI "
