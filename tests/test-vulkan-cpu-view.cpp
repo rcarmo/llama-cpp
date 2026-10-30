@@ -21,6 +21,7 @@ static void counted_set(ggml_backend_buffer_t b, ggml_tensor * t, const void * p
 static bool counted_copy(ggml_backend_buffer_t b, const ggml_tensor * s, ggml_tensor * d) { ++copies; return saved_copy(b,s,d); }
 
 int main() {
+    if (ggml_backend_vk_get_device_count() == 0) { std::puts("SKIP: Vulkan unavailable"); return 77; }
     ggml_backend_t vk = ggml_backend_vk_init(0);
     if (!vk) { std::puts("SKIP: Vulkan unavailable"); return 77; }
     auto cpu = ggml_backend_cpu_init();

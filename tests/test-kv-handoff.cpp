@@ -11,6 +11,7 @@ struct toy_model : llama_model {
     toy_model() : llama_model(llama_model_default_params()) {
         arch=LLM_ARCH_LLAMA;
         hparams.n_layer_all=2;
+        for (uint32_t il=0;il<hparams.n_layer_all;++il) hparams.kv_source_impl[il]=il;
         hparams.n_embd=32;
         hparams.n_embd_head_k_full=32;
         hparams.n_embd_head_v_full=32;
@@ -35,7 +36,7 @@ struct bytes_writer : llama_io_write_i {
 };
 static std::vector<uint8_t> state(llama_memory_i & c) { bytes_writer out; c.state_write(out); return out.bytes; }
 static std::unique_ptr<llama_kv_cache> cache(toy_model & m,uint32_t size=256) {
-    return std::make_unique<llama_kv_cache>(m,m.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,size,2,256,0,LLAMA_SWA_TYPE_NONE,nullptr,nullptr,nullptr,nullptr);
+    return std::make_unique<llama_kv_cache>(m,false,m.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,size,2,0,LLAMA_SWA_TYPE_NONE,nullptr,nullptr,nullptr,nullptr);
 }
 static void populate(llama_kv_cache & c) {
     for (llama_seq_id s=0;s<2;++s) {
@@ -113,7 +114,7 @@ int main() {
     {
         auto src=cache(model),dst=cache(model);populate(*src);size_t shared=0,copied=0;
         const auto before_borrow=state(*src);
-        auto borrower=std::make_unique<llama_kv_cache>(model,model.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,256,2,256,0,LLAMA_SWA_TYPE_NONE,src.get(),nullptr,nullptr,[](int32_t il){return il;});
+        auto borrower=std::make_unique<llama_kv_cache>(model,false,model.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,256,2,0,LLAMA_SWA_TYPE_NONE,src.get(),nullptr,nullptr,[](int32_t il){return il;});
         GGML_ASSERT(state(*src)==before_borrow);
         GGML_ASSERT(!dst->prepare_handoff(*src,no_view,true,shared,copied));
         borrower.reset();GGML_ASSERT(state(*src)==before_borrow);auto tx=dst->prepare_handoff(*src,no_view,true,shared,copied);GGML_ASSERT(tx);tx->commit();
@@ -121,7 +122,7 @@ int main() {
     {
         model.hparams.n_swa=64;model.hparams.swa_type=LLAMA_SWA_TYPE_STANDARD;
         model.hparams.is_swa_impl[0]=1;model.hparams.is_swa_impl[1]=0;
-        auto make=[&](uint32_t ubatch){return std::make_unique<llama_kv_cache_iswa>(model,model.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,false,512,2,ubatch,256,nullptr,nullptr,nullptr,nullptr);};
+        auto make=[&](uint32_t ubatch){return std::make_unique<llama_kv_cache_iswa>(model,false,model.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,false,512,2,ubatch,nullptr,nullptr,nullptr,nullptr);};
         auto src=make(128),dst=make(128);populate(*const_cast<llama_kv_cache *>(src->get_base()));populate(*const_cast<llama_kv_cache *>(src->get_swa()));
         const auto expected=state(*src),empty=state(*dst);size_t shared=0,copied=0;
         auto wrong=make(512);GGML_ASSERT(!wrong->prepare_handoff(*src,no_view,true,shared,copied));

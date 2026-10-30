@@ -381,6 +381,8 @@ extern "C" {
     GGML_API void        ggml_fp32_to_bf16_row_ref(const float *, ggml_bf16_t *, int64_t);
     GGML_API void        ggml_fp32_to_bf16_row(const float *, ggml_bf16_t *, int64_t);
 
+    typedef struct { uint8_t bits; } ggml_fp8_e4m3_t;
+
     struct ggml_object;
     struct ggml_context;
     struct ggml_cgraph;
@@ -430,7 +432,8 @@ extern "C" {
         GGML_TYPE_NVFP4   = 40, // NVFP4 (4 blocks, E4M3 scale)
         GGML_TYPE_Q1_0    = 41,
         GGML_TYPE_Q2_0    = 42,
-        GGML_TYPE_TURBO2_0 = 43, // TurboQuant 2-bit KV cache: WHT + 2-bit PolarQuant
+        GGML_TYPE_F8_E4M3 = 43,
+        GGML_TYPE_TURBO2_0 = 144, // TurboQuant 2-bit KV cache: WHT + 2-bit PolarQuant
         GGML_TYPE_TURBO3_0 = 44, // TurboQuant 3-bit KV cache: WHT + 3-bit PolarQuant
         GGML_TYPE_TURBO4_0 = 45, // TurboQuant 4-bit KV cache: WHT + 4-bit PolarQuant
         GGML_TYPE_TQ3_1S  = 46, // TurboQuant 3-bit weight: WHT-rotated 8-level Lloyd-Max, block_size=32
@@ -438,7 +441,7 @@ extern "C" {
         // Prism-private Q2_0 at group size 128 (upstream Q2_0 is group 64).
         GGML_TYPE_PQ2_0 = 142,
         GGML_TYPE_PTQ1_0 = 143, // Prism-private ternary, group 128
-        GGML_TYPE_COUNT   = 144,
+        GGML_TYPE_COUNT   = 145,
     };
 
     // [TAG_GGML_PREC]
@@ -496,6 +499,7 @@ extern "C" {
         GGML_FTYPE_MOSTLY_Q2_0    = 28, // except 1d tensors
         GGML_FTYPE_MOSTLY_PQ2_0 = 128, // except 1d tensors (Prism-private group-128 Q2_0)
         GGML_FTYPE_MOSTLY_PTQ1_0 = 129, // except 1d tensors (Prism-private group-128 ternary)
+        GGML_FTYPE_MOSTLY_F8_E4M3 = 29, // except 1d tensors
     };
 
     // available tensor operations:
@@ -936,6 +940,7 @@ extern "C" {
             enum   ggml_type      type);
 
     // dst[i0, i1, i2] = a[i0, i1, i2] + b[i0, ids[i1, i2]]
+    // an id of -1 adds nothing: dst[i0, i1, i2] = a[i0, i1, i2]
     GGML_API struct ggml_tensor * ggml_add_id(
             struct ggml_context * ctx,
             struct ggml_tensor  * a,
@@ -1487,6 +1492,16 @@ extern "C" {
             enum ggml_prec       prec,
             int                  idx);
 
+    // [TAG_GGML_PREC]
+    // get the accumulator / src[idx] precision set by the functions above
+    // return GGML_PREC_UNDEFINED when the op does not carry the requested precision
+    GGML_API enum ggml_prec ggml_prec_get_acc(
+            const struct ggml_tensor * a);
+
+    GGML_API enum ggml_prec ggml_prec_get_src(
+            const struct ggml_tensor * a,
+            int                        idx);
+
     // A: k columns, n rows => [ne03, ne02, n, k]
     // B: k columns, m rows  (i.e. we transpose it internally) => [ne03 * x, ne02 * y, m, k]
     // result is n columns, m rows => [ne03 * x, ne02 * y, m, n]
@@ -1508,6 +1523,7 @@ extern "C" {
             enum ggml_op_hint    hint);
 
     // indirect matrix multiplication
+    // an id of -1 skips the slot and zeroes the matching row of the result
     //
     // [TAG_MUL_MAT_ID_DUPLICATE_ID]
     // note: this op has undefined behaviour if a given `a` is referenced more than once for a given `b`

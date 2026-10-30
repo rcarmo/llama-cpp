@@ -10,6 +10,7 @@ struct toy_model : llama_model {
     toy_model(llm_arch architecture = LLM_ARCH_QWEN35) : llama_model(llama_model_default_params()) {
         arch = architecture;
         hparams.n_layer_all = 2;
+        for (uint32_t il = 0; il < hparams.n_layer_all; ++il) hparams.kv_source_impl[il] = il;
         hparams.n_embd = 32;
         hparams.n_embd_head_k_full = 32;
         hparams.n_embd_head_v_full = 32;
@@ -56,8 +57,8 @@ static std::shared_ptr<llama_memory_hybrid> make(toy_model & model, bool deferre
     init.strict = true;
     init.deferred = deferred;
     init.alloc = [](ggml_backend_buffer_type_t buft, size_t size) { return ggml_backend_buft_alloc_buffer(buft, size); };
-    return std::make_shared<llama_memory_hybrid>(model, GGML_TYPE_F16, GGML_TYPE_F16, false,
-            32, 1, 0, LLAMA_SWA_TYPE_NONE, GGML_TYPE_F32, GGML_TYPE_F32, 1, 1, rollback, false, false,
+    return std::make_shared<llama_memory_hybrid>(model, false, GGML_TYPE_F16, GGML_TYPE_F16, false,
+            32, 0, LLAMA_SWA_TYPE_NONE, GGML_TYPE_F32, GGML_TYPE_F32, 1, 1, rollback, false, false,
             nullptr, nullptr, init);
 }
 
@@ -67,6 +68,7 @@ static void populate(llama_memory_hybrid & mem) {
     for (int i = 0; i < 9; ++i) { cells.pos_set(i, i); cells.seq_add(i, 0); }
     auto * r = mem.get_mem_recr();
     r->head = 0; r->n = 1; r->used = 1;
+    r->cells[0].rs_max = r->n_rs_seq;
     r->cells[0].pos = 8; r->cells[0].src = 0; r->cells[0].src0 = 0; r->cells[0].tail = 0; r->cells[0].seq_id.insert(0);
     for (auto * t : {r->r_l[0], r->s_l[0]}) {
         std::vector<float> data(ggml_nelements(t));
@@ -156,7 +158,7 @@ static void exercise(llm_arch arch) {
     {
         llama_memory_init init; init.strict = true;
         bool rejected = false;
-        try { llama_memory_recurrent r(model, GGML_TYPE_F32, GGML_TYPE_F32, false, 1, 1, 3, nullptr, init); }
+        try { llama_memory_recurrent r(model, false, GGML_TYPE_F32, GGML_TYPE_F32, false, 1, 1, 3, nullptr, init); }
         catch (const std::runtime_error &) { rejected = true; }
         GGML_ASSERT(rejected);
     }

@@ -30,7 +30,7 @@ void add_bytes(size_t & total, size_t n) {
 }
 
 void llama_kv_cache::init_cpu_shared(const llama_memory_alloc_cb & alloc) {
-    if (other || hparams.no_alloc) return;
+    if (other || ctxs_bufs.no_alloc) return;
     for (auto & cb : ctxs_bufs) {
         auto old = cb.second.get();
         if (!old || ggml_backend_buffer_is_host(old)) continue;
@@ -81,8 +81,8 @@ struct llama_kv_cache::handoff : llama_memory_transfer_i {
 llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & source, const llama_memory_view_cb & view, bool allow_copy, size_t & shared, size_t & copied) {
     auto src = dynamic_cast<llama_kv_cache *>(&source);
     if (!src || typeid(*src)!=typeid(llama_kv_cache) || typeid(*this)!=typeid(llama_kv_cache) || src == this || other || src->other || v_cells_impl.use_count()!=1 || src->v_cells_impl.use_count()!=1 ||
-        hparams.no_alloc || src->hparams.no_alloc || !handoff_buffers.empty() ||
-        v_trans!=src->v_trans || n_seq_max!=src->n_seq_max || n_stream!=src->n_stream || n_pad!=src->n_pad ||
+        ctxs_bufs.no_alloc || src->ctxs_bufs.no_alloc || !handoff_buffers.empty() ||
+        v_trans!=src->v_trans || n_seq_max!=src->n_seq_max || n_stream!=src->n_stream ||
         n_swa!=src->n_swa || swa_type!=src->swa_type || get_size()!=src->get_size() ||
         n_rot_k!=src->n_rot_k || n_rot_v!=src->n_rot_v || map_layer_ids!=src->map_layer_ids ||
         layers.size()!=src->layers.size() || !sc_info.empty() || !src->sc_info.empty() || get_has_shift() || src->get_has_shift()) return nullptr;

@@ -1,3 +1,4 @@
+#include "gguf-fixture-writer.h"
 #include "llama.h"
 #include "gguf.h"
 #include "ggml-backend.h"
@@ -68,7 +69,7 @@ int main(int argc,char ** argv){
     ggml_backend_load_all();
     llama_backend_init();
     const llm_arch arch=nemotron?(nemotron_moe?LLM_ARCH_NEMOTRON_H_MOE:LLM_ARCH_NEMOTRON_H):gemma?LLM_ARCH_GEMMA4:qwen?LLM_ARCH_QWEN35:LLM_ARCH_LLAMA;
-    auto meta=gguf_init_empty();llama_model_saver m(arch,meta);
+    auto meta=gguf_init_empty();kv_writer m(arch,meta);
     m.add_kv(LLM_KV_GENERAL_ARCHITECTURE,gemma?"gemma4":qwen?"qwen35":"llama");m.add_kv(LLM_KV_VOCAB_SIZE,uint32_t(128));m.add_kv(LLM_KV_CONTEXT_LENGTH,uint32_t(qwen?32:256));
     m.add_kv(LLM_KV_EMBEDDING_LENGTH,uint32_t(32));m.add_kv(LLM_KV_BLOCK_COUNT,uint32_t(gemma?5:qwen_mtp?3:2));m.add_kv(LLM_KV_FEED_FORWARD_LENGTH,uint32_t(64));
     m.add_kv(LLM_KV_ATTENTION_HEAD_COUNT,uint32_t(1));m.add_kv(LLM_KV_ATTENTION_HEAD_COUNT_KV,uint32_t(1));m.add_kv(LLM_KV_ROPE_DIMENSION_COUNT,uint32_t(32));
@@ -112,7 +113,7 @@ int main(int argc,char ** argv){
     }
     if(vulkan || qwen_mtp_roundtrip){
         const char * path=vulkan?argv[3]:"test-qwen-mtp-roundtrip.gguf";
-        {llama_model_saver saver(model.get());saver.add_kv_from_model();if(gemma){saver.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN,std::vector<uint32_t>{1,1,1,1,0});saver.add_kv(LLM_KV_EMBEDDING_LENGTH_PER_LAYER,uint32_t(16));saver.add_kv(LLM_KV_ATTENTION_SHARED_KV_LAYERS,uint32_t(0));saver.add_kv(LLM_KV_ATTENTION_KEY_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ROPE_FREQ_BASE_SWA,10000.0f);}for(const auto & tensor:model->tensors_by_name)saver.add_tensor(tensor.second);saver.save(path);}
+        {llama_model_saver saver(model.get());saver.add_kv_from_model();if(gemma){saver.add_kv(LLM_KV_ATTENTION_SLIDING_WINDOW_PATTERN,std::vector<uint32_t>{1,1,1,1,0});saver.add_kv(LLM_KV_EMBEDDING_LENGTH_PER_LAYER,uint32_t(16));saver.add_kv(LLM_KV_ATTENTION_SHARED_KV_LAYERS,uint32_t(0));saver.add_kv(LLM_KV_ATTENTION_KEY_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ATTENTION_VALUE_LENGTH_SWA,uint32_t(32));saver.add_kv(LLM_KV_ROPE_FREQ_BASE_SWA,10000.0f);}saver.add_tensors_from_model();saver.save(path);}
         model.reset();model.reset(llama_model_load_from_file(path,mp));GGML_ASSERT(model);
         if(qwen_mtp_roundtrip){GGML_ASSERT(model->hparams.n_layer_all==3&&model->hparams.n_layer()==2&&!model->hparams.is_recr(2));std::remove(path);std::puts("PASS: embedded Qwen MTP GGUF round-trip preserves all-layer recurrent metadata");return 0;}
         mp.n_gpu_layers=999;gpu.reset(llama_model_load_from_file(path,mp));GGML_ASSERT(gpu);
@@ -234,8 +235,12 @@ int main(int argc,char ** argv){
     if(vulkan)std::remove(argv[3]);
     if(!gemma && !vulkan){
         // Exercise independently loaded file snapshots without a GPU or trained weights.
-        std::unique_ptr<FILE,decltype(&std::fclose)> file(std::tmpfile(),std::fclose);GGML_ASSERT(file);
-        {llama_model_saver saver(model.get());saver.add_kv_from_model();for(const auto & t:model->tensors_by_name)saver.add_tensor(t.second);saver.save(file.get());}
+        struct snapshot_file {
+            const char * path = "test-context-handoff-snapshot.gguf";
+            ~snapshot_file() { std::remove(path); }
+        } snapshot_path;
+        {llama_model_saver saver(model.get());saver.add_kv_from_model();saver.add_tensors_from_model();saver.save(snapshot_path.path);}
+        std::unique_ptr<FILE,decltype(&std::fclose)> file(std::fopen(snapshot_path.path,"rb"),std::fclose);GGML_ASSERT(file);
         std::fflush(file.get());std::rewind(file.get());
         model_owner a(llama_model_load_from_file_ptr(file.get(),mp),llama_model_free);std::rewind(file.get());
         model_owner b(llama_model_load_from_file_ptr(file.get(),mp),llama_model_free);GGML_ASSERT(a && b);
