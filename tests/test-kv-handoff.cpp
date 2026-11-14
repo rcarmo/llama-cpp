@@ -11,6 +11,7 @@ struct toy_model : llama_model {
     toy_model() : llama_model(llama_model_default_params()) {
         arch=LLM_ARCH_LLAMA;
         hparams.n_layer_all=2;
+        layers.resize(hparams.n_layer_all);
         for (uint32_t il=0;il<hparams.n_layer_all;++il) hparams.kv_source_impl[il]=il;
         hparams.n_embd=32;
         hparams.n_embd_head_k_full=32;
@@ -35,8 +36,8 @@ struct bytes_writer : llama_io_write_i {
     size_t n_bytes() override { return bytes.size(); }
 };
 static std::vector<uint8_t> state(llama_memory_i & c) { bytes_writer out; c.state_write(out); return out.bytes; }
-static std::unique_ptr<llama_kv_cache> cache(toy_model & m,uint32_t size=256) {
-    return std::make_unique<llama_kv_cache>(m,false,m.hparams,GGML_TYPE_F16,GGML_TYPE_F16,false,false,false,size,2,0,LLAMA_SWA_TYPE_NONE,nullptr,nullptr,nullptr,nullptr);
+static std::unique_ptr<llama_kv_cache> cache(toy_model & m,uint32_t size=256,bool indexer=false,ggml_type type=GGML_TYPE_F16) {
+    return std::make_unique<llama_kv_cache>(m,false,m.hparams,type,type,false,false,false,size,2,0,LLAMA_SWA_TYPE_NONE,nullptr,nullptr,nullptr,nullptr,"",llama_memory_init{},indexer);
 }
 static void populate(llama_kv_cache & c) {
     for (llama_seq_id s=0;s<2;++s) {
@@ -118,6 +119,32 @@ int main() {
         GGML_ASSERT(state(*src)==before_borrow);
         GGML_ASSERT(!dst->prepare_handoff(*src,no_view,true,shared,copied));
         borrower.reset();GGML_ASSERT(state(*src)==before_borrow);auto tx=dst->prepare_handoff(*src,no_view,true,shared,copied);GGML_ASSERT(tx);tx->commit();
+    }
+    {
+        auto src=cache(model),dst=cache(model,256,true);populate(*src);
+        const auto original=state(*src),empty=state(*dst);size_t shared=0,copied=0;int calls=0;
+        llama_memory_view_cb view=[&](ggml_backend_buffer_t,size_t,size_t)->ggml_backend_buffer_t{++calls;return nullptr;};
+        GGML_ASSERT(!dst->prepare_handoff(*src,view,true,shared,copied));
+        GGML_ASSERT(calls==0 && shared==0 && copied==0 && state(*src)==original && state(*dst)==empty);
+    }
+    {
+        ggml_context_ptr scales(ggml_init({4096,nullptr,false}));GGML_ASSERT(scales);
+        auto scale=ggml_new_tensor_1d(scales.get(),GGML_TYPE_F32,1);*(float *)scale->data=1.0f;
+        auto other_scale=ggml_new_tensor_1d(scales.get(),GGML_TYPE_F32,1);*(float *)other_scale->data=2.0f;
+        for(auto & layer:model.layers){layer.k_cache_s=scale;layer.v_cache_s=scale;}
+        auto src=cache(model,256,false,GGML_TYPE_F8_E4M3);populate(*src);const auto original=state(*src);
+        for(bool key:{false,true}) {
+            auto & value=key?model.layers[0].k_cache_s:model.layers[0].v_cache_s;
+            value=other_scale;auto dst=cache(model,256,false,GGML_TYPE_F8_E4M3);value=scale;
+            const auto empty=state(*dst);size_t shared=0,copied=0;int calls=0;
+            llama_memory_view_cb view=[&](ggml_backend_buffer_t,size_t,size_t)->ggml_backend_buffer_t{++calls;return nullptr;};
+            GGML_ASSERT(!dst->prepare_handoff(*src,view,true,shared,copied));
+            GGML_ASSERT(calls==0 && shared==0 && copied==0 && state(*src)==original && state(*dst)==empty);
+        }
+        auto dst=cache(model,256,false,GGML_TYPE_F8_E4M3);size_t shared=0,copied=0;
+        auto tx=dst->prepare_handoff(*src,no_view,true,shared,copied);GGML_ASSERT(tx && copied>0 && shared==0);
+        tx->commit();tx.reset();src.reset();GGML_ASSERT(state(*dst)==original);
+        for(auto & layer:model.layers){layer.k_cache_s=nullptr;layer.v_cache_s=nullptr;}
     }
     {
         model.hparams.n_swa=64;model.hparams.swa_type=LLAMA_SWA_TYPE_STANDARD;

@@ -10,6 +10,7 @@ struct toy_model : llama_model {
     toy_model(llm_arch architecture = LLM_ARCH_QWEN35) : llama_model(llama_model_default_params()) {
         arch = architecture;
         hparams.n_layer_all = 2;
+        layers.resize(hparams.n_layer_all);
         for (uint32_t il = 0; il < hparams.n_layer_all; ++il) hparams.kv_source_impl[il] = il;
         hparams.n_embd = 32;
         hparams.n_embd_head_k_full = 32;

@@ -82,7 +82,7 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
     auto src = dynamic_cast<llama_kv_cache *>(&source);
     if (!src || typeid(*src)!=typeid(llama_kv_cache) || typeid(*this)!=typeid(llama_kv_cache) || src == this || other || src->other || v_cells_impl.use_count()!=1 || src->v_cells_impl.use_count()!=1 ||
         ctxs_bufs.no_alloc || src->ctxs_bufs.no_alloc || !handoff_buffers.empty() ||
-        v_trans!=src->v_trans || n_seq_max!=src->n_seq_max || n_stream!=src->n_stream ||
+        v_trans!=src->v_trans || is_indexer!=src->is_indexer || n_seq_max!=src->n_seq_max || n_stream!=src->n_stream ||
         n_swa!=src->n_swa || swa_type!=src->swa_type || get_size()!=src->get_size() ||
         n_rot_k!=src->n_rot_k || n_rot_v!=src->n_rot_v || map_layer_ids!=src->map_layer_ids ||
         layers.size()!=src->layers.size() || !sc_info.empty() || !src->sc_info.empty() || get_has_shift() || src->get_has_shift()) return nullptr;
@@ -90,7 +90,8 @@ llama_memory_transfer_ptr llama_kv_cache::prepare_handoff(llama_memory_i & sourc
     // Check every layout before acquiring buffers or copying payloads.
     for (size_t i=0;i<layers.size();++i) {
         const auto & d=layers[i]; const auto & s=src->layers[i];
-        if (d.il!=s.il || !same_tensor(d.k,s.k) || !same_tensor(d.v,s.v)) return nullptr;
+        if (d.il!=s.il || !same_tensor(d.k,s.k) || !same_tensor(d.v,s.v) ||
+            get_k_scale(d.il)!=src->get_k_scale(s.il) || get_v_scale(d.il)!=src->get_v_scale(s.il)) return nullptr;
         for (auto t : {d.k,d.v}) if (t && !handoff_deferred && (!t->buffer || !ggml_backend_buffer_is_host(t->buffer))) return nullptr;
     }
     auto result = std::make_unique<handoff>(*this,*src);
