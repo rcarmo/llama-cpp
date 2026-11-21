@@ -1,0 +1,72 @@
+{
+  "verified_at": "2026-11-21T21:43:39.266Z",
+  "url": "http://192.168.1.70:11434/#/chat/f7uzp2ivfp",
+  "title": "Reply with exactly OK. - llama-ui",
+  "answer": "OK",
+  "reasoning": "The user asks to reply with exactly OK. This is a benign formatting request. Need answer exactly OK likely no extra punctuation or explanation. Need ensure final is exactly \"OK\". No need to use tools. Done. Final exactly OK.",
+  "finish": "stop",
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 173,
+    "prompt_ms": 8463.618,
+    "prompt_per_token_ms": 48.922647398843935,
+    "prompt_per_second": 20.440431030795576,
+    "predicted_n": 57,
+    "predicted_ms": 7247.508,
+    "predicted_per_token_ms": 129.41978571428572,
+    "predicted_per_second": 7.726793816578057
+  },
+  "request": {
+    "messages": [
+      {
+        "content": "Reply with exactly OK.",
+        "role": "user"
+      }
+    ],
+    "return_progress": true,
+    "sse_ping_interval": 1,
+    "stream": true,
+    "tools": [
+      {
+        "function": {
+          "description": "Returns the current local date and time in ISO 8601 format, with the IANA time zone name",
+          "name": "get_datetime",
+          "parameters": {
+            "properties": {},
+            "required": [],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      },
+      {
+        "function": {
+          "description": "Get runtime info (OS name), may call when user asks about local files or shell commands",
+          "name": "get_info",
+          "parameters": {
+            "properties": {},
+            "required": [],
+            "type": "object"
+          }
+        },
+        "type": "function"
+      }
+    ],
+    "reasoning_format": "auto",
+    "reasoning_control": true,
+    "backend_sampling": false,
+    "timings_per_token": true
+  },
+  "errors": [],
+  "unexpected_responses": [],
+  "disabled_optional_tools": [
+    {
+      "url": "http://192.168.1.70:11434/tools",
+      "status": 403
+    },
+    {
+      "url": "http://192.168.1.70:11434/tools",
+      "status": 403
+    }
+  ]
+}

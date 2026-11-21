@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+const run='/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-cache-serving-20261121-1dadee62b';
+const label=process.argv[2],parent=process.argv[3]==='parent';
+if(!/^[a-z0-9-]+$/.test(label))throw Error('label');
+const expected=JSON.parse(fs.readFileSync(run+'/serving-profile.json')).args;
+if(parent)expected[expected.indexOf('--cache-ram')+1]='256';
+const c=JSON.parse(fs.readFileSync(run+'/'+label+'.container.json'))[0];
+const at=c.Args.findIndex(x=>x.endsWith('/llama-server'));if(at<0)throw Error('missing binary');
+const args=c.Args.slice(at+1);
+if(JSON.stringify(args)!==JSON.stringify(expected))throw Error('Native server CLI differs: '+JSON.stringify({expected,args}));
+const result={verified:new Date().toISOString(),label,parent,container_id:c.Id,args,capacity_mib:parent?256:768,only_production_factor_changed:'--cache-ram 256 -> 768'};
+fs.writeFileSync(run+'/'+label+'.profile-verification.json',JSON.stringify(result,null,2)+'\n');
+console.log('PASS '+label+' exact server argument inheritance, cache'+result.capacity_mib);
