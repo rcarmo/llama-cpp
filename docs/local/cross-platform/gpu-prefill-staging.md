@@ -124,3 +124,15 @@ and a calibrated transfer-versus-compute cost model remain outside this patch.
 Production is unchanged: prefetch remains off and the offload threshold remains
 32. Only the memory guard is a candidate reusable safety improvement; the tested
 staging settings are not recommended for this host.
+
+## Vulkan CPU-owned expert placement (experimental, 21 November 2026)
+
+`GGML_VK_CPU_PREFILL_PATTERN` restricts Vulkan's existing automatic offload requests to matching matrix weights. Unset or empty preserves the previous behaviour. With a non-empty pattern, only `MUL_MAT` and `MUL_MAT_ID` with more than one token are eligible; `GGML_OP_OFFLOAD_MIN_BATCH` and backend operator checks still apply. Invalid regex disables automatic offload. This is a batch-shape filter; batched decode can also qualify. The scheduler can place adjacent stateless operations on the GPU.
+
+For a single-sequence CPU-weight experiment, combine the pattern with `--n-gpu-layers 0 --no-kv-offload --op-offload --no-repack --no-host`. The existing CPU memory placement retains KV and convolution state in one context. This route needs no cross-context state handoff and does not relax the strict handoff guards for SWA or recurrent memory.
+
+An Inkling layer-selection example is `^blk\.(6|7)\.ffn_(gate_up|down)_exps\.weight$`. Its four official IQ4_NL tensors total 1,146,617,856 bytes before backend copies and allocation overhead. The pattern is not a memory quota. Account full model/projector backing, non-model RSS, GPU allocations and retained staging under an enforced process limit. Disable expert prefetch for the initial comparison. GPU buffers can remain allocated during CPU decode.
+
+The existing `--override-tensor` parser also discovers backend extra buffer types such as `CPU_REPACK`. Explicit tensor overrides work with `--no-repack`, which disables automatic selection. Packing only selected expert tensors avoids whole-model repacking, but still allocates and copies those full tensors. CPU_REPACK buffers cannot also be treated as raw GPU weights; keep the initial repack and GPU-placement selections separate.
+
+`test-vulkan-cpu-prefill` covers pattern selection, invalid input, missing sources, single-token exclusion and unchanged disabled behaviour. `test-extra-buffer-override` covers explicit CPU_REPACK selection with automatic repacking disabled and rejects unknown types. The Sigma campaign passed four actual Vulkan callback checks, nine IQ4_NL routed-matrix cases and `test-vulkan-cpu-view` on Intel hardware under 4 GiB, zero swap and two CPUs. Trained-model continuation, memory use and performance have not yet been qualified. No serving default changed.

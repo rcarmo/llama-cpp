@@ -1,4 +1,5 @@
 #include "ggml-vulkan-common.h"
+#include "ggml-vulkan-cpu-prefill.h"
 
 static vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device) {
     vk::PhysicalDeviceProperties props = device.getProperties();
@@ -17315,8 +17316,15 @@ static bool ggml_backend_vk_device_supports_buft(ggml_backend_dev_t dev, ggml_ba
 
 static bool ggml_backend_vk_device_offload_op(ggml_backend_dev_t dev, const ggml_tensor * op) {
     ggml_backend_vk_device_context * dev_ctx = (ggml_backend_vk_device_context *)dev->context;
-
-    return ggml_vk_get_op_batch_size(op) >= dev_ctx->op_offload_min_batch_size;
+    static const ggml_vk_cpu_prefill_policy policy = [] {
+        ggml_vk_cpu_prefill_policy result(getenv("GGML_VK_CPU_PREFILL_PATTERN"));
+        if (!result.valid) {
+            GGML_LOG_ERROR("GGML_VK_CPU_PREFILL_PATTERN: invalid regex; automatic offload disabled\n");
+        }
+        return result;
+    }();
+    const int64_t batch_size = ggml_vk_get_op_batch_size(op);
+    return policy.allows(op, batch_size) && batch_size >= dev_ctx->op_offload_min_batch_size;
 }
 
 static ggml_backend_event_t ggml_backend_vk_device_event_new(ggml_backend_dev_t dev) {

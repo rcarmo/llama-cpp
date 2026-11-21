@@ -350,6 +350,8 @@ llama_build_and_test(test-thread-safety.cpp  LABEL "main backend"  ARGS -m "${MO
 set_tests_properties(test-thread-safety PROPERTIES FIXTURES_REQUIRED test-download-model)
 
 llama_build_and_test(test-arg-parser.cpp  LABEL behavior)
+llama_build_and_test(test-extra-buffer-override.cpp LABEL behavior)
+llama_build_and_test(test-vulkan-cpu-prefill.cpp LABEL behavior)
 llama_build_and_test(test-model-resolution.cpp  LABEL behavior)
 llama_build_and_test(test-gemma-hybrid-session-policy.cpp LABEL behavior)
 target_include_directories(test-gemma-hybrid-session-policy PRIVATE ${CMAKE_SOURCE_DIR}/tools/gemma-hybrid)
