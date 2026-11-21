@@ -1,0 +1,44 @@
+{
+  "generated": "2026-11-21T22:22:52.847Z",
+  "qualification": "Time-separated uncounterbalanced screen, two repetitions per arm, not a deployment result",
+  "baseline_label": "g768-512-a2",
+  "candidate_label": "g768-512-c1",
+  "prefill_tps_percent": -16.536948775914183,
+  "decode_tps_percent": -0.017363578039542027,
+  "whole_replay_wall_percent": 14.303699712829498,
+  "candidate": {
+    "label": "g768-512-c1",
+    "token_stream_hash": "8442142248321227302",
+    "tokens": 576,
+    "config": {
+      "mode": "cpu-offload-candidate",
+      "cache_mib": "0",
+      "threads": "4",
+      "batch_threads": "16",
+      "ubatch": "128",
+      "fa": "0",
+      "pool": "3",
+      "async": "0",
+      "prompt": "512",
+      "decode": "64",
+      "reps": "2"
+    },
+    "pattern": "^blk\\.[0-9]+\\.attn_(q|k|v|output)\\.weight$",
+    "within_arm_repeat_argmax_equal": true,
+    "within_arm_repeat_logits_equal": true,
+    "median_pp_tps": 20.201449500000003,
+    "median_tg_tps": 7.7188425,
+    "median_wall_ms": 33693.8005,
+    "peak_full_backing_estimate_bytes": 23656781376,
+    "peak_gpu_accounted_bytes": 2832162816,
+    "peak_cgroup_bytes": 5625327616,
+    "minimum_host_available_bytes": 25821966336,
+    "peak_gpu_engine_ns": 12719484908,
+    "cpu_nr_throttled": 0,
+    "cpu_state_allocations": [
+      "llama_kv_cache:        CPU KV buffer size =  2048.00 MiB",
+      "llama_kv_cache:        CPU KV buffer size =   200.00 MiB",
+      "llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB"
+    ]
+  }
+}

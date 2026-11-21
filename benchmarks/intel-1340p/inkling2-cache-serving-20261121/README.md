@@ -42,3 +42,7 @@ Current transient unit/container: `inkling2-mini-cache768-webui-20261121`, `Rest
 Configured 64K capacity has not been populated end-to-end. Broad coding/model quality, GPU serving, CUDA and Metal remain unqualified. GPU 128/8 diagnostics established finite logits and selected Vulkan routed operators, not a serving performance win. The queued GPU screen was held before native start so its old cache256 restoration controller cannot undo this deployment. Future GPU experiments must restore the new accepted cache768 parent and pass their own timing/append/cancel/fallback checks.
 
 Raw serving state: `tmp/llama-cpp/runs/inkling-cache-serving-20261121-1dadee62b`. Raw cache/GPU evidence: `tmp/llama-cpp/runs/inkling-cache-gpu-20261121-1dadee62b`. Paths are relative to the actual workspace. The archived [harness](harness/) uses these retained host paths; inspect it before preparing a new namespace and never overwrite active launchers or repeat valid arms. [Operating note](../../../docs/local/intel-i5-1340p/inkling2-cache-serving-20261121.md).
+
+## GPU continuation, 21 November 2026
+
+[Profiler-off placement screens and guard/recovery evidence](gpu-research/README.md) found no gain: expert-group prefill throughput-23.24%, dense-attention-16.54%, both at 512/64 with two repetitions. Cache768 CPU/SIMD serving was restored and verified after each phase. GPU remains experimental and undeployed; no 2048/counterbalanced or serving-quality confirmation of these losing points.

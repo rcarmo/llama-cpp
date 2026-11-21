@@ -1,0 +1,153 @@
+{
+  "generated": "2026-11-21T22:12:39.757Z",
+  "phase": "screen-v2",
+  "runtime_code_commit": "1dadee62b291391d7b6c230fa81f04a2358c6bf2",
+  "accepted_parent_config_commit": "6543c98c14284e48816d7a4bcc1f719289986155",
+  "kind": "uncounterbalanced feasibility screen",
+  "warmup_excluded": true,
+  "observations_per_arm": 2,
+  "promotion_qualified": false,
+  "restored_cache768": true,
+  "arms": [
+    {
+      "label": "g768-512-a2",
+      "token_stream_hash": "8442142248321227302",
+      "tokens": 576,
+      "config": {
+        "mode": "cpu-offload-candidate",
+        "cache_mib": "0",
+        "threads": "4",
+        "batch_threads": "16",
+        "ubatch": "128",
+        "fa": "0",
+        "pool": "3",
+        "async": "0",
+        "prompt": "512",
+        "decode": "64",
+        "reps": "2"
+      },
+      "pattern": "^$",
+      "within_arm_repeat_argmax_equal": true,
+      "within_arm_repeat_logits_equal": true,
+      "median_pp_tps": 24.204063,
+      "median_tg_tps": 7.7201830000000005,
+      "median_wall_ms": 29477.4365,
+      "peak_full_backing_estimate_bytes": 23385269824,
+      "peak_gpu_accounted_bytes": 2580062208,
+      "peak_cgroup_bytes": 5335216128,
+      "minimum_host_available_bytes": 26554773504,
+      "peak_gpu_engine_ns": 72228,
+      "cpu_nr_throttled": 0,
+      "cpu_state_allocations": [
+        "llama_kv_cache:        CPU KV buffer size =  2048.00 MiB",
+        "llama_kv_cache:        CPU KV buffer size =   200.00 MiB",
+        "llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB"
+      ]
+    },
+    {
+      "label": "g768-512-b2",
+      "token_stream_hash": "8442142248321227302",
+      "tokens": 576,
+      "config": {
+        "mode": "cpu-offload-candidate",
+        "cache_mib": "0",
+        "threads": "4",
+        "batch_threads": "16",
+        "ubatch": "128",
+        "fa": "0",
+        "pool": "3",
+        "async": "0",
+        "prompt": "512",
+        "decode": "64",
+        "reps": "2"
+      },
+      "pattern": "^blk\\.(6|7)\\.ffn_(gate_up|down)_exps\\.weight$",
+      "within_arm_repeat_argmax_equal": true,
+      "within_arm_repeat_logits_equal": true,
+      "median_pp_tps": 18.57869,
+      "median_tg_tps": 7.776177,
+      "median_wall_ms": 35828.954,
+      "peak_full_backing_estimate_bytes": 24620201536,
+      "peak_gpu_accounted_bytes": 3804921856,
+      "peak_cgroup_bytes": 6593355776,
+      "minimum_host_available_bytes": 24893812736,
+      "peak_gpu_engine_ns": 14600445392,
+      "cpu_nr_throttled": 0,
+      "cpu_state_allocations": [
+        "llama_kv_cache:        CPU KV buffer size =  2048.00 MiB",
+        "llama_kv_cache:        CPU KV buffer size =   200.00 MiB",
+        "llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB"
+      ]
+    }
+  ],
+  "comparison": {
+    "prefill_tps_percent": -23.241440910148015,
+    "decode_tps_percent": 0.7252936879863947,
+    "whole_replay_wall_percent": 21.54704836697723
+  },
+  "rows": [
+    {
+      "label": "g768-512-a2",
+      "rep": 0,
+      "prompt": 512,
+      "generated": 64,
+      "pp_ms": 21142.454,
+      "tg_ms": 8258.676,
+      "pp_tps": 24.216678,
+      "tg_tps": 7.749426,
+      "wall_ms": 29435.46,
+      "argmax_hash": "15208383757221281192",
+      "logits_hash": "4905216514008250081",
+      "finite": true
+    },
+    {
+      "label": "g768-512-a2",
+      "rep": 1,
+      "prompt": 512,
+      "generated": 64,
+      "pp_ms": 21164.504,
+      "tg_ms": 8321.48,
+      "pp_tps": 24.191448,
+      "tg_tps": 7.69094,
+      "wall_ms": 29519.413,
+      "argmax_hash": "15208383757221281192",
+      "logits_hash": "4905216514008250081",
+      "finite": true
+    },
+    {
+      "label": "g768-512-b2",
+      "rep": 0,
+      "prompt": 512,
+      "generated": 64,
+      "pp_ms": 27401.029,
+      "tg_ms": 8179.443,
+      "pp_tps": 18.68543,
+      "tg_tps": 7.824494,
+      "wall_ms": 35625.083,
+      "argmax_hash": "15208383757221281192",
+      "logits_hash": "15048467649191390470",
+      "finite": true
+    },
+    {
+      "label": "g768-512-b2",
+      "rep": 1,
+      "prompt": 512,
+      "generated": 64,
+      "pp_ms": 27717.702,
+      "tg_ms": 8281.724,
+      "pp_tps": 18.47195,
+      "tg_tps": 7.72786,
+      "wall_ms": 36032.825,
+      "argmax_hash": "15208383757221281192",
+      "logits_hash": "15048467649191390470",
+      "finite": true
+    }
+  ],
+  "limits": [
+    "Fixed-token teacher-forced replay, not independent coding quality.",
+    "Eight dump frames support numerical diagnostics only.",
+    "AB order/two repetitions per process do not establish counterbalanced performance.",
+    "Startup, shader warmup and full-vocabulary checks outside tg_ms are not decode kernel time.",
+    "No populated64K, crash recovery or serving GPU qualification."
+  ]
+}

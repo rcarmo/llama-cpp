@@ -1,0 +1,22 @@
+2026-11-21T22:07:27.244596802+00:00 stderr F ggml_vulkan: 0 = Intel(R) Iris(R) Xe Graphics (RPL-P) (Intel open-source Mesa driver) | uma: 1 | rebar: 1 | fp16: 1 | bf16: 0 | fp4: 0 | warp size: 32 | shared memory: 49152 | int dot: 1 | matrix cores: none | tier: 1 (fp16-integer-dot)
+2026-11-21T22:07:27.809595790+00:00 stderr F llama_context: n_ctx                 = 65536
+2026-11-21T22:07:27.809595790+00:00 stderr F llama_context: n_ctx_seq             = 65536
+2026-11-21T22:07:27.809595790+00:00 stderr F llama_context: n_batch               = 512
+2026-11-21T22:07:27.809595790+00:00 stderr F llama_context: n_ubatch              = 128
+2026-11-21T22:07:27.809595790+00:00 stderr F llama_context: n_ctx_seq (65536) < n_ctx_train (1048576) -- the full capacity of the model will not be utilized
+2026-11-21T22:07:28.517427508+00:00 stderr F llama_kv_cache:        CPU KV buffer size =  2048.00 MiB
+2026-11-21T22:07:28.584895547+00:00 stderr F llama_kv_cache:        CPU KV buffer size =   200.00 MiB
+2026-11-21T22:07:28.585990836+00:00 stderr F llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB
+2026-11-21T22:07:28.608848650+00:00 stderr F sched_reserve: Vulkan_Host compute buffer size =  2442.44 MiB
+2026-11-21T22:07:28.613048456+00:00 stdout F MODEL_ID layers=48 vocab=200058 context=65536
+2026-11-21T22:07:28.613048456+00:00 stdout F TOKEN_STREAM_HASH hash=8442142248321227302 tokens=576
+2026-11-21T22:07:28.613048456+00:00 stdout F TUNING_CONFIG decode_mask=0x55 batch_mask=0xffff poll=50 batch_poll=50
+2026-11-21T22:07:28.613048456+00:00 stdout F BENCH_CONFIG mode=cpu-offload-candidate cache_mib=0 threads=4 batch_threads=16 ubatch=128 fa=0 pool=3 async=0 prompt=512 decode=64 reps=2
+2026-11-21T22:08:27.952949929+00:00 stdout F WORKLOAD_WARMUP_COMPLETE
+2026-11-21T22:08:27.952949929+00:00 stdout F BENCH_RESULT rep=0 prompt=512 generated=64 pp_ms=21142.454 tg_ms=8258.676 pp_tps=24.216678 tg_tps=7.749426 wall_ms=29435.460 hash=15208383757221281192 finite=1
+2026-11-21T22:08:27.952949929+00:00 stdout F LOGITS_HASH rep=0 hash=4905216514008250081
+2026-11-21T22:08:27.952949929+00:00 stdout F ARGMAX_SEQUENCE rep=0 values=11,220,16,60,26,198,1374,151800,196977,196989,18,11,220,16,11,220,17,60,26,198,51070,13,34809,7,145985,13,89904,7,3022,827,784,7,59175,8,8,197008,198394,13,89904,7,70990,8,8,26,198,100887,151661,185905,150410,149880,154989,149914,180011,13,198,145055,150392,784,149877,32433,358,149880,171098,13
+2026-11-21T22:08:57.526928800+00:00 stdout F BENCH_RESULT rep=1 prompt=512 generated=64 pp_ms=21164.504 tg_ms=8321.480 pp_tps=24.191448 tg_tps=7.690940 wall_ms=29519.413 hash=15208383757221281192 finite=1
+2026-11-21T22:08:57.526928800+00:00 stdout F LOGITS_HASH rep=1 hash=4905216514008250081
+2026-11-21T22:08:57.526928800+00:00 stdout F ARGMAX_SEQUENCE rep=1 values=11,220,16,60,26,198,1374,151800,196977,196989,18,11,220,16,11,220,17,60,26,198,51070,13,34809,7,145985,13,89904,7,3022,827,784,7,59175,8,8,197008,198394,13,89904,7,70990,8,8,26,198,100887,151661,185905,150410,149880,154989,149914,180011,13,198,145055,150392,784,149877,32433,358,149880,171098,13
+2026-11-21T22:08:57.808239733+00:00 stdout F RESULT PASS finite replay

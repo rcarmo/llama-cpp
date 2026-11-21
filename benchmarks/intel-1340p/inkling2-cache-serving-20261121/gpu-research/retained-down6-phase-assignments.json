@@ -1,0 +1,281 @@
+[
+  {
+    "label": "gfallback-a1",
+    "graph_assignment_rows": {
+      "reservation_or_outside:CPU": {
+        "assignment_rows": 46494,
+        "ops": {
+          "      CONT": 3156,
+          "   MUL_MAT": 6390,
+          "   SIGMOID": 864,
+          "       MUL": 5106,
+          "    CONCAT": 3276,
+          "       CPY": 1428,
+          "  SSM_CONV": 1140,
+          "       ADD": 5214,
+          "     SCALE": 3744,
+          "  RMS_NORM": 3066,
+          "    REPEAT": 720,
+          "  SOFT_MAX": 1002,
+          "   ARGSORT": 288,
+          "  GET_ROWS": 858,
+          "  SUM_ROWS": 1134,
+          "       DIV": 1134,
+          "MUL_MAT_ID": 576,
+          "      TANH": 1734,
+          "      FILL": 1410,
+          "       SQR": 846,
+          "      SQRT": 846,
+          "     CLAMP": 852,
+          "  SET_ROWS": 564,
+          "       PAD": 282,
+          "       SUB": 858,
+          "       LOG": 6
+        }
+      },
+      "prefill:CPU": {
+        "assignment_rows": 15498,
+        "ops": {
+          "      CONT": 1052,
+          "   MUL_MAT": 2130,
+          "   SIGMOID": 288,
+          "       MUL": 1702,
+          "    CONCAT": 1092,
+          "       CPY": 476,
+          "  SSM_CONV": 380,
+          "       ADD": 1738,
+          "     SCALE": 1248,
+          "  RMS_NORM": 1022,
+          "    REPEAT": 240,
+          "  SOFT_MAX": 334,
+          "   ARGSORT": 96,
+          "  GET_ROWS": 286,
+          "  SUM_ROWS": 378,
+          "       DIV": 378,
+          "MUL_MAT_ID": 192,
+          "      TANH": 578,
+          "      FILL": 470,
+          "       SQR": 282,
+          "      SQRT": 282,
+          "     CLAMP": 284,
+          "  SET_ROWS": 188,
+          "       PAD": 94,
+          "       SUB": 286,
+          "       LOG": 2
+        }
+      },
+      "decode_single:CPU": {
+        "assignment_rows": 15498,
+        "ops": {
+          "      CONT": 1052,
+          "   MUL_MAT": 2130,
+          "   SIGMOID": 288,
+          "       MUL": 1702,
+          "    CONCAT": 1092,
+          "       CPY": 476,
+          "  SSM_CONV": 380,
+          "       ADD": 1738,
+          "     SCALE": 1248,
+          "  RMS_NORM": 1022,
+          "    REPEAT": 240,
+          "  SOFT_MAX": 334,
+          "   ARGSORT": 96,
+          "  GET_ROWS": 286,
+          "  SUM_ROWS": 378,
+          "       DIV": 378,
+          "MUL_MAT_ID": 192,
+          "      TANH": 578,
+          "      FILL": 470,
+          "       SQR": 282,
+          "      SQRT": 282,
+          "     CLAMP": 284,
+          "  SET_ROWS": 188,
+          "       PAD": 94,
+          "       SUB": 286,
+          "       LOG": 2
+        }
+      }
+    },
+    "gpu_assignment_examples": {},
+    "cpu_state_allocations": [
+      "llama_kv_cache:        CPU KV buffer size =  2048.00 MiB",
+      "llama_kv_cache:        CPU KV buffer size =   200.00 MiB",
+      "llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB"
+    ],
+    "interpretation": "Scheduler assignment rows, not hardware events. Outside-phase rows are graph reservations. Warmup and measured passes are combined. CPU-only decode claim requires actual decode assignment evidence and source batch gates."
+  },
+  {
+    "label": "gdown6-b1",
+    "graph_assignment_rows": {
+      "reservation_or_outside:CPU": {
+        "assignment_rows": 46392,
+        "ops": {
+          "      CONT": 3156,
+          "   MUL_MAT": 6390,
+          "   SIGMOID": 858,
+          "       MUL": 5088,
+          "    CONCAT": 3270,
+          "       CPY": 1428,
+          "  SSM_CONV": 1140,
+          "       ADD": 5172,
+          "     SCALE": 3732,
+          "  RMS_NORM": 3066,
+          "    REPEAT": 720,
+          "  SOFT_MAX": 1002,
+          "   ARGSORT": 288,
+          "  GET_ROWS": 858,
+          "  SUM_ROWS": 1134,
+          "       DIV": 1134,
+          "MUL_MAT_ID": 570,
+          "      TANH": 1722,
+          "      FILL": 1410,
+          "       SQR": 846,
+          "      SQRT": 846,
+          "     CLAMP": 852,
+          "  SET_ROWS": 564,
+          "       PAD": 282,
+          "       SUB": 858,
+          "       LOG": 6
+        }
+      },
+      "reservation_or_outside:Vulka": {
+        "assignment_rows": 102,
+        "ops": {
+          "      TANH": 12,
+          "     SCALE": 12,
+          "   SIGMOID": 6,
+          "       MUL": 18,
+          "MUL_MAT_ID": 6,
+          "       ADD": 42,
+          "    CONCAT": 6
+        }
+      },
+      "prefill:CPU": {
+        "assignment_rows": 15396,
+        "ops": {
+          "      CONT": 1052,
+          "   MUL_MAT": 2130,
+          "   SIGMOID": 282,
+          "       MUL": 1684,
+          "    CONCAT": 1086,
+          "       CPY": 476,
+          "  SSM_CONV": 380,
+          "       ADD": 1696,
+          "     SCALE": 1236,
+          "  RMS_NORM": 1022,
+          "    REPEAT": 240,
+          "  SOFT_MAX": 334,
+          "   ARGSORT": 96,
+          "  GET_ROWS": 286,
+          "  SUM_ROWS": 378,
+          "       DIV": 378,
+          "MUL_MAT_ID": 186,
+          "      TANH": 566,
+          "      FILL": 470,
+          "       SQR": 282,
+          "      SQRT": 282,
+          "     CLAMP": 284,
+          "  SET_ROWS": 188,
+          "       PAD": 94,
+          "       SUB": 286,
+          "       LOG": 2
+        }
+      },
+      "prefill:Vulka": {
+        "assignment_rows": 102,
+        "ops": {
+          "      TANH": 12,
+          "     SCALE": 12,
+          "   SIGMOID": 6,
+          "       MUL": 18,
+          "MUL_MAT_ID": 6,
+          "       ADD": 42,
+          "    CONCAT": 6
+        }
+      },
+      "decode_single:CPU": {
+        "assignment_rows": 15498,
+        "ops": {
+          "      CONT": 1052,
+          "   MUL_MAT": 2130,
+          "   SIGMOID": 288,
+          "       MUL": 1702,
+          "    CONCAT": 1092,
+          "       CPY": 476,
+          "  SSM_CONV": 380,
+          "       ADD": 1738,
+          "     SCALE": 1248,
+          "  RMS_NORM": 1022,
+          "    REPEAT": 240,
+          "  SOFT_MAX": 334,
+          "   ARGSORT": 96,
+          "  GET_ROWS": 286,
+          "  SUM_ROWS": 378,
+          "       DIV": 378,
+          "MUL_MAT_ID": 192,
+          "      TANH": 578,
+          "      FILL": 470,
+          "       SQR": 282,
+          "      SQRT": 282,
+          "     CLAMP": 284,
+          "  SET_ROWS": 188,
+          "       PAD": 94,
+          "       SUB": 286,
+          "       LOG": 2
+        }
+      }
+    },
+    "gpu_assignment_examples": {
+      "reservation_or_outside": [
+        {
+          "op": "      TANH",
+          "tensor": "node_1396",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "     SCALE",
+          "tensor": "node_1397",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "   SIGMOID",
+          "tensor": "node_1398",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "       MUL",
+          "tensor": "node_1399",
+          "assignment": "Vulka"
+        }
+      ],
+      "prefill": [
+        {
+          "op": "      TANH",
+          "tensor": "node_1396",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "     SCALE",
+          "tensor": "node_1397",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "   SIGMOID",
+          "tensor": "node_1398",
+          "assignment": "Vulka"
+        },
+        {
+          "op": "       MUL",
+          "tensor": "node_1399",
+          "assignment": "Vulka"
+        }
+      ]
+    },
+    "cpu_state_allocations": [
+      "llama_kv_cache:        CPU KV buffer size =  2048.00 MiB",
+      "llama_kv_cache:        CPU KV buffer size =   200.00 MiB",
+      "llama_memory_recurrent:        CPU RS buffer size =     3.66 MiB"
+    ],
+    "interpretation": "Scheduler assignment rows, not hardware events. Outside-phase rows are graph reservations. Warmup and measured passes are combined. CPU-only decode claim requires actual decode assignment evidence and source batch gates."
+  }
+]

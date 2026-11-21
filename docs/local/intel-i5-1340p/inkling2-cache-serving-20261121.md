@@ -11,3 +11,7 @@ Native23.25GiB/zero-swap/16CPU limits and the separate full-backing/RSS/2GiB-res
 Current unit/container: inkling2-mini-cache768-webui-20261121 (transient,Restart=no). For deliberate rollback, wait until slots are idle, stop that unit, then run rollback.sh from tmp/llama-cpp/runs/inkling-cache-serving-20261121-1dadee62b. It restores inkling2-mini-simd-webui-20261121/cache256 and checks identity,limits,UI,argv and READY. Do not rerun one-shot cutover scripts. Native crash respawn and populated64K remain unqualified.
 
 GPU diagnostics are experimental and not deployed. The old queued screen/controller was held because it restores cache256; adapt its parent before resuming. Preserve all source/model/closure/failure evidence. Global model defaults are unchanged.
+
+## GPU follow-up, 21 November 2026
+
+The new cache768-targeted controllers completed two profiler-off placement screens and restored the accepted CPU service. Expert-group and dense-attention prefill were 23.24% and 16.54% slower respectively at 512/64 (two observations each, no counterbalanced conclusion). [Evidence and retained opportunities](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/gpu-research/README.md). No GPU serving/default/push/boot change.
