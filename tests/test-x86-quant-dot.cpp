@@ -24,7 +24,7 @@ static int test_dot(ggml_type lhs, ggml_type rhs, const char * name) {
     }
 
     std::vector<int> sizes;
-    for (int n : {32, 64, 96, 128, 256, 4096, 8192}) {
+    for (int n : {32, 64, 96, 128, 256, 1152, 2304, 4096, 8192}) {
         if (n % lhs_traits->blck_size == 0 && n % rhs_traits->blck_size == 0) {
             sizes.push_back(n);
         }
@@ -55,6 +55,34 @@ static int test_dot(ggml_type lhs, ggml_type rhs, const char * name) {
         if (!(err < 1e-4f)) {
             std::fprintf(stderr, "%s dot mismatch n=%d got=%g ref=%g err/n=%g\n", name, n, got, ref, err);
             return 1;
+        }
+    }
+    return 0;
+}
+
+static int test_iq4_nl_codes() {
+    static const int values[] = {-127, -104, -83, -65, -49, -35, -22, -10, 1, 13, 25, 38, 53, 69, 89, 113};
+    const auto dot = ggml_get_type_traits_cpu(GGML_TYPE_IQ4_NL)->vec_dot;
+    for (int code = 0; code < 16; ++code) {
+        for (int lane = 0; lane < 64; ++lane) {
+            for (int sign : {-127, 127}) {
+                block_iq4_nl x[2] = {};
+                block_q8_0 y[2] = {};
+                for (int b = 0; b < 2; ++b) {
+                    x[b].d = ggml_fp32_to_fp16(1.0f);
+                    y[b].d = ggml_fp32_to_fp16(1.0f);
+                }
+                const int b = lane / 32;
+                const int j = lane % 32;
+                x[b].qs[j % 16] = code << (j < 16 ? 0 : 4);
+                y[b].qs[j] = sign;
+                float got = 0;
+                dot(64, &got, 0, x, 0, y, 0, 1);
+                if (got != values[code] * sign) {
+                    std::fprintf(stderr, "iq4_nl code/lane mismatch code=%d lane=%d sign=%d got=%g\n", code, lane, sign, got);
+                    return 1;
+                }
+            }
         }
     }
     return 0;
@@ -149,6 +177,9 @@ static int test_tq2_f32_dot() {
 
 int main() {
     ggml_cpu_init();
+    if (int rc = test_iq4_nl_codes()) {
+        return rc;
+    }
     if (int rc = test_tq2_f32_dot()) {
         return rc;
     }
@@ -159,6 +190,9 @@ int main() {
         return rc;
     }
     if (int rc = test_dot(GGML_TYPE_Q1_0, GGML_TYPE_Q8_0, "q1_0*q8_0")) {
+        return rc;
+    }
+    if (int rc = test_dot(GGML_TYPE_IQ4_NL, GGML_TYPE_Q8_0, "iq4_nl*q8_0")) {
         return rc;
     }
     if (int rc = test_dot(GGML_TYPE_Q4_0, GGML_TYPE_Q8_0, "q4_0*q8_0")) {
