@@ -5,6 +5,7 @@
 #include "../src/llama-model-saver.h"
 #include "../src/llama-context.h"
 #include "../src/llama-model.h"
+#include "../src/llama-moe-copy.h"
 #include "../src/llama-io.h"
 #include "../src/llama-kv-cache-iswa.h"
 #include <vector>
@@ -93,6 +94,28 @@ int main(int argc,char ** argv){
     auto mp=llama_model_default_params();mp.n_gpu_layers=0;mp.load_mtp=qwen_mtp;
     using model_owner=std::unique_ptr<llama_model,decltype(&llama_model_free)>;
     model_owner model(llama_model_init_from_user(meta,fill,nullptr,mp),llama_model_free);gguf_free(meta);GGML_ASSERT(model);
+    {
+        GGML_ASSERT(model->layers.size() >= 2);
+        const auto first = model->layers[0], second = model->layers[1];
+        auto * probe = model->tok_embd;
+        GGML_ASSERT(probe && !llama_moe_weight_is_shared(*model, nullptr));
+        GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
+        ggml_tensor * llama_layer::* roles[] = {&llama_layer::ffn_gate_exps, &llama_layer::ffn_up_exps,
+                &llama_layer::ffn_down_exps, &llama_layer::ffn_gate_up_exps};
+        for (auto role : roles) {
+            model->layers[0].*role = probe;
+            GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
+            model->layers[1].*role = probe;
+            GGML_ASSERT(llama_moe_weight_is_shared(*model, probe));
+            model->layers[0] = first; model->layers[1] = second;
+        }
+        model->layers[0].ffn_gate_exps = probe; model->layers[0].ffn_up_exps = probe;
+        GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
+        model->layers[1].ffn_down_exps = probe;
+        GGML_ASSERT(llama_moe_weight_is_shared(*model, probe));
+        model->layers[0] = first; model->layers[1] = second;
+        std::puts("PASS shared expert tensor: null/unrelated/unique/shared/cross-role, model restored");
+    }
     model_owner gpu(nullptr,llama_model_free);
     if(qwen_destination || nemotron_destination){
         auto pending_cp=llama_context_default_params();pending_cp.n_ctx=32;pending_cp.n_batch=32;pending_cp.n_ubatch=32;pending_cp.n_seq_max=1;pending_cp.n_rs_seq=3;pending_cp.n_threads=2;pending_cp.n_threads_batch=2;pending_cp.type_k=GGML_TYPE_F16;pending_cp.type_v=GGML_TYPE_F16;pending_cp.offload_kqv=false;pending_cp.op_offload=false;pending_cp.kv_handoff_strict=true;pending_cp.kv_handoff_destination=true;
