@@ -1,0 +1,336 @@
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=1
+REPLAY_PHASE begin tokens=128 pos=0
+SCHED_RUN backend=CPU split=0 nodes=1396 async_cpu=0 status=0 call_us=1171674
+SCHED_SYNC backend=Vulkan0 call_us=3
+SCHED_COPY name=node_1395 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=1008 api_us=1001
+SCHED_SYNC backend=Vulkan0 call_us=27651
+SCHED_COPY name=ffn_moe_gate-6 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=27679 api_us=22
+SCHED_RUN backend=Vulkan0 split=1 nodes=5 async_cpu=0 status=0 call_us=8524
+SCHED_SYNC backend=Vulkan0 call_us=490
+SCHED_RUN backend=CPU split=2 nodes=1 async_cpu=0 status=0 call_us=722
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=node_1401 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=32 api_us=31
+SCHED_RUN backend=Vulkan0 split=3 nodes=3 async_cpu=0 status=0 call_us=4539
+SCHED_ROUTE name=ffn_moe_topk-6 n0=8 n1=128 nb0=4 nb1=512 mask=11101111111100011011111011111111100111111010111111100111011110110011111111101110111101001111110111011111111011010101111110011110
+SCHED_SYNC backend=Vulkan0 call_us=462
+SCHED_COPY name=ffn_moe_topk-6 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=857 api_us=384
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=ffn_moe_weights_scaled-6 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=4 api_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=5 api_us=5
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=blk.6.ffn_down_exps.weight src=CPU_Mapped dst=Vulkan0 bytes=191102976 path=sync_fallback total_us=24773 api_us=24770
+SCHED_BANK split=4 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-6#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=4 nodes=23 async_cpu=0 status=0 call_us=107319
+SCHED_SYNC backend=Vulkan0 call_us=755
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1826 api_us=1056
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_1425 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=977 api_us=964
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=ffn_moe_out-6 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=784 api_us=777
+SCHED_RUN backend=CPU split=5 nodes=2592 async_cpu=0 status=0 call_us=1220377
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_4019 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=48 api_us=41
+SCHED_SYNC backend=Vulkan0 call_us=803
+SCHED_COPY name=ffn_moe_gate-24 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=818 api_us=12
+SCHED_RUN backend=Vulkan0 split=6 nodes=5 async_cpu=0 status=0 call_us=2660
+SCHED_SYNC backend=Vulkan0 call_us=388
+SCHED_RUN backend=CPU split=7 nodes=1 async_cpu=0 status=0 call_us=705
+SCHED_SYNC backend=Vulkan0 call_us=2
+SCHED_COPY name=node_4025 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=43 api_us=41
+SCHED_RUN backend=Vulkan0 split=8 nodes=3 async_cpu=0 status=0 call_us=2086
+SCHED_ROUTE name=ffn_moe_topk-24 n0=8 n1=128 nb0=4 nb1=512 mask=11101011111100111011111101110111101111011111111111111101000110110010110111001110101101101111111110011111111011111111111111011110
+SCHED_SYNC backend=Vulkan0 call_us=541
+SCHED_COPY name=ffn_moe_topk-24 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=584 api_us=10
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=ffn_moe_weights_scaled-24 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=3 api_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=5 api_us=4
+SCHED_BANK split=9 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-24#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=9 nodes=23 async_cpu=0 status=0 call_us=83991
+SCHED_SYNC backend=Vulkan0 call_us=367
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1185 api_us=815
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=node_4049 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=660 api_us=658
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=ffn_moe_out-24 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=589 api_us=587
+SCHED_RUN backend=CPU split=10 nodes=3390 async_cpu=0 status=0 call_us=1351141
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_7441 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=50 api_us=43
+SCHED_SYNC backend=Vulkan0 call_us=946
+SCHED_COPY name=ffn_moe_gate-36 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=957 api_us=9
+SCHED_RUN backend=Vulkan0 split=11 nodes=5 async_cpu=0 status=0 call_us=2702
+SCHED_SYNC backend=Vulkan0 call_us=377
+SCHED_RUN backend=CPU split=12 nodes=1 async_cpu=0 status=0 call_us=692
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=node_7447 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=16 api_us=13
+SCHED_RUN backend=Vulkan0 split=13 nodes=3 async_cpu=0 status=0 call_us=2049
+SCHED_ROUTE name=ffn_moe_topk-36 n0=8 n1=128 nb0=4 nb1=512 mask=11101111111001111111111111110111100111011011111111101110001110110010111111101110101100101111110110011110111011011111101111011110
+SCHED_SYNC backend=Vulkan0 call_us=345
+SCHED_COPY name=ffn_moe_topk-36 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=360 api_us=6
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=ffn_moe_weights_scaled-36 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=2 api_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=3 api_us=3
+SCHED_BANK split=14 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-36#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=14 nodes=23 async_cpu=0 status=0 call_us=95617
+SCHED_SYNC backend=Vulkan0 call_us=371
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1211 api_us=836
+SCHED_SYNC backend=Vulkan0 call_us=2
+SCHED_COPY name=node_7471 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=834 api_us=828
+SCHED_SYNC backend=Vulkan0 call_us=2
+SCHED_COPY name=ffn_moe_out-36 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=878 api_us=871
+SCHED_RUN backend=CPU split=15 nodes=4496 async_cpu=0 status=0 call_us=2038476
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=58 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=4
+REPLAY_PHASE end tokens=128 pos=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=128
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=120048
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=4
+REPLAY_PHASE end tokens=1 pos=128
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=129
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=119123
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=57 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=129
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=130
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=119019
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=130
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=131
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=120110
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=61 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=131
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=132
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=118666
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=60 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=132
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=133
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=139034
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=59 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=3
+REPLAY_PHASE end tokens=1 pos=133
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=134
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=153835
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=134
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=135
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=132449
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=55 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=135
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=128 pos=0
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_RUN backend=CPU split=0 nodes=1396 async_cpu=0 status=0 call_us=702811
+SCHED_SYNC backend=Vulkan0 call_us=3
+SCHED_COPY name=node_1395 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=57 api_us=50
+SCHED_SYNC backend=Vulkan0 call_us=1496
+SCHED_COPY name=ffn_moe_gate-6 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=1509 api_us=9
+SCHED_RUN backend=Vulkan0 split=1 nodes=5 async_cpu=0 status=0 call_us=3465
+SCHED_SYNC backend=Vulkan0 call_us=359
+SCHED_RUN backend=CPU split=2 nodes=1 async_cpu=0 status=0 call_us=686
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=node_1401 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=19 api_us=16
+SCHED_RUN backend=Vulkan0 split=3 nodes=3 async_cpu=0 status=0 call_us=2372
+SCHED_ROUTE name=ffn_moe_topk-6 n0=8 n1=128 nb0=4 nb1=512 mask=11101111111100011011111011111111100111111010111111100111011110110011111111101110111101001111110111011111111011010101111110011110
+SCHED_SYNC backend=Vulkan0 call_us=325
+SCHED_COPY name=ffn_moe_topk-6 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=342 api_us=5
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=ffn_moe_weights_scaled-6 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=2 api_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=3 api_us=2
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=blk.6.ffn_down_exps.weight src=CPU_Mapped dst=Vulkan0 bytes=191102976 path=sync_fallback total_us=10870 api_us=10867
+SCHED_BANK split=4 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-6#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=4 nodes=23 async_cpu=0 status=0 call_us=80636
+SCHED_SYNC backend=Vulkan0 call_us=739
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1788 api_us=1038
+SCHED_SYNC backend=Vulkan0 call_us=2
+SCHED_COPY name=node_1425 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=572 api_us=565
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=ffn_moe_out-6 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=558 api_us=552
+SCHED_RUN backend=CPU split=5 nodes=2592 async_cpu=0 status=0 call_us=1418106
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_4019 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=46 api_us=40
+SCHED_SYNC backend=Vulkan0 call_us=1321
+SCHED_COPY name=ffn_moe_gate-24 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=1331 api_us=7
+SCHED_RUN backend=Vulkan0 split=6 nodes=5 async_cpu=0 status=0 call_us=2652
+SCHED_SYNC backend=Vulkan0 call_us=383
+SCHED_RUN backend=CPU split=7 nodes=1 async_cpu=0 status=0 call_us=783
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=node_4025 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=16 api_us=13
+SCHED_RUN backend=Vulkan0 split=8 nodes=3 async_cpu=0 status=0 call_us=1912
+SCHED_ROUTE name=ffn_moe_topk-24 n0=8 n1=128 nb0=4 nb1=512 mask=11101011111100111011111101110111101111011111111111111101000110110010110111001110101101101111111110011111111011111111111111011110
+SCHED_SYNC backend=Vulkan0 call_us=299
+SCHED_COPY name=ffn_moe_topk-24 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=314 api_us=7
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name=ffn_moe_weights_scaled-24 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=2 api_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=3 api_us=2
+SCHED_BANK split=9 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-24#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=9 nodes=23 async_cpu=0 status=0 call_us=83804
+SCHED_SYNC backend=Vulkan0 call_us=832
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1618 api_us=773
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_4049 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=814 api_us=803
+SCHED_SYNC backend=Vulkan0 call_us=3
+SCHED_COPY name=ffn_moe_out-24 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=667 api_us=657
+SCHED_RUN backend=CPU split=10 nodes=3390 async_cpu=0 status=0 call_us=1307099
+SCHED_SYNC backend=Vulkan0 call_us=3
+SCHED_COPY name=node_7441 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=49 api_us=41
+SCHED_SYNC backend=Vulkan0 call_us=1339
+SCHED_COPY name=ffn_moe_gate-36 src=Vulkan_Host dst=Vulkan0 bytes=9432576 path=async_api total_us=1350 api_us=9
+SCHED_RUN backend=Vulkan0 split=11 nodes=5 async_cpu=0 status=0 call_us=2922
+SCHED_SYNC backend=Vulkan0 call_us=391
+SCHED_RUN backend=CPU split=12 nodes=1 async_cpu=0 status=0 call_us=740
+SCHED_SYNC backend=Vulkan0 call_us=2
+SCHED_COPY name=node_7447 src=Vulkan_Host dst=Vulkan0 bytes=4718592 path=async_api total_us=20 api_us=17
+SCHED_RUN backend=Vulkan0 split=13 nodes=3 async_cpu=0 status=0 call_us=2084
+SCHED_ROUTE name=ffn_moe_topk-36 n0=8 n1=128 nb0=4 nb1=512 mask=11101111111001111111111111110111100111011011111111101110001110110010111111101110101100101111110110011110111011011111101111011110
+SCHED_SYNC backend=Vulkan0 call_us=332
+SCHED_COPY name=ffn_moe_topk-36 src=Vulkan_Host dst=Vulkan0 bytes=65056 path=async_api total_us=363 api_us=7
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_COPY name=ffn_moe_weights_scaled-36 src=Vulkan_Host dst=Vulkan0 bytes=4096 path=async_api total_us=2 api_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_COPY name= (view) (reshaped) (view) src=Vulkan_Host dst=Vulkan0 bytes=27648 path=async_api total_us=3 api_us=3
+SCHED_BANK split=14 weight=Vulkan0#blk.6.ffn_down_exps.weight#0 ids=Vulkan0#ffn_moe_topk-36#0 buffer=0x2352ff90 data=0x481000 bytes=191102976
+SCHED_RUN backend=Vulkan0 split=14 nodes=23 async_cpu=0 status=0 call_us=95728
+SCHED_SYNC backend=Vulkan0 call_us=800
+SCHED_COPY name= (view) src=Vulkan0 dst=Vulkan_Host bytes=1206784 path=sync_fallback total_us=1651 api_us=838
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=node_7471 src=Vulkan0 dst=Vulkan_Host bytes=1207296 path=sync_fallback total_us=831 api_us=818
+SCHED_SYNC backend=Vulkan0 call_us=4
+SCHED_COPY name=ffn_moe_out-36 src=Vulkan0 dst=Vulkan_Host bytes=1179648 path=sync_fallback total_us=735 api_us=723
+SCHED_RUN backend=CPU split=15 nodes=4496 async_cpu=0 status=0 call_us=2027561
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=73 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=3
+REPLAY_PHASE end tokens=128 pos=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=128
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=121651
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=128
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=129
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=185290
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=44 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=4
+REPLAY_PHASE end tokens=1 pos=129
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=130
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=136027
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=67 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=130
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=131
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=152621
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=58 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=4
+REPLAY_PHASE end tokens=1 pos=131
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=132
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=119859
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=55 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=132
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=133
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=120841
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=133
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=134
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=119828
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=56 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=2
+REPLAY_PHASE end tokens=1 pos=134
+SCHED_SYNC backend=Vulkan0 call_us=0
+SCHED_SYNC backend=Vulkan0 call_us=0
+REPLAY_PHASE begin tokens=1 pos=135
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-6 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-24 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_BANK split=0 weight=blk.6.ffn_down_exps.weight ids=ffn_moe_topk-36 buffer=0x23371d50 data=0x7fa5de1ad620 bytes=191102976
+SCHED_RUN backend=CPU split=0 nodes=11970 async_cpu=0 status=0 call_us=122260
+SCHED_GET backend=CPU name=result_output offset=0 bytes=800232 api_us=111 native_async=0
+SCHED_SYNC backend=Vulkan0 call_us=4
+REPLAY_PHASE end tokens=1 pos=135
+SCHED_SYNC backend=Vulkan0 call_us=1
+SCHED_SYNC backend=Vulkan0 call_us=0
+BENCH_RESULT rep=0 prompt=128 generated=8 pp_ms=5767.386 tg_ms=1085.498 pp_tps=22.193763 tg_tps=7.369889 wall_ms=6864.199 hash=14218288031509138399 finite=1
+LOGITS_HASH rep=0 hash=1306955748314143874
+SCHED_SYNC backend=Vulkan0 call_us=0
+RESULT PASS finite replay

@@ -1,0 +1,281 @@
+diff --git a/ggml/src/ggml-backend.cpp b/ggml/src/ggml-backend.cpp
+index 1132c48b2..dee294db2 100644
+--- a/ggml/src/ggml-backend.cpp
++++ b/ggml/src/ggml-backend.cpp
+@@ -11,6 +11,7 @@
+ #include "ggml-backend.h"
+ #include "ggml-prefetch-budget.h"
+ #include "ggml-backend-impl.h"
++#include "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/route-coverage/route-mask.h"
+ #include "ggml-alloc.h"
+ #include "ggml-impl.h"
+ 
+@@ -469,12 +470,19 @@ void ggml_backend_tensor_set_async(ggml_backend_t backend, struct ggml_tensor *
+     GGML_ASSERT(tensor->data != NULL && "tensor not allocated");
+     GGML_ASSERT(offset + size <= ggml_nbytes(tensor) && "tensor write out of bounds");
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     if (backend->iface.set_tensor_async == NULL) {
+         ggml_backend_synchronize(backend);
+         ggml_backend_tensor_set(tensor, data, offset, size);
+     } else {
+         backend->iface.set_tensor_async(backend, tensor, data, offset, size);
+     }
++    if (profile) {
++        fprintf(stderr, "SCHED_SET backend=%s name=%s offset=%zu bytes=%zu api_us=%lld native_async=%d\n",
++                ggml_backend_name(backend), tensor->name, offset, size, (long long) (ggml_time_us() - start),
++                (int) (backend->iface.set_tensor_async != NULL));
++    }
+ }
+ 
+ void ggml_backend_tensor_get_async(ggml_backend_t backend, const struct ggml_tensor * tensor, void * data, size_t offset, size_t size) {
+@@ -483,12 +491,19 @@ void ggml_backend_tensor_get_async(ggml_backend_t backend, const struct ggml_ten
+     GGML_ASSERT(tensor->data != NULL && "tensor not allocated");
+     GGML_ASSERT(offset + size <= ggml_nbytes(tensor) && "tensor read out of bounds");
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     if (backend->iface.get_tensor_async == NULL) {
+         ggml_backend_synchronize(backend);
+         ggml_backend_tensor_get(tensor, data, offset, size);
+     } else {
+         backend->iface.get_tensor_async(backend, tensor, data, offset, size);
+     }
++    if (profile) {
++        fprintf(stderr, "SCHED_GET backend=%s name=%s offset=%zu bytes=%zu api_us=%lld native_async=%d\n",
++                ggml_backend_name(backend), tensor->name, offset, size, (long long) (ggml_time_us() - start),
++                (int) (backend->iface.get_tensor_async != NULL));
++    }
+ }
+ 
+ void ggml_backend_tensor_set_2d_async(ggml_backend_t backend, struct ggml_tensor * tensor, const void * data, size_t offset, size_t size,
+@@ -777,7 +792,12 @@ void ggml_backend_synchronize(ggml_backend_t backend) {
+         return;
+     }
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     backend->iface.synchronize(backend);
++    if (profile) {
++        fprintf(stderr, "SCHED_SYNC backend=%s call_us=%lld\n", ggml_backend_name(backend), (long long) (ggml_time_us() - start));
++    }
+ }
+ 
+ ggml_backend_graph_plan_t ggml_backend_graph_plan_create(ggml_backend_t backend, struct ggml_cgraph * cgraph) {
+@@ -2512,10 +2532,38 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+     ggml_backend_t input_backend = ggml_backend_sched_get_tensor_backend(sched, input);
+     struct ggml_tensor * input_cpy = tensor_copy(input, split_backend_id, sched->cur_copy);
+ 
++    struct copy_profile {
++        bool enabled;
++        const ggml_tensor * input;
++        const ggml_tensor * output;
++        const char * path = "async_api";
++        int64_t start = 0;
++        int64_t api_us = 0;
++        void begin_api() { if (enabled) api_us = -ggml_time_us(); }
++        void end_api() { if (enabled) api_us += ggml_time_us(); }
++        ~copy_profile() {
++            if (enabled) {
++                fprintf(stderr, "SCHED_COPY name=%s src=%s dst=%s bytes=%zu path=%s total_us=%lld api_us=%lld\n",
++                        input->name, ggml_backend_buffer_name(input->buffer), ggml_backend_buffer_name(output->buffer),
++                        ggml_nbytes(input), path, (long long) (ggml_time_us() - start), (long long) api_us);
++            }
++        }
++    } profile{getenv("GGML_SCHED_COPY_PROFILE") != nullptr, input, input_cpy};
++    if (profile.enabled) profile.start = ggml_time_us();
++
++    if (getenv("GGML_SCHED_ROUTE_PROFILE") && strncmp(input->name, "ffn_moe_topk-", 13) == 0) {
++        const ggml_tensor * base = input->view_src ? input->view_src : input;
++        GGML_ASSERT(base->buffer && ggml_backend_buffer_is_host(base->buffer));
++        char mask[129]; GGML_ASSERT(route_mask_128(*input, mask));
++        fprintf(stderr, "SCHED_ROUTE name=%s n0=%lld n1=%lld nb0=%zu nb1=%zu mask=%s\n", input->name,
++                (long long) input->ne[0], (long long) input->ne[1], input->nb[0], input->nb[1], mask);
++    }
++
+     // read before the previous split, wait for the copy only
+     if (split == &sched->splits[sched->prefetch_split]) {
+         for (int i = 0; i < sched->n_prefetched; i++) {
+             if (sched->prefetched[i] == input) {
++                profile.path = "prefetched_wait";
+                 ggml_backend_event_synchronize(sched->prefetch_events[sched->prefetch_backend_id]);
+                 return;
+             }
+@@ -2529,7 +2577,10 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+         } else {
+             ggml_backend_synchronize(split_backend);
+         }
++        profile.path = "sync_input";
++        profile.begin_api();
+         ggml_backend_tensor_copy(input, input_cpy);
++        profile.end_api();
+         return;
+     }
+ 
+@@ -2542,19 +2593,26 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+ 
+     if (sched->callback_copy != NULL && ggml_backend_sched_is_host_weight(input) &&
+         sched->callback_copy(split_backend, input, input_cpy, &split->graph, sched->callback_copy_user_data)) {
++        profile.path = "callback";
+         return;
+     }
+ 
+     // try async copy, but if not possible, we can still use a sync copy without synchronizing the dst backend, since we handle the synchronization here with multiple copies and events
+     // TODO: add public function to facilitate this, since applications do not have direct access to the backend interface
+-    if (!split_backend->iface.cpy_tensor_async || !split_backend->iface.cpy_tensor_async(input_backend, split_backend, input, input_cpy)) {
++    profile.begin_api();
++    const bool copied_async = split_backend->iface.cpy_tensor_async && split_backend->iface.cpy_tensor_async(input_backend, split_backend, input, input_cpy);
++    profile.end_api();
++    if (!copied_async) {
++        profile.path = "sync_fallback";
+         ggml_backend_synchronize(input_backend);
+         if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
+             ggml_backend_event_synchronize(sched->events[split_backend_id][sched->cur_copy]);
+         } else {
+             ggml_backend_synchronize(split_backend);
+         }
++        profile.begin_api();
+         ggml_backend_tensor_copy(input, input_cpy);
++        profile.end_api();
+     }
+ }
+ 
+@@ -2608,7 +2666,13 @@ static void ggml_backend_sched_prefetch_inputs(ggml_backend_sched_t sched, int s
+             return;
+         }
+ 
++        const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++        const int64_t start = profile ? ggml_time_us() : 0;
+         ggml_backend_tensor_get_async(backend, input, input_cpy->data, 0, ggml_nbytes(input));
++        if (profile) {
++            fprintf(stderr, "SCHED_PREFETCH name=%s src=%s bytes=%zu api_us=%lld\n", input->name,
++                    ggml_backend_name(backend), ggml_nbytes(input), (long long) (ggml_time_us() - start));
++        }
+         sched->prefetched[sched->n_prefetched++] = input;
+     }
+ 
+@@ -2759,6 +2823,17 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
+             }
+         }
+ 
++        if (getenv("GGML_SCHED_ROUTE_PROFILE")) {
++            for (int j = 0; j < split->graph.n_nodes; ++j) {
++                const ggml_tensor * node = split->graph.nodes[j];
++                if (node->op == GGML_OP_MUL_MAT_ID && strstr(node->src[0]->name, "blk.6.ffn_down_exps.weight")) {
++                    const ggml_tensor * bank = node->src[0];
++                    fprintf(stderr, "SCHED_BANK split=%d weight=%s ids=%s buffer=%p data=%p bytes=%zu\n", split_id,
++                            bank->name, node->src[2]->name, (void *) bank->buffer, bank->data, ggml_nbytes(bank));
++                }
++            }
++        }
++
+         if (!sched->callback_eval) {
+             const bool async_cpu_split = sched->async_cpu_enabled &&
+                     split_backend_id == sched->n_backends - 1 && split_prefetch_slot == -1 &&
+@@ -2775,7 +2850,14 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
+                 prev_backend_id = split_backend_id;
+                 continue;
+             }
++            const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++            const int64_t start = profile ? ggml_time_us() : 0;
+             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
++            if (profile) {
++                fprintf(stderr, "SCHED_RUN backend=%s split=%d nodes=%d async_cpu=%d status=%d call_us=%lld\n",
++                        ggml_backend_name(split_backend), split_id, split->graph.n_nodes, (int) sched->async_cpu_enabled,
++                        (int) ec, (long long) (ggml_time_us() - start));
++            }
+             if (split_prefetch_slot != -1) {
+                 // the kernels have captured the slot address at launch, safe to restore
+                 ggml_backend_event_record(sched->prefetch_free[split_prefetch_slot], split_backend);
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index d35a29001..2e93982c9 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -10,6 +10,7 @@
+ #include "llama-mmap.h"
+ #include "llama-model.h"
+ #include "llama-moe-cache.h"
++#include "llama-moe-copy.h"
+ #include "llama-ext.h"
+ #include "llama-sampler.h"
+ #include "llama.h"
+@@ -3325,6 +3326,11 @@ ggml_status llama_context::graph_compute(
+ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor * src, ggml_tensor * dst, ggml_cgraph * graph, void * user_data) {
+     auto * lctx = static_cast<llama_context *>(user_data);
+ 
++    // A later layer can route to experts absent from the first use of this bank.
++    if (llama_moe_weight_is_shared(lctx->model, src)) {
++        return false;
++    }
++
+     // the slot maps of the MoE cache
+     if (lctx->moe_cache && lctx->moe_cache->copy(backend, src, dst, graph)) {
+         return true;
+diff --git a/src/llama-moe-copy.h b/src/llama-moe-copy.h
+new file mode 100644
+index 000000000..77fd800fc
+--- /dev/null
++++ b/src/llama-moe-copy.h
+@@ -0,0 +1,20 @@
++#pragma once
++
++#include "llama-model.h"
++
++inline bool llama_moe_weight_is_shared(const llama_model & model, const ggml_tensor * weight) {
++    if (weight == nullptr) {
++        return false;
++    }
++    bool seen = false;
++    for (const auto & layer : model.layers) {
++        if (weight == layer.ffn_gate_exps || weight == layer.ffn_up_exps ||
++            weight == layer.ffn_down_exps || weight == layer.ffn_gate_up_exps) {
++            if (seen) {
++                return true;
++            }
++            seen = true;
++        }
++    }
++    return false;
++}
+diff --git a/tests/test-context-handoff.cpp b/tests/test-context-handoff.cpp
+index 82b5db360..7e8ac7ad4 100644
+--- a/tests/test-context-handoff.cpp
++++ b/tests/test-context-handoff.cpp
+@@ -5,6 +5,7 @@
+ #include "../src/llama-model-saver.h"
+ #include "../src/llama-context.h"
+ #include "../src/llama-model.h"
++#include "../src/llama-moe-copy.h"
+ #include "../src/llama-io.h"
+ #include "../src/llama-kv-cache-iswa.h"
+ #include <vector>
+@@ -93,6 +94,28 @@ int main(int argc,char ** argv){
+     auto mp=llama_model_default_params();mp.n_gpu_layers=0;mp.load_mtp=qwen_mtp;
+     using model_owner=std::unique_ptr<llama_model,decltype(&llama_model_free)>;
+     model_owner model(llama_model_init_from_user(meta,fill,nullptr,mp),llama_model_free);gguf_free(meta);GGML_ASSERT(model);
++    {
++        GGML_ASSERT(model->layers.size() >= 2);
++        const auto first = model->layers[0], second = model->layers[1];
++        auto * probe = model->tok_embd;
++        GGML_ASSERT(probe && !llama_moe_weight_is_shared(*model, nullptr));
++        GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
++        ggml_tensor * llama_layer::* roles[] = {&llama_layer::ffn_gate_exps, &llama_layer::ffn_up_exps,
++                &llama_layer::ffn_down_exps, &llama_layer::ffn_gate_up_exps};
++        for (auto role : roles) {
++            model->layers[0].*role = probe;
++            GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
++            model->layers[1].*role = probe;
++            GGML_ASSERT(llama_moe_weight_is_shared(*model, probe));
++            model->layers[0] = first; model->layers[1] = second;
++        }
++        model->layers[0].ffn_gate_exps = probe; model->layers[0].ffn_up_exps = probe;
++        GGML_ASSERT(!llama_moe_weight_is_shared(*model, probe));
++        model->layers[1].ffn_down_exps = probe;
++        GGML_ASSERT(llama_moe_weight_is_shared(*model, probe));
++        model->layers[0] = first; model->layers[1] = second;
++        std::puts("PASS shared expert tensor: null/unrelated/unique/shared/cross-role, model restored");
++    }
+     model_owner gpu(nullptr,llama_model_free);
+     if(qwen_destination || nemotron_destination){
+         auto pending_cp=llama_context_default_params();pending_cp.n_ctx=32;pending_cp.n_batch=32;pending_cp.n_ubatch=32;pending_cp.n_seq_max=1;pending_cp.n_rs_seq=3;pending_cp.n_threads=2;pending_cp.n_threads_batch=2;pending_cp.type_k=GGML_TYPE_F16;pending_cp.type_v=GGML_TYPE_F16;pending_cp.offload_kqv=false;pending_cp.op_offload=false;pending_cp.kv_handoff_strict=true;pending_cp.kv_handoff_destination=true;

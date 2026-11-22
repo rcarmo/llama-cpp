@@ -20,3 +20,8 @@ The new cache768-targeted controllers completed two profiler-off placement scree
 ## Copy/dispatch follow-up, 22 November
 
 The [bounded diagnostic](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/gpu-research/copy-dispatch-20261122/findings.md) spends5.069s in CPU backend calls and0.058s in copy/wait wrappers within5.402s of instrumented128-token prefill. No profiler-off speedup is inferred. Zero-cache still uses the expert-copy callback:146,324,992bytes/23ranges/98of128experts, not the entire191,102,976-byte bank. Later shared-loop route coverage is the next correctness gate. The logger-only fix and tests are retained locally; temporary scheduler hooks were removed. Exact cache768/native caps/API recovery passed; serving defaults and immutable binaries remain unchanged.
+
+
+## Shared expert-bank correction, 22 November
+
+[Routing evidence](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/gpu-research/shared-bank-coverage-20261122/findings.md) found13/10 unuploaded experts at later loop visits. Local source fix fea919c6d disables sparse copying for model expert tensors shared across layers; the existing full copy covers all128experts. Scoped tests and fixed128/8 coverage pass; broad GPU quality/serving remain unqualified. The live cache768 CPU/SIMD runtime and budgets are unchanged. Next target: retained CPU Q8_0/graph cost evidence, not another unchanged placement sweep.

@@ -1,0 +1,65 @@
+{
+  "fix_commit": "fea919c6d66be27f903d834deaa9ea997b41a922",
+  "primary_integrated": true,
+  "temporary_common_hooks_removed": true,
+  "production_runtime": "1dadee62b291391d7b6c230fa81f04a2358c6bf2",
+  "production_cache_mib": 768,
+  "profiler_off_repeats": 0,
+  "native_attempts_new": 2,
+  "source_tests": "12 scheduler cases, Vulkan queued-copy/lifetime/canary, route-mask unit, four synthetic shared-weight/handoff variants,10coverage parser checks and full-copy parser control",
+  "evidence": [
+    {
+      "dir": "profile-coverage",
+      "label": "g768-copy128-coverage-d1",
+      "raw_path": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/profile-coverage/g768-copy128-coverage-d1.native.log",
+      "sha256": "f9616350dfb9bce7c1839a15342ea84738a6871e99b19a7ce61d7e53e68cca38",
+      "bytes": 568030,
+      "complete": 0,
+      "restoration": 0
+    },
+    {
+      "dir": "profile-coverage-fixed",
+      "label": "g768-copy128-coverage-fixed-d1",
+      "raw_path": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/profile-coverage-fixed/g768-copy128-coverage-fixed-d1.native.log",
+      "sha256": "a5b1f320ccbd99fb4089f4fb4dc37fd130864c050e8c581b84e10440ddc930d1",
+      "bytes": 557833,
+      "complete": 0,
+      "restoration": 0
+    },
+    {
+      "file": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/shared-expert-fix/handoff-default.log",
+      "sha256": "a0ae433af9f8f8177ae99681791a662e8fe8ccef46e7a9a84a1681fe9152be75",
+      "bytes": 210925,
+      "purpose": "Synthetic shared expert metadata and handoff control",
+      "exit": 0
+    },
+    {
+      "file": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/shared-expert-fix/handoff-gemma.log",
+      "sha256": "271dbfc8c2c584bf0ffc6d75aad298b78b9c8a6912dc419cf259a26c74e7166e",
+      "bytes": 172594,
+      "purpose": "Synthetic shared expert metadata and handoff control",
+      "exit": 0
+    },
+    {
+      "file": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/shared-expert-fix/handoff-qwen.log",
+      "sha256": "6f3e1c3bf1b7cdd83937588aeeb2022176ee84307ee42868b246de1d8ae17533",
+      "bytes": 7871,
+      "purpose": "Synthetic shared expert metadata and handoff control",
+      "exit": 0
+    },
+    {
+      "file": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/shared-expert-fix/handoff-nemotron.log",
+      "sha256": "f6757b44b395af9c2e783a0556d7a198e82f60716de2646f09df3c249cc24f6c",
+      "bytes": 8366,
+      "purpose": "Synthetic shared expert metadata and handoff control",
+      "exit": 0
+    },
+    {
+      "file": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/route-coverage/timing.host.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "exit": 1,
+      "reason": "Separate route-mask unit include path omitted ggml/include; preserved, fixed in fresh build2; no model launched"
+    }
+  ]
+}
