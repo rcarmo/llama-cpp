@@ -1,0 +1,42 @@
+{
+  "purpose": "Measure Vulkan operator duration/dispatch for the retained down6 selector, not repeat a profiler-off performance screen.",
+  "source": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-gpu-cache768-20261121-1dadee62b/dense",
+  "controller_limits": {
+    "memory_bytes": 4294967296,
+    "swap": 0,
+    "cpu_max": "200000 100000"
+  },
+  "native_limits": {
+    "memory_bytes": 24964497408,
+    "swap": 0,
+    "cpu_max": "1600000 100000"
+  },
+  "native_runtime_seconds": 240,
+  "prompt": 128,
+  "decode": 8,
+  "reps": 1,
+  "excluded_full_warmup": 1,
+  "pattern": "^blk\\.6\\.ffn_down_exps\\.weight$",
+  "loggers": [
+    "GGML_VK_PERF_LOGGER",
+    "GGML_VK_SYNC_LOGGER",
+    "GGML_VK_MEMORY_LOGGER"
+  ],
+  "unchanged_runtime": false,
+  "new_builds": 2,
+  "exact_cache768_restoration": true,
+  "gap": "GPU timestamps do not expose CPU memcpy duration; copy bytes remain scheduler-derived until a direct counter is available.",
+  "production_runtime_unchanged": true,
+  "source_commit": "f07f44b9e7a6edae266861e497365bba1aae7a92",
+  "runtime_parent": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-cache-gpu-20261121-1dadee62b/closure-vulkan-simd-1dadee62b",
+  "runtime_overlay": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-copy-dispatch-20261122-2d079cf5b/logger-fix/closure-logger-fixed",
+  "changed_paths": [
+    "libggml-vulkan.so",
+    "libggml-vulkan.so.1",
+    "libggml-vulkan.so.1.0.0"
+  ],
+  "logger_frequency": 0,
+  "phase": "operator-profile128-fixed",
+  "arm": "g768-copy128-fixed-d1:down6",
+  "note": "Logger-only input drain is outside operator timestamps. Per-graph logs are phase-attributable. No profiler-off comparison or measured copy-latency claim."
+}

@@ -1,0 +1,29 @@
+{
+  "purpose": "Measure Vulkan operator duration/dispatch for the retained down6 selector, not repeat a profiler-off performance screen.",
+  "source": "/var/home/agent/workspace/tmp/llama-cpp/runs/inkling-gpu-cache768-20261121-1dadee62b/dense",
+  "controller_limits": {
+    "memory_bytes": 4294967296,
+    "swap": 0,
+    "cpu_max": "200000 100000"
+  },
+  "native_limits": {
+    "memory_bytes": 24964497408,
+    "swap": 0,
+    "cpu_max": "1600000 100000"
+  },
+  "native_runtime_seconds": 240,
+  "prompt": 128,
+  "decode": 8,
+  "reps": 1,
+  "excluded_full_warmup": 1,
+  "pattern": "^blk\\.6\\.ffn_down_exps\\.weight$",
+  "loggers": [
+    "GGML_VK_PERF_LOGGER",
+    "GGML_VK_SYNC_LOGGER",
+    "GGML_VK_MEMORY_LOGGER"
+  ],
+  "unchanged_runtime": true,
+  "new_builds": 0,
+  "exact_cache768_restoration": true,
+  "gap": "GPU timestamps do not expose CPU memcpy duration; copy bytes remain scheduler-derived until a direct counter is available."
+}

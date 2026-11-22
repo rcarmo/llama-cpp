@@ -1,0 +1,156 @@
+diff --git a/ggml/src/ggml-backend.cpp b/ggml/src/ggml-backend.cpp
+index 1132c48b2..cae049ebb 100644
+--- a/ggml/src/ggml-backend.cpp
++++ b/ggml/src/ggml-backend.cpp
+@@ -469,12 +469,19 @@ void ggml_backend_tensor_set_async(ggml_backend_t backend, struct ggml_tensor *
+     GGML_ASSERT(tensor->data != NULL && "tensor not allocated");
+     GGML_ASSERT(offset + size <= ggml_nbytes(tensor) && "tensor write out of bounds");
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     if (backend->iface.set_tensor_async == NULL) {
+         ggml_backend_synchronize(backend);
+         ggml_backend_tensor_set(tensor, data, offset, size);
+     } else {
+         backend->iface.set_tensor_async(backend, tensor, data, offset, size);
+     }
++    if (profile) {
++        fprintf(stderr, "SCHED_SET backend=%s name=%s offset=%zu bytes=%zu api_us=%lld native_async=%d\n",
++                ggml_backend_name(backend), tensor->name, offset, size, (long long) (ggml_time_us() - start),
++                (int) (backend->iface.set_tensor_async != NULL));
++    }
+ }
+ 
+ void ggml_backend_tensor_get_async(ggml_backend_t backend, const struct ggml_tensor * tensor, void * data, size_t offset, size_t size) {
+@@ -483,12 +490,19 @@ void ggml_backend_tensor_get_async(ggml_backend_t backend, const struct ggml_ten
+     GGML_ASSERT(tensor->data != NULL && "tensor not allocated");
+     GGML_ASSERT(offset + size <= ggml_nbytes(tensor) && "tensor read out of bounds");
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     if (backend->iface.get_tensor_async == NULL) {
+         ggml_backend_synchronize(backend);
+         ggml_backend_tensor_get(tensor, data, offset, size);
+     } else {
+         backend->iface.get_tensor_async(backend, tensor, data, offset, size);
+     }
++    if (profile) {
++        fprintf(stderr, "SCHED_GET backend=%s name=%s offset=%zu bytes=%zu api_us=%lld native_async=%d\n",
++                ggml_backend_name(backend), tensor->name, offset, size, (long long) (ggml_time_us() - start),
++                (int) (backend->iface.get_tensor_async != NULL));
++    }
+ }
+ 
+ void ggml_backend_tensor_set_2d_async(ggml_backend_t backend, struct ggml_tensor * tensor, const void * data, size_t offset, size_t size,
+@@ -777,7 +791,12 @@ void ggml_backend_synchronize(ggml_backend_t backend) {
+         return;
+     }
+ 
++    const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++    const int64_t start = profile ? ggml_time_us() : 0;
+     backend->iface.synchronize(backend);
++    if (profile) {
++        fprintf(stderr, "SCHED_SYNC backend=%s call_us=%lld\n", ggml_backend_name(backend), (long long) (ggml_time_us() - start));
++    }
+ }
+ 
+ ggml_backend_graph_plan_t ggml_backend_graph_plan_create(ggml_backend_t backend, struct ggml_cgraph * cgraph) {
+@@ -2512,10 +2531,30 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+     ggml_backend_t input_backend = ggml_backend_sched_get_tensor_backend(sched, input);
+     struct ggml_tensor * input_cpy = tensor_copy(input, split_backend_id, sched->cur_copy);
+ 
++    struct copy_profile {
++        bool enabled;
++        const ggml_tensor * input;
++        const ggml_tensor * output;
++        const char * path = "async_api";
++        int64_t start = 0;
++        int64_t api_us = 0;
++        void begin_api() { if (enabled) api_us = -ggml_time_us(); }
++        void end_api() { if (enabled) api_us += ggml_time_us(); }
++        ~copy_profile() {
++            if (enabled) {
++                fprintf(stderr, "SCHED_COPY name=%s src=%s dst=%s bytes=%zu path=%s total_us=%lld api_us=%lld\n",
++                        input->name, ggml_backend_buffer_name(input->buffer), ggml_backend_buffer_name(output->buffer),
++                        ggml_nbytes(input), path, (long long) (ggml_time_us() - start), (long long) api_us);
++            }
++        }
++    } profile{getenv("GGML_SCHED_COPY_PROFILE") != nullptr, input, input_cpy};
++    if (profile.enabled) profile.start = ggml_time_us();
++
+     // read before the previous split, wait for the copy only
+     if (split == &sched->splits[sched->prefetch_split]) {
+         for (int i = 0; i < sched->n_prefetched; i++) {
+             if (sched->prefetched[i] == input) {
++                profile.path = "prefetched_wait";
+                 ggml_backend_event_synchronize(sched->prefetch_events[sched->prefetch_backend_id]);
+                 return;
+             }
+@@ -2529,7 +2568,10 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+         } else {
+             ggml_backend_synchronize(split_backend);
+         }
++        profile.path = "sync_input";
++        profile.begin_api();
+         ggml_backend_tensor_copy(input, input_cpy);
++        profile.end_api();
+         return;
+     }
+ 
+@@ -2542,19 +2584,26 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
+ 
+     if (sched->callback_copy != NULL && ggml_backend_sched_is_host_weight(input) &&
+         sched->callback_copy(split_backend, input, input_cpy, &split->graph, sched->callback_copy_user_data)) {
++        profile.path = "callback";
+         return;
+     }
+ 
+     // try async copy, but if not possible, we can still use a sync copy without synchronizing the dst backend, since we handle the synchronization here with multiple copies and events
+     // TODO: add public function to facilitate this, since applications do not have direct access to the backend interface
+-    if (!split_backend->iface.cpy_tensor_async || !split_backend->iface.cpy_tensor_async(input_backend, split_backend, input, input_cpy)) {
++    profile.begin_api();
++    const bool copied_async = split_backend->iface.cpy_tensor_async && split_backend->iface.cpy_tensor_async(input_backend, split_backend, input, input_cpy);
++    profile.end_api();
++    if (!copied_async) {
++        profile.path = "sync_fallback";
+         ggml_backend_synchronize(input_backend);
+         if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
+             ggml_backend_event_synchronize(sched->events[split_backend_id][sched->cur_copy]);
+         } else {
+             ggml_backend_synchronize(split_backend);
+         }
++        profile.begin_api();
+         ggml_backend_tensor_copy(input, input_cpy);
++        profile.end_api();
+     }
+ }
+ 
+@@ -2608,7 +2657,13 @@ static void ggml_backend_sched_prefetch_inputs(ggml_backend_sched_t sched, int s
+             return;
+         }
+ 
++        const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++        const int64_t start = profile ? ggml_time_us() : 0;
+         ggml_backend_tensor_get_async(backend, input, input_cpy->data, 0, ggml_nbytes(input));
++        if (profile) {
++            fprintf(stderr, "SCHED_PREFETCH name=%s src=%s bytes=%zu api_us=%lld\n", input->name,
++                    ggml_backend_name(backend), ggml_nbytes(input), (long long) (ggml_time_us() - start));
++        }
+         sched->prefetched[sched->n_prefetched++] = input;
+     }
+ 
+@@ -2775,7 +2830,14 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
+                 prev_backend_id = split_backend_id;
+                 continue;
+             }
++            const bool profile = getenv("GGML_SCHED_COPY_PROFILE") != nullptr;
++            const int64_t start = profile ? ggml_time_us() : 0;
+             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
++            if (profile) {
++                fprintf(stderr, "SCHED_RUN backend=%s split=%d nodes=%d async_cpu=%d status=%d call_us=%lld\n",
++                        ggml_backend_name(split_backend), split_id, split->graph.n_nodes, (int) sched->async_cpu_enabled,
++                        (int) ec, (long long) (ggml_time_us() - start));
++            }
+             if (split_prefetch_slot != -1) {
+                 // the kernels have captured the slot address at launch, safe to restore
+                 ggml_backend_event_record(sched->prefetch_free[split_prefetch_slot], split_backend);

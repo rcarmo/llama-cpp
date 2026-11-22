@@ -15,3 +15,8 @@ GPU diagnostics are experimental and not deployed. The old queued screen/control
 ## GPU follow-up, 21 November 2026
 
 The new cache768-targeted controllers completed two profiler-off placement screens and restored the accepted CPU service. Expert-group and dense-attention prefill were 23.24% and 16.54% slower respectively at 512/64 (two observations each, no counterbalanced conclusion). [Evidence and retained opportunities](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/gpu-research/README.md). No GPU serving/default/push/boot change.
+
+
+## Copy/dispatch follow-up, 22 November
+
+The [bounded diagnostic](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/gpu-research/copy-dispatch-20261122/findings.md) spends5.069s in CPU backend calls and0.058s in copy/wait wrappers within5.402s of instrumented128-token prefill. No profiler-off speedup is inferred. Zero-cache still uses the expert-copy callback:146,324,992bytes/23ranges/98of128experts, not the entire191,102,976-byte bank. Later shared-loop route coverage is the next correctness gate. The logger-only fix and tests are retained locally; temporary scheduler hooks were removed. Exact cache768/native caps/API recovery passed; serving defaults and immutable binaries remain unchanged.
