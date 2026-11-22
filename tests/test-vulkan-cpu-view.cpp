@@ -125,7 +125,42 @@ int main() {
     ggml_backend_buffer_free(first_view); ggml_backend_buffer_free(first);
     ggml_backend_buffer_free(second); ggml_backend_buffer_free(second_view);
     ggml_backend_free(vk);
+
+    // Queue an input copy before profiling, then grow and reuse the query pool.
+    std::fputs("BEGIN: queued Vulkan input-copy regression\n", stderr);
+    vk = ggml_backend_vk_init(0);
+    auto copy_ctx = ggml_init({ 2 * 1024 * 1024, nullptr, true });
+    auto source = ggml_new_tensor_1d(copy_ctx, GGML_TYPE_F32, count);
+    auto copied = ggml_new_tensor_1d(copy_ctx, GGML_TYPE_F32, count);
+    auto doubled = ggml_scale(copy_ctx, copied, 2.0f);
+    auto small_graph = ggml_new_graph(copy_ctx);
+    ggml_build_forward_expand(small_graph, doubled);
+    auto chain = copied;
+    for (int i = 0; i < 128; ++i) {
+        chain = ggml_scale(copy_ctx, chain, i % 2 == 0 ? 2.0f : 0.5f);
+    }
+    auto large_graph = ggml_new_graph(copy_ctx);
+    ggml_build_forward_expand(large_graph, chain);
+    auto copy_buffer = ggml_backend_alloc_ctx_tensors(copy_ctx, vk);
+    GGML_ASSERT(copy_buffer);
+    std::vector<float> copy_input(count), copy_output(count);
+    for (int pass = 0; pass < 4; ++pass) {
+        for (size_t i = 0; i < count; ++i) copy_input[i] = float(int(i % 31) - 15 + pass);
+        ggml_backend_tensor_set(source, copy_input.data(), 0, count * sizeof(float));
+        ggml_backend_tensor_copy_async(vk, vk, source, copied);
+        auto active_graph = pass == 1 ? large_graph : small_graph;
+        auto active_output = pass == 1 ? chain : doubled;
+        GGML_ASSERT(ggml_backend_graph_compute_async(vk, active_graph) == GGML_STATUS_SUCCESS);
+        ggml_backend_synchronize(vk);
+        ggml_backend_tensor_get(active_output, copy_output.data(), 0, count * sizeof(float));
+        const float scale = pass == 1 ? 1.0f : 2.0f;
+        for (size_t i = 0; i < count; ++i) GGML_ASSERT(copy_output[i] == scale * copy_input[i]);
+    }
+    ggml_backend_buffer_free(copy_buffer);
+    ggml_free(copy_ctx);
+    ggml_backend_free(vk);
     ggml_backend_free(cpu);
+    std::puts("PASS: queued Vulkan input copies, exact results, small/large/small graph query-pool reuse");
     std::puts("PASS: F16 payload bytes, independent slot allocations, surrounding canaries, both buffer destruction orders");
     std::puts("PASS: range/alignment rejection, offset aliases, CPU buffer callbacks, allocation and backend lifetime, prefix canaries");
     return 0;

@@ -15476,6 +15476,10 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
     bool first_node_in_batch = true; // true if next node will be first node in a batch
     int submit_node_idx = 0; // index to first node in a batch
 
+    if (vk_perf_logger_enabled) {
+        // Complete input copies before reusing the profiler query pool.
+        ggml_vk_synchronize(ctx);
+    }
     ggml_vk_submit_transfer_ctx(ctx);
 
     vk_context compute_ctx;
