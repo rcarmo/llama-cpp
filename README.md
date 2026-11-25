@@ -14,7 +14,9 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 | Machine | Area | Status | Measured result |
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
-| LattePanda Sigma | Gemma 4 E4B QAT + MTP zero-copy, 32K | Primary boot deployment | 25.85 sustained decode tok/s; +11.56% over the ZC1 baseline across eight runs; 584,056,832 shared K/V bytes per handoff, zero copied bytes and live UI progress |
+| LattePanda Sigma | [Inkling 2 Mini](docs/local/intel-i5-1340p/sigma-model-serving.md) | Active CPU service, 64K | Retained 512+64 replay: 24.67 prefill / 7.72 decode tok/s |
+| LattePanda Sigma | [Bonsai 2.5 27B PTQ1](benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) | Experimental | Iris Xe 512+64 replay: 7.69 prefill / 4.35 decode tok/s; ubatch 512 rejected |
+| LattePanda Sigma | Gemma 4 E4B QAT + MTP zero-copy, 32K | Historical deployment | 25.85 sustained decode tok/s; +11.56% over ZC1 across eight runs |
 | LattePanda Sigma | Huihui Gemma 4 12B QAT Q4_K + MTP, 8K | Explicit local security-audit profile; static and inactive | 8.07 decode tok/s on the selected 256-token audit fixture; 754,974,720 shared K/V bytes, zero copied bytes, full embedded chat UI |
 | LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
 | LattePanda Sigma | Qwen3.6 35B-A3B Q2_K_XL, 128K | Validated; service disabled | 99,104-token request; only matched repository-retrieval pass |
@@ -53,7 +55,7 @@ These results do not change the Sigma or SpaceMIT selections above.
 
 ## Build the selected CPU backend
 
-This command builds the general CPU-only benchmark backend. It does not build the live Gemma Vulkan-prefill service; use the [Gemma runbook](docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#build) for that deployment.
+This command builds the general CPU-only benchmark backend. It does not build the historical Gemma Vulkan-prefill service; use the [Gemma runbook](docs/local/intel-i5-1340p/gemma-local-provider-runbook.md#build) for that deployment.
 
 ```bash
 BUILD_JOBS=2 tools/build-intel-1340p.sh
@@ -67,8 +69,8 @@ Key entrypoints:
 - `tools/run-intel-qwen-longctx.sh` - Qwen 128K service;
 - `tools/run-intel-qwen38.sh` - manual Qwen 3.8 target, MTP and vision profile;
 - `tools/run-intel-candidate.sh` - historical CPU Ornith and Gemma profiles;
-- `tools/run-gemma-zero-copy-service.sh` - primary 32K Gemma Vulkan-prefill/CPU-MTP service;
-- `tools/gemma-profile` - switch among the primary model and static Huihui/Bonsai test profiles;
+- `tools/run-gemma-zero-copy-service.sh` - historical 32K Gemma Vulkan-prefill/CPU-MTP launcher;
+- `tools/gemma-profile` - historical Gemma/Huihui/Bonsai profile selector;
 - `tools/validate-intel-candidate.sh` - no-install historical candidate validation;
 - `tools/systemd/user/` - tracked user services.
 
@@ -116,16 +118,16 @@ Operations and evidence:
 
 ### Local model profiles
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary boot deployment. Huihui Gemma 4 12B QAT Q4_K + MTP and the verified Bonsai 2 27B PQ2_0 CPU baseline use static, inactive units for explicit tests. Use `gemma-profile primary|audit|bonsai|status`; all profiles use `192.168.1.70:11434`, the standard Ollama port, and run one at a time. The service API remains OpenAI-compatible; it does not implement Ollama-native `/api/*` routes. The HN accelerated Bonsai instructions use PTQ1_0. The installed profile uses PQ2_0; PTQ1_0 integration is pending.
+The old Gemma zero-copy, Huihui and Bonsai 2 PQ2 profiles are historical. See [current Sigma operations](docs/local/intel-i5-1340p/sigma-model-serving.md) before using a retained launcher. The [Bonsai 2.5 PTQ1 experiment](benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) uses a different model and has no serving deployment.
 
-The primary Sigma service keeps CPU and Vulkan model owners resident. Each cold conversation gets a fresh Iris Xe Vulkan context; the service moves its 32K F16 K/V cache into a CPU context without payload copies, then generates with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 11434.
+The historical Gemma zero-copy service kept CPU and Vulkan model owners resident. Each cold conversation got a fresh Iris Xe Vulkan context; the service moved its 32K F16 K/V cache into a CPU context without payload copies, then generated with the CPU MTP assistant. It is serial, has one resident conversation and exposes the embedded UI/API on trusted-LAN port 11434.
 
 | Workload | Prompt throughput | Handoff | Result |
 |---|---:|---:|---|
 | Exact 4K (15 September architecture qualification) | 202.60 tok/s | 88.1 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 | Exact 32K (15 September architecture qualification) | 128.00 tok/s | 74.8 ms | `LONG OK`; 584,056,832 B shared, 0 B copied |
 
-These prompt-side figures were not remeasured for the current Gemma 4 E4B QAT + MTP deployment. Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Its Q4 scheduling optimisation, historically labelled ZC2, shortens temporary lifetimes in the four-row Q4 target kernel. Eight counterbalanced runs improved sustained decode from 23.1749 to 25.8539 tok/s (+11.56%); the exact historical 512/64 fixture improved 5.58% with identical output and MTP work.
+These prompt-side figures were not remeasured for the historical Gemma 4 E4B QAT + MTP deployment. Tools, exact append reuse, divergent-branch reset, cancellation and no-swap limits passed. Live SSE sends prompt progress plus parsed content, reasoning and tool-call deltas; the final chunk contains usage, timings and zero-copy telemetry. Its Q4 scheduling optimisation, historically labelled ZC2, shortens temporary lifetimes in the four-row Q4 target kernel. Eight counterbalanced runs improved sustained decode from 23.1749 to 25.8539 tok/s (+11.56%); the exact historical 512/64 fixture improved 5.58% with identical output and MTP work.
 
 Operations and evidence:
 
@@ -191,7 +193,7 @@ curl -fsS http://127.0.0.1:8095/health
 pi --provider local-ornith --model ornith-1.5-35b-a3b-q4-k-m
 ```
 
-Gemma 4 E4B QAT + MTP zero-copy is the primary and sole boot-enabled local model service. The Huihui security-audit and Bonsai CPU test units are static and inactive. The retained Ornith, Maple, Qwen3.6, Qwen3.8 and historical two-slot Gemma CPU services are disabled. Their weight files remain available for explicit tests or rollback.
+[Inkling 2 Mini](docs/local/intel-i5-1340p/sigma-model-serving.md) is the active Sigma service. This release adds no boot service, changes no serving defaults and restores no historical profiles.
 
 Installation, Pi registration, diagnostics, measurements and rollback:
 
@@ -213,9 +215,9 @@ The 5-6 August 2026 campaign used exact per-tokenizer 512, 4,096 and 32,768-toke
 
 The blind substantive review of Maple, Gemma and Qwen3.6 ranked Gemma first, Qwen3.6 second and Maple third. Qwen3.6 alone found the requested source path and function. Gemma alone obeyed the requested tool-result limit. Maple and Gemma each failed one repository-retrieval task, while all three passed constrained edits, independent tests, exact replies and cancellation recovery.
 
-Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. That Qwen service is disabled; LAN port 11434 now exposes Gemma zero-copy.
+Qwen 3.8 MTP accepted 42 of 63 draft tokens and improved generation by 48.7% over its target-only profile. The matched 4K MTP probe peaked at 28.97 GiB PSS and 2.73 GiB process swap. Its target-only exact 32K prompt took 2 hours 50 minutes 12 seconds. That Qwen service is disabled; LAN port 11434 served Gemma zero-copy at that point.
 
-These role assignments record the 5-6 August comparison. Ornith 1.5 superseded them on 20 August. Gemma 4 E4B QAT + MTP zero-copy superseded Ornith on 15 September and is the sole boot-enabled local model service. Historical CPU profiles remain disabled, and the static Huihui security-audit profile remains available for explicit selection.
+These role assignments record the 5-6 August comparison. Ornith 1.5 superseded them on 20 August. Gemma 4 E4B QAT + MTP zero-copy superseded Ornith on 15 September and was then the sole boot-enabled local model service. Historical CPU profiles remain disabled, and the static Huihui security-audit profile remains available for explicit selection.
 
 Full reports, raw responses, telemetry, identities and validators:
 

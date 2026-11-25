@@ -1,6 +1,6 @@
 # Model navigation
 
-**Sigma status,24 October2026:** ThinkingCap64k/8P-SMT is the user-authorised live service. Other Sigma deployment statements below describe historical profiles. The [dated operating status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes their startup and rollback instructions; other hosts are unchanged.
+**Sigma status, 25 November 2026:** Inkling 2 Mini is the active CPU service. Bonsai 2.5 PTQ1 is experimental and undeployed. See [current operating status](../intel-i5-1340p/sigma-model-serving.md) and [Bonsai 2.5 CPU/Iris Xe evidence](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md).
 
 The same work can be read by model family instead of by host. That matters whenever one model appears on more than one machine or when a newer report keeps an older one only as rollback context.
 
@@ -16,7 +16,7 @@ The same work can be read by model family instead of by host. That matters whene
 
 ## Gemma
 
-* ThinkingCap and baseGemma4-26B-A4B: [24October five-model comparison](../intel-i5-1340p/thinkingcap-gemma4-20261024.md),including fresh Qwen3.6 andNemotron CPU replay. ThinkingCap is live; new competitors are comparison assets only.
+* ThinkingCap and baseGemma4-26B-A4B: [24October five-model comparison](../intel-i5-1340p/thinkingcap-gemma4-20261024.md),including fresh Qwen3.6 andNemotron CPU replay. ThinkingCap was live at the time. The other models were comparison assets only.
 
 * Gemma 4 E4B
   * Sigma operations: [retained32K E4B zero-copy service](../intel-i5-1340p/gemma-local-provider-runbook.md), [qualification and post-change live verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [historical 128K CPU runbook](../intel-i5-1340p/intel-1340p-gemma4-runbook.md), [historical concurrency benchmark](../intel-i5-1340p/gemma-local-provider-benchmark-2026-08-02.md)
@@ -24,6 +24,8 @@ The same work can be read by model family instead of by host. That matters whene
   * K3 history: [dense fallback experiments](../spacemit-k3/spacemit-dense-fallback-experiments.md)
 
 ## Bonsai
+
+* [Bonsai 2.5 27B PTQ1_0 with bundled MTP](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) -- experimental CPU and Iris Xe results. CPU max3 MTP was slower; larger GPU microbatch failed trained-logit checks. No serving profile.
 
 * Bonsai 2 27B
   * Sigma operations: [static PQ2 CPU baseline](../intel-i5-1340p/gemma-local-provider-runbook.md#cpu-baseline-profile-bonsai-2-27b-pq2_0)

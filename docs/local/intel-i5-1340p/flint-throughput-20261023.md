@@ -1,5 +1,7 @@
 # Flint throughput on Sigma, 23 October 2026
 
+> Historical Sigma profile. See [current model-serving status](sigma-model-serving.md) before using its service commands.
+
 The best measured CPU configuration achieved **50.43 prompt tok/s and 13.09 decode tok/s** on a 512-token prompt plus 64-token continuation. Against the matched 4-thread control, prompt throughput improved 28.61%, decode throughput improved 4.19%, and measured inference wall time fell 17.12% (18.17 to 15.06 seconds). Larger GPU expert caches improved hit rates but lost throughput.
 
 These are controlled token-replay measurements, not a general quality score or serving qualification. No service was deployed. The measurements predate the combined source integration; [later build and regression verification](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/integration-verification.md) is recorded separately.

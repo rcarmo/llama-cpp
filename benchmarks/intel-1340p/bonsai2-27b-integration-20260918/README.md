@@ -1,5 +1,7 @@
 # Bonsai 2 27B PQ2_0 integration on Intel Core i5-1340P
 
+> Historical Bonsai 2 campaign. The later [Bonsai 2.5 27B experiments](../bonsai25-ptq1-20261125/README.md) use a different model and retain these results as controls. See [current Sigma operations](../../../docs/local/intel-i5-1340p/sigma-model-serving.md) for serving status.
+
 Bonsai 2 27B PQ2_0 runs correctly on `sigma` with a CPU-only llama.cpp profile. CPU generation reached about 1.48 tok/s. Full PQ2 Vulkan offload was correct but slower at 0.59 tok/s, so the retained test profile disables Vulkan.
 
 The separate [PTQ1_0 qualification](ptq1-qualification/README.md) reached 25.5768 prompt tok/s with native full Vulkan offload. Its generation rate was 0.4763 tok/s, so PTQ1 source support is accepted without replacing the retained PQ2 CPU profile.

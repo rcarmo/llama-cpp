@@ -1,5 +1,7 @@
 # PTQ1 recovery fixed-work qualification
 
+> Historical Bonsai 2 campaign. See [Bonsai 2.5 PTQ1 measurements](../../bonsai25-ptq1-20261125/README.md) for the separate November model and its CPU/Iris Xe tests.
+
 This is the final native ABBA qualification for the recovered PTQ1 Vulkan-prefill/CPU-generation candidate. It used 512-token chunks, logical batch 2048, microbatch 512, 12 threads, F16 K/V, flash attention and the AVX-VNNI PTQ1 CPU kernel.
 
 ## Result

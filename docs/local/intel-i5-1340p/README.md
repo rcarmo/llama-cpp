@@ -2,11 +2,11 @@
 
 This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM, and a lot of CPU-first experiments that spilled across Qwen, Ornith, Gemma, Maple and later Intel Xe handoff work. The old flat `docs/` list made it too easy to lose chronology, so the benchmark-heavy material is now linked from one page.
 
-**Current state,24 October2026:** [operating status](model-serving-status-20261023.md). User-authorised ThinkingCap64k/8P-SMT is live; the other roles below are historical. [Five-model comparison](thinkingcap-gemma4-20261024.md): separate20/23.25GiB groups,coding6/6 for ThinkingCap and historicalFlint.
+**Sigma status, 25 November 2026:** Inkling 2 Mini is the active CPU service. Bonsai 2.5 PTQ1 is experimental and undeployed. See [current operating status](sigma-model-serving.md) and [Bonsai 2.5 CPU/Iris Xe evidence](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md).
 
 ## Retained roles and runbooks
 
-* [Local model profiles](gemma-local-provider-runbook.md) -- primary Gemma 4 E4B QAT + MTP zero-copy deployment plus static Huihui security-audit and verified Bonsai 2 27B PQ2 CPU-baseline profiles, with health-checked switching and one LAN UI/API on port 11434.
+* [Local model profiles](gemma-local-provider-runbook.md) -- historical Gemma 4 E4B QAT + MTP zero-copy configuration and static Huihui security-audit and verified Bonsai 2 27B PQ2 CPU-baseline profiles, with health-checked switching and one LAN UI/API on port 11434.
 * [Qwen3.6 128K service runbook](intel-1340p-qwen-longctx-runbook.md) -- retained rollback and long-context service profile.
 * [Maple Preview local provider](maple-local-provider-runbook.md) -- explicit alternative provider, not the default.
 * [Ornith 1.0 runbook](intel-1340p-ornith-runbook.md) and [Ornith 1.5 provider](ornith-1.5-local-provider-runbook.md) -- retained disabled profiles and rollback references.
@@ -30,7 +30,7 @@ This subtree collects the local work on `sigma`: Intel Core i5-1340P, 31 GiB RAM
 * [Fedora Intel build container](intel-build-container.md) -- reproducible rootless Podman toolchain for native CPU and Vulkan builds, including image identity, ccache and host-runtime boundaries.
 * [Gemma zero-copy service qualification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md) -- 15 September 2026 Vulkan-prefill to CPU-MTP service, exact 4K/32K, tool/multi-turn, persistent-model and live-stream evidence.
 * [Gemma generation parity](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md) -- ZC1 baseline: model-derived defaults and `n_min=1`, rejected pool/small-batch paths, sustained and historical fixtures, full serving qualification and immutable rollback.
-* [Gemma 4 E4B QAT + MTP Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) -- primary deployment, historically labelled ZC2: equivalent four-row Q4 arithmetic with shorter temporary lifetimes, confirmed sustained and historical speedups, full zero-copy/UI qualification and verified ZC1 rollback.
+* [Gemma 4 E4B QAT + MTP Q4 scheduling](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md) -- historical deployment, labelled ZC2: equivalent four-row Q4 arithmetic with shorter temporary lifetimes, confirmed sustained and historical speedups, full zero-copy/UI qualification and verified ZC1 rollback.
 * [Gemma prompt-lookup benchmark correction](../../../benchmarks/intel-1340p/prompt-lookup-20260928/README.md) -- synthetic high-fanout cache loops improved, but isolated CPU-only `llama-lookup` spent less than 0.4 ms per request in cache work and showed no validated request-level gain. The live Gemma MTP service was not changed.
 * [Huihui Gemma 4 12B security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md) -- explicit boot-disabled alternative with matched MTP, zero-copy handoff, parser correction, full embedded UI and repeatable local switching.
 * [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) -- PQ2/Hadamard correctness, CPU/Vulkan comparison, API/UI qualification and a static CPU-only profile.
@@ -55,4 +55,4 @@ The main benchmark index is [../../../benchmarks/intel-1340p/README.md](../../..
 
 * CPU masks in these documents are host-specific. Several reports note that requested binding and observed OpenMP worker placement were not identical.
 * Thermal annotations exist where they were measured, but not every campaign has full thermal telemetry. Keep that distinction.
-* The 16 September Gemma Q4 scheduling campaign defines the primary Gemma 4 E4B QAT + MTP deployment. Generation parity defines its ZC1 baseline, and the 15 September service report defines the original zero-copy architecture. The 17 September Huihui profile and 18 September Bonsai PQ2 CPU baseline are explicit local alternatives. Bonsai PTQ1 source/handoff correctness is retained, but its measured topology is rejected for performance and not deployed. Earlier Intel Xe studies remain narrow measured slices and do not change other model/backend defaults.
+* The 16 September Gemma Q4 scheduling report records the historical ZC2 deployment. The September Bonsai PQ2 and PTQ1 campaigns used Bonsai 2, not Bonsai 2.5. Their performance decisions and rollback notes are historical. The current Bonsai 2.5 candidate has not replaced Inkling.

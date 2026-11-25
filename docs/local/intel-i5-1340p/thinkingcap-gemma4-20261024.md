@@ -1,5 +1,7 @@
 # ThinkingCap Gemma 4 and five-model CPU comparison - 24 October 2026
 
+> Historical Sigma profile. See [current model-serving status](sigma-model-serving.md) before using its service commands.
+
 Nemotron Lightning was fastest in the measured CPU replay. ThinkingCap passed all six uncapped coding tasks and 1,053 assertions. Its selected eight-thread setting improved sustained replay decode by about 4.5% over four threads.
 
 ## Hardware and software

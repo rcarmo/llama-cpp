@@ -1,5 +1,7 @@
 # External Qwen3.8 Q4 MTP compatibility screen
 
+> Historical Bonsai 2 campaign. See [Bonsai 2.5 PTQ1 measurements](../../bonsai25-ptq1-20261125/README.md) for the separate November model and its CPU/Iris Xe tests.
+
 This CPU-only screen tests the local Qwen3.8 Q4 MTP sidecar against Bonsai 2 27B PTQ1. It establishes runtime compatibility but rejects the sidecar as a performance candidate.
 
 ## Models and source

@@ -2,7 +2,7 @@
 
 This directory is the raw evidence spine for the `sigma` work. It covers the July Qwen CPU/Vulkan campaign, the August Maple and Ornith/Gemma studies, the September Gemma optimisation series and the later Intel Xe handoff work.
 
-**Current operating state:** [23 October model-serving status](../../docs/local/intel-i5-1340p/model-serving-status-20261023.md). ThinkingCap is now the authorised64k/8P-SMT service. Older service statements below are historical; the source merge did not restore them.
+**Sigma status, 25 November 2026:** Inkling 2 Mini is the active CPU service. Bonsai 2.5 PTQ1 is experimental and undeployed. See [current operating status](../../docs/local/intel-i5-1340p/sigma-model-serving.md) and [Bonsai 2.5 CPU/Iris Xe evidence](bonsai25-ptq1-20261125/README.md).
 
 ## Upstream integration
 
@@ -93,8 +93,9 @@ These directories freeze the file-mediated CPU/GPU service and decoder deploymen
 
 * [gemma-zero-copy-service-20260915/](gemma-zero-copy-service-20260915/) -- original in-process Gemma service record: resident Vulkan model, fresh cold-prefill contexts, CPU MTP continuation, live UI streaming/progress, exact 4K/32K qualification and zero copied bytes.
 * [gemma-generation-parity-20260916/](gemma-generation-parity-20260916/) -- ZC1 baseline record: model sampling metadata and `n_min=1` restored; attached pools and small-target-batch rejected; sustained A/B, quality and full serving qualification.
-* [gemma-zc-speed-20260916/](gemma-zc-speed-20260916/) -- primary Gemma 4 E4B QAT + MTP deployment (historical label ZC2): shorter-lived Q4 four-row temporaries improved sustained decode by 11.56% over eight confirmation runs and the historical 512/64 fixture by 5.58%; full zero-copy/UI qualification and verified ZC1 rollback passed.
+* [gemma-zc-speed-20260916/](gemma-zc-speed-20260916/) -- historical Gemma 4 E4B QAT + MTP deployment (ZC2): shorter-lived Q4 four-row temporaries improved sustained decode by 11.56% over eight confirmation runs and the historical 512/64 fixture by 5.58%; full zero-copy/UI qualification and verified ZC1 rollback passed.
 * [huihui-gemma4-12b-trial-20260917/](huihui-gemma4-12b-trial-20260917/) -- explicit local security-audit profile: matched Huihui QAT target/MTP pair, response-channel parser fix, seven-profile speed screen, zero-copy/service/UI qualification and a health-checked switch back to the primary model.
+* [Bonsai 2.5 PTQ1 on Sigma](bonsai25-ptq1-20261125/README.md) -- CPU register decoding, Iris Xe integer dot, native replay and the rejected ubatch-512 configuration.
 * [bonsai2-27b-integration-20260918/](bonsai2-27b-integration-20260918/) -- verified Bonsai 2 27B PQ2_0 CPU baseline, API/UI checks and static profile; the linked PTQ1 campaign adds qualified Vulkan kernels.
 * [bonsai2-27b-zero-copy-20260918/](bonsai2-27b-zero-copy-20260918/) -- target-only PTQ1 Vulkan-to-CPU zero-copy diagnostic: exact synthetic/lifecycle/API evidence, but the 256/1024/2048 performance result is rejected because it missed the published PTQ1 prefill and PQ2 CPU generation endpoints.
 * [qwen38-vulkan-mtp-memory-20260915/](qwen38-vulkan-mtp-memory-20260915/) -- 18-run CPU/Vulkan prefill matrix, production server A/B, exact constructor check and 1K handoff resource summary.

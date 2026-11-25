@@ -1,5 +1,7 @@
 # Bonsai 2 27B PTQ1 zero-copy handoff diagnostic
 
+> Historical Bonsai 2 campaign. The later [Bonsai 2.5 27B experiments](../bonsai25-ptq1-20261125/README.md) use a different model and retain these results as controls. See [current Sigma operations](../../../docs/local/intel-i5-1340p/sigma-model-serving.md) for serving status.
+
 This campaign proves strict target-only Vulkan-to-CPU state handoff for Bonsai 2 27B PTQ1 on Intel Iris Xe UMA. It does not qualify the topology as a performance candidate. The measured 17.62-29.15% fixed-work reductions compare against slow full-Vulkan generation inside a 256/256 batch geometry; the handoff path reached only about 12.7 prompt tok/s and 0.79 generation tok/s. Published controls are 25.5768 prompt tok/s for PTQ1 full Vulkan and 1.4846 generation tok/s for the retained PQ2 CPU profile.
 
 The handoff is retained as correctness, ownership, API and lifecycle evidence. Performance status is rejected pending at least 23 prompt tok/s, 1.34 generation tok/s and the fixed-work wall-time gates in this report. No PTQ1 service is deployed or enabled. The primary Gemma 4 E4B QAT + MTP zero-copy service remains unchanged; PQ2 CPU remains the production Bonsai alternative.

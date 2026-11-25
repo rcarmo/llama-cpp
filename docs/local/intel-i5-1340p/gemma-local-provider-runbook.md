@@ -1,10 +1,10 @@
 # Local model profiles on Sigma
 
-**Retention notice, 23 October 2026:** Sigma model-serving units and installed model/transcription runtimes were removed. This runbook retains historical configurations. Read the [dated operating status](model-serving-status-20261023.md) before any startup, profile switch or rollback. Service restoration requires a separate explicit request.
+**Historical runbook:** The 23 October removal retired these profiles. Read [current Sigma operations](sigma-model-serving.md) before any startup or rollback. The original profiles below are not current service instructions.
 
-**Gemma 4 E4B QAT + MTP zero-copy** is the primary local deployment on `sigma`. Its service is enabled at boot and its immutable runtime is `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
+**Gemma 4 E4B QAT + MTP zero-copy** was the primary local deployment on `sigma`. Its service was enabled at boot and its immutable runtime was `runtime/deployments/gemma-q4-n4-schedule-2768e715c-1c5ba700`. Historical benchmark records call this optimisation generation `ZC2`; use the model name for normal operations.
 
-Two static profiles are available for explicit tests: **Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** for security audits and **Bonsai 2 27B PQ2_0** for CPU-only ternary-model tests. All three profiles use `http://192.168.1.70:11434/` without authentication and are mutually exclusive. Huihui and Bonsai bind the LAN address directly; the primary binds loopback and reaches the LAN through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
+Two static profiles were defined for explicit tests: **Huihui Gemma 4 12B QAT Q4_K + MTP zero-copy** for security audits and **Bonsai 2 27B PQ2_0** for CPU-only ternary-model tests. All three profiles use `http://192.168.1.70:11434/` without authentication and are mutually exclusive. Huihui and Bonsai bind the LAN address directly; the primary binds loopback and reaches the LAN through the systemd socket proxy. The older file-mediated `llama-gemma-local-provider.service` is disabled and ports 8091 and 18092 are closed.
 
 ## Switch profiles
 
@@ -127,7 +127,7 @@ Evidence: [Huihui security-audit trial](../../../benchmarks/intel-1340p/huihui-g
 
 The immutable runtime is `runtime/deployments/bonsai2-27b-pq2-cpu-bb2ea4754-ccb8e4aa`. It was built with `GGML_VULKAN=OFF` and embeds the primary profile's frozen 70-asset UI. CPU smoke generation measured about 1.48 tok/s. Full Vulkan offload of the PQ2 model produced correct output but measured 0.59 tok/s because published local master has no PQ2_0 Vulkan matrix kernel; it is excluded from this profile.
 
-The Hacker News instructions and accelerated reports use `Ternary-Bonsai-2-27B-PTQ1_0.gguf`, a distinct 5,946,648,928-byte format with native Vulkan support in Prism commit `01fd9521c`. Published local master contains no PTQ1_0 implementation or direct Hadamard-sharing dependency `633168fb`. The installed PQ2 service is the verified baseline. PTQ1 integration, qualification and fastest-profile selection on Sigma are pending.
+The September comparison used different Bonsai 2 PQ2 and PTQ1 files. See [Bonsai 2 PTQ1 qualification](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/ptq1-qualification/README.md) for the subsequent integration and [Bonsai 2.5 PTQ1 experiments](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) for the distinct November model. Neither is a current serving profile.
 
 The PQ2 profile passed exact non-streaming output, incremental SSE, forced OpenAI-style tool selection, 70/70 UI asset equality, model alias checks, zero swap/OOM and primary rollback. A 315-token forced tool request took 149 seconds, so this profile is for deliberate tests rather than routine interactive use.
 

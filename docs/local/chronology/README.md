@@ -31,14 +31,14 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * 2026-09-13 / 2026-09-14 -- [Intel Xe handoff and zero-copy series](../../../benchmarks/intel-1340p/README.md#2026-09-13-and-2026-09-14-intel-xe-series), [in-memory KV handoff note](../intel-i5-1340p/in-memory-kv-handoff.md), [paired Q6 note](../intel-i5-1340p/cpu-q6-pair.md)
 * 2026-09-14 -- [RTX 3060 GSQ rebuild](../rtx3060/qwen38-gsq-rco-report.md)
 * 2026-09-15 -- [Gemma 32K zero-copy service qualification, persistent-model and live-stream verification](../../../benchmarks/intel-1340p/gemma-zero-copy-service-20260915/README.md), [Qwen3.8 embedded-MTP microbatch cap on Intel Iris Xe](../intel-i5-1340p/qwen38-vulkan-mtp-memory.md)
-* 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [Gemma 4 E4B QAT + MTP Q4 scheduling release and primary deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [current operations](../intel-i5-1340p/gemma-local-provider-runbook.md)
+* 2026-09-16 -- [Gemma ZC1 generation-parity baseline](../../../benchmarks/intel-1340p/gemma-generation-parity-20260916/README.md), [Gemma 4 E4B QAT + MTP Q4 scheduling release and primary deployment](../../../benchmarks/intel-1340p/gemma-zc-speed-20260916/README.md), [historical profile runbook](../intel-i5-1340p/gemma-local-provider-runbook.md)
 * 2026-09-17 -- [Huihui Gemma 4 12B local security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md), including matched MTP zero-copy, speed tuning, full UI checks and local profile switching
 * 2026-09-18 / 2026-09-19 -- [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md) and [PTQ1 zero-copy handoff diagnostic](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md): PTQ1 Vulkan/source and state-transfer correctness passed, but the topology was later rejected for performance after endpoint reconciliation; no deployment
 * 2026-09-28 -- [Gemma prompt-lookup benchmark correction](../../../benchmarks/intel-1340p/prompt-lookup-20260928/README.md): synthetic high-fanout cache loop improved, but isolated CPU-only `llama-lookup` spent less than 0.4 ms per 7-20 second request in cache work, with no validated request-level gain; the live Gemma MTP service was unchanged
 
 ## 2026-10
 
-* 2026-10-24 -- [ThinkingCap and five-model comparison](../intel-i5-1340p/thinkingcap-gemma4-20261024.md): uncapped coding6/6,8P-SMT confirmation,20/23.25GiB groups and current64k ThinkingCap service.
+* 2026-10-24 -- [ThinkingCap and five-model comparison](../intel-i5-1340p/thinkingcap-gemma4-20261024.md): uncapped coding6/6,8P-SMT confirmation,20/23.25GiB groups and the then-current 64K ThinkingCap service.
 
 * 2026-10-23 -- [Upstream merge and model-free validation](../cross-platform/upstream-sync-20261023.md); no weights, service restoration or deployment
 * 2026-10-23 -- [Model-serving removal/status](../intel-i5-1340p/model-serving-status-20261023.md) supersedes older deployment statements. [Flint throughput, strict zero-copy and coding](../../../benchmarks/intel-1340p/flint-zero-copy-20261023/README.md): 50.43/13.09 prompt/decode tok/s; capped coding calibration retained, uncapped coding complete6/6,1053assertions; historical serving state; see current operating status.
@@ -57,3 +57,8 @@ The dated campaigns below are the quickest way to see what superseded what. Unda
 * [Huihui Gemma 4 12B security-audit profile](../../../benchmarks/intel-1340p/huihui-gemma4-12b-trial-20260917/README.md): explicit local alternative with zero-copy, matched MTP, full embedded chat UI and `gemma-profile` switching.
 * [Bonsai 2 27B PQ2_0 baseline](../../../benchmarks/intel-1340p/bonsai2-27b-integration-20260918/README.md): static CPU-only alternative after correct but slower PQ2 Vulkan offload; API, tool, SSE, UI and rollback checks passed. [PTQ1 zero-copy handoff](../../../benchmarks/intel-1340p/bonsai2-27b-zero-copy-20260918/README.md) remains a correctness diagnostic and is rejected for performance.
 * [RTX 3060 persistent GSQ service](../rtx3060/qwen38-gsq-rco-report.md#persistent-serving-2026-09-16): enabled user unit replaces transient serving; health and API smoke checks passed, no new benchmark.
+
+## 2026-11
+
+* 22 November: [Inkling 2 Mini CPU production qualification](../../../benchmarks/intel-1340p/inkling2-cache-serving-20261121/production-20261122/README.md). Existing 4/16-thread, cache768, 64K and vision settings retained.
+* 24-25 November: [Bonsai 2.5 PTQ1 CPU and Iris Xe experiments](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md). The GPU profile nearly doubled Bonsai decode but lagged Inkling in 512+64 replay. Trained logits rejected ubatch 512. The cancelled DiffusionGemma trial did not produce an adopted service.

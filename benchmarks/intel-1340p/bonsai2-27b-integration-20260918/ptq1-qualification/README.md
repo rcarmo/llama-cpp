@@ -1,5 +1,7 @@
 # Bonsai 2 27B PTQ1_0 qualification on Intel Core i5-1340P
 
+> Historical Bonsai 2 campaign. The later [Bonsai 2.5 27B experiments](../../bonsai25-ptq1-20261125/README.md) use a different model and retain these results as controls. See [current Sigma operations](../../../../docs/local/intel-i5-1340p/sigma-model-serving.md) for serving status.
+
 PTQ1_0 full Vulkan offload reached 25.5768 prompt tok/s and 0.4763 generation tok/s on Sigma. It accelerates prompt ingestion but does not replace the PQ2_0 CPU profile, which generates at 1.4846 tok/s.
 
 ## Inputs

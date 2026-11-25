@@ -1,5 +1,7 @@
 # HN and Prism PTQ1_0 correction
 
+> Historical Bonsai 2 campaign. See [Bonsai 2.5 PTQ1 measurements](../bonsai25-ptq1-20261125/README.md) for the separate November model and its CPU/Iris Xe tests.
+
 The Hacker News instructions and reported accelerated runs use `Ternary-Bonsai-2-27B-PTQ1_0.gguf`. Sigma PTQ1 qualification reached 25.5768 prompt tok/s with full Vulkan offload, while generation reached 0.4763 tok/s. The installed PQ2_0 CPU profile remains faster for generation at 1.4846 tok/s.
 
 ## Sources checked

@@ -1,5 +1,7 @@
 # Sigma model-serving status - updated 24 October 2026
 
+**Sigma status, 25 November 2026:** Inkling 2 Mini is the active CPU service. Bonsai 2.5 PTQ1 is experimental and undeployed. See [current operating status](sigma-model-serving.md) and [Bonsai 2.5 CPU/Iris Xe evidence](../../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md).
+
 ThinkingCap Gemma 4 is the only active model server, with user authorisation. It replaced the temporary Flint UI. Endpoint:`http://192.168.1.70:11434/`, container`thinkingcap-gemma4-p8-webui`, alias `ThinkingCap-Gemma4`, physical context 65536, CPU 8P-SMT/16 prefill, F16KV, FAoff, mmap/no_host/no repack. Output/reasoning budgets are unlimited; no context shifting. The guard uses available RAM minus 2 GiB and zero swap. Boot startup is disabled. HTML and a natural-EOG SSE READY response passed.
 
 [ThinkingCap and five-model comparison](thinkingcap-gemma4-20261024.md) records the frozen 4P coding 6/6,1,053 assertions, the separate 8P replay confirmation and the new comparison limits. Historical Flint also passed 6/6 and 1,053 assertions. BaseGemma 4, Qwen 3.6 andNemotron weights are verified comparison assets; none is a running or boot-enabled service. No new coding-quality result exists for those three.

@@ -2,9 +2,9 @@
 
 Host-specific experiments and retained operating notes are under `docs/local/`. Upstream llama.cpp documentation stays under `docs/`.
 
-**Sigma status, 23 October 2026:** model-serving units and installed model/transcription runtimes were removed. [Operating status](intel-i5-1340p/model-serving-status-20261023.md) supersedes the older deployment instructions. No model service was restored by the source merge.
+**Historical:** The [23 October removal and ThinkingCap record](intel-i5-1340p/model-serving-status-20261023.md) describes the earlier service state.
 
-**Sigma status,24 October2026:** ThinkingCap Gemma4 replaced Flint at `http://192.168.1.70:11434/`:64k physical context,8P-SMT CPU workers,unlimited output/reasoning,HTML/API smoke passed. Other removed services remain stopped; boot startup is disabled. See the [five-model comparison](intel-i5-1340p/thinkingcap-gemma4-20261024.md).
+**Sigma status, 25 November 2026:** Inkling 2 Mini is the active CPU service. Bonsai 2.5 PTQ1 is experimental and undeployed. See [current operating status](intel-i5-1340p/sigma-model-serving.md) and [Bonsai 2.5 CPU/Iris Xe evidence](../../benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md).
 
 ## Web UI build default
 
@@ -24,7 +24,7 @@ Server builds default to `LLAMA_BUILD_UI=ON`, with `LLAMA_USE_PREBUILT_UI=ON` as
 
 ## Reading order
 
-* For Sigma's operating state, read the dated [model-serving status](intel-i5-1340p/model-serving-status-20261023.md) first. The [local model profiles runbook](intel-i5-1340p/gemma-local-provider-runbook.md) retains the former Gemma, Huihui and Bonsai configurations.
+* For Sigma's operating state, read the [current operating status](intel-i5-1340p/sigma-model-serving.md) first. The [local model profiles runbook](intel-i5-1340p/gemma-local-provider-runbook.md) retains the former Gemma, Huihui and Bonsai configurations.
 * Use the chronology to follow results across campaigns. Dated reports preserve their original measurements and service state; undated runbooks require revalidation before any future deployment.
 * If you need raw logs, JSON, thermal CSVs or reproduction scripts, prefer the benchmark tree over the prose reports. The reports summarise measured outcomes; the benchmark directories keep the evidence.
 
