@@ -781,6 +781,7 @@ struct vk_device_struct {
     // 0: default, 1: force mmvq, -1: disable mmvq
     int32_t mmvq_mode;
     bool ptq1_mmvq {};
+    bool ptq1_mmq_f32_acc {};
 
     bool subgroup_size_control;
     uint32_t subgroup_min_size;

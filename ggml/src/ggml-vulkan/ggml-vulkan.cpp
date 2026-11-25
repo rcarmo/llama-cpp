@@ -5590,6 +5590,9 @@ vk_device ggml_vk_get_device(size_t idx) {
 
         device->ptq1_mmvq = getenv("GGML_VK_INTEL_PTQ1_MMVQ") != nullptr && device->mmvq_mode != -1 &&
                             device->vendor_id == VK_VENDOR_ID_INTEL && device->uma && device->integer_dot_signed;
+        device->ptq1_mmq_f32_acc = getenv("GGML_VK_INTEL_PTQ1_F32_ACC") != nullptr &&
+                                  device->vendor_id == VK_VENDOR_ID_INTEL && device->uma && device->fp16 &&
+                                  !device->coopmat_support && !device->coopmat2;
 
         // publish the device only when it is fully built
         vk_instance.devices[idx] = device;
@@ -7226,8 +7229,17 @@ static void ggml_vk_mul_mat_q_f16(ggml_backend_vk_context * ctx, vk_context& sub
     // coopmat shaders are fast enough that memory bandwidth reduction from f16 activations helps
     const bool prefer_f16_b = is_coopmat && ggml_is_quantized(src0->type) && src1->type == GGML_TYPE_F32;
 
+    ggml_prec acc = ggml_prec_get_acc(dst);
+    // Iris Xe subgroup FP16 accumulation loses accuracy on long PTQ1 reductions.
+    // Scope the opt-in to dense bulk matmul with no explicit accumulator request.
+    if (ctx->device->ptq1_mmq_f32_acc && acc == GGML_PREC_UNDEFINED && !disable_split_k &&
+        src0->type == GGML_TYPE_PTQ1_0 && src1->type == GGML_TYPE_F32 && ne11 > 1 &&
+        ne02 == 1 && ne03 == 1 && ne12 == 1 && ne13 == 1 &&
+        ggml_is_contiguous(src0) && ggml_is_contiguous(src1)) {
+        acc = GGML_PREC_F32;
+    }
     const ggml_type y_kernel_type = ggml_vk_mul_mat_b_type(ctx, src0->type, src1, f16_type,
-                                        ggml_prec_get_acc(dst), false, can_quantize_y, prefer_f16_b);
+                                        acc, false, can_quantize_y, prefer_f16_b);
 
     const bool quantize_y       = y_kernel_type == GGML_TYPE_Q8_1;
     const bool y_f32_kernel     = y_kernel_type == GGML_TYPE_F32;
@@ -7236,7 +7248,7 @@ static void ggml_vk_mul_mat_q_f16(ggml_backend_vk_context * ctx, vk_context& sub
     ggml_type mmp_type_a = src0->type;
     const ggml_type mmp_type_b = y_kernel_type;
     const std::vector<vk_matmul_pipeline_pair> * mmp_map =
-        ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, ggml_prec_get_acc(dst));
+        ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, acc);
 
     const bool qx_needs_dequant = mmp_map == nullptr || x_non_contig;
     const bool qy_needs_dequant = y_needs_reformat;
@@ -7244,7 +7256,7 @@ static void ggml_vk_mul_mat_q_f16(ggml_backend_vk_context * ctx, vk_context& sub
     if (qx_needs_dequant) {
         // dequant src0 to f16
         mmp_type_a = f16_type;
-        mmp_map = ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, ggml_prec_get_acc(dst));
+        mmp_map = ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, acc);
     }
 
     GGML_ASSERT(mmp_map != nullptr);
@@ -7252,7 +7264,7 @@ static void ggml_vk_mul_mat_q_f16(ggml_backend_vk_context * ctx, vk_context& sub
     const std::vector<vk_matmul_pipeline_pair> * regular_mmp_map = mmp_map;
     bool use_stream_k = ctx->device->coopmat2 && !ctx->device->disable_stream_k && !disable_split_k;
     if (use_stream_k) {
-        mmp_map = ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, ggml_prec_get_acc(dst), false, true);
+        mmp_map = ggml_vk_get_mul_mat_mat_pipeline_map(ctx, mmp_type_a, mmp_type_b, acc, false, true);
         if (mmp_map == nullptr) {
             mmp_map = regular_mmp_map;
             use_stream_k = false;
