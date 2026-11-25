@@ -436,46 +436,27 @@ void load_a_to_shmem(const uint pos_a, const uint row, const uint col, const uin
 
         const uint ib  = idx / 16;
         const uint grp = idx & 0xfu;
-        const uint e0  = grp * 8u;
         const float d = float(a_ptq1_0.data[ib].d);
 
+        // The entire group of eight stays within one of the three storage regions.
+        const uint stage = grp < 10u ? grp >> 1u : grp < 15u ? grp - 10u : 0u;
+        // Repeated multiply by three modulo 256 is one multiply by 3^stage.
+        const uint radix = stage == 4u ? 81u : (0x1b090301u >> (8u * (stage & 3u))) & 0xffu;
         const uint k_pair = row * mm_load_vec_a() / 2;
         [[unroll]] for (uint l = 0; l < 4; ++l) {
-            const uint e = e0 + 2u*l;
-            uint b0;
-            uint n0;
-            uint b1;
-            uint n1;
-            if (e < 80u) {
-                b0 = uint(a_ptq1_0.data[ib].qs[e & 15u]);
-                n0 = e >> 4u;
-            } else if (e < 120u) {
-                const uint t = e - 80u;
-                b0 = uint(a_ptq1_0.data[ib].qs[16u + (t & 7u)]);
-                n0 = t >> 3u;
+            uvec2 packed;
+            if (grp < 10u) {
+                const uint q = (grp & 1u)*8u + 2u*l;
+                packed = uvec2(a_ptq1_0.data[ib].qs[q], a_ptq1_0.data[ib].qs[q+1u]);
+            } else if (grp < 15u) {
+                const uint q = 16u + 2u*l;
+                packed = uvec2(a_ptq1_0.data[ib].qs[q], a_ptq1_0.data[ib].qs[q+1u]);
             } else {
-                const uint t = e - 120u;
-                b0 = uint(a_ptq1_0.data[ib].qh[t & 1u]);
-                n0 = t >> 1u;
+                packed = uvec2(a_ptq1_0.data[ib].qh[0], a_ptq1_0.data[ib].qh[1]);
             }
-            const uint e_next = e + 1u;
-            if (e_next < 80u) {
-                b1 = uint(a_ptq1_0.data[ib].qs[e_next & 15u]);
-                n1 = e_next >> 4u;
-            } else if (e_next < 120u) {
-                const uint t = e_next - 80u;
-                b1 = uint(a_ptq1_0.data[ib].qs[16u + (t & 7u)]);
-                n1 = t >> 3u;
-            } else {
-                const uint t = e_next - 120u;
-                b1 = uint(a_ptq1_0.data[ib].qh[t & 1u]);
-                n1 = t >> 1u;
-            }
-            for (uint i = 0u; i < n0; ++i) b0 = (b0 * 3u) & 0xFFu;
-            for (uint i = 0u; i < n1; ++i) b1 = (b1 * 3u) & 0xFFu;
-            store_a(col, k_pair + l, FLOAT_TYPEV2(
-                float(int((b0 * 3u) >> 8u) - 1) * d,
-                float(int((b1 * 3u) >> 8u) - 1) * d));
+            const uint power = grp == 15u ? (0x1b090301u >> (8u*l)) & 0xffu : radix;
+            const ivec2 trit = ivec2((((packed * power) & 0xffu) * 3u) >> 8u) - 1;
+            store_a(col, k_pair + l, FLOAT_TYPEV2(vec2(trit) * d));
         }
     } else if (MmTypeA == GGML_TYPE_Q1_0) {
         const uint idx = pos_a + col * p.stride_a / mm_load_vec_a() + row;
