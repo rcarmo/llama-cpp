@@ -1,5 +1,7 @@
 # Bonsai 2.5 on Sigma: native Iris Xe replay
 
+The [FP32 follow-up](fp32/README.md) reduced trained 512+64 Iris Xe replay to 61.55 s at a 128-token microbatch. The results below are the original CPU and Vulkan comparison. Microbatch 512 still produces sparse logits. Bonsai is not deployed.
+
 Iris Xe raised Bonsai decode from 2.247 to 4.351 tokens/s and cut 512+64 replay wall time from 193.610 to 81.394 seconds. The GPU result is still 2.80x slower than the retained Inkling CPU replay. Prefill accounts for about 82% of Bonsai's GPU time.
 
 | Profile | Prefill tok/s | Decode tok/s | 512+64 wall time |

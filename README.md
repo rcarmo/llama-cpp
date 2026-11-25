@@ -15,7 +15,7 @@ This repository tracks [`ggml-org/llama.cpp`](https://github.com/ggml-org/llama.
 |---|---|---|---|
 | LattePanda Sigma | Clang/native CPU build | Selected | Best general backend on this host |
 | LattePanda Sigma | [Inkling 2 Mini](docs/local/intel-i5-1340p/sigma-model-serving.md) | Active CPU service, 64K | Retained 512+64 replay: 24.67 prefill / 7.72 decode tok/s |
-| LattePanda Sigma | [Bonsai 2.5 27B PTQ1](benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) | Experimental | Iris Xe 512+64 replay: 7.69 prefill / 4.35 decode tok/s; ubatch 512 rejected |
+| LattePanda Sigma | [Bonsai 2.5 27B PTQ1](benchmarks/intel-1340p/bonsai25-ptq1-20261125/README.md) | Experimental | Iris Xe FP32 opt-in 512+64 replay: 10.98 prefill / 4.31 decode tok/s; ubatch 512 rejected |
 | LattePanda Sigma | Gemma 4 E4B QAT + MTP zero-copy, 32K | Historical deployment | 25.85 sustained decode tok/s; +11.56% over ZC1 across eight runs |
 | LattePanda Sigma | Huihui Gemma 4 12B QAT Q4_K + MTP, 8K | Explicit local security-audit profile; static and inactive | 8.07 decode tok/s on the selected 256-token audit fixture; 754,974,720 shared K/V bytes, zero copied bytes, full embedded chat UI |
 | LattePanda Sigma | Ornith 1.5 35B-A3B Q4_K_M, 128K | Validated; service disabled | 18.07 prompt tok/s and 6.80 generation tok/s at 32K with Q8 KV |
