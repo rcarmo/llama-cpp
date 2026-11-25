@@ -31,4 +31,6 @@ An API-only run and an LM-head-only callback both produced zero nonzero logits a
 
 Retrospective i915 logs reported fence expiration during all three sparse runs and at the end of one dense 512-token checkpoint run. No such warnings were recorded during the four timed 128-token arms. The warning does not identify the first failing operation or establish causality. Keep microbatch 512 disabled for this candidate.
 
+The [packed-radix follow-up](../packed/README.md) reduces synthetic bulk matmul time further. It has no trained replay result yet.
+
 Evidence: [native ABBA](native-abba.csv), [operator ABBA](operator-abba.csv), [native metrics](native-results.json), [checksums](evidence.sha256).
