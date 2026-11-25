@@ -780,6 +780,7 @@ struct vk_device_struct {
     bool integer_dot_unsigned {};
     // 0: default, 1: force mmvq, -1: disable mmvq
     int32_t mmvq_mode;
+    bool ptq1_mmvq {};
 
     bool subgroup_size_control;
     uint32_t subgroup_min_size;
