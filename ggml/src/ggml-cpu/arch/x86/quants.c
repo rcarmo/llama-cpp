@@ -585,6 +585,34 @@ static inline uint16_t decode_ptq1_0_2(const uint8_t * qs, uint16_t pow3) {
 }
 #endif
 
+// Adapted from PrismML-Eng03ec600: direct AVX2 radix3 decoding; preserve scalar FP order.
+#if (defined(__AVX512VNNI__) && defined(__AVX512VL__)) || defined(__AVXVNNI__)
+static inline __m256i ptq1_0_mul_u8(__m256i x, __m256i c) {
+    const __m256i lo = _mm256_and_si256(_mm256_mullo_epi16(x, c), _mm256_set1_epi16(0x00FF));
+    const __m256i hi = _mm256_mullo_epi16(_mm256_and_si256(x, _mm256_set1_epi16((short) 0xFF00)), c);
+    return _mm256_or_si256(lo, hi);
+}
+
+// trit (3*v)>>8 in {0,1,2}: unsigned v >= 86 and v >= 171 as signed compares of v ^ 0x80 (masks are -1)
+static inline __m256i ptq1_0_trit(__m256i v) {
+    const __m256i vs = _mm256_xor_si256(v, _mm256_set1_epi8((char) 0x80));
+    const __m256i m1 = _mm256_cmpgt_epi8(vs, _mm256_set1_epi8((char) (85 ^ 0x80)));
+    const __m256i m2 = _mm256_cmpgt_epi8(vs, _mm256_set1_epi8((char) (170 ^ 0x80)));
+    return _mm256_sub_epi8(_mm256_setzero_si256(), _mm256_add_epi8(m1, m2));
+}
+
+// sum((t-1)*y) in 8 int32 lanes
+static inline __m256i ptq1_0_dot(__m256i t, __m256i y) {
+#if defined(GGML_DPBUSD_256)
+    return _mm256_sub_epi32(GGML_DPBUSD_256(_mm256_setzero_si256(), t, y),
+                            GGML_DPBUSD_256(_mm256_setzero_si256(), _mm256_set1_epi8(1), y));
+#else
+    const __m256i s16 = _mm256_sub_epi16(_mm256_maddubs_epi16(t, y), _mm256_maddubs_epi16(_mm256_set1_epi8(1), y));
+    return _mm256_madd_epi16(s16, _mm256_set1_epi16(1));
+#endif
+}
+#endif
+
 void ggml_vec_dot_q2_0_g128_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, size_t bx, const void * GGML_RESTRICT vy, size_t by, int nrc) {
     const int qk = QK2_0_G128;
     const int nb = n / qk;
@@ -670,35 +698,42 @@ void ggml_vec_dot_ptq1_0_q8_0(int n, float * GGML_RESTRICT s, size_t bs, const v
     const block_q8_0   * GGML_RESTRICT y = vy;
 
 #if (defined(__AVX512VNNI__) && defined(__AVX512VL__)) || defined(__AVXVNNI__)
-    static const uint16_t pow3[5] = {1, 3, 9, 27, 81};
-    const __m256i ones = _mm256_set1_epi8(1);
+
+    // powers of 3 per 16-bit lane, one vector per q8_0 sub-block (see the AVX-512 path for the layout)
+    const __m256i c0 = _mm256_setr_epi16( 1,  1,  1,  1,  1,  1,  1,  1,  3,  3,  3,  3,  3,  3,  3,  3);
+    const __m256i c1 = _mm256_setr_epi16( 9,  9,  9,  9,  9,  9,  9,  9, 27, 27, 27, 27, 27, 27, 27, 27);
+    const __m256i c2 = _mm256_setr_epi16(81, 81, 81, 81, 81, 81, 81, 81,  1,  1,  1,  1,  3,  3,  3,  3);
+    const __m256i c3 = _mm256_setr_epi16( 9,  9,  9,  9, 27, 27, 27, 27, 81, 81, 81, 81,  1,  3,  9, 27);
+    // sources of sub-blocks 2 and 3 (block bytes 12..27: qs[16..23] at 4..11, qh at 12..13)
+    const __m256i sh2 = _mm256_setr_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                         4, 5, 6, 7, 8, 9, 10, 11, 4, 5, 6, 7, 8, 9, 10, 11);
+    const __m256i sh3 = _mm256_setr_epi8(4, 5, 6, 7, 8, 9, 10, 11, 4, 5, 6, 7, 8, 9, 10, 11,
+                                         4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 12, 13, 12, 13, 12, 13);
+
     float sumf = 0.0f;
+    for (int i = 0; i < nb; i++) {
+        const uint8_t * GGML_RESTRICT xb = (const uint8_t *) &x[i];
+        const __m128i a = _mm_loadu_si128((const __m128i *) xb);
+        const __m128i b = _mm_loadu_si128((const __m128i *) (xb + 12));
+        const __m256i aa = _mm256_broadcastsi128_si256(a);
+        const __m256i ab = _mm256_shuffle_epi8(_mm256_inserti128_si256(_mm256_castsi128_si256(a), b, 1), sh2);
+        const __m256i bb = _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(b), sh3);
 
-    for (int i = 0; i < nb; ++i) {
-        uint8_t codes[QK_PTQ1_0];
-        for (int digit = 0; digit < 5; ++digit) {
-            _mm_storeu_si128((__m128i *) &codes[digit * 16], decode_ptq1_0_16(x[i].qs, pow3[digit]));
-            _mm_storel_epi64((__m128i *) &codes[80 + digit * 8], decode_ptq1_0_8(x[i].qs + 16, pow3[digit]));
-        }
-        for (int digit = 0; digit < 4; ++digit) {
-            const uint16_t pair = decode_ptq1_0_2(x[i].qh, pow3[digit]);
-            memcpy(&codes[120 + digit * 2], &pair, sizeof(pair));
-        }
-
+        const block_q8_0 * GGML_RESTRICT yb = &y[4*i];
         const float d0 = GGML_CPU_FP16_TO_FP32(x[i].d);
+        const __m256i p0 = ptq1_0_dot(ptq1_0_trit(ptq1_0_mul_u8(aa, c0)), _mm256_loadu_si256((const __m256i *) yb[0].qs));
+        const __m256i p1 = ptq1_0_dot(ptq1_0_trit(ptq1_0_mul_u8(aa, c1)), _mm256_loadu_si256((const __m256i *) yb[1].qs));
+        const __m256i p2 = ptq1_0_dot(ptq1_0_trit(ptq1_0_mul_u8(ab, c2)), _mm256_loadu_si256((const __m256i *) yb[2].qs));
+        const __m256i p3 = ptq1_0_dot(ptq1_0_trit(ptq1_0_mul_u8(bb, c3)), _mm256_loadu_si256((const __m256i *) yb[3].qs));
         float sumi = 0.0f;
-        for (int k = 0; k < 4; ++k) {
-            const block_q8_0 * GGML_RESTRICT yb = &y[i * 4 + k];
-            const __m256i code = _mm256_loadu_si256((const __m256i *) &codes[k * 32]);
-            const __m256i qy = _mm256_loadu_si256((const __m256i *) yb->qs);
-            const int dp = hsum_i32_8(GGML_DPBUSD_256(_mm256_setzero_si256(), code, qy));
-            const int sy = hsum_i32_8(GGML_DPBUSD_256(_mm256_setzero_si256(), ones, qy));
-            sumi += GGML_CPU_FP16_TO_FP32(yb->d) * (float) (dp - sy);
-        }
+        sumi += GGML_CPU_FP16_TO_FP32(yb[0].d) * (float) hsum_i32_8(p0);
+        sumi += GGML_CPU_FP16_TO_FP32(yb[1].d) * (float) hsum_i32_8(p1);
+        sumi += GGML_CPU_FP16_TO_FP32(yb[2].d) * (float) hsum_i32_8(p2);
+        sumi += GGML_CPU_FP16_TO_FP32(yb[3].d) * (float) hsum_i32_8(p3);
         sumf += d0 * sumi;
     }
-
     *s = sumf;
+
 #else
     ggml_vec_dot_ptq1_0_q8_0_generic(n, s, bs, vx, bx, vy, by, nrc);
 #endif

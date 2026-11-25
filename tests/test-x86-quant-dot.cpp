@@ -1,9 +1,11 @@
 #include "ggml-cpu.h"
 #include "ggml.h"
 #include "quants.h"
+#include "ggml-quants.h"
 
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 static float frand(int i) {
@@ -175,12 +177,96 @@ static int test_tq2_f32_dot() {
     return 0;
 }
 
+static unsigned ptq1_raw_rng(unsigned & s) {
+    s ^= s << 13;
+    s ^= s >> 17;
+    s ^= s << 5;
+    return s;
+}
+
+static int test_ptq1_raw_basis() {
+    block_ptq1_0 x = {};
+    block_q8_0 y[4] = {};
+    x.d = ggml_fp32_to_fp16(1);
+    for (auto & b : y) b.d = ggml_fp32_to_fp16(1);
+    float decoded[128];
+    unsigned long checks = 0;
+    for (int byte = 0; byte < 26; ++byte) {
+        for (int value = 0; value < 256; ++value) {
+            std::memset(x.qs, 0, sizeof(x.qs));
+            std::memset(x.qh, 0, sizeof(x.qh));
+            if (byte < 24) {
+                x.qs[byte] = value;
+            } else {
+                x.qh[byte - 24] = value;
+            }
+            dequantize_row_ptq1_0(&x, decoded, 128);
+            for (int lane = 0; lane < 128; ++lane) {
+                for (int activation : {-128, -127, 127}) {
+                    y[lane / 32].qs[lane % 32] = activation;
+                    float got;
+                    ggml_vec_dot_ptq1_0_q8_0(128, &got, 0, &x, 0, y, 0, 1);
+                    y[lane / 32].qs[lane % 32] = 0;
+                    if (got != decoded[lane] * activation) {
+                        std::fprintf(stderr, "basis mismatch byte=%d value=%d lane=%d y=%d got=%g expected=%g\n", byte, value, lane, activation, got, decoded[lane] * activation);
+                        return 1;
+                    }
+                    ++checks;
+                }
+            }
+        }
+    }
+    std::printf("PASS raw radix3 basis checks=%lu (all packed bytes, lanes, signed extrema)\n", checks);
+    return 0;
+}
+
+static int test_ptq1_raw_parity() {
+    unsigned s = 91827;
+    for (int n : {128, 256, 4096, 5120, 8192, 17408}) {
+        std::vector<block_ptq1_0> x(n / 128);
+        std::vector<block_q8_0> y(n / 32);
+        for (int seed = 0; seed < 64; ++seed) {
+            for (auto & b : x) {
+                for (auto & q : b.qs) {
+                    q = ptq1_raw_rng(s);
+                }
+                for (auto & q : b.qh) {
+                    q = ptq1_raw_rng(s);
+                }
+                b.d = ggml_fp32_to_fp16(0.005f + (ptq1_raw_rng(s) % 100) * 0.003f);
+            }
+            for (auto & b : y) {
+                for (auto & q : b.qs) {
+                    q = (int) (ptq1_raw_rng(s) % 256) - 128;
+                }
+                b.d = ggml_fp32_to_fp16(0.005f + (ptq1_raw_rng(s) % 100) * 0.003f);
+            }
+            float got, ref;
+            ggml_vec_dot_ptq1_0_q8_0(n, &got, 0, x.data(), 0, y.data(), 0, 1);
+            ggml_vec_dot_ptq1_0_q8_0_generic(n, &ref, 0, x.data(), 0, y.data(), 0, 1);
+            const float tolerance = 1e-6f * std::fmax(1.0f, std::fabs(ref));
+            if (!std::isfinite(got) || std::fabs(got - ref) > tolerance) {
+                std::fprintf(stderr, "random parity mismatch n=%d seed=%d got=%g ref=%g tolerance=%g\n", n, seed, got, ref, tolerance);
+                return 1;
+            }
+        }
+    }
+    std::puts("PASS 384 raw-code random dot cases, including 5120/17408; existing 1e-6 tolerance unchanged");
+    return 0;
+}
+
 int main() {
     ggml_cpu_init();
     if (int rc = test_iq4_nl_codes()) {
         return rc;
     }
     if (int rc = test_tq2_f32_dot()) {
+        return rc;
+    }
+    if (int rc = test_ptq1_raw_basis()) {
+        return rc;
+    }
+    if (int rc = test_ptq1_raw_parity()) {
         return rc;
     }
     if (int rc = test_ptq1_dot_parity()) {
